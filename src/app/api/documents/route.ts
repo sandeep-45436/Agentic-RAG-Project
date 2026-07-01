@@ -1,0 +1,76 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
+import { db } from "@/server/db/prisma";
+import { syncUserToDatabase } from "@/server/actions/auth";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(req: Request) {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    let membership = await db.membership.findFirst({ where: { userId: user.id } });
+    if (!membership) {
+      await syncUserToDatabase();
+      membership = await db.membership.findFirst({ where: { userId: user.id } });
+      if (!membership) return NextResponse.json({ error: "No organization found" }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const status   = searchParams.get("status");   // COMPLETED | PROCESSING | FAILED | DELETED
+    const search   = searchParams.get("search") ?? "";
+    const page     = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
+    const pageSize = Math.min(50, Math.max(1, parseInt(searchParams.get("pageSize") ?? "10")));
+
+    const where: any = {
+      organizationId: membership.organizationId,
+      ...(status === "DELETED"
+        ? { deletedAt: { not: null } }
+        : { deletedAt: null }),
+    };
+
+    if (status && status !== "DELETED") {
+      where.processingStatus = status;
+    }
+    if (search) {
+      where.fileName = { contains: search, mode: "insensitive" };
+    }
+
+    const [documents, total, totalStorage] = await Promise.all([
+      db.document.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        select: {
+          id: true,
+          fileName: true,
+          fileSize: true,
+          fileType: true,
+          processingStatus: true,
+          createdAt: true,
+          uploadedBy: true,
+          knowledgeBaseId: true,
+          knowledgeBase: { select: { name: true } },
+          _count: { select: { chunks: { where: { deletedAt: null } } } },
+        },
+      }),
+      db.document.count({ where }),
+      db.document.aggregate({
+        where: { organizationId: membership.organizationId, deletedAt: null },
+        _sum: { fileSize: true },
+      }),
+    ]);
+
+    return NextResponse.json({
+      documents,
+      pagination: { page, pageSize, total, pages: Math.ceil(total / pageSize) },
+      totalStorageBytes: totalStorage._sum.fileSize ?? 0,
+    });
+  } catch (error: any) {
+    console.error("GET /api/documents error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

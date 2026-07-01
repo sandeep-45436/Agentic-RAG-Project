@@ -1,0 +1,289 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum ProcessingStatus {
+  UPLOADED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum UsageType {
+  CHAT
+  EMBEDDING
+  RETRIEVAL
+  GRAPH_QUERY
+  AGENT_EXECUTION
+}
+
+model Organization {
+  id        String    @id @default(uuid())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  memberships       Membership[]
+  knowledgeBases    KnowledgeBase[]
+  documents         Document[]
+  chunks            Chunk[]
+  agents            Agent[]
+  conversations     Conversation[]
+  messages          Message[]
+  usageEvents       UsageEvent[]
+  usageAggregations UsageAggregation[]
+  planLimits        PlanLimits?
+  apiKeys           ApiKey[]
+
+  @@index([deletedAt])
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  memberships   Membership[]
+  conversations Conversation[]
+
+  @@index([deletedAt])
+}
+
+model Membership {
+  id             String    @id @default(uuid())
+  userId         String
+  organizationId String
+  role           Role      @default(MEMBER)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  // Relations
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId, deletedAt])
+}
+
+model KnowledgeBase {
+  id             String    @id @default(uuid())
+  name           String
+  description    String?
+  organizationId String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  documents    Document[]
+  agents       Agent[]
+
+  @@index([organizationId, deletedAt])
+}
+
+model Document {
+  id               String           @id @default(uuid())
+  fileName         String
+  fileType         String           @default("application/pdf")
+  fileSize         Int              @default(0)
+  storagePath      String
+  processingStatus ProcessingStatus @default(UPLOADED)
+  uploadedBy       String?
+  content          String?          @db.Text
+  knowledgeBaseId  String?
+  organizationId   String
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  deletedAt        DateTime?
+
+  // Relations
+  knowledgeBase KnowledgeBase? @relation(fields: [knowledgeBaseId], references: [id], onDelete: SetNull)
+  organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  chunks        Chunk[]
+
+  @@index([organizationId, knowledgeBaseId, deletedAt])
+}
+
+model Chunk {
+  id             String    @id @default(uuid())
+  content        String    @db.Text
+  chunkIndex     Int
+  tokenCount     Int
+  metadata       Json?
+  documentId     String
+  organizationId String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  // Relations
+  document     Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, documentId, deletedAt])
+}
+
+model Agent {
+  id              String    @id @default(uuid())
+  name            String
+  prompt          String    @db.Text
+  knowledgeBaseId String?
+  organizationId  String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  // Relations
+  knowledgeBase KnowledgeBase? @relation(fields: [knowledgeBaseId], references: [id], onDelete: SetNull)
+  organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, deletedAt])
+}
+
+model Conversation {
+  id             String    @id @default(uuid())
+  title          String?
+  userId         String
+  organizationId String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  // Relations
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  messages     Message[]
+
+  @@index([organizationId, userId, deletedAt])
+}
+
+model Message {
+  id             String      @id @default(uuid())
+  role           MessageRole
+  content        String      @db.Text
+  citations      Json?
+  metadata       Json?
+  conversationId String
+  organizationId String
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  deletedAt      DateTime?
+
+  // Relations
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, conversationId, deletedAt])
+}
+
+model UsageEvent {
+  id String @id @default(uuid())
+
+  organizationId String
+  userId         String?
+
+  type UsageType
+
+  model String?
+
+  tokensInput  Int?
+  tokensOutput Int?
+
+  embeddingTokens Int?
+
+  latencyMs Int?
+
+  estimatedCost Float?
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, type, createdAt])
+}
+
+model UsageAggregation {
+  id             String @id @default(uuid())
+  organizationId String
+
+  period String // e.g., '2023-10' or '2023-10-15'
+
+  totalInputTokens     Int @default(0)
+  totalOutputTokens    Int @default(0)
+  totalEmbeddingTokens Int @default(0)
+
+  totalCost Float @default(0.0)
+
+  retrievalCount Int @default(0)
+  messagesCount  Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, period])
+  @@index([organizationId])
+}
+
+model PlanLimits {
+  id             String @id @default(uuid())
+  organizationId String @unique
+
+  messagesPerMonth  Int    @default(1000)
+  embeddingQuota    Int    @default(50000)
+  documentQuota     Int    @default(50)
+  storageQuotaBytes BigInt @default(536870912) // 512MB default
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model ApiKey {
+  id             String    @id @default(uuid())
+  name           String
+  key            String    @unique // In production, store a hashed version
+  organizationId String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+  lastUsedAt     DateTime?
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, deletedAt])
+  @@index([key])
+}

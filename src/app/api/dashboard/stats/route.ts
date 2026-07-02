@@ -6,6 +6,7 @@ import { syncUserToDatabase } from "@/server/actions/auth";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  let orgIdForLog: string | null = null;
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -19,6 +20,7 @@ export async function GET() {
     }
 
     const { organizationId } = membership;
+    orgIdForLog = organizationId;
     const now = new Date();
 
     // Date helpers
@@ -197,6 +199,20 @@ export async function GET() {
     });
   } catch (error: any) {
     console.error("Dashboard stats error:", error);
+    try {
+      const { AuditService } = require("@/server/services/audit");
+      const fallbackOrg = await db.organization.findFirst();
+      await AuditService.logEvent({
+        orgId: orgIdForLog || fallbackOrg?.id || "system",
+        action: "DASHBOARD_STATS_ERROR",
+        metadata: {
+          message: error.message || String(error),
+          stack: error.stack || null,
+        }
+      });
+    } catch (dbLogErr) {
+      console.error("Failed to write stats error to AuditLog:", dbLogErr);
+    }
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

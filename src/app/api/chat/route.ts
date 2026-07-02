@@ -6,6 +6,7 @@ import { streamText } from "ai";
 import { appGraph } from "@/ai/graph/workflow";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { getMessageText } from "@/lib/utils";
+import { validateApiKeyRequest } from "@/server/utils/api-key-auth";
 
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -14,20 +15,36 @@ const openrouter = createOpenAI({
 
 export async function POST(req: Request) {
   try {
+    let organizationId: string | null = null;
+    let userId: string | null = null;
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return new Response("Unauthorized", { status: 401 });
+
+    if (user) {
+      userId = user.id;
+      let membership = await db.membership.findFirst({ where: { userId: user.id } });
+      if (!membership) {
+        await syncUserToDatabase();
+        membership = await db.membership.findFirst({ where: { userId: user.id } });
+      }
+      if (membership) {
+        organizationId = membership.organizationId;
+      }
+    } else {
+      // Fallback to API Key authentication
+      const apiKeyAuth = await validateApiKeyRequest(req);
+      if (apiKeyAuth) {
+        organizationId = apiKeyAuth.organizationId;
+      }
+    }
+
+    if (!organizationId) {
+      return new Response("Unauthorized", { status: 401 });
+    }
 
     const { messages, conversationId } = await req.json();
     console.log("POST /api/chat messages:", JSON.stringify(messages, null, 2));
-
-    let membership = await db.membership.findFirst({ where: { userId: user.id } });
-    if (!membership) {
-      await syncUserToDatabase();
-      membership = await db.membership.findFirst({ where: { userId: user.id } });
-      if (!membership) return new Response("No organization found", { status: 403 });
-    }
-    const organizationId = membership.organizationId;
 
     const latestMessage = messages[messages.length - 1];
     const userQuery = getMessageText(latestMessage);
@@ -41,7 +58,7 @@ export async function POST(req: Request) {
     const finalState = await appGraph.invoke({
       messages,
       organizationId,
-      userId: user.id,
+      userId: userId || "api_key_auth",
     });
 
     const systemPrompt = finalState.finalPrompt;

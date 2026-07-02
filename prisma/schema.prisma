@@ -277,6 +277,7 @@ model ApiKey {
   id             String    @id @default(uuid())
   name           String
   key            String    @unique // In production, store a hashed version
+  preview        String?
   organizationId String
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt

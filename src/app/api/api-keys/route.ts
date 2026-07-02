@@ -4,6 +4,7 @@ import { db } from "@/server/db/prisma";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { randomBytes } from "crypto";
 import { AuditService } from "@/server/services/audit";
+import { hashApiKey } from "@/server/utils/api-key-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -26,17 +27,17 @@ export async function GET() {
       select: {
         id: true,
         name: true,
-        key: true,
+        preview: true,
         createdAt: true,
         lastUsedAt: true,
       },
     });
 
-    // Only expose a preview (first 8 + last 4 chars)
+    // Only expose a preview
     const sanitized = keys.map((k) => ({
       id: k.id,
       name: k.name,
-      keyPreview: k.key.slice(0, 8) + "..." + k.key.slice(-4),
+      keyPreview: k.preview || "ai_live_xxxx...xxxx",
       createdAt: k.createdAt,
       lastUsedAt: k.lastUsedAt,
     }));
@@ -63,13 +64,16 @@ export async function POST(req: Request) {
     const { name } = await req.json();
     if (!name?.trim()) return NextResponse.json({ error: "Name is required" }, { status: 400 });
 
-    // Generate a secure random key
-    const rawKey = "sk-" + randomBytes(32).toString("hex");
+    // Generate a secure random key with 'ai_live_' prefix
+    const rawKey = "ai_live_" + randomBytes(24).toString("hex");
+    const preview = rawKey.slice(0, 12) + "..." + rawKey.slice(-4);
+    const hashedKey = hashApiKey(rawKey);
 
     const apiKey = await db.apiKey.create({
       data: {
         name: name.trim(),
-        key: rawKey,
+        key: hashedKey,
+        preview: preview,
         organizationId: membership.organizationId,
       },
     });
@@ -96,7 +100,7 @@ export async function POST(req: Request) {
         id: apiKey.id,
         name: apiKey.name,
         key: rawKey, // shown once
-        keyPreview: rawKey.slice(0, 8) + "..." + rawKey.slice(-4),
+        keyPreview: preview,
         createdAt: apiKey.createdAt,
         lastUsedAt: null,
       },

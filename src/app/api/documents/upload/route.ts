@@ -3,30 +3,38 @@ import { createClient } from "@/utils/supabase/server";
 import { db } from "@/server/db/prisma";
 import { DocumentService } from "@/server/services/document.service";
 import { syncUserToDatabase } from "@/server/actions/auth";
+import { validateApiKeyRequest } from "@/server/utils/api-key-auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    let organizationId: string | null = null;
+    let userId: string | null = null;
 
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      userId = user.id;
+      let membership = await db.membership.findFirst({ where: { userId: user.id } });
+      if (!membership) {
+        await syncUserToDatabase();
+        membership = await db.membership.findFirst({ where: { userId: user.id } });
+      }
+      if (membership) {
+        organizationId = membership.organizationId;
+      }
+    } else {
+      // Fallback to API Key authentication
+      const apiKeyAuth = await validateApiKeyRequest(request);
+      if (apiKeyAuth) {
+        organizationId = apiKeyAuth.organizationId;
+      }
     }
 
-    let membership = await db.membership.findFirst({
-      where: { userId: user.id },
-    });
-
-    if (!membership) {
-      await syncUserToDatabase();
-      membership = await db.membership.findFirst({
-        where: { userId: user.id },
-      });
-      if (!membership) {
-        return NextResponse.json({ error: "No organization found" }, { status: 403 });
-      }
+    if (!organizationId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const formData = await request.formData();
@@ -43,8 +51,8 @@ export async function POST(request: Request) {
     // Save the file to Supabase Storage + create DB record
     const document = await DocumentService.uploadDocument(
       file,
-      membership.organizationId,
-      user.id
+      organizationId,
+      userId || "api_key_auth"
     );
 
     // Read buffer before the response closes
@@ -56,7 +64,7 @@ export async function POST(request: Request) {
     DocumentService.processDocumentAsync(
       document.id,
       fileBuffer,
-      membership.organizationId,
+      organizationId,
       document.knowledgeBaseId || undefined,
       document.fileName
     ).catch((err) => {

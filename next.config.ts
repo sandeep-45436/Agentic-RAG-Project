@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   // Keep these packages as CommonJS requires — don't bundle them
   serverExternalPackages: [
     "pdf-parse",
-    "pdf-parse/dist/pdf-parse/cjs/index.cjs",
     "@langchain/community",
     "tiktoken",
     "neo4j-driver",

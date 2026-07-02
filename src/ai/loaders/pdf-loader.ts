@@ -7,20 +7,9 @@ export const splitter = new RecursiveCharacterTextSplitter({
 
 export async function extractTextFromPdf(buffer: Buffer): Promise<string> {
   try {
-    // Use require() with exact CJS path to bypass Next.js/Turbopack bundling.
-    // pdf-parse v2.x requires a class instantiation pattern.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfModule = require("pdf-parse/dist/pdf-parse/cjs/index.cjs");
-    const PDFParse = pdfModule.PDFParse;
-
-    const parser = new PDFParse({
-      data: buffer,
-      verbosity: 0,
-      // Remove the "-- N of M --" page separator injected by default
-      pageJoiner: "\n",
-    });
-
-    const result = await parser.getText();
+    // Use require() to load pdf-parse v1.1.1 (bypass Next.js/Turbopack bundling)
+    const pdf = require("pdf-parse");
+    const result = await pdf(buffer);
     let text: string = result.text ?? "";
     text = text.replace(/\n+/g, "\n").replace(/ +/g, " ").trim();
     return text;

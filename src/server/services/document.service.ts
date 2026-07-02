@@ -7,6 +7,7 @@ import { VectorService, VectorPayload } from "./vector.service";
 import { GraphExtractionService } from "./graph-extraction.service";
 import { v4 as uuidv4 } from "uuid";
 import tiktoken from "tiktoken";
+import { AuditService } from "./audit";
 
 export class DocumentService {
   /**
@@ -60,6 +61,19 @@ export class DocumentService {
         knowledgeBaseId, // Optional KB relation
         uploadedBy,
         processingStatus: "PROCESSING",
+      },
+    });
+
+    // Log the upload event
+    await AuditService.logEvent({
+      orgId: organizationId,
+      userId: uploadedBy,
+      action: "DOCUMENT_UPLOAD",
+      metadata: {
+        documentId: document.id,
+        fileName: document.fileName,
+        fileSize: document.fileSize,
+        knowledgeBaseId,
       },
     });
     
@@ -165,12 +179,39 @@ export class DocumentService {
       });
       log("✅ Processing COMPLETED");
 
+      // Log success event
+      const doc = await db.document.findUnique({ where: { id: documentId } });
+      await AuditService.logEvent({
+        orgId: organizationId,
+        userId: doc?.uploadedBy,
+        action: "DOCUMENT_PROCESSING_COMPLETED",
+        metadata: {
+          documentId,
+          fileName: fileName || doc?.fileName,
+          chunksCount: chunks.length,
+        },
+      });
+
     } catch (error: any) {
       console.error(`[DocProcess:${documentId.slice(0,8)}] ❌ FAILED:`, error?.message ?? error);
       await db.document.update({
         where: { id: documentId },
         data: { processingStatus: "FAILED" },
       });
+
+      // Log failure event
+      const doc = await db.document.findUnique({ where: { id: documentId } });
+      await AuditService.logEvent({
+        orgId: organizationId,
+        userId: doc?.uploadedBy,
+        action: "DOCUMENT_PROCESSING_FAILED",
+        metadata: {
+          documentId,
+          fileName: fileName || doc?.fileName,
+          error: error?.message || String(error),
+        },
+      });
+
       throw error;
     }
   }

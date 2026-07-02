@@ -53,6 +53,7 @@ model Organization {
   usageAggregations UsageAggregation[]
   planLimits        PlanLimits?
   apiKeys           ApiKey[]
+  auditLogs         AuditLog[]
 
   @@index([deletedAt])
 }
@@ -68,6 +69,7 @@ model User {
   // Relations
   memberships   Membership[]
   conversations Conversation[]
+  auditLogs     AuditLog[]
 
   @@index([deletedAt])
 }
@@ -286,4 +288,22 @@ model ApiKey {
 
   @@index([organizationId, deletedAt])
   @@index([key])
+}
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  organizationId String
+  userId         String?
+  action         String   // e.g. 'DOCUMENT_UPLOAD', 'MEMBER_INVITED', 'API_KEY_CREATED'
+  ipAddress      String?
+  userAgent      String?
+  metadata       Json?    // Context payload
+  createdAt      DateTime @default(now())
+
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([createdAt])
 }

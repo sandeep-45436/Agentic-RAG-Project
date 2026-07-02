@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { db } from "@/server/db/prisma";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { randomBytes } from "crypto";
+import { AuditService } from "@/server/services/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -70,6 +71,22 @@ export async function POST(req: Request) {
         name: name.trim(),
         key: rawKey,
         organizationId: membership.organizationId,
+      },
+    });
+
+    // Log the API key creation event
+    const userAgent = req.headers.get("user-agent");
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || null;
+
+    await AuditService.logEvent({
+      orgId: membership.organizationId,
+      userId: user.id,
+      action: "API_KEY_CREATED",
+      ip,
+      userAgent,
+      metadata: {
+        keyId: apiKey.id,
+        name: apiKey.name,
       },
     });
 

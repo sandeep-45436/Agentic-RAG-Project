@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { db } from "@/server/db/prisma";
+import { AuditService } from "@/server/services/audit";
 
 export const dynamic = "force-dynamic";
 
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -23,6 +24,22 @@ export async function DELETE(
     if (!key) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     await db.apiKey.update({ where: { id }, data: { deletedAt: new Date() } });
+
+    // Log the API key deletion event
+    const userAgent = req.headers.get("user-agent");
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || null;
+
+    await AuditService.logEvent({
+      orgId: membership.organizationId,
+      userId: user.id,
+      action: "API_KEY_DELETED",
+      ip,
+      userAgent,
+      metadata: {
+        keyId: id,
+        name: key.name,
+      },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

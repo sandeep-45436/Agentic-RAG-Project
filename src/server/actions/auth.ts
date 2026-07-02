@@ -2,6 +2,8 @@
 
 import { db } from "@/server/db/prisma";
 import { createClient } from "@/utils/supabase/server";
+import { AuditService } from "@/server/services/audit";
+import { headers } from "next/headers";
 
 export async function syncUserToDatabase() {
   try {
@@ -12,11 +14,17 @@ export async function syncUserToDatabase() {
       return { success: false, error: "Not authenticated" };
     }
 
+    const reqHeaders = await headers();
+    const userAgent = reqHeaders.get("user-agent");
+    const ip = reqHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() || reqHeaders.get("x-real-ip") || null;
+
     // Check if user already exists in Prisma database
     let dbUser = await db.user.findUnique({
       where: { id: user.id },
       include: { memberships: true },
     });
+
+    const isNewUser = !dbUser;
 
     if (!dbUser) {
       // 1. Create the user
@@ -30,8 +38,10 @@ export async function syncUserToDatabase() {
       });
     }
 
+    let targetOrgId = dbUser.memberships[0]?.organizationId;
+
     // Ensure they have at least one membership
-    if (dbUser.memberships.length === 0) {
+    if (!targetOrgId) {
       // 2. Create a default organization for them
       const org = await db.organization.create({
         data: {
@@ -47,7 +57,22 @@ export async function syncUserToDatabase() {
           role: "OWNER",
         },
       });
+
+      targetOrgId = org.id;
     }
+
+    // Log the authentication event
+    await AuditService.logEvent({
+      orgId: targetOrgId,
+      userId: dbUser.id,
+      action: isNewUser ? "USER_SIGNUP" : "USER_LOGIN",
+      ip,
+      userAgent,
+      metadata: {
+        email: dbUser.email,
+        name: dbUser.name,
+      },
+    });
 
     return { success: true };
   } catch (err) {

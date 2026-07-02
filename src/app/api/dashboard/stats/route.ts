@@ -6,6 +6,17 @@ import { syncUserToDatabase } from "@/server/actions/auth";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const missingEnvs: string[] = [];
+  if (!process.env.DATABASE_URL) missingEnvs.push("DATABASE_URL");
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) missingEnvs.push("NEXT_PUBLIC_SUPABASE_URL");
+  if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) missingEnvs.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+
+  if (missingEnvs.length > 0) {
+    return NextResponse.json({
+      error: `Missing environment variable(s) on Vercel: ${missingEnvs.join(", ")}. Please configure them in your Vercel Project Settings and redeploy.`
+    }, { status: 500 });
+  }
+
   let orgIdForLog: string | null = null;
   try {
     const supabase = await createClient();
@@ -213,6 +224,6 @@ export async function GET() {
     } catch (dbLogErr) {
       console.error("Failed to write stats error to AuditLog:", dbLogErr);
     }
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
   }
 }

@@ -168,24 +168,49 @@ const STORAGE_COLORS = ["#6366f1", "#3b82f6", "#22c55e", "#f59e0b"];
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [chartRange, setChartRange] = useState<"30d" | "7d">("30d");
 
   const load = useCallback(() => {
     setLoading(true);
+    setError(null);
     fetch("/api/dashboard/stats")
-      .then((r) => r.json())
-      .then((d) => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then(async (r) => {
+        const contentType = r.headers.get("content-type");
+        if (contentType && contentType.includes("text/html")) {
+          // Redirected to login page (unauthorized)
+          window.location.href = "/login";
+          return null;
+        }
+        if (!r.ok) {
+          const errData = await r.json().catch(() => ({}));
+          throw new Error(errData.error || `HTTP error ${r.status}`);
+        }
+        return r.json();
+      })
+      .then((d) => {
+        if (!d) return;
+        if (d.error) {
+          throw new Error(d.error);
+        }
+        setData(d);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Dashboard load failed:", err);
+        setError(err.message || "Failed to load dashboard data");
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => { load(); }, [load]);
 
   const chartData =
-    chartRange === "7d" && data
+    chartRange === "7d" && data?.tokenChart
       ? data.tokenChart.slice(-7)
       : data?.tokenChart ?? [];
 
-  const storageDonut = data
+  const storageDonut = data?.storage
     ? [
         { name: "Documents", value: data.storage.docBytes },
         { name: "Embeddings", value: data.storage.embeddingBytes },
@@ -194,9 +219,9 @@ export default function DashboardPage() {
       ]
     : [];
 
-  const storagePct = data
+  const storagePct = data?.storage
     ? Math.min(
-        ((data.storage.totalBytes / data.storage.limitBytes) * 100).toFixed(1) as unknown as number,
+        Number(((data.storage.totalBytes / data.storage.limitBytes) * 100).toFixed(1)),
         100
       )
     : 0;
@@ -209,6 +234,23 @@ export default function DashboardPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+        <div className="bg-[#1a1f2e] border border-red-500/20 rounded-2xl p-8 max-w-md text-center shadow-xl">
+          <h2 className="text-lg font-semibold text-red-400 mb-2">Connection Issue</h2>
+          <p className="text-sm text-gray-300 mb-6">{error}</p>
+          <button
+            onClick={load}
+            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 text-sm font-medium transition-colors shadow-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const s = data?.stats;
 
   return (
@@ -217,7 +259,7 @@ export default function DashboardPage() {
       <div className="flex items-start justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-white">
-            {greeting()}, {data?.user.name} 👋
+            {greeting()}, {data?.user?.name || "User"} 👋
           </h1>
           <p className="text-sm text-gray-400 mt-1">
             Here's what's happening with your workspace today.

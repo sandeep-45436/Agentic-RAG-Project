@@ -8,9 +8,10 @@ import {
   Settings2,
   FileText,
   LogOut,
-  Box,
+  Sparkles,
   BarChart2,
   MessageSquare,
+  Search,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -35,6 +36,7 @@ const data = {
     { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },
     { title: "Agents", url: "/agents", icon: Bot },
     { title: "Analytics", url: "/analytics", icon: BarChart2 },
+    { title: "Retrieval Debug", url: "/retrieval-debug", icon: Search },
     { title: "Settings", url: "/settings", icon: Settings2 },
   ],
 };
@@ -56,12 +58,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" render={<Link href="/" />} className="hover:bg-muted transition-colors rounded-md">
-              <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-foreground text-background">
-                <Box className="size-4" />
+              <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-gradient-to-br from-primary to-cyan-500 text-white shadow-soft">
+                <Sparkles className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight ml-2">
-                <span className="truncate font-bold">AI Foundation</span>
-                <span className="truncate text-xs text-muted-foreground font-medium">Free Plan</span>
+                <span className="truncate font-bold">NexusIQ</span>
+                <span className="truncate text-xs text-muted-foreground font-medium">Enterprise RAG</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

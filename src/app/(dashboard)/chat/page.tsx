@@ -10,8 +10,18 @@ import {
   FileText, ThumbsUp, ThumbsDown, Copy, RotateCcw,
   MoreHorizontal, Paperclip, AtSign, Command, Share2,
   ChevronRight, Bot,
+  Bug, Eye, EyeOff, Clock, BarChart3,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -26,6 +36,12 @@ interface Chunk {
   chunkText: string;
   score: number | null;
   chunkIndex: number;
+}
+
+interface DebugChunk extends Chunk {
+  vectorScore?: number | null;
+  bm25Score?: number | null;
+  fusionScore?: number | null;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -46,6 +62,150 @@ function fmtTime(iso: string) {
 
 function copyText(text: string) {
   navigator.clipboard.writeText(text).catch(() => {});
+}
+
+function getConfidenceLevel(score: number): "high" | "medium" | "low" {
+  const pct = score * 100;
+  if (pct >= 70) return "high";
+  if (pct >= 40) return "medium";
+  return "low";
+}
+
+function confidenceBarColor(level: "high" | "medium" | "low") {
+  switch (level) {
+    case "high": return "bg-emerald-500";
+    case "medium": return "bg-amber-500";
+    case "low": return "bg-red-500";
+  }
+}
+
+// ── Retrieval Debug Panel Content ─────────────────────────────────────────────
+
+function RetrievalDebugContent({
+  chunks,
+  latency,
+}: {
+  chunks: DebugChunk[];
+  latency: number | null;
+}) {
+  if (chunks.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+        <div className="p-3 rounded-2xl bg-primary/10 mb-3">
+          <Bug className="w-6 h-6 text-primary" />
+        </div>
+        <p className="text-sm font-medium text-foreground">No retrieval data</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Send a message to see retrieval debug information here.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 p-4">
+      {/* Latency display */}
+      {latency !== null && (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl glass-subtle">
+          <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+          <span className="text-xs text-muted-foreground">Retrieval latency:</span>
+          <span className={`text-xs font-semibold ${
+            latency > 500 ? "confidence-low" : latency > 200 ? "confidence-medium" : "confidence-high"
+          }`}>
+            {latency}ms
+          </span>
+        </div>
+      )}
+
+      {/* Chunks list */}
+      <div className="space-y-3">
+        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+          Retrieved Chunks ({chunks.length})
+        </p>
+        {chunks.map((chunk, i) => {
+          const mainScore = chunk.fusionScore ?? chunk.vectorScore ?? chunk.score;
+          const level = mainScore !== null && mainScore !== undefined
+            ? getConfidenceLevel(mainScore)
+            : "medium";
+
+          return (
+            <div
+              key={i}
+              className="glass-subtle rounded-xl p-3 space-y-2.5 hover:bg-muted/50 transition-colors"
+            >
+              {/* Header */}
+              <div className="flex items-start gap-2">
+                <div className="p-1.5 bg-primary/10 rounded-lg shrink-0 mt-0.5">
+                  <FileText className="w-3 h-3 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold truncate">
+                    {chunk.documentName}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">
+                    Chunk {chunk.chunkIndex + 1}
+                  </p>
+                </div>
+                {mainScore !== null && mainScore !== undefined && (
+                  <Badge
+                    variant="outline"
+                    className={`text-[10px] shrink-0 ${
+                      level === "high"
+                        ? "border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                        : level === "medium"
+                        ? "border-amber-500/30 text-amber-600 dark:text-amber-400"
+                        : "border-red-500/30 text-red-600 dark:text-red-400"
+                    }`}
+                  >
+                    {Math.round(mainScore * 100)}%
+                  </Badge>
+                )}
+              </div>
+
+              {/* Confidence bar */}
+              {mainScore !== null && mainScore !== undefined && (
+                <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-700 ease-out ${confidenceBarColor(level)}`}
+                    style={{ width: `${Math.round(mainScore * 100)}%` }}
+                  />
+                </div>
+              )}
+
+              {/* Score breakdowns */}
+              {(chunk.vectorScore !== undefined || chunk.bm25Score !== undefined || chunk.fusionScore !== undefined) && (
+                <div className="grid grid-cols-3 gap-2 pt-1">
+                  {chunk.vectorScore !== null && chunk.vectorScore !== undefined && (
+                    <div className="text-center">
+                      <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Vector</p>
+                      <p className="text-xs font-semibold tabular-nums">{Math.round(chunk.vectorScore * 100)}%</p>
+                    </div>
+                  )}
+                  {chunk.bm25Score !== null && chunk.bm25Score !== undefined && (
+                    <div className="text-center">
+                      <p className="text-[9px] text-muted-foreground uppercase tracking-wider">BM25</p>
+                      <p className="text-xs font-semibold tabular-nums">{Math.round(chunk.bm25Score * 100)}%</p>
+                    </div>
+                  )}
+                  {chunk.fusionScore !== null && chunk.fusionScore !== undefined && (
+                    <div className="text-center">
+                      <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Fusion</p>
+                      <p className="text-xs font-semibold tabular-nums">{Math.round(chunk.fusionScore * 100)}%</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Chunk text preview */}
+              <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-3">
+                {chunk.chunkText}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 // ── Context Panel ─────────────────────────────────────────────────────────────
@@ -70,7 +230,7 @@ function ContextPanel({ chunks, model, temperature }: {
 
         {chunks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <Sparkles className="w-6 h-6 text-indigo-400/40 mb-2" />
+            <Sparkles className="w-6 h-6 text-primary/40 mb-2" />
             <p className="text-xs text-gray-500">
               Chunks will appear here after you send a message.
             </p>
@@ -90,7 +250,7 @@ function ContextPanel({ chunks, model, temperature }: {
                     <p className="text-[10px] text-gray-400">
                       Chunk {c.chunkIndex + 1}
                       {c.score !== null && (
-                        <span className="ml-1 text-indigo-400">
+                        <span className="ml-1 text-primary">
                           · {Math.round(c.score * 100)}%
                         </span>
                       )}
@@ -106,7 +266,7 @@ function ContextPanel({ chunks, model, temperature }: {
             {chunks.length > 2 && (
               <button
                 onClick={() => setShowAll((v) => !v)}
-                className="w-full text-xs text-indigo-400 hover:text-indigo-300 py-2 rounded-xl border border-white/5 hover:bg-white/5 transition-colors"
+                className="w-full text-xs text-primary hover:text-primary/80 py-2 rounded-xl border border-white/5 hover:bg-white/5 transition-colors"
               >
                 {showAll ? "Show less" : `View all ${chunks.length} sources`}
               </button>
@@ -132,7 +292,7 @@ function ContextPanel({ chunks, model, temperature }: {
           </div>
           <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
+              className="h-full bg-gradient-to-r from-primary to-cyan-500 rounded-full"
               style={{ width: `${(temperature / 2) * 100}%` }}
             />
           </div>
@@ -153,8 +313,8 @@ function EmptyState({ onSuggest }: { onSuggest: (q: string) => void }) {
   ];
   return (
     <div className="flex flex-col items-center justify-center h-full text-center px-8 gap-6">
-      <div className="bg-indigo-500/10 border border-indigo-500/20 p-5 rounded-2xl">
-        <Sparkles className="w-8 h-8 text-indigo-400" />
+      <div className="bg-primary/10 border border-primary/20 p-5 rounded-2xl">
+        <Sparkles className="w-8 h-8 text-primary" />
       </div>
       <div>
         <h2 className="text-xl font-bold text-white">Ask your Knowledge Base</h2>
@@ -167,7 +327,7 @@ function EmptyState({ onSuggest }: { onSuggest: (q: string) => void }) {
           <button
             key={s}
             onClick={() => onSuggest(s)}
-            className="text-left text-xs text-gray-300 bg-[#1a1f2e] hover:bg-[#1e2435] border border-white/5 hover:border-indigo-500/30 rounded-xl px-4 py-3 transition-all"
+            className="text-left text-xs text-gray-300 bg-[#1a1f2e] hover:bg-[#1e2435] border border-white/5 hover:border-primary/30 rounded-xl px-4 py-3 transition-all"
           >
             {s}
           </button>
@@ -184,7 +344,7 @@ function UserBubble({ content, time, name, initials }: {
 }) {
   return (
     <div className="flex gap-3 items-start">
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
         {initials}
       </div>
       <div className="flex-1 min-w-0">
@@ -200,15 +360,32 @@ function UserBubble({ content, time, name, initials }: {
   );
 }
 
-function AssistantBubble({ content, time, onCopy, onRetry, chunks }: {
-  content: string; time?: string; onCopy: () => void; onRetry: () => void; chunks?: Chunk[];
+function AssistantBubble({ id, content, time, onCopy, onRetry, chunks, initialFeedback }: {
+  id?: string; content: string; time?: string; onCopy: () => void; onRetry: () => void; chunks?: Chunk[]; initialFeedback?: "thumbs_up" | "thumbs_down" | null;
 }) {
+  const [feedback, setFeedback] = useState<"thumbs_up" | "thumbs_down" | null>(initialFeedback || null);
+
+  const handleFeedback = async (val: "thumbs_up" | "thumbs_down") => {
+    if (!id) return;
+    const newValue = feedback === val ? null : val;
+    setFeedback(newValue);
+    try {
+      await fetch(`/api/messages/${id}/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feedback: newValue }),
+      });
+    } catch (e) {
+      console.error("Failed sending feedback:", e);
+    }
+  };
+
   // Extract sources list from content if present
   const sourceMatch = content.match(/(?:Sources?|References?|Citations?):\s*([\s\S]*?)(?:\n\n|$)/i);
 
   return (
     <div className="flex gap-3 items-start">
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center shrink-0">
+      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center shrink-0">
         <Bot className="w-4 h-4 text-white" />
       </div>
       <div className="flex-1 min-w-0">
@@ -219,27 +396,48 @@ function AssistantBubble({ content, time, onCopy, onRetry, chunks }: {
         <div className="bg-[#1a1f2e] border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3">
           <div className="prose prose-invert prose-sm max-w-none text-gray-200
             prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-strong:text-white
-            prose-headings:text-white prose-code:text-indigo-300">
+            prose-headings:text-white prose-code:text-primary">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
           </div>
         </div>
         {/* Action bar */}
         <div className="flex items-center gap-1 mt-2 ml-1">
-          {[
-            { icon: ThumbsUp, label: "Good response" },
-            { icon: ThumbsDown, label: "Bad response" },
-            { icon: Copy, label: "Copy", onClick: onCopy },
-            { icon: RotateCcw, label: "Retry", onClick: onRetry },
-          ].map(({ icon: Icon, label, onClick }) => (
-            <button
-              key={label}
-              onClick={onClick}
-              title={label}
-              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors"
-            >
-              <Icon className="w-3.5 h-3.5" />
-            </button>
-          ))}
+          <button
+            onClick={() => handleFeedback("thumbs_up")}
+            title="Good response"
+            className={`p-1.5 rounded-lg transition-colors ${
+              feedback === "thumbs_up"
+                ? "text-emerald-400 bg-emerald-500/10"
+                : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+            }`}
+          >
+            <ThumbsUp className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => handleFeedback("thumbs_down")}
+            title="Bad response"
+            className={`p-1.5 rounded-lg transition-colors ${
+              feedback === "thumbs_down"
+                ? "text-rose-400 bg-rose-500/10"
+                : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+            }`}
+          >
+            <ThumbsDown className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={onCopy}
+            title="Copy"
+            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors"
+          >
+            <Copy className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={onRetry}
+            title="Retry"
+            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     </div>
@@ -258,6 +456,12 @@ export default function ChatPage() {
   const [userInitials, setUserInitials] = useState("U");
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Debug panel state
+  const [debugOpen, setDebugOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"simple" | "debug">("simple");
+  const [debugChunks, setDebugChunks] = useState<DebugChunk[]>([]);
+  const [retrievalLatency, setRetrievalLatency] = useState<number | null>(null);
 
   // Load user info
   useEffect(() => {
@@ -294,6 +498,8 @@ export default function ChatPage() {
       setConversationId(data.conversation.id);
       setInitialMessages([]);
       setChunks([]);
+      setDebugChunks([]);
+      setRetrievalLatency(null);
       loadHistory();
     }
   }, [loadHistory]);
@@ -302,6 +508,8 @@ export default function ChatPage() {
   const loadConversation = useCallback(async (id: string) => {
     setConversationId(id);
     setChunks([]);
+    setDebugChunks([]);
+    setRetrievalLatency(null);
     const res = await fetch(`/api/conversations/${id}`);
     const data = await res.json();
     if (data.conversation?.messages) {
@@ -320,7 +528,10 @@ export default function ChatPage() {
           const parsed = typeof lastAssistant.citations === "string"
             ? JSON.parse(lastAssistant.citations)
             : lastAssistant.citations;
-          if (Array.isArray(parsed)) setChunks(parsed.slice(0, 5));
+          if (Array.isArray(parsed)) {
+            setChunks(parsed.slice(0, 5));
+            setDebugChunks(parsed.slice(0, 5));
+          }
         } catch {}
       }
     }
@@ -331,7 +542,7 @@ export default function ChatPage() {
     e.stopPropagation();
     if (!window.confirm("Delete this conversation?")) return;
     await fetch(`/api/conversations/${id}`, { method: "DELETE" });
-    if (conversationId === id) { setConversationId(null); setInitialMessages([]); setChunks([]); }
+    if (conversationId === id) { setConversationId(null); setInitialMessages([]); setChunks([]); setDebugChunks([]); setRetrievalLatency(null); }
     loadHistory();
   }, [conversationId, loadHistory]);
 
@@ -341,12 +552,49 @@ export default function ChatPage() {
     transport: new DefaultChatTransport({
       api: "/api/chat",
       fetch: async (url, init) => {
+        const startTime = Date.now();
         const res = await fetch(url, init);
+        const elapsed = Date.now() - startTime;
+        setRetrievalLatency(elapsed);
         const raw = res.headers.get("X-Retrieved-Chunks");
         if (raw) {
           try {
             const parsed = JSON.parse(decodeURIComponent(raw));
-            if (Array.isArray(parsed)) setChunks(parsed);
+            if (Array.isArray(parsed)) {
+              setChunks(parsed);
+              // Map to debug chunks with extended score fields
+              const debugParsed: DebugChunk[] = parsed.map((c: any) => ({
+                documentName: c.documentName,
+                chunkText: c.chunkText,
+                score: c.score ?? null,
+                chunkIndex: c.chunkIndex,
+                vectorScore: c.vectorScore ?? c.score ?? null,
+                bm25Score: c.bm25Score ?? null,
+                fusionScore: c.fusionScore ?? null,
+              }));
+              setDebugChunks(debugParsed);
+            }
+          } catch {}
+        }
+        const debugRaw = res.headers.get("X-Retrieval-Debug-Info");
+        if (debugRaw) {
+          try {
+            const debugInfo = JSON.parse(decodeURIComponent(debugRaw));
+            if (debugInfo.latencyMs) {
+              setRetrievalLatency(debugInfo.latencyMs);
+            }
+            if (debugInfo.fusedChunks && Array.isArray(debugInfo.fusedChunks)) {
+              const debugParsed: DebugChunk[] = debugInfo.fusedChunks.map((c: any) => ({
+                documentName: c.documentName,
+                chunkText: c.chunkText,
+                score: c.fusionScore ?? null,
+                chunkIndex: c.chunkIndex,
+                vectorScore: c.vectorScore ?? null,
+                bm25Score: c.bm25Score ?? null,
+                fusionScore: c.fusionScore ?? null,
+              }));
+              setDebugChunks(debugParsed);
+            }
           } catch {}
         }
         return res;
@@ -418,6 +666,86 @@ export default function ChatPage() {
 
   const currentTitle = history.find((h) => h.id === conversationId)?.title ?? "New Chat";
 
+  // Debug panel content for rendering in both desktop sidebar and mobile sheet
+  const debugPanelContent = (
+    <div className="flex flex-col h-full">
+      {/* View mode toggle */}
+      <div className="p-4 border-b border-border/50">
+        <div className="flex items-center gap-1 p-0.5 rounded-lg bg-muted/50">
+          <button
+            onClick={() => setViewMode("simple")}
+            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
+              viewMode === "simple"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Eye className="w-3 h-3" />
+            Simple
+          </button>
+          <button
+            onClick={() => setViewMode("debug")}
+            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
+              viewMode === "debug"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Bug className="w-3 h-3" />
+            Debug
+          </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto">
+        {viewMode === "simple" ? (
+          /* Simple view — just sources */
+          <div className="p-4 space-y-3">
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+              Retrieved Sources
+            </p>
+            {debugChunks.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <Sparkles className="w-6 h-6 text-primary/40 mb-2" />
+                <p className="text-xs text-muted-foreground">
+                  Sources will appear here after you send a message.
+                </p>
+              </div>
+            ) : (
+              debugChunks.map((c, i) => (
+                <div key={i} className="glass-subtle rounded-xl p-3 space-y-1.5">
+                  <div className="flex items-start gap-2">
+                    <div className="p-1.5 bg-primary/10 rounded-lg shrink-0 mt-0.5">
+                      <FileText className="w-3 h-3 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold truncate">{c.documentName}</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        Chunk {c.chunkIndex + 1}
+                        {c.score !== null && (
+                          <span className="ml-1 text-primary">
+                            · {Math.round(c.score * 100)}%
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-3">
+                    {c.chunkText}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        ) : (
+          /* Debug view — detailed scores */
+          <RetrievalDebugContent chunks={debugChunks} latency={retrievalLatency} />
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex h-[calc(100vh-3.5rem)] bg-[#0f1117] text-white overflow-hidden -m-6 md:-m-10">
 
@@ -426,7 +754,7 @@ export default function ChatPage() {
         <div className="p-3">
           <button
             onClick={createNew}
-            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-500 text-white text-sm font-medium transition-all duration-200"
           >
             <Plus className="w-4 h-4" /> New Chat
           </button>
@@ -477,6 +805,39 @@ export default function ChatPage() {
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
           <h1 className="text-base font-semibold text-white">{currentTitle}</h1>
           <div className="flex items-center gap-2">
+            {/* Debug panel toggle — desktop */}
+            <button
+              onClick={() => setDebugOpen((v) => !v)}
+              className={`hidden md:flex items-center gap-2 text-xs border rounded-lg px-3 py-1.5 transition-all duration-200 ${
+                debugOpen
+                  ? "text-primary bg-primary/10 border-primary/30"
+                  : "text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10"
+              }`}
+              title="Toggle retrieval debug panel"
+            >
+              <Bug className="w-3.5 h-3.5" />
+              <span>{debugOpen ? "Hide Debug" : "Debug"}</span>
+            </button>
+
+            {/* Debug panel toggle — mobile (sheet) */}
+            <Sheet>
+              <SheetTrigger
+                className="md:hidden flex items-center gap-2 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-3 py-1.5 transition-colors"
+              >
+                <Bug className="w-3.5 h-3.5" />
+                Debug
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[85vw] sm:max-w-sm bg-background p-0">
+                <SheetHeader className="p-4 border-b border-border/50">
+                  <SheetTitle>Retrieval Debug</SheetTitle>
+                  <SheetDescription>
+                    Inspect retrieved chunks and scores
+                  </SheetDescription>
+                </SheetHeader>
+                {debugPanelContent}
+              </SheetContent>
+            </Sheet>
+
             <button className="flex items-center gap-2 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-3 py-1.5 transition-colors">
               <Share2 className="w-3.5 h-3.5" /> Share
             </button>
@@ -503,6 +864,14 @@ export default function ChatPage() {
               ) : (
                 <AssistantBubble
                   key={m.id}
+                  id={m.id}
+                  initialFeedback={
+                    m.metadata
+                      ? typeof m.metadata === "string"
+                        ? JSON.parse(m.metadata).feedback
+                        : (m.metadata as any).feedback
+                      : null
+                  }
                   content={m.content}
                   time={m.createdAt ? fmtTime(m.createdAt.toISOString?.() ?? m.createdAt) : undefined}
                   onCopy={() => copyText(m.content)}
@@ -516,7 +885,7 @@ export default function ChatPage() {
           {/* Typing indicator */}
           {isLoading && messages[messages.length - 1]?.role === "user" && (
             <div className="flex gap-3 items-start">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center shrink-0">
                 <Bot className="w-4 h-4 text-white" />
               </div>
               <div className="bg-[#1a1f2e] border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2">
@@ -524,7 +893,7 @@ export default function ChatPage() {
                   {[0, 0.15, 0.3].map((d) => (
                     <span
                       key={d}
-                      className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
+                      className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
                       style={{ animationDelay: `${d}s` }}
                     />
                   ))}
@@ -549,7 +918,7 @@ export default function ChatPage() {
         {/* Input area */}
         <div className="shrink-0 px-6 pb-5 pt-3 border-t border-white/5">
           <form onSubmit={handleFormSubmit}>
-            <div className="bg-[#1a1f2e] border border-white/10 focus-within:border-indigo-500/50 rounded-2xl transition-colors overflow-hidden">
+            <div className="bg-[#1a1f2e] border border-white/10 focus-within:border-primary/50 rounded-2xl transition-colors overflow-hidden">
               <textarea
                 value={input}
                 onChange={(e) => {
@@ -589,7 +958,7 @@ export default function ChatPage() {
                 <button
                   type="submit"
                   disabled={isLoading || !input?.trim()}
-                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-all hover:scale-105 active:scale-95 shrink-0"
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-500 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-all hover:scale-105 active:scale-95 shrink-0"
                 >
                   {isLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -606,12 +975,36 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* ── Right context panel ─────────────────────────────────── */}
-      <ContextPanel
-        chunks={chunks}
-        model="GPT-4o (via OpenRouter)"
-        temperature={0.3}
-      />
+      {/* ── Right: Debug panel (desktop) ─────────────────────────── */}
+      {debugOpen && (
+        <aside className="w-80 shrink-0 bg-background/95 backdrop-blur-xl border-l border-border/50 flex-col overflow-hidden hidden md:flex animate-slide-up-fade">
+          <div className="p-4 border-b border-border/50 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-primary/10">
+                <BarChart3 className="w-3.5 h-3.5 text-primary" />
+              </div>
+              <h3 className="text-sm font-semibold">Retrieval Debug</h3>
+            </div>
+            <button
+              onClick={() => setDebugOpen(false)}
+              className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              title="Close debug panel"
+            >
+              <EyeOff className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          {debugPanelContent}
+        </aside>
+      )}
+
+      {/* ── Right context panel (always visible on desktop when debug is closed) ── */}
+      {!debugOpen && (
+        <ContextPanel
+          chunks={chunks}
+          model="GPT-4o (via OpenRouter)"
+          temperature={0.3}
+        />
+      )}
     </div>
   );
 }

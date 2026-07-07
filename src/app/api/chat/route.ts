@@ -7,6 +7,7 @@ import { appGraph } from "@/ai/graph/workflow";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { getMessageText } from "@/lib/utils";
 import { validateApiKeyRequest } from "@/server/utils/api-key-auth";
+import { EvaluationService } from "@/server/services/evaluation.service";
 
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -63,6 +64,7 @@ export async function POST(req: Request) {
 
     const systemPrompt = finalState.finalPrompt;
     const retrievedChunks = finalState.retrievedChunks ?? [];
+    const debugInfo = finalState.retrievalDebugInfo ?? null;
 
     const coreMessages: any[] = [];
     messages.slice(0, -1).forEach((m: any) =>
@@ -88,19 +90,41 @@ export async function POST(req: Request) {
             retrievedChunks.length > 0 ? retrievedChunks : undefined
           );
         }
+
+        // Trigger asynchronous background evaluation
+        if (debugInfo?.retrievalLogId) {
+          const contextText = retrievedChunks.map((c: any) => c.chunkText).join("\n\n");
+          EvaluationService.evaluateAsync({
+            query: userQuery,
+            context: contextText,
+            response: text,
+            retrievalLogId: debugInfo.retrievalLogId,
+          });
+        }
       },
     });
 
     // Pass retrieved chunks as a response header so the client can render the Context panel
     const response = result.toTextStreamResponse();
+    
+    // Prepare chunks payload with individual retrieval method scores for frontend UI
     const chunks = JSON.stringify(
-      retrievedChunks.slice(0, 5).map((c: any) => ({
-        documentName: c.documentName ?? c.payload?.documentName ?? "Source",
-        chunkText: (c.chunkText ?? c.payload?.chunkText ?? "").substring(0, 200),
-        score: c.score ?? null,
-        chunkIndex: c.chunkIndex ?? c.payload?.chunkIndex ?? 0,
-      }))
+      retrievedChunks.slice(0, 5).map((c: any) => {
+        const metadata = c.metadata || {};
+        return {
+          documentName: c.documentName ?? metadata.documentName ?? "Source",
+          chunkText: (c.chunkText ?? "").substring(0, 200),
+          score: c.score ?? metadata.fusionScore ?? null,
+          vectorScore: metadata.vectorScore ?? null,
+          bm25Score: metadata.bm25Score ?? null,
+          chunkIndex: c.chunkIndex ?? metadata.chunkIndex ?? 0,
+          pageNumber: c.pageNumber ?? metadata.pageNumber ?? null,
+        };
+      })
     );
+
+    const debugHeaderValue = debugInfo ? encodeURIComponent(JSON.stringify(debugInfo)) : "";
+    const logIdHeaderValue = debugInfo?.retrievalLogId || "";
 
     // Return as a new Response preserving the stream but adding the header
     return new Response(response.body, {
@@ -108,6 +132,8 @@ export async function POST(req: Request) {
       headers: {
         ...Object.fromEntries(response.headers.entries()),
         "X-Retrieved-Chunks": encodeURIComponent(chunks),
+        ...(logIdHeaderValue && { "X-Retrieval-Log-Id": logIdHeaderValue }),
+        ...(debugHeaderValue && { "X-Retrieval-Debug-Info": debugHeaderValue }),
       },
     });
   } catch (error: any) {

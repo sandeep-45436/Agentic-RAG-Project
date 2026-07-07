@@ -8,9 +8,15 @@ export type VectorPayload = {
   chunkId: string;
   chunkIndex: number;
   chunkText: string;
+  pageNumber?: number | null;
   tags?: string[];
   metadata?: Record<string, any>;
 };
+
+export interface ScoredVectorResult {
+  payload: VectorPayload;
+  score: number;
+}
 
 export class VectorService {
   /**
@@ -36,28 +42,51 @@ export class VectorService {
 
   /**
    * Searches Qdrant using semantic similarity, enforcing strict organization isolation.
+   * Returns results with similarity scores for use in hybrid fusion.
    */
-  static async similaritySearch(vector: number[], organizationId: string, limit: number = 20) {
+  static async similaritySearch(
+    vector: number[],
+    organizationId: string,
+    limit: number = 20,
+    documentIds?: string[]
+  ): Promise<ScoredVectorResult[]> {
     try {
+      const mustFilters: any[] = [
+        {
+          key: "organizationId",
+          match: {
+            value: organizationId,
+          },
+        },
+      ];
+
+      // Inject document filter if specified for retrieval memory boosting
+      if (documentIds && documentIds.length > 0) {
+        mustFilters.push({
+          key: "documentId",
+          match: {
+            any: documentIds,
+          },
+        });
+      }
+
       const results = await qdrant.search(GLOBAL_COLLECTION_NAME, {
         vector,
         limit,
+        with_payload: true,
         filter: {
-          must: [
-            {
-              key: "organizationId",
-              match: {
-                value: organizationId,
-              },
-            },
-          ],
+          must: mustFilters,
         },
       });
 
-      return results;
+      return results.map((hit) => ({
+        payload: hit.payload as unknown as VectorPayload,
+        score: hit.score,
+      }));
     } catch (error) {
       console.error("[VectorService] Similarity search failed:", error);
       throw error;
     }
   }
 }
+

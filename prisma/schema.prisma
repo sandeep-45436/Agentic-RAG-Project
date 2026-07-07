@@ -54,6 +54,8 @@ model Organization {
   planLimits        PlanLimits?
   apiKeys           ApiKey[]
   auditLogs         AuditLog[]
+  retrievalLogs     RetrievalLog[]
+  agentRuns         AgentRun[]
 
   @@index([deletedAt])
 }
@@ -136,7 +138,9 @@ model Chunk {
   content        String    @db.Text
   chunkIndex     Int
   tokenCount     Int
+  pageNumber     Int?
   metadata       Json?
+  search_vector  Unsupported("tsvector")?
   documentId     String
   organizationId String
   createdAt      DateTime  @default(now())
@@ -308,3 +312,69 @@ model AuditLog {
   @@index([organizationId])
   @@index([createdAt])
 }
+
+model RetrievalLog {
+  id              String   @id @default(uuid())
+  query           String   @db.Text
+  organizationId  String
+  vectorResults   Json?
+  bm25Results     Json?
+  fusionResults   Json?
+  rerankedResults Json?
+  latencyMs       Float?
+  retrievalType   String   @default("hybrid") // "vector", "bm25", "hybrid"
+  chunksReturned  Int      @default(0)
+  cacheHit        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  // Relations
+  organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  queryVariants QueryVariant[]
+  evaluations   Evaluation[]
+
+  @@index([organizationId, createdAt])
+}
+
+model QueryVariant {
+  id             String   @id @default(uuid())
+  originalQuery  String   @db.Text
+  rewrittenQuery String   @db.Text
+  variantType    String   @default("rewrite") // "rewrite", "expansion"
+  retrievalLogId String?
+  createdAt      DateTime @default(now())
+
+  // Relations
+  retrievalLog RetrievalLog? @relation(fields: [retrievalLogId], references: [id], onDelete: Cascade)
+
+  @@index([retrievalLogId])
+}
+
+model Evaluation {
+  id                 String   @id @default(uuid())
+  query              String   @db.Text
+  recallScore        Float
+  faithfulnessScore  Float
+  hallucinationScore Float
+  retrievalLogId     String?
+  createdAt          DateTime @default(now())
+
+  // Relations
+  retrievalLog       RetrievalLog? @relation(fields: [retrievalLogId], references: [id], onDelete: Cascade)
+
+  @@index([retrievalLogId])
+}
+
+model AgentRun {
+  id             String   @id @default(uuid())
+  query          String   @db.Text
+  toolsUsed      Json     // Array of strings, e.g. ["sql", "vector", "web_search"]
+  iterations     Int
+  organizationId String
+  createdAt      DateTime @default(now())
+
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt])
+}
+

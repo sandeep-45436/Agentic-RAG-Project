@@ -9,6 +9,23 @@ interface DocumentUploadProps {
   onUploadComplete?: () => void;
 }
 
+/* Supported MIME types */
+const ACCEPTED_TYPES = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "text/plain",
+];
+
+const ACCEPTED_EXTENSIONS = ".pdf,.docx,.txt";
+
+function isAcceptedType(file: File): boolean {
+  // Check MIME type first
+  if (ACCEPTED_TYPES.includes(file.type)) return true;
+  // Fallback: check extension (some browsers report empty type for .txt)
+  const ext = file.name.split(".").pop()?.toLowerCase();
+  return ext === "pdf" || ext === "docx" || ext === "txt";
+}
+
 export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -19,9 +36,9 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectFile = (selected: File) => {
-    if (selected.type !== "application/pdf") {
+    if (!isAcceptedType(selected)) {
       setStatus("error");
-      setErrorMessage("Only PDF files are supported.");
+      setErrorMessage("Only PDF, DOCX, and TXT files are supported.");
       setFile(null);
       return;
     }
@@ -120,7 +137,7 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
           </div>
           <div className="text-center">
             <p className="font-medium">Click to upload or drag and drop</p>
-            <p className="text-sm text-muted-foreground mt-1">PDF documents only (max 10 MB)</p>
+            <p className="text-sm text-muted-foreground mt-1">PDF, DOCX, or TXT files (max 10 MB)</p>
           </div>
           {status === "error" && (
             <div className="flex items-center gap-2 text-destructive bg-destructive/10 px-4 py-2 rounded-lg text-sm">
@@ -132,7 +149,7 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept="application/pdf"
+            accept={ACCEPTED_EXTENSIONS}
             className="hidden"
           />
         </div>

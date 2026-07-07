@@ -1,6 +1,8 @@
 import { db } from "@/server/db/prisma";
 import { createClient } from "@/utils/supabase/server";
-import { extractTextFromPdf, chunkText } from "@/ai/loaders/pdf-loader";
+import { extractTextFromPdf, chunkText, extractTextWithPages, chunkTextWithMetadata } from "@/ai/loaders/pdf-loader";
+import { extractTextFromDocx, extractTextWithPagesDocx } from "@/ai/loaders/docx-loader";
+import { extractTextFromTxt, extractTextWithPagesTxt } from "@/ai/loaders/txt-loader";
 import { ensureCollectionExists } from "@/ai/vector/qdrant";
 import { EmbeddingService } from "./embedding.service";
 import { VectorService, VectorPayload } from "./vector.service";
@@ -32,7 +34,11 @@ export class DocumentService {
       );
       const { error: bucketError } = await admin.storage.createBucket("documents", {
         public: false,
-        allowedMimeTypes: ["application/pdf"],
+        allowedMimeTypes: [
+          "application/pdf",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "text/plain"
+        ],
         fileSizeLimit: 10 * 1024 * 1024,
       });
       // Ignore "already exists" — this is idempotent
@@ -81,6 +87,22 @@ export class DocumentService {
   }
 
   /**
+   * Detects the document type from the file name extension.
+   * Returns a normalized type string: 'pdf', 'docx', 'txt', or 'unknown'.
+   */
+  private static detectFileType(fileName?: string, fileType?: string): "pdf" | "docx" | "txt" | "unknown" {
+    const ext = fileName?.split(".").pop()?.toLowerCase();
+    if (ext === "pdf" || fileType === "application/pdf") return "pdf";
+    if (
+      ext === "docx" ||
+      fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
+      return "docx";
+    if (ext === "txt" || fileType === "text/plain") return "txt";
+    return "unknown";
+  }
+
+  /**
    * Background process for text extraction, chunking, and embedding.
    */
   static async processDocumentAsync(documentId: string, fileBuffer: ArrayBuffer, organizationId: string, knowledgeBaseId?: string, fileName?: string) {
@@ -89,13 +111,41 @@ export class DocumentService {
       log(`Starting processing for: ${fileName}`);
       const buffer = Buffer.from(fileBuffer);
 
-      // Step 1: Extract text
-      log("Step 1: Extracting text from PDF...");
-      const text = await extractTextFromPdf(buffer);
-      log(`Step 1 done. Text length: ${text.length} chars`);
+      // Detect file type from filename or DB record
+      const docRecord = await db.document.findUnique({ where: { id: documentId } });
+      const detectedType = DocumentService.detectFileType(fileName, docRecord?.fileType);
+      log(`Detected file type: ${detectedType}`);
+
+      // Step 1: Extract text with page info based on file type
+      log("Step 1: Extracting text...");
+      let extractionResult: {
+        pages: Array<{ pageNumber: number; text: string }>;
+        fullText: string;
+        numPages: number;
+      };
+
+      switch (detectedType) {
+        case "pdf":
+          extractionResult = await extractTextWithPages(buffer);
+          break;
+        case "docx":
+          extractionResult = await extractTextWithPagesDocx(buffer);
+          break;
+        case "txt":
+          extractionResult = await extractTextWithPagesTxt(buffer);
+          break;
+        default:
+          // Fallback: try PDF extraction for backward compatibility
+          log(`Unknown file type, falling back to PDF extraction`);
+          extractionResult = await extractTextWithPages(buffer);
+          break;
+      }
+
+      const { pages, fullText: text, numPages } = extractionResult;
+      log(`Step 1 done. Text length: ${text.length} chars, Pages: ${numPages}`);
 
       if (!text || text.trim().length === 0) {
-        throw new Error("PDF appears to be empty or contains no extractable text.");
+        throw new Error("Document appears to be empty or contains no extractable text.");
       }
 
       await db.document.update({
@@ -103,11 +153,11 @@ export class DocumentService {
         data: { content: text },
       });
 
-      // Step 2: Chunk text
-      log("Step 2: Chunking text...");
-      const chunks = await chunkText(text);
-      log(`Step 2 done. Chunks: ${chunks.length}`);
-      if (chunks.length === 0) {
+      // Step 2: Chunk text with page metadata
+      log("Step 2: Chunking text with page metadata...");
+      const chunksWithMeta = await chunkTextWithMetadata(text, pages);
+      log(`Step 2 done. Chunks: ${chunksWithMeta.length}`);
+      if (chunksWithMeta.length === 0) {
         throw new Error("No chunks produced from text.");
       }
 
@@ -120,8 +170,9 @@ export class DocumentService {
       const BATCH_SIZE = 50;
       const encoder = tiktoken.encoding_for_model("text-embedding-3-small");
 
-      for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
-        const batchTexts = chunks.slice(i, i + BATCH_SIZE);
+      for (let i = 0; i < chunksWithMeta.length; i += BATCH_SIZE) {
+        const batchChunks = chunksWithMeta.slice(i, i + BATCH_SIZE);
+        const batchTexts = batchChunks.map((c) => c.text);
         log(`Step 4: Embedding batch ${i / BATCH_SIZE + 1} (${batchTexts.length} chunks)...`);
 
         const vectors = await EmbeddingService.embedBatch(batchTexts, 3);
@@ -132,18 +183,22 @@ export class DocumentService {
 
         const qdrantPoints = [];
 
-        for (let j = 0; j < batchTexts.length; j++) {
-          const chunkText = batchTexts[j];
+        for (let j = 0; j < batchChunks.length; j++) {
+          const chunk = batchChunks[j];
+          const chunkTextContent = chunk.text;
           const globalIndex = i + j;
-          const tokenCount = encoder.encode(chunkText).length;
+          const tokenCount = encoder.encode(chunkTextContent).length;
 
           const chunkRecord = await db.chunk.create({
             data: {
-              content: chunkText,
+              content: chunkTextContent,
               chunkIndex: globalIndex,
               tokenCount,
               documentId,
               organizationId,
+              metadata: {
+                pageNumber: chunk.pageNumber,
+              },
             },
           });
 
@@ -153,8 +208,11 @@ export class DocumentService {
             documentName: fileName || "Unknown",
             chunkId: chunkRecord.id,
             chunkIndex: globalIndex,
-            chunkText,
+            chunkText: chunkTextContent,
             ...(knowledgeBaseId && { knowledgeBaseId }),
+            metadata: {
+              pageNumber: chunk.pageNumber,
+            },
           };
 
           qdrantPoints.push({ id: chunkRecord.id, vector: vectors[j], payload });
@@ -188,7 +246,7 @@ export class DocumentService {
         metadata: {
           documentId,
           fileName: fileName || doc?.fileName,
-          chunksCount: chunks.length,
+          chunksCount: chunksWithMeta.length,
         },
       });
 

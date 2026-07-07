@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     "@langchain/community",
     "tiktoken",
     "neo4j-driver",
+    "@xenova/transformers",
   ],
 
   // Turbopack also needs the externals declared separately

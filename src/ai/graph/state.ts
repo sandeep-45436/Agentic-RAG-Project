@@ -28,6 +28,12 @@ export const GraphState = Annotation.Root({
     default: () => [],
   }),
 
+  // Retrieval debugging state
+  retrievalDebugInfo: Annotation<any>({
+    reducer: (curr, update) => update,
+    default: () => null,
+  }),
+
   // Citation payload state
   formattedCitations: Annotation<string>({
     reducer: (curr, update) => update,
@@ -40,3 +46,4 @@ export const GraphState = Annotation.Root({
     default: () => "",
   }),
 });
+

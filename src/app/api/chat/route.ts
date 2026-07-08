@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     coreMessages.push({ role: "user", content: userQuery });
 
     const result = streamText({
-      model: openrouter("openai/gpt-4o-mini"),
+      model: openrouter.chat("openai/gpt-4o-mini"),
       system: systemPrompt || undefined,
       messages: coreMessages,
       temperature: 0.3,

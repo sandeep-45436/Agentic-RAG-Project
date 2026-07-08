@@ -64,12 +64,12 @@ export class RerankService {
       // 1. Try local BGE cross-encoder (WASM) first
       const classifier = await this.getReranker();
       
-      // Prepare inputs as [query, passage] pairs
-      const inputs = chunks.map((chunk) => [query, chunk.chunkText]);
+      // Prepare inputs as query-passage pairs (concatenated with [SEP])
+      const inputs = chunks.map((chunk) => `${query} [SEP] ${chunk.chunkText}`);
       
       // Run local inference batch
       console.log(`[RerankService] Running local WASM Cross-Encoder on ${chunks.length} candidates...`);
-      const outputs = await classifier(inputs);
+      const outputs = await classifier(inputs, { topk: null });
       
       const scored = chunks.map((chunk, index) => {
         const score = outputs[index]?.score ?? 0;

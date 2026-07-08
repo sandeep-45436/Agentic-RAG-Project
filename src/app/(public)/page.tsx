@@ -80,7 +80,7 @@ export default function LandingPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Link href="/dashboard" className={cn(buttonVariants({ size: "lg" }), "h-14 px-8 font-medium rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white border-0 text-base shadow-lg shadow-indigo-600/20")}>
+              <Link href="/signup" className={cn(buttonVariants({ size: "lg" }), "h-14 px-8 font-medium rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white border-0 text-base shadow-lg shadow-indigo-600/20")}>
                 Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <Link href="#" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-14 px-8 font-medium rounded-xl border-slate-700 hover:bg-slate-800 text-white transition-colors text-base")}>

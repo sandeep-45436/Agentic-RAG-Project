@@ -122,9 +122,10 @@ USER QUERY:
 
     try {
       const response = await generateText({
-        model: openrouter("google/gemini-2.5-flash"),
+        model: openrouter.chat("google/gemini-2.5-flash"),
         prompt,
         temperature: 0.1,
+        maxOutputTokens: 2000,
       });
 
       const clean = response.text.replace(/```json/g, "").replace(/```/g, "").trim();

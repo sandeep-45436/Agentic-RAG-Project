@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 import {
   Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip,
   PieChart, Pie, Cell, ResponsiveContainer,
@@ -166,10 +168,20 @@ const DonutTooltip = ({ active, payload }: any) => {
 const STORAGE_COLORS = ["#6366f1", "#3b82f6", "#22c55e", "#f59e0b"];
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [chartRange, setChartRange] = useState<"30d" | "7d">("30d");
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        router.replace("/login");
+      }
+    });
+  }, [router]);
 
   const load = useCallback(() => {
     setLoading(true);

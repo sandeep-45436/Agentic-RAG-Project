@@ -1,83 +1,155 @@
 "use server";
 
 import { db } from "@/server/db/prisma";
-import { createClient } from "@/utils/supabase/server";
-import { AuditService } from "@/server/services/audit";
+import { createClient, createAuthClient } from "@/utils/insforge/server";
 import { headers } from "next/headers";
 
 export async function syncUserToDatabase() {
   try {
-    const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data, error } = await insforge.auth.getCurrentUser();
 
-    if (error || !user) {
+    if (error || !data?.user) {
       return { success: false, error: "Not authenticated" };
     }
 
-    const reqHeaders = await headers();
-    const userAgent = reqHeaders.get("user-agent");
-    const ip = reqHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() || reqHeaders.get("x-real-ip") || null;
+    const user = data.user;
 
-    // Check if user already exists in Prisma database
     let dbUser = await db.user.findUnique({
       where: { id: user.id },
       include: { memberships: true },
     });
 
-    const isNewUser = !dbUser;
-
     if (!dbUser) {
-      // 1. Create the user
       dbUser = await db.user.create({
         data: {
-          id: user.id, // Keep IDs synced between Supabase Auth and Prisma
+          id: user.id,
           email: user.email!,
-          name: user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
+          name: user.profile?.name || user.email?.split("@")[0] || "User",
         },
         include: { memberships: true },
       });
     }
 
-    let targetOrgId = dbUser.memberships[0]?.organizationId;
-
-    // Ensure they have at least one membership
-    if (!targetOrgId) {
-      // 2. Create a default organization for them
+    if (dbUser.memberships.length === 0) {
       const org = await db.organization.create({
-        data: {
-          name: `${dbUser.name}'s Organization`,
-        },
+        data: { name: `${dbUser.name}'s Organization` },
       });
-
-      // 3. Link them as the OWNER
       await db.membership.create({
-        data: {
-          userId: dbUser.id,
-          organizationId: org.id,
-          role: "OWNER",
-        },
+        data: { userId: dbUser.id, organizationId: org.id, role: "OWNER" },
       });
-
-      targetOrgId = org.id;
     }
-
-    // Log the authentication event
-    await AuditService.logEvent({
-      orgId: targetOrgId,
-      userId: dbUser.id,
-      action: isNewUser ? "USER_SIGNUP" : "USER_LOGIN",
-      ip,
-      userAgent,
-      metadata: {
-        email: dbUser.email,
-        name: dbUser.name,
-      },
-    });
 
     return { success: true };
   } catch (err) {
-    console.error("Database sync failed or skipped (e.g. missing DATABASE_URL):", err);
-    // Proceed with success in development so the auth redirect is not blocked
-    return { success: true, error: "Database sync skipped (offline mode)" };
+    console.error("Database sync failed:", err);
+    return { success: true, error: "Database sync skipped" };
+  }
+}
+
+export async function loginAction(formData: { email: string; password: string }) {
+  try {
+    const authClient = await createAuthClient();
+    const { error } = await authClient.signInWithPassword({
+      email: formData.email,
+      password: formData.password,
+    });
+
+    if (error) return { success: false, error: error.message };
+
+    await syncUserToDatabase();
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to sign in" };
+  }
+}
+
+export async function signupAction(formData: {
+  email: string;
+  password: string;
+  fullName: string;
+}) {
+  try {
+    const authClient = await createAuthClient();
+    const { data, error } = await authClient.signUp({
+      email: formData.email,
+      password: formData.password,
+      name: formData.fullName,
+    });
+
+    if (error) return { success: false, error: error.message };
+
+    if (data?.requireEmailVerification) {
+      return {
+        success: true,
+        requireVerification: true,
+        message: "A 6-digit verification code has been sent to your email.",
+      };
+    }
+
+    await syncUserToDatabase();
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to sign up" };
+  }
+}
+
+export async function verifyEmailAction(formData: { email: string; otp: string }) {
+  try {
+    const authClient = await createAuthClient();
+    const { error } = await authClient.verifyEmail({
+      email: formData.email,
+      otp: formData.otp,
+    });
+
+    if (error) return { success: false, error: error.message };
+
+    await syncUserToDatabase();
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to verify email" };
+  }
+}
+
+export async function resendVerificationAction(formData: { email: string }) {
+  try {
+    const insforge = await createClient();
+    const { error } = await (insforge.auth as any).resendVerificationEmail({
+      email: formData.email,
+    });
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to resend code" };
+  }
+}
+
+export async function signOutAction() {
+  try {
+    const authClient = await createAuthClient();
+    await authClient.signOut();
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to sign out" };
+  }
+}
+
+export async function getCurrentUserRoleAction() {
+  try {
+    const insforge = await createClient();
+    const { data } = await insforge.auth.getCurrentUser();
+    if (!data?.user) return { role: "STUDENT", isFacultyOrAdmin: false };
+
+    const mem = await db.membership.findFirst({
+      where: { userId: data.user.id },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const role = mem?.role || "STUDENT";
+    const isFacultyOrAdmin = ["OWNER", "ADMIN", "FACULTY", "DEAN", "ADVISOR"].includes(role);
+
+    return { role, isFacultyOrAdmin };
+  } catch (err) {
+    return { role: "STUDENT", isFacultyOrAdmin: false };
   }
 }

@@ -7,6 +7,12 @@ import { getMessageText } from "@/lib/utils";
  * or if we can just rely on conversational memory.
  */
 export async function routerAgent(state: typeof GraphState.State) {
+  const isConversational = state.queryAnalysis?.isConversational;
+  if (typeof isConversational === "boolean") {
+    console.log(`[RouterAgent] Using pre-computed routing decision: ${isConversational ? "MEMORY" : "RETRIEVAL"}`);
+    return { routedPath: isConversational ? ("MEMORY" as const) : ("RETRIEVAL" as const) };
+  }
+
   const messages = state.messages;
   const latestMessage = messages[messages.length - 1];
   

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { neo4jDriver } from "@/ai/graph/neo4j";
@@ -25,8 +25,9 @@ interface GraphEdge {
 
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     let membership = await db.membership.findFirst({ where: { userId: user.id } });
@@ -207,8 +208,9 @@ export async function GET() {
 export async function POST() {
   // Recalculate / re-trigger graph extraction for all docs
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const membership = await db.membership.findFirst({ where: { userId: user.id } });

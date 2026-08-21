@@ -353,8 +353,8 @@ export default function DocumentsPage() {
         {/* ── Top bar ── */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0 gap-4">
           <div>
-            <h1 className="text-xl font-bold text-white">Documents</h1>
-            <p className="text-xs text-gray-400 mt-0.5">Manage and explore your organization's documents.</p>
+            <h1 className="text-xl font-bold text-white">University Documents</h1>
+            <p className="text-xs text-gray-400 mt-0.5">Explore institutional and course documents. Academic documents are managed via the Faculty Portal.</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {/* Search */}
@@ -367,15 +367,12 @@ export default function DocumentsPage() {
                 className="bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 w-52"
               />
             </div>
-            <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-gray-300 transition-colors">
-              <Filter className="w-3.5 h-3.5" /> Filter
-            </button>
-            <button
-              onClick={() => setShowUpload(true)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition-colors"
+            <a
+              href="/faculty/documents"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-xs text-purple-300 transition-colors"
             >
-              <Upload className="w-3.5 h-3.5" /> Upload Document
-            </button>
+              🎓 Go to Faculty Portal
+            </a>
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 import { DocumentService } from "@/server/services/document.service";
 import { syncUserToDatabase } from "@/server/actions/auth";
@@ -12,8 +12,9 @@ export async function POST(request: Request) {
     let organizationId: string | null = null;
     let userId: string | null = null;
 
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
 
     if (user) {
       userId = user.id;
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Only PDF files are supported" }, { status: 400 });
     }
 
-    // Save the file to Supabase Storage + create DB record
+    // Save the file to InsForge Storage + create DB record
     const document = await DocumentService.uploadDocument(
       file,
       organizationId,

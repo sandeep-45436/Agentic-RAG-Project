@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 import { NextResponse } from "next/server";
 
@@ -15,8 +15,9 @@ export async function POST(
     }
 
     // 1. Authenticate user
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

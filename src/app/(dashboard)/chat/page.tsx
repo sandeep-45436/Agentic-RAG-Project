@@ -12,7 +12,7 @@ import {
   ChevronRight, Bot,
   Bug, Eye, EyeOff, Clock, BarChart3,
 } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/insforge/client";
 import {
   Sheet,
   SheetTrigger,
@@ -62,6 +62,19 @@ function fmtTime(iso: string) {
 
 function copyText(text: string) {
   navigator.clipboard.writeText(text).catch(() => {});
+}
+
+/** Extract text from a message that may use parts (UI Message Stream) or plain content. */
+function getMessageContent(m: any): string {
+  // If the message has parts (UI Message Stream protocol), extract text from them
+  if (m.parts && Array.isArray(m.parts)) {
+    return m.parts
+      .filter((p: any) => p.type === "text")
+      .map((p: any) => p.text)
+      .join("");
+  }
+  // Fallback to plain content string
+  return typeof m.content === "string" ? m.content : "";
 }
 
 function getConfidenceLevel(score: number): "high" | "medium" | "low" {
@@ -465,10 +478,12 @@ export default function ChatPage() {
 
   // Load user info
   useEffect(() => {
-    createClient().auth.getUser().then(({ data: { user } }) => {
+    const insforge = createClient();
+    insforge.auth.getCurrentUser().then((res: any) => {
+      const user = res?.data?.user;
       if (!user) return;
       const name =
-        user.user_metadata?.full_name ??
+        user.profile?.name ??
         user.email?.split("@")[0] ??
         "You";
       setUserName(name);
@@ -625,31 +640,37 @@ export default function ChatPage() {
 
       let currentId = conversationId;
 
-      if (!currentId) {
-        try {
-          const res = await fetch("/api/conversations", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({}),
-          });
-          if (!res.ok) {
-            console.error("Failed to create conversation:", res.statusText);
+      // Auto-create conversation if none exists
+        if (!currentId) {
+          try {
+            const res = await fetch("/api/conversations", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({}),
+            });
+            if (!res.ok) {
+              const errData = await res.json().catch(() => ({}));
+              const msg = errData.error || res.statusText;
+              console.error("Failed to create conversation:", msg);
+              alert(`Failed to create conversation: ${msg}`);
+              return;
+            }
+            const data = await res.json();
+            if (data.conversation?.id) {
+              currentId = data.conversation.id;
+              setConversationId(currentId);
+              loadHistory();
+            } else {
+              console.error("No conversation ID returned");
+              alert("Failed to create conversation: No ID returned");
+              return;
+            }
+          } catch (err) {
+            console.error("Error creating conversation:", err);
+            alert(`Error creating conversation: ${err}`);
             return;
           }
-          const data = await res.json();
-          if (data.conversation?.id) {
-            currentId = data.conversation.id;
-            setConversationId(currentId);
-            loadHistory();
-          } else {
-            console.error("No conversation ID returned");
-            return;
-          }
-        } catch (err) {
-          console.error("Error creating conversation:", err);
-          return;
         }
-      }
 
       sendMessage(
         { text: input },
@@ -852,11 +873,12 @@ export default function ChatPage() {
           {messages.length === 0 ? (
             <EmptyState onSuggest={(q) => setInput(q)} />
           ) : (
-            messages.map((m: any) =>
-              m.role === "user" ? (
+            messages.map((m: any) => {
+              const textContent = getMessageContent(m);
+              return m.role === "user" ? (
                 <UserBubble
                   key={m.id}
-                  content={m.content}
+                  content={textContent}
                   time={m.createdAt ? fmtTime(m.createdAt.toISOString?.() ?? m.createdAt) : undefined}
                   name={userName}
                   initials={userInitials}
@@ -872,18 +894,18 @@ export default function ChatPage() {
                         : (m.metadata as any).feedback
                       : null
                   }
-                  content={m.content}
+                  content={textContent}
                   time={m.createdAt ? fmtTime(m.createdAt.toISOString?.() ?? m.createdAt) : undefined}
-                  onCopy={() => copyText(m.content)}
+                  onCopy={() => copyText(textContent)}
                   onRetry={() => regenerate()}
                   chunks={chunks}
                 />
-              )
-            )
+              );
+            })
           )}
 
-          {/* Typing indicator */}
-          {isLoading && messages[messages.length - 1]?.role === "user" && (
+          {/* Typing indicator — show when loading and the last assistant message has no content yet */}
+          {isLoading && (messages[messages.length - 1]?.role === "user" || (messages[messages.length - 1]?.role === "assistant" && !getMessageContent(messages[messages.length - 1]))) && (
             <div className="flex gap-3 items-start">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center shrink-0">
                 <Bot className="w-4 h-4 text-white" />

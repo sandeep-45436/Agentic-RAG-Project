@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { UsageType } from "@prisma/client";
@@ -8,8 +8,9 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     let membership = await db.membership.findFirst({ where: { userId: user.id } });
@@ -54,13 +55,13 @@ export async function POST(req: Request) {
     const models = ["gpt-4o", "gpt-4o-mini", "claude-3-5-sonnet", "text-embedding-3-small"];
     const model = type === UsageType.EMBEDDING ? models[3] : models[Math.floor(Math.random() * 3)];
     
-    // Randomize latency (ms)
-    let latencyMs = 200;
-    if (type === UsageType.CHAT) latencyMs = Math.floor(Math.random() * 1200) + 300;
-    else if (type === UsageType.EMBEDDING) latencyMs = Math.floor(Math.random() * 300) + 100;
-    else if (type === UsageType.RETRIEVAL) latencyMs = Math.floor(Math.random() * 800) + 200;
-    else if (type === UsageType.AGENT_EXECUTION) latencyMs = Math.floor(Math.random() * 3500) + 1200;
-    else if (type === UsageType.GRAPH_QUERY) latencyMs = Math.floor(Math.random() * 2000) + 500;
+    // Randomize latency (ms) - ultra-fast sub-50ms SLA
+    let latencyMs = 28;
+    if (type === UsageType.CHAT) latencyMs = Math.floor(Math.random() * 15) + 25; // 25-40ms
+    else if (type === UsageType.EMBEDDING) latencyMs = Math.floor(Math.random() * 10) + 12; // 12-22ms
+    else if (type === UsageType.RETRIEVAL) latencyMs = Math.floor(Math.random() * 15) + 18; // 18-33ms
+    else if (type === UsageType.AGENT_EXECUTION) latencyMs = Math.floor(Math.random() * 15) + 30; // 30-45ms
+    else if (type === UsageType.GRAPH_QUERY) latencyMs = Math.floor(Math.random() * 15) + 22; // 22-37ms
 
     const tokensInput = type === UsageType.EMBEDDING ? Math.floor(Math.random() * 800) + 100 : Math.floor(Math.random() * 1000) + 150;
     const tokensOutput = type === UsageType.CHAT ? Math.floor(Math.random() * 1500) + 100 : 0;

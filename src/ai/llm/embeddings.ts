@@ -1,11 +1,24 @@
-import { OpenAIEmbeddings } from "@langchain/openai";
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+dotenv.config();
 
-// OpenRouter supports embeddings via the /embeddings endpoint.
-// The model must be prefixed with "openai/" when using OpenRouter.
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { ModelConfig } from "./model-config";
+
+const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY || "";
+if (!process.env.OPENAI_API_KEY && apiKey) {
+  process.env.OPENAI_API_KEY = apiKey;
+}
+
 export const embeddings = new OpenAIEmbeddings({
-  model: "openai/text-embedding-3-small",
-  apiKey: process.env.OPENROUTER_API_KEY,
+  model: ModelConfig.embedding,
+  openAIApiKey: apiKey,
+  apiKey: apiKey,
   configuration: {
-    baseURL: "https://openrouter.ai/api/v1",
+    baseURL: ModelConfig.baseUrl,
+    apiKey: apiKey,
+    defaultHeaders: {
+      Authorization: `Bearer ${apiKey}`,
+    },
   },
 });

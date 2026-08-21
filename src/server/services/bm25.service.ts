@@ -12,6 +12,17 @@ export interface BM25Result {
 }
 
 export class BM25Service {
+  // Cache the availability check for 5 minutes to avoid repeated schema queries
+  private static _availableCache: { value: boolean; expiresAt: number } | null = null;
+
+  /**
+   * Pre-warms the BM25 availability cache at server startup.
+   * Avoids a cold information_schema round-trip during the first user request.
+   */
+  static warmUp(): void {
+    this.isAvailable().catch(() => {});
+  }
+
   /**
    * Performs BM25-style keyword retrieval using PostgreSQL full-text search.
    * Uses ts_rank_cd (Cover Density) for proximity-aware ranking.
@@ -28,9 +39,10 @@ export class BM25Service {
     documentIds?: string[]
   ): Promise<BM25Result[]> {
     if (!query.trim()) return [];
+    if (documentIds !== undefined && documentIds.length === 0) return [];
 
     try {
-      const filterDocs = documentIds && documentIds.length > 0;
+      const filterDocs = documentIds !== undefined && documentIds.length > 0;
       const docsArray = filterDocs ? documentIds : [];
 
       // Use websearch_to_tsquery for natural language queries
@@ -94,6 +106,46 @@ export class BM25Service {
           LIMIT ${limit}
         `;
 
+        if (fallbackResults.length === 0) {
+          // Additional fallback: OR keyword matching if strict AND matching yields no results
+          const terms = query
+            .toLowerCase()
+            .replace(/[^\w\s]/g, " ")
+            .split(/\s+/)
+            .filter((w) => w.length > 2);
+          if (terms.length > 0) {
+            const orQueryStr = terms.join(" | ");
+            const orResults = await db.$queryRaw<
+              Array<{
+                id: string;
+                documentId: string;
+                organizationId: string;
+                content: string;
+                pageNumber: number | null;
+                chunkIndex: number;
+                rank: number;
+              }>
+            >`
+              SELECT 
+                c."id",
+                c."documentId",
+                c."organizationId",
+                c."content",
+                c."pageNumber",
+                c."chunkIndex",
+                ts_rank_cd(c."search_vector", to_tsquery('english', ${orQueryStr})) AS rank
+              FROM "Chunk" c
+              WHERE c."search_vector" @@ to_tsquery('english', ${orQueryStr})
+                AND c."organizationId" = ${organizationId}
+                AND c."deletedAt" IS NULL
+                AND (${!filterDocs} OR c."documentId" = ANY(${docsArray}))
+              ORDER BY rank DESC
+              LIMIT ${limit}
+            `;
+            return BM25Service.normalizeResults(orResults);
+          }
+        }
+
         return BM25Service.normalizeResults(fallbackResults);
       }
 
@@ -141,9 +193,14 @@ export class BM25Service {
 
   /**
    * Checks if the BM25 search infrastructure is available.
+   * Result is cached for 5 minutes to avoid repeated schema queries.
    * Useful for graceful degradation if the tsvector column hasn't been created yet.
    */
   static async isAvailable(): Promise<boolean> {
+    const now = Date.now();
+    if (this._availableCache && now < this._availableCache.expiresAt) {
+      return this._availableCache.value;
+    }
     try {
       const result = await db.$queryRaw<Array<{ exists: boolean }>>`
         SELECT EXISTS (
@@ -152,8 +209,11 @@ export class BM25Service {
           AND column_name = 'search_vector'
         ) AS exists
       `;
-      return result[0]?.exists === true;
+      const available = result[0]?.exists === true;
+      this._availableCache = { value: available, expiresAt: now + 5 * 60 * 1000 };
+      return available;
     } catch {
+      this._availableCache = { value: false, expiresAt: now + 60 * 1000 };
       return false;
     }
   }

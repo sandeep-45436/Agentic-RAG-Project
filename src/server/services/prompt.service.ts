@@ -8,6 +8,8 @@ export class PromptService {
     formattedContext: string,
     isMultiDoc: boolean = false
   ): string {
+    const hasDocumentDelivery = formattedContext.includes("Document Delivery:");
+
     const multiDocInstructions = isMultiDoc
       ? `\nMULTI-DOCUMENT SYNTHESIS RULES:
 - The CONTEXT contains information across multiple separate source documents.
@@ -16,14 +18,25 @@ export class PromptService {
 - Highlight any discrepancies, contradictions, or conflicting facts found between the sources.`
       : "";
 
+    const documentDeliveryInstruction = hasDocumentDelivery
+      ? `\nDOCUMENT DELIVERY DIRECTIVE:
+- The CONTEXT contains a "Document Delivery" section with a generated PDF download link.
+- You MUST present the PDF download link and table clearly to the user with a helpful confirmation message (e.g. "Here is your requested PDF document extract:").
+- Do NOT output "I could not find that information in your documents." when a Document Delivery download link is provided.`
+      : "";
+
+    const rule2 = hasDocumentDelivery
+      ? `2. If the user asked a factual question AND the answer cannot be found in CONTEXT nor in the Document Delivery card, reply with: "I could not find that information in your documents."`
+      : `2. If the answer cannot be found in the CONTEXT, you MUST reply exactly with: "I could not find that information in your documents."`;
+
     return `
 SYSTEM:
 You are a highly precise, retrieval-grounded AI assistant behaving like an enterprise research analyst.
-Your primary directive is to answer the user's question using ONLY the provided CONTEXT.${multiDocInstructions}
+Your primary directive is to answer the user's question using ONLY the provided CONTEXT.${multiDocInstructions}${documentDeliveryInstruction}
 
 CRITICAL RULES:
 1. Only answer using the provided CONTEXT. Do not use outside knowledge.
-2. If the answer cannot be found in the CONTEXT, you MUST reply exactly with: "I could not find that information in your documents."
+${rule2}
 3. Do not invent, assume, or hallucinate any information.
 4. Always cite your sources by referencing the exact [Citation ID: X] or Source name from the CONTEXT at the end of statements where they are used.
 

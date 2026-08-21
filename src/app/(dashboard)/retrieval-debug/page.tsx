@@ -322,15 +322,18 @@ export default function RetrievalDebugPage() {
   const fetchData = useCallback(async () => {
     try {
       const res = await fetch("/api/debug/retrieval");
-      if (!res.ok) throw new Error("Failed to fetch");
-      const data = await res.json();
-      setLogs(data.logs ?? []);
-      setStats(data.stats ?? null);
+      if (!res.ok) {
+        setLogs([]);
+        setStats({ totalQueries: 0, avgLatencyMs: 0, cacheHitRate: 0, hybridRatio: 0 });
+        return;
+      }
+      const data = await res.json().catch(() => ({}));
+      setLogs(data?.logs ?? []);
+      setStats(data?.stats ?? { totalQueries: 0, avgLatencyMs: 0, cacheHitRate: 0, hybridRatio: 0 });
     } catch (err) {
-      console.error("Failed to load retrieval debug data:", err);
-      // Fallback: show empty state
+      console.warn("Failed to load retrieval debug data:", err);
       setLogs([]);
-      setStats(null);
+      setStats({ totalQueries: 0, avgLatencyMs: 0, cacheHitRate: 0, hybridRatio: 0 });
     } finally {
       setLoading(false);
       setRefreshing(false);

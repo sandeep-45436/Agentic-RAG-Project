@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { BillingService } from "@/server/services/billing";
@@ -8,8 +8,9 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     let membership = await db.membership.findFirst({ where: { userId: user.id } });

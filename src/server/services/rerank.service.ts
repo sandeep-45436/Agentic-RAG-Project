@@ -7,6 +7,18 @@ export class RerankService {
   private static initError: Error | null = null;
 
   /**
+   * Asynchronously pre-warms the BGE reranker WASM model at server startup.
+   * Call this once at module level (outside any request handler) so the
+   * 270 MB model download is amortized to boot time, not the first user query.
+   */
+  static warmUp(): void {
+    if (process.env.DISABLE_RERANKER === "true" || process.env.NEXT_PUBLIC_DISABLE_RERANKER === "true") return;
+    this.getReranker().catch(() => {
+      // Warm-up failures are non-fatal; the per-request path will fall back to LLM reranking
+    });
+  }
+
+  /**
    * Initializes the local BGE-Reranker WebAssembly pipeline.
    * Singleton pattern to prevent multiple loads of the 270MB model.
    */
@@ -49,6 +61,22 @@ export class RerankService {
     topK: number = 5
   ): Promise<VectorPayload[]> {
     if (chunks.length === 0) return [];
+
+    // Bypass reranking if disabled via env config (highly recommended for high-speed local dev/hosting)
+    if (process.env.DISABLE_RERANKER === "true" || process.env.NEXT_PUBLIC_DISABLE_RERANKER === "true") {
+      console.log(`[RerankService] Reranking bypassed. Returning top ${topK} elements by fusion score.`);
+      return chunks
+        .sort((a, b) => (b.metadata?.fusionScore ?? 0) - (a.metadata?.fusionScore ?? 0))
+        .slice(0, topK)
+        .map(c => ({
+          ...c,
+          metadata: {
+            ...c.metadata,
+            rerankScore: c.metadata?.fusionScore ?? 1.0,
+          }
+        }));
+    }
+
     if (chunks.length <= topK) {
       // Still populate scores for debugging observability
       return chunks.map(c => ({

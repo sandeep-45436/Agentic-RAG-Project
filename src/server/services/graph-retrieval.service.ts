@@ -5,19 +5,29 @@ export class GraphRetrievalService {
   /**
    * Performs multi-hop traversal in Neo4j to find relationship context for the user query.
    */
-  static async retrieveGraphContext(query: string, organizationId: string): Promise<string> {
+  static async retrieveGraphContext(
+    query: string,
+    organizationId: string,
+    preComputedEntities?: string[]
+  ): Promise<string> {
     if (!query.trim()) return "";
 
     try {
-      // 1. Fast entity extraction from query
-      const prompt = `
+      let entityNames: string[] = [];
+
+      if (preComputedEntities && preComputedEntities.length > 0) {
+        entityNames = preComputedEntities;
+      } else {
+        // 1. Fast entity extraction from query
+        const prompt = `
 Extract up to 3 key entities (technologies, concepts, features, APIs) from the following query.
 Return ONLY a comma-separated list of the entities. No extra text.
 
 Query: "${query}"
 `;
-      const response = await llm.invoke(prompt);
-      const entityNames = response.content.toString().split(",").map(e => e.trim());
+        const response = await llm.invoke(prompt);
+        entityNames = response.content.toString().split(",").map(e => e.trim());
+      }
 
       if (entityNames.length === 0 || entityNames[0] === "") return "";
 
@@ -27,27 +37,29 @@ Query: "${query}"
 
       try {
         await session.executeRead(async (tx) => {
-          for (const entityName of entityNames) {
-            // Find nodes with matching names (case-insensitive approximation) and traverse 1 hop
-            const cypher = `
-              MATCH (n:Entity { organizationId: $organizationId })-[r]->(m:Entity { organizationId: $organizationId })
-              WHERE toLower(n.name) CONTAINS toLower($name)
-              RETURN n.name AS source, type(r) AS rel, m.name AS target
-              LIMIT 5
-            `;
-            
+          // Run all entity queries in parallel instead of sequentially
+          const cypher = `
+            MATCH (n:Entity { organizationId: $organizationId })-[r]->(m:Entity { organizationId: $organizationId })
+            WHERE toLower(n.name) CONTAINS toLower($name)
+            RETURN n.name AS source, type(r) AS rel, m.name AS target
+            LIMIT 5
+          `;
+
+          const entityQueries = entityNames.map(async (entityName) => {
             const result = await tx.run(cypher, {
               organizationId,
-              name: entityName
+              name: entityName,
             });
-
-            result.records.forEach(record => {
+            return result.records.map((record) => {
               const source = record.get("source");
               const rel = record.get("rel");
               const target = record.get("target");
-              graphContexts.push(`${source} ${rel} ${target}`);
+              return `${source} ${rel} ${target}`;
             });
-          }
+          });
+
+          const results = await Promise.all(entityQueries);
+          results.forEach((triples) => graphContexts.push(...triples));
         });
       } finally {
         await session.close();

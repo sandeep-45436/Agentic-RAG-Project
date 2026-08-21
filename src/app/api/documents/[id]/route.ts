@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 
 export const dynamic = "force-dynamic";
@@ -10,8 +10,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const membership = await db.membership.findFirst({ where: { userId: user.id } });
@@ -34,7 +35,7 @@ export async function GET(
     if (!doc) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     // Build a signed URL for the storage object
-    const { data: signedUrlData } = await supabase.storage
+    const { data: signedUrlData } = await insforge.storage
       .from("documents")
       .createSignedUrl(doc.storagePath, 3600); // 1h
 
@@ -52,8 +53,9 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const membership = await db.membership.findFirst({ where: { userId: user.id } });
@@ -65,7 +67,7 @@ export async function DELETE(
     if (!doc) return NextResponse.json({ error: "Document not found" }, { status: 404 });
 
     await db.document.update({ where: { id }, data: { deletedAt: new Date() } });
-    await supabase.storage.from("documents").remove([doc.storagePath]);
+    await insforge.storage.from("documents").remove(doc.storagePath);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

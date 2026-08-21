@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agentic RAG Powered Smart University Operations – Abstract</title>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    @page {
+      size: A4;
+      margin: 25mm 20mm 25mm 20mm;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
+      font-size: 12pt;
+      line-height: 1.75;
+      color: #1a1a1a;
+      background: #ffffff;
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 25mm 20mm;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* ── Title Block ────────────────────────────────── */
+    .title-block {
+      text-align: center;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 2.5px solid #1a3c6e;
+    }
+
+    .title-block h1 {
+      font-family: 'Merriweather', Georgia, serif;
+      font-size: 20pt;
+      font-weight: 900;
+      color: #0d1b2a;
+      letter-spacing: -0.3px;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .title-block .subtitle {
+      font-size: 11pt;
+      font-weight: 600;
+      color: #415a77;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .title-block .date {
+      font-size: 10pt;
+      color: #778da9;
+      margin-top: 6px;
+    }
+
+    /* ── Section Headings ──────────────────────────── */
+    h2 {
+      font-family: 'Merriweather', Georgia, serif;
+      font-size: 13pt;
+      font-weight: 700;
+      color: #0d1b2a;
+      margin-top: 24px;
+      margin-bottom: 10px;
+      padding-bottom: 4px;
+      border-bottom: 1.5px solid #e0e1dd;
+    }
+
+    h3 {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 11.5pt;
+      font-weight: 700;
+      color: #1b263b;
+      margin-top: 18px;
+      margin-bottom: 6px;
+    }
+
+    /* ── Body Text ─────────────────────────────────── */
+    p {
+      text-align: justify;
+      margin-bottom: 10px;
+      hyphens: auto;
+    }
+
+    strong {
+      color: #0d1b2a;
+      font-weight: 700;
+    }
+
+    em { color: #415a77; }
+
+    code {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 9.5pt;
+      background: #f0f4f8;
+      color: #1b263b;
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid #e0e1dd;
+    }
+
+    /* ── Lists ─────────────────────────────────────── */
+    ol, ul {
+      margin-left: 22px;
+      margin-bottom: 10px;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    li strong { color: #1b263b; }
+
+    /* ── Architecture Diagram ──────────────────────── */
+    .architecture-box {
+      background: #f8f9fa;
+      border: 1px solid #d5d8dc;
+      border-left: 4px solid #1a3c6e;
+      border-radius: 4px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 9pt;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      color: #1b263b;
+    }
+
+    /* ── Keywords Box ──────────────────────────────── */
+    .keywords {
+      background: #f0f4f8;
+      border: 1px solid #d5d8dc;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin-top: 20px;
+      font-size: 10.5pt;
+    }
+
+    .keywords strong {
+      color: #1a3c6e;
+    }
+
+    /* ── Divider ───────────────────────────────────── */
+    hr {
+      border: none;
+      border-top: 1px solid #d5d8dc;
+      margin: 22px 0;
+    }
+
+    /* ── Footer ────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      font-size: 10pt;
+      color: #778da9;
+      font-style: italic;
+      margin-top: 28px;
+      padding-top: 14px;
+      border-top: 1.5px solid #e0e1dd;
+    }
+
+    /* ── Print Button (hidden in print) ────────────── */
+    .print-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: linear-gradient(135deg, #0d1b2a, #1a3c6e);
+      color: #ffffff;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1000;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+      font-size: 10.5pt;
+    }
+
+    .print-bar span { font-weight: 600; letter-spacing: 0.5px; }
+
+    .print-btn {
+      background: #ffffff;
+      color: #0d1b2a;
+      border: none;
+      padding: 8px 28px;
+      font-size: 11pt;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .print-btn:hover {
+      background: #e0e1dd;
+      transform: translateY(-1px);
+    }
+
+    @media print {
+      .print-bar { display: none !important; }
+      body { padding: 0; margin: 0; }
+    }
+
+    @media screen {
+      body { padding-top: 70px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Print Bar (screen only) -->
+  <div class="print-bar">
+    <span>📄 Project Abstract — Ready to Save as PDF</span>
+    <button class="print-btn" onclick="window.print()">⬇ Save as PDF</button>
+  </div>
+
+  <!-- Title Block -->
+  <div class="title-block">
+    <h1>Agentic RAG Powered Smart University Operations</h1>
+    <div class="subtitle">Project Abstract</div>
+    <div class="date">Engineers Day 2026</div>
+  </div>
+
+  <!-- Abstract -->
+  <h2>Abstract</h2>
+
+  <p>
+    Modern universities generate and manage vast volumes of heterogeneous institutional documents — academic regulations, examination circulars, administrative policies, syllabi, timetables, and research publications — spread across disparate departments and legacy systems. Retrieving accurate, contextually relevant information from this corpus in response to natural-language queries remains a critical operational challenge. Conventional keyword-based search systems suffer from vocabulary mismatch, lack semantic understanding, and are unable to reason across interrelated documents, leading to information silos and operational inefficiencies.
+  </p>
+
+  <p>
+    This project presents <strong>"Agentic RAG Powered Smart University Operations"</strong>, an enterprise-grade, next-generation document intelligence platform that unifies <strong>Retrieval-Augmented Generation (RAG)</strong> with <strong>autonomous multi-agent orchestration</strong> to deliver zero-hallucination, citation-grounded answers to complex university queries. The system is designed to serve as a centralized AI-powered knowledge hub for students, faculty, and administrative staff, transforming how universities access, interpret, and act upon institutional knowledge.
+  </p>
+
+  <!-- Hybrid Retrieval -->
+  <h2>Hybrid Multi-Channel Retrieval Architecture</h2>
+
+  <p>
+    At its core, the platform implements a novel <strong>hybrid multi-channel retrieval</strong> pipeline that simultaneously queries three complementary search backends:
+  </p>
+
+  <ol>
+    <li><strong>Qdrant Vector Search</strong> — performs cosine-similarity semantic search over high-dimensional document embeddings, capturing deep conceptual meaning beyond surface-level keywords.</li>
+    <li><strong>PostgreSQL BM25 Full-Text Search</strong> — executes classical term-frequency inverse-document-frequency (TF-IDF) keyword ranking using <code>ts_rank_cd</code>, ensuring precise lexical matches for domain-specific terminology (e.g., regulation numbers, course codes).</li>
+    <li><strong>Neo4j Knowledge Graph Traversal</strong> — runs Cypher graph queries to navigate entity–relationship structures (e.g., <em>Course → Department → Faculty → Regulation</em>), enabling multi-hop relational reasoning that neither vector nor keyword search can achieve alone.</li>
+  </ol>
+
+  <p>
+    Candidates from all three channels are mathematically fused using <strong>Reciprocal Rank Fusion (RRF)</strong>, producing a unified, bias-corrected ranking. A local <strong>BGE Cross-Encoder Reranker</strong> (<code>Xenova/bge-reranker-base</code>) then applies pairwise attention-based relevance scoring to eliminate false positives and surface the most contextually faithful passages.
+  </p>
+
+  <div class="architecture-box">User Query ──▶ LangGraph (Analysis &amp; Router Agents)
+                   │
+                   ├──▶ Hybrid Retrieval Service
+                   │     ├── Qdrant Vector Search (Cosine)
+                   │     ├── Postgres BM25 Search (ts_rank_cd)
+                   │     └── Neo4j Knowledge Graph (Cypher)
+                   │
+                   ├──▶ Reciprocal Rank Fusion (RRF)
+                   ├──▶ BGE Cross-Encoder Reranker
+                   └──▶ Jaccard Context Compression
+                                │
+                                ▼
+                 Streaming Grounded Response + Debug Headers</div>
+
+  <!-- Agentic Workflow -->
+  <h2>LangGraph-Based Agentic Workflow</h2>
+
+  <p>
+    Unlike monolithic RAG pipelines, this platform employs a <strong>LangGraph multi-agent state graph</strong> where specialised autonomous agents collaborate in a directed workflow:
+  </p>
+
+  <ul>
+    <li><strong>Analysis Agent</strong> — decomposes the user's natural-language query into structured intent, entities, and temporal constraints.</li>
+    <li><strong>Router Agent</strong> — dynamically selects the optimal retrieval strategy (vector, keyword, graph, or hybrid) based on query classification.</li>
+    <li><strong>Retrieval Agent</strong> — orchestrates parallel search across all backends and applies RRF fusion.</li>
+    <li><strong>Citation Agent</strong> — maps each claim in the generated response to specific source passages, ensuring full traceability.</li>
+    <li><strong>Response Agent</strong> — synthesises a grounded, streaming answer with inline citations and confidence scores.</li>
+  </ul>
+
+  <p>
+    Additional planning-layer agents — including an <strong>Intent Classifier</strong>, <strong>Goal Recognition Engine</strong>, <strong>Task Decomposer</strong>, <strong>Plan Optimizer</strong>, and <strong>Verification Agent</strong> — enable the system to handle complex multi-step queries (e.g., <em>"Compare the re-evaluation policy across all departments for autonomous and non-autonomous programs"</em>) that require decomposition, parallel retrieval, and cross-document synthesis.
+  </p>
+
+  <!-- Multimodal Ingestion -->
+  <h2>Multimodal Document Ingestion</h2>
+
+  <p>
+    The ingestion pipeline leverages <strong>Gemini 2.5 Flash vision</strong> for multimodal PDF layout understanding — parsing tables into structured Markdown, converting charts and figures into semantic text summaries, and performing OCR on scanned legacy documents — ensuring that even non-digital university records are fully searchable.
+  </p>
+
+  <!-- Analytics -->
+  <h2>Real-Time Analytics &amp; Evaluation</h2>
+
+  <p>
+    A <strong>live analytics dashboard</strong> provides administrators with real-time operational metrics — query volumes, retrieval latencies, source utilisation, and user engagement — computed directly from database events with dynamic date-range filtering and CSV export capabilities. An integrated <strong>LLM-as-a-Judge evaluation engine</strong> continuously scores system performance on recall, faithfulness, and hallucination rates via non-blocking background workers.
+  </p>
+
+  <!-- Tech Stack -->
+  <h2>Technology Stack</h2>
+
+  <p>
+    The platform is built on a modern, production-ready stack: <strong>Next.js 15</strong> (App Router) with <strong>React 19</strong> and <strong>TypeScript</strong> on the frontend; <strong>Python 3</strong> with <strong>FastAPI</strong> and <strong>Uvicorn</strong> powering the Enterprise Tool Runtime (ETR) microservice for agent planning, tool discovery, execution, health monitoring, and audit logging; <strong>PostgreSQL</strong> (Prisma ORM) for relational data; <strong>Qdrant</strong> for vector storage; <strong>Neo4j</strong> for graph-based knowledge representation; <strong>Upstash Redis</strong> for caching; <strong>LangGraph</strong> and <strong>LangChain</strong> (both TypeScript and Python) for agent orchestration; and the <strong>OpenRouter AI Gateway</strong> for multi-model LLM access (GPT-4o-mini, Claude 3.5 Sonnet, Gemini 2.5 Flash) with automatic failover routing.
+  </p>
+
+  <!-- Key Contributions -->
+  <h2>Key Contributions</h2>
+
+  <ol>
+    <li>A <strong>hybrid retrieval architecture</strong> combining vector, keyword, and graph search with RRF fusion and cross-encoder reranking for superior retrieval accuracy.</li>
+    <li>A <strong>multi-agent agentic workflow</strong> using LangGraph that decomposes, plans, retrieves, verifies, and cites — going beyond single-pass RAG to deliver human-quality, trustworthy answers.</li>
+    <li>A <strong>multimodal ingestion pipeline</strong> capable of understanding PDFs with complex layouts including tables, charts, and scanned images.</li>
+    <li>A <strong>real-time evaluation framework</strong> with LLM-as-a-Judge scoring for continuous quality assurance.</li>
+    <li><strong>Enterprise-grade design</strong> with multi-tenant isolation, RBAC, audit logging, SSO readiness, and production hardening for institutional deployment.</li>
+  </ol>
+
+  <!-- Conclusion -->
+  <h2>Conclusion</h2>
+
+  <p>
+    The proposed system demonstrates that combining agentic AI orchestration with hybrid multi-modal retrieval can fundamentally transform university operations — reducing information retrieval time from hours to seconds, eliminating hallucinated responses through citation grounding, and providing a single intelligent interface for the entire institutional knowledge base. The platform is designed to be scalable, extensible, and production-ready for deployment across diverse higher-education institutions.
+  </p>
+
+  <hr />
+
+  <!-- Keywords -->
+  <div class="keywords">
+    <strong>Keywords:</strong> Retrieval-Augmented Generation (RAG), Multi-Agent Systems, LangGraph, Knowledge Graph, Hybrid Search, Reciprocal Rank Fusion, Cross-Encoder Reranking, Smart University, Document Intelligence, LLM Orchestration
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    Project developed for Engineers Day 2026
+  </div>
+
+</body>
+</html>

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 import { AnalyticsService } from '@/server/services/analytics';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/insforge/server';
 import { db } from '@/server/db/prisma';
 import { redirect } from 'next/navigation';
 
@@ -13,10 +13,11 @@ export const metadata: Metadata = {
 };
 
 export default async function AnalyticsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const insforge = await createClient();
+  const { data, error } = await insforge.auth.getCurrentUser();
 
-  if (!user) redirect('/login');
+  if (error || !data?.user) redirect('/login');
+  const user = data.user;
 
   const membership = await db.membership.findFirst({ where: { userId: user.id } });
   if (!membership) redirect('/login');

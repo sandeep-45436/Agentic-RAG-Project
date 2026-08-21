@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 import { ConversationService } from "@/server/services/conversation.service";
 import { syncUserToDatabase } from "@/server/actions/auth";
@@ -8,8 +8,9 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     let membership = await db.membership.findFirst({ where: { userId: user.id } });
@@ -24,7 +25,9 @@ export async function GET() {
       membership.organizationId
     );
 
-    return NextResponse.json({ conversations });
+    // Successfully retrieved conversations
+console.log("GET /api/conversations: retrieved", conversations.length, "conversations");
+return NextResponse.json({ conversations });
   } catch (error: any) {
     console.error("GET /api/conversations error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -33,8 +36,9 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     let membership = await db.membership.findFirst({ where: { userId: user.id } });
@@ -55,6 +59,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ conversation }, { status: 201 });
   } catch (error: any) {
     console.error("POST /api/conversations error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: error?.message || "Internal server error" }, { status: 500 });
   }
 }

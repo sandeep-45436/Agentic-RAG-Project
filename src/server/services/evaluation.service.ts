@@ -1,4 +1,5 @@
 import { db } from "@/server/db/prisma";
+import { ModelConfig } from "@/ai/llm/model-config";
 
 export class EvaluationService {
   /**
@@ -86,14 +87,14 @@ GENERATED ASSISTANT RESPONSE:
 ${response}
 `;
 
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const res = await fetch(`${ModelConfig.baseUrl}/chat/completions`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: ModelConfig.evaluation,
           messages: [{ role: "user", content: prompt }],
           temperature: 0.1,
           max_tokens: 1000,

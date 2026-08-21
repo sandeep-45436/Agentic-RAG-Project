@@ -1,0 +1,164 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/Contents 8 0 R /MediaBox [ 0 0 612 792 ] /Parent 7 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+5 0 obj
+<<
+/PageMode /UseNone /Pages 7 0 R /Type /Catalog
+>>
+endobj
+6 0 obj
+<<
+/Author (\(anonymous\)) /CreationDate (D:20260821151748+05'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20260821151748+05'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (\(unspecified\)) /Title (\(anonymous\)) /Trapped /False
+>>
+endobj
+7 0 obj
+<<
+/Count 1 /Kids [ 4 0 R ] /Type /Pages
+>>
+endobj
+8 0 obj
+<<
+/Length 2423
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+1 0 0 1 78 666 cm
+q
+.117647 .227451 .541176 rg
+BT 1 0 0 1 0 28 Tm /F2 20 Tf 24 TL (Department of Computer Science - Course) Tj T* (Syllabus) Tj T* ET
+Q
+Q
+q
+1 0 0 1 78 636 cm
+q
+BT 1 0 0 1 0 4 Tm 18 TL /F2 14 Tf .145098 .388235 .921569 rg (CS401: Advanced Algorithms & Data Structures | 4 Credits) Tj T* ET
+Q
+Q
+q
+1 0 0 1 78 618 cm
+Q
+q
+1 0 0 1 78 588 cm
+q
+BT 1 0 0 1 0 4 Tm 18 TL /F2 14 Tf .145098 .388235 .921569 rg (Course Overview & Prerequisites) Tj T* ET
+Q
+Q
+q
+1 0 0 1 78 538 cm
+q
+.121569 .160784 .215686 rg
+BT 1 0 0 1 0 32 Tm /F1 10 Tf 14 TL (CS401 covers dynamic programming, amortized analysis, graph algorithms \(Dijkstra, Bellman-Ford,) Tj T* (Tarjan's SCC\), network flows, and NP-completeness. Prerequisites: CS201 \(Basic Data Structures\)) Tj T* (and MATH301 \(Linear Algebra\).) Tj T* ET
+Q
+Q
+q
+1 0 0 1 78 520 cm
+Q
+q
+1 0 0 1 78 490 cm
+q
+BT 1 0 0 1 0 4 Tm 18 TL /F2 14 Tf .145098 .388235 .921569 rg (Examination Schedule & Weightage) Tj T* ET
+Q
+Q
+q
+1 0 0 1 76 389 cm
+q
+.015686 .470588 .341176 rg
+n 0 93 460 -21 re f*
+.92549 .992157 .960784 rg
+n 0 72 460 -72 re f*
+.960784 .960784 .960784 rg
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 30.545 80 Tm (Assessment) Tj T* ET
+BT 1 0 0 1 166.105 80 Tm (Date & Time) Tj T* ET
+BT 1 0 0 1 304.165 80 Tm (Location) Tj T* ET
+BT 1 0 0 1 394.72 80 Tm (Weightage) Tj T* ET
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 45.55 59 Tm (Quiz 1) Tj T* ET
+BT 1 0 0 1 138.385 59 Tm (Sept 15, 2026 | 10:00 AM) Tj T* ET
+BT 1 0 0 1 306.66 59 Tm (Hall 201) Tj T* ET
+BT 1 0 0 1 409.995 59 Tm (10%) Tj T* ET
+BT 1 0 0 1 24.445 41 Tm (Mid-Term Exam) Tj T* ET
+BT 1 0 0 1 140.89 41 Tm (Oct 20, 2026 | 09:00 AM) Tj T* ET
+BT 1 0 0 1 288.6 41 Tm (Tech Auditorium) Tj T* ET
+BT 1 0 0 1 409.995 41 Tm (30%) Tj T* ET
+BT 1 0 0 1 21.65 23 Tm (Lab Assignments) Tj T* ET
+BT 1 0 0 1 148.88 23 Tm (Weekly Submissions) Tj T* ET
+BT 1 0 0 1 296.1 23 Tm (Online Portal) Tj T* ET
+BT 1 0 0 1 409.995 23 Tm (20%) Tj T* ET
+BT 1 0 0 1 12.765 5 Tm (Final End-Sem Exam) Tj T* ET
+BT 1 0 0 1 139.78 5 Tm (Dec 10, 2026 | 02:00 PM) Tj T* ET
+BT 1 0 0 1 288.6 5 Tm (Tech Auditorium) Tj T* ET
+BT 1 0 0 1 409.995 5 Tm (40%) Tj T* ET
+q
+1 J
+1 j
+.654902 .952941 .815686 RG
+1 w
+n 0 93 m 460 93 l S
+n 0 0 m 460 0 l S
+n 0 0 m 0 93 l S
+n 460 0 m 460 93 l S
+n 0 72 m 460 72 l S
+n 0 54 m 460 54 l S
+n 0 36 m 460 36 l S
+n 0 18 m 460 18 l S
+n 120 0 m 120 93 l S
+n 270 0 m 270 93 l S
+n 380 0 m 380 93 l S
+Q
+Q
+Q
+ 
+endstream
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000061 00000 n 
+0000000102 00000 n 
+0000000209 00000 n 
+0000000321 00000 n 
+0000000514 00000 n 
+0000000582 00000 n 
+0000000862 00000 n 
+0000000921 00000 n 
+trailer
+<<
+/ID 
+[<1c3643c304872a8ed2f94bda49d0e04c><1c3643c304872a8ed2f94bda49d0e04c>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 6 0 R
+/Root 5 0 R
+/Size 9
+>>
+startxref
+3395
+%%EOF

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { UsageType } from "@prisma/client";
@@ -9,8 +9,9 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     let membership = await db.membership.findFirst({ where: { userId: user.id } });
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
 
     const { organizationId } = membership;
 
-    const { agentId } = await req.json();
+    const { agentId, query: customQuery } = await req.json();
     if (!agentId) {
       return NextResponse.json({ error: "Missing agentId" }, { status: 400 });
     }
@@ -35,18 +36,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Agent not found" }, { status: 404 });
     }
 
-    // Determine query based on agent name to demonstrate multi-tool planning
-    let query = "Audit compliance policies and database statistics.";
-    if (agent.name.includes("Research")) {
-      query = "Compare key facts in our document context with external competitor rates.";
-    } else if (agent.name.includes("Document")) {
-      query = "Summarize uploaded files and count total chunk records.";
-    } else if (agent.name.includes("Graph")) {
-      query = "Traverse knowledge graph chunks and retrieve summary statistics.";
-    } else if (agent.name.includes("Compliance")) {
-      query = "Check compliance policy documents and summarize database usage logs.";
-    } else if (agent.name.includes("Email")) {
-      query = "Draft email reply about SaaS benchmark rates from search.";
+    // Use custom query from UI if provided, otherwise fall back to agent's purpose
+    let query = customQuery?.trim() || agent.prompt || "Analyze available data and provide insights.";
+    if (!customQuery) {
+      // Fallback: derive a task from the agent name
+      if (agent.name.toLowerCase().includes("research")) {
+        query = "Compare key facts in our document context with external benchmark data.";
+      } else if (agent.name.toLowerCase().includes("document") || agent.name.toLowerCase().includes("analyst")) {
+        query = "Summarize uploaded files and count total chunk records.";
+      } else if (agent.name.toLowerCase().includes("graph")) {
+        query = "Traverse knowledge graph chunks and retrieve summary statistics.";
+      } else if (agent.name.toLowerCase().includes("compliance")) {
+        query = "Check compliance policy documents and summarize database usage logs.";
+      } else if (agent.name.toLowerCase().includes("summar")) {
+        query = "Summarize the key topics and findings across all uploaded documents.";
+      }
     }
 
     // Execute real multi-turn agentic orchestration

@@ -3,13 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/insforge/client";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Bot } from "lucide-react";
+
+import { loginAction } from "@/server/actions/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -23,23 +25,21 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const res = await loginAction({ email, password });
 
-    if (signInError) {
-      setError(signInError.message);
+      if (!res.success) {
+        setError(res.error || "Failed to sign in");
+        return;
+      }
+
+      // Hard redirect so proxy and middleware read fresh session cookies
+      window.location.href = "/dashboard";
+    } catch (err: any) {
+      setError(err.message || "Failed to sign in. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Sync user to Prisma DB before redirecting
-    await syncUserToDatabase();
-    
-    router.push("/dashboard");
-    router.refresh(); // Refresh to update server components (like sidebar)
   };
 
   return (
@@ -69,6 +69,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
           <div className="space-y-2">
@@ -79,6 +80,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
         </CardContent>

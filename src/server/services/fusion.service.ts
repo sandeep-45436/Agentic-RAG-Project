@@ -140,19 +140,16 @@ export class FusionService {
    * Enriches BM25-only results with document names by looking up
    * the document records. This fills the gap where BM25 results
    * from raw SQL queries don't carry document metadata.
+   * Mutates chunks in-place.
    */
-  static async enrichDocumentNames(
+  static enrichDocumentNames(
     chunks: FusedChunk[],
     documentNameMap: Map<string, string>
-  ): Promise<FusedChunk[]> {
-    return chunks.map((chunk) => {
+  ): void {
+    chunks.forEach((chunk) => {
       if (chunk.documentName === "Unknown" && documentNameMap.has(chunk.documentId)) {
-        return {
-          ...chunk,
-          documentName: documentNameMap.get(chunk.documentId) || "Unknown",
-        };
+        chunk.documentName = documentNameMap.get(chunk.documentId) || "Unknown";
       }
-      return chunk;
     });
   }
 

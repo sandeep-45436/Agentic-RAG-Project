@@ -7,7 +7,7 @@ import { getMessageText } from "@/lib/utils";
  * ensuring strict organization filtering and logging debug metrics.
  */
 export async function retrievalAgent(state: typeof GraphState.State) {
-  const { messages, organizationId } = state;
+  const { messages, organizationId, queryAnalysis } = state;
   const latestMessage = messages[messages.length - 1];
   
   if (!latestMessage || !organizationId) {
@@ -26,8 +26,13 @@ export async function retrievalAgent(state: typeof GraphState.State) {
         citations: (msg as any).citations ?? null,
       }));
 
-    // Invoke the controlled hybrid retrieval service with history
-    const result = await RetrievalService.buildContextualPrompt(query, organizationId, chatHistory);
+    // Invoke the controlled hybrid retrieval service with history and pre-computed analysis
+    const result = await RetrievalService.buildContextualPrompt(
+      query,
+      organizationId,
+      chatHistory,
+      queryAnalysis || undefined
+    );
     
     return { 
       retrievedChunks: result.chunks || [], 

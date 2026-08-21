@@ -16,7 +16,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/insforge/client";
+import { signOutAction } from "@/server/actions/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -30,21 +31,24 @@ export default function DashboardLayout({
   const [userInitials, setUserInitials] = useState<string>("U");
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    const insforge = createClient();
+    insforge.auth.getCurrentUser().then((res: any) => {
+      const user = res?.data?.user;
       if (user?.email) {
         setUserEmail(user.email);
-        // Derive initials from email prefix
-        const prefix = user.email.split("@")[0];
-        setUserInitials(prefix.slice(0, 2).toUpperCase());
+        // Derive initials from email prefix or name
+        const displayName = user.profile?.name || user.email.split("@")[0];
+        setUserInitials(displayName.slice(0, 2).toUpperCase());
       }
     });
   }, []);
 
   const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/login");
+    const res = await signOutAction();
+    if (res.success) {
+      router.push("/login");
+      router.refresh();
+    }
   };
 
   // Dispatch global custom event for command menu

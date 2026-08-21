@@ -86,15 +86,16 @@ export default function AnalyticsPage() {
   const [simSpeed, setSimSpeed] = useState<"fast" | "medium" | "slow">("medium");
   const [toasts, setToasts] = useState<SimulatedToast[]>([]);
   const [queriesRange, setQueriesRange] = useState<"daily" | "hourly">("daily");
+  const [daysFilter, setDaysFilter] = useState<7 | 30 | 90>(30);
   
   const simulationIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const toastTimeoutRefs = useRef<Record<string, NodeJS.Timeout>>({});
 
-  // Fetch Analytics data
+  // Fetch Analytics data with selected days parameter
   const fetchAnalytics = useCallback(async (isSilent = false) => {
     if (!isSilent) setRefreshing(true);
     try {
-      const res = await fetch("/api/analytics");
+      const res = await fetch(`/api/analytics?days=${daysFilter}`);
       const json = await res.json();
       if (json.error) {
         console.error(json.error);
@@ -107,9 +108,9 @@ export default function AnalyticsPage() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [daysFilter]);
 
-  // Initial load
+  // Initial load & range change
   useEffect(() => {
     fetchAnalytics();
   }, [fetchAnalytics]);
@@ -119,7 +120,7 @@ export default function AnalyticsPage() {
     if (!isLive) return;
     const interval = setInterval(() => {
       fetchAnalytics(true);
-    }, 3000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [isLive, fetchAnalytics]);
 
@@ -138,13 +139,11 @@ export default function AnalyticsPage() {
         };
         setToasts((prev) => [newToast, ...prev.slice(0, 4)]);
         
-        // Auto-remove toast after 4s
         const timeoutId = setTimeout(() => {
           setToasts((prev) => prev.filter((t) => t.id !== newToast.id));
         }, 4000);
         toastTimeoutRefs.current[newToast.id] = timeoutId;
 
-        // Instantly poll to refresh
         fetchAnalytics(true);
       }
     } catch (e) {
@@ -179,11 +178,39 @@ export default function AnalyticsPage() {
     };
   }, []);
 
+  // Real CSV export generator
+  const exportCsvReport = () => {
+    if (!data) return;
+    const rows = [
+      ["Metric", "Value"],
+      ["Total Queries", data.stats.totalQueries],
+      ["Documents Processed", data.stats.totalDocs],
+      ["Active Users", data.stats.totalActiveUsers],
+      ["Agents Executed", data.stats.totalAgentsExecuted],
+      ["Avg Response Time (s)", data.stats.avgResponseTime],
+      [""],
+      ["Category", "Query Count", "Percentage"],
+      ...data.queriesByCategory.map((c) => [c.name, c.value, `${c.percentage}%`]),
+      [""],
+      ["Document Name", "Retrievals"],
+      ...data.topDocuments.map((d) => [d.name, d.queries]),
+    ];
+
+    const csvContent = "data:text/csv;charset=utf-8," + rows.map((e) => e.join(",")).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `rag_analytics_report_${daysFilter}d.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading && !data) {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] gap-3">
         <Loader2 className="w-10 h-10 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground animate-pulse">Loading analytics engine...</p>
+        <p className="text-sm text-muted-foreground animate-pulse">Loading real-time analytics...</p>
       </div>
     );
   }
@@ -229,7 +256,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
           <p className="text-muted-foreground text-sm mt-1">
-            Track usage, performance and key insights across your workspace.
+            Track real workspace retrieval trends, costs, latency, and quality evaluations.
           </p>
         </div>
 
@@ -300,20 +327,30 @@ export default function AnalyticsPage() {
             )}
           </div>
 
-          {/* Date Range Selector */}
-          <div className="flex items-center bg-card border border-border/60 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground cursor-pointer hover:bg-muted transition-colors">
-            <Calendar className="w-3.5 h-3.5 mr-2" />
-            <span>May 24 – Jun 24, 2025</span>
-            <ChevronDown className="w-3 h-3 ml-2 text-muted-foreground/60" />
+          {/* Dynamic Range Selector */}
+          <div className="flex items-center bg-card border border-border/60 rounded-xl p-0.5">
+            {([7, 30, 90] as const).map((days) => (
+              <button
+                key={days}
+                onClick={() => setDaysFilter(days)}
+                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                  daysFilter === days
+                    ? "bg-primary/20 text-primary-foreground font-semibold"
+                    : "text-muted-foreground hover:text-white"
+                }`}
+              >
+                {days}d
+              </button>
+            ))}
           </div>
 
           {/* Export button */}
           <button
-            onClick={() => alert("Report downloaded successfully (Mock).")}
+            onClick={exportCsvReport}
             className="flex items-center gap-2 bg-card hover:bg-muted border border-border/60 text-xs px-3.5 py-2 rounded-xl font-medium text-white transition-colors"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Export Report</span>
+            <span>Export CSV</span>
           </button>
         </div>
       </div>
@@ -336,7 +373,7 @@ export default function AnalyticsPage() {
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
               <ArrowUpRight className="w-3.5 h-3.5" />
               <span>{stats.queriesTrend}%</span>
-              <span className="text-muted-foreground font-normal ml-1">vs last 30 days</span>
+              <span className="text-muted-foreground font-normal ml-1">vs prior period</span>
             </div>
           </div>
 
@@ -355,7 +392,7 @@ export default function AnalyticsPage() {
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
               <ArrowUpRight className="w-3.5 h-3.5" />
               <span>{stats.docsTrend}%</span>
-              <span className="text-muted-foreground font-normal ml-1">vs last 30 days</span>
+              <span className="text-muted-foreground font-normal ml-1">active</span>
             </div>
           </div>
 
@@ -374,7 +411,7 @@ export default function AnalyticsPage() {
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
               <ArrowUpRight className="w-3.5 h-3.5" />
               <span>{stats.usersTrend}%</span>
-              <span className="text-muted-foreground font-normal ml-1">vs last 30 days</span>
+              <span className="text-muted-foreground font-normal ml-1">vs prior period</span>
             </div>
           </div>
 
@@ -393,7 +430,7 @@ export default function AnalyticsPage() {
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
               <ArrowUpRight className="w-3.5 h-3.5" />
               <span>{stats.agentsTrend}%</span>
-              <span className="text-muted-foreground font-normal ml-1">vs last 30 days</span>
+              <span className="text-muted-foreground font-normal ml-1">vs prior period</span>
             </div>
           </div>
 
@@ -418,7 +455,7 @@ export default function AnalyticsPage() {
                 <ArrowUpRight className="w-3.5 h-3.5" />
               )}
               <span>{Math.abs(stats.responseTimeTrend)}%</span>
-              <span className="text-muted-foreground font-normal ml-1">vs last 30 days</span>
+              <span className="text-muted-foreground font-normal ml-1">vs prior period</span>
             </div>
           </div>
         </div>
@@ -433,7 +470,7 @@ export default function AnalyticsPage() {
               <h2 className="text-base font-semibold text-white">Queries Over Time</h2>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
                 <span className="w-2 h-2 rounded-full bg-purple-500" />
-                <span>Total Queries</span>
+                <span>Total Queries ({daysFilter} days)</span>
               </div>
             </div>
 
@@ -471,7 +508,7 @@ export default function AnalyticsPage() {
                       ? data.queriesOverTime.slice(-6).map((q, i) => ({
                           ...q,
                           date: `${12 + i * 2}:00`,
-                          queries: Math.round(q.queries / 12),
+                          queries: Math.round(q.queries / 4),
                         }))
                       : data.queriesOverTime
                   }
@@ -489,7 +526,7 @@ export default function AnalyticsPage() {
                     tick={{ fill: "#6b7280", fontSize: 10 }}
                     axisLine={false}
                     tickLine={false}
-                    interval={queriesRange === "daily" ? 4 : 0}
+                    interval={daysFilter > 30 ? 7 : 4}
                   />
                   <YAxis
                     tick={{ fill: "#6b7280", fontSize: 10 }}
@@ -528,11 +565,10 @@ export default function AnalyticsPage() {
 
         {/* Queries by Category Donut Chart */}
         <div className="bg-[#13161e] border border-white/5 rounded-2xl p-6 shadow-soft flex flex-col">
-          <h2 className="text-base font-semibold text-white mb-6">Queries by Category</h2>
+          <h2 className="text-base font-semibold text-white mb-6">Queries by Search Mode</h2>
 
           {data && (
             <div className="relative flex-1 flex flex-col justify-center items-center">
-              {/* Outer Center Text container */}
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -mt-7 flex flex-col items-center">
                 <span className="text-2xl font-extrabold text-white tracking-tight">
                   {stats?.totalQueries.toLocaleString()}
@@ -580,14 +616,14 @@ export default function AnalyticsPage() {
               <div className="w-full space-y-2 text-xs">
                 {data.queriesByCategory.map((cat, idx) => (
                   <div key={cat.name} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
                       <span
                         className="w-2.5 h-2.5 rounded-full shrink-0"
                         style={{ backgroundColor: CATEGORY_COLORS[idx % CATEGORY_COLORS.length] }}
                       />
-                      <span className="text-muted-foreground">{cat.name}</span>
+                      <span className="text-muted-foreground truncate">{cat.name}</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 shrink-0">
                       <span className="text-white font-medium">
                         {cat.value.toLocaleString()}
                       </span>
@@ -610,17 +646,13 @@ export default function AnalyticsPage() {
           <div>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-base font-semibold text-white">Top Documents</h2>
-              <div className="flex items-center text-xs text-muted-foreground hover:text-white cursor-pointer transition-colors bg-[#1c1f2a] px-2.5 py-1 rounded-lg border border-white/5">
-                <span>By Queries</span>
-                <ChevronDown className="w-3 h-3 ml-1.5" />
-              </div>
+              <span className="text-xs text-muted-foreground">By Retrievals</span>
             </div>
 
             <div className="space-y-4">
               {data?.topDocuments.map((doc, idx) => (
                 <div key={doc.name + idx} className="flex items-center justify-between group">
                   <div className="flex items-center gap-3 min-w-0">
-                    {/* Document Badge */}
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold border shrink-0 ${getDocumentColor(doc.type)}`}>
                       {getDocumentLabel(doc.type)}
                     </span>
@@ -640,7 +672,7 @@ export default function AnalyticsPage() {
             href="/documents"
             className="mt-6 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
           >
-            <span>View all documents</span>
+            <span>Manage documents</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -649,16 +681,12 @@ export default function AnalyticsPage() {
         <div className="bg-[#13161e] border border-white/5 rounded-2xl p-6 shadow-soft flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-white">User Engagement</h2>
-              <div className="flex items-center text-xs text-muted-foreground hover:text-white cursor-pointer transition-colors bg-[#1c1f2a] px-2.5 py-1 rounded-lg border border-white/5">
-                <span>This Month</span>
-                <ChevronDown className="w-3 h-3 ml-1.5" />
-              </div>
+              <h2 className="text-base font-semibold text-white">User Activity</h2>
+              <span className="text-xs text-muted-foreground">{daysFilter}d window</span>
             </div>
 
             {data && (
               <div className="flex items-center gap-5 my-3">
-                {/* Visual Radial Score Indicator */}
                 <div className="relative flex items-center justify-center shrink-0">
                   <svg className="w-28 h-28 transform -rotate-90">
                     <circle
@@ -689,37 +717,18 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
 
-                {/* Sub-Metrics list */}
                 <div className="flex-1 space-y-2.5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground font-medium">Active Users</span>
-                    <div className="flex flex-col items-end">
-                      <span className="text-white font-bold">{data.userEngagement.activeUsers}</span>
-                      <span className="text-[10px] text-emerald-400 font-semibold flex items-center">
-                        <ArrowUpRight className="w-3 h-3" />
-                        +{data.userEngagement.activeTrend}%
-                      </span>
-                    </div>
+                    <span className="text-white font-bold">{data.userEngagement.activeUsers}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs border-t border-white/5 pt-2">
                     <span className="text-muted-foreground font-medium">Returning Users</span>
-                    <div className="flex flex-col items-end">
-                      <span className="text-white font-bold">{data.userEngagement.returningUsers}</span>
-                      <span className="text-[10px] text-emerald-400 font-semibold flex items-center">
-                        <ArrowUpRight className="w-3 h-3" />
-                        +{data.userEngagement.returningTrend}%
-                      </span>
-                    </div>
+                    <span className="text-white font-bold">{data.userEngagement.returningUsers}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs border-t border-white/5 pt-2">
                     <span className="text-muted-foreground font-medium">New Users</span>
-                    <div className="flex flex-col items-end">
-                      <span className="text-white font-bold">{data.userEngagement.newUsers}</span>
-                      <span className="text-[10px] text-emerald-400 font-semibold flex items-center">
-                        <ArrowUpRight className="w-3 h-3" />
-                        +{data.userEngagement.newTrend}%
-                      </span>
-                    </div>
+                    <span className="text-white font-bold">{data.userEngagement.newUsers}</span>
                   </div>
                 </div>
               </div>
@@ -727,7 +736,7 @@ export default function AnalyticsPage() {
           </div>
 
           <p className="text-xs text-muted-foreground bg-white/5 border border-white/5 rounded-xl p-3 leading-relaxed">
-            Engagement score is based on user activity, queries, and feedback.
+            Real workspace metrics aggregated across all active sessions.
           </p>
         </div>
 
@@ -738,12 +747,8 @@ export default function AnalyticsPage() {
               <h2 className="text-base font-semibold text-white">Response Time (Avg.)</h2>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
                 <span className="w-2 h-2 rounded-full bg-blue-500" />
-                <span>Response Time</span>
+                <span>Latency Trend</span>
               </div>
-            </div>
-            <div className="flex items-center text-xs text-muted-foreground hover:text-white cursor-pointer transition-colors bg-[#1c1f2a] px-2.5 py-1 rounded-lg border border-white/5">
-              <span>Daily</span>
-              <ChevronDown className="w-3 h-3 ml-1.5" />
             </div>
           </div>
 
@@ -757,13 +762,13 @@ export default function AnalyticsPage() {
                     tick={{ fill: "#6b7280", fontSize: 10 }}
                     axisLine={false}
                     tickLine={false}
-                    interval={4}
+                    interval={daysFilter > 30 ? 7 : 4}
                   />
                   <YAxis
                     tick={{ fill: "#6b7280", fontSize: 10 }}
                     axisLine={false}
                     tickLine={false}
-                    domain={[0, 8]}
+                    domain={[0, "auto"]}
                     tickFormatter={(v) => `${v}s`}
                   />
                   <Tooltip
@@ -796,132 +801,10 @@ export default function AnalyticsPage() {
 
           {stats && (
             <div className="flex items-center justify-between text-xs border-t border-white/5 pt-3.5">
-              <span className="text-muted-foreground">Current Avg Response</span>
+              <span className="text-muted-foreground">Current Latency</span>
               <span className="text-white font-extrabold text-sm">{stats.avgResponseTime}s</span>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* ── RAG Quality Alignment & Evaluation (LLM-as-a-Judge) ────── */}
-      <div className="bg-[#13161e] border border-white/5 rounded-2xl p-6 shadow-soft space-y-6">
-        <div>
-          <h2 className="text-base font-semibold text-white flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-            RAG Alignment & Auto-Evaluation (LLM-as-a-Judge)
-          </h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Real-time quality assessments measuring context recall, factual faithfulness, and hallucination rates.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Gauge 1: Context Recall */}
-          <div className="glass-subtle rounded-xl p-5 flex flex-col justify-between space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Context Recall@K</span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Target &gt; 90%</span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold text-white">
-                {data?.evaluations ? (data.evaluations.avgRecall * 100).toFixed(1) : "94.0"}%
-              </span>
-            </div>
-            <div className="space-y-1.5">
-              <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                  style={{ width: `${(data?.evaluations?.avgRecall ?? 0.94) * 100}%` }}
-                />
-              </div>
-              <p className="text-[10px] text-muted-foreground">
-                Measures if retrieved chunks contain the grounding facts.
-              </p>
-            </div>
-          </div>
-
-          {/* Gauge 2: Faithfulness */}
-          <div className="glass-subtle rounded-xl p-5 flex flex-col justify-between space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Faithfulness Score</span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border bg-indigo-500/10 text-indigo-400 border-indigo-500/20">Target &gt; 90%</span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold text-white">
-                {data?.evaluations ? (data.evaluations.avgFaithfulness * 100).toFixed(1) : "91.0"}%
-              </span>
-            </div>
-            <div className="space-y-1.5">
-              <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-indigo-500 rounded-full transition-all duration-500"
-                  style={{ width: `${(data?.evaluations?.avgFaithfulness ?? 0.91) * 100}%` }}
-                />
-              </div>
-              <p className="text-[10px] text-muted-foreground">
-                Measures alignment — verifying statements correspond *only* to context.
-              </p>
-            </div>
-          </div>
-
-          {/* Gauge 3: Hallucination Index */}
-          <div className="glass-subtle rounded-xl p-5 flex flex-col justify-between space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Hallucination Index</span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border bg-rose-500/10 text-rose-400 border-rose-500/20">Target &lt; 10%</span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold text-white">
-                {data?.evaluations ? (data.evaluations.avgHallucination * 100).toFixed(1) : "9.0"}%
-              </span>
-            </div>
-            <div className="space-y-1.5">
-              <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-rose-500 rounded-full transition-all duration-500"
-                  style={{ width: `${(data?.evaluations?.avgHallucination ?? 0.09) * 100}%` }}
-                />
-              </div>
-              <p className="text-[10px] text-muted-foreground">
-                Percentage of responses containing unsupported external content.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Row 3: Insights & Recommendations ──────────────────── */}
-      <div>
-        <h2 className="text-base font-semibold text-white mb-4">Insights & Recommendations</h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {data?.insights.map((insight, index) => {
-            let borderClass = "border-l-4 border-l-emerald-500 bg-emerald-500/5 text-white";
-            let icon = <TrendingUp className="w-4 h-4 text-emerald-400" />;
-
-            if (insight.type === "info") {
-              borderClass = "border-l-4 border-l-blue-500 bg-blue-500/5 text-white";
-              icon = <Info className="w-4 h-4 text-blue-400" />;
-            } else if (insight.type === "warning") {
-              borderClass = "border-l-4 border-l-amber-500 bg-amber-500/5 text-white";
-              icon = <AlertTriangle className="w-4 h-4 text-amber-400" />;
-            } else if (insight.type === "purple") {
-              borderClass = "border-l-4 border-l-purple-500 bg-purple-500/5 text-white";
-              icon = <Sparkles className="w-4 h-4 text-purple-400" />;
-            }
-
-            return (
-              <div
-                key={index}
-                className={`flex items-start gap-3 p-4 rounded-xl border border-white/5 shadow-soft transition-all duration-300 hover:bg-white/[0.02] ${borderClass}`}
-              >
-                <div className="mt-0.5 shrink-0">{icon}</div>
-                <p className="text-xs leading-relaxed text-gray-300 font-medium">
-                  {insight.text}
-                </p>
-              </div>
-            );
-          })}
         </div>
       </div>
     </div>

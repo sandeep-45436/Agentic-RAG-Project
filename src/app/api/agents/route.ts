@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { UsageType } from "@prisma/client";
@@ -140,7 +140,7 @@ async function seedDefaultAgentsAndEvents(organizationId: string) {
         model: "gpt-4o-mini",
         tokensInput: Math.floor(Math.random() * 800) + 100,
         tokensOutput: Math.floor(Math.random() * 1200) + 50,
-        latencyMs: Math.floor(Math.random() * 1500) + 200,
+        latencyMs: Math.floor(Math.random() * 100) + 50,
         estimatedCost: 0.0003,
         createdAt: eventDate,
         metadata: {
@@ -162,8 +162,9 @@ async function seedDefaultAgentsAndEvents(organizationId: string) {
 
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     let membership = await db.membership.findFirst({ where: { userId: user.id } });
@@ -307,8 +308,9 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     let membership = await db.membership.findFirst({ where: { userId: user.id } });

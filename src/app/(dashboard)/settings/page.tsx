@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/insforge/client";
 
 interface UserInfo {
   email: string;
@@ -15,12 +15,14 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    createClient().auth.getUser().then(({ data: { user: u } }) => {
+    const insforge = createClient();
+    insforge.auth.getCurrentUser().then((res: any) => {
+      const u = res?.data?.user;
       if (u) {
         setUser({
           email: u.email ?? "—",
-          name: u.user_metadata?.full_name ?? u.email?.split("@")[0] ?? "—",
-          createdAt: u.created_at,
+          name: u.profile?.name ?? u.email?.split("@")[0] ?? "—",
+          createdAt: u.createdAt,
         });
       }
       setLoading(false);

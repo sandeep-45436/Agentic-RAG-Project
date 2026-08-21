@@ -1,12 +1,9 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { OpenAIEmbeddings } from "@langchain/openai";
+import { ModelConfig } from "./model-config";
 
-// Enforce types for fallback models
-const FALLBACK_MODELS = [
-  "openai/gpt-4o-mini",          // Fastest/cheap fallback
-  "anthropic/claude-3-5-sonnet", // Smart fallback
-  "google/gemini-2.5-flash",     // High availability fallback
-];
+// Enforce types for fallback models including Meta models
+const FALLBACK_MODELS = ModelConfig.failoverChain;
 
 export class FailoverLLM {
   /**
@@ -84,7 +81,7 @@ export class FailoverEmbeddings {
   ): Promise<number[][]> {
     const maxRetries = options?.maxRetries ?? 3;
     const timeoutMs = options?.timeoutMs ?? 20000; // 20s timeout
-    const modelsToTry = ["openai/text-embedding-3-small", "openai/text-embedding-ada-002"];
+    const modelsToTry = ModelConfig.embeddingFailoverChain;
     
     let lastError: Error | null = null;
 

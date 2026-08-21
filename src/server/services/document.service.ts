@@ -1,8 +1,9 @@
 import { db } from "@/server/db/prisma";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/insforge/server";
 import { extractTextFromPdf, chunkText, extractTextWithPages, chunkTextWithMetadata } from "@/ai/loaders/pdf-loader";
 import { extractTextFromDocx, extractTextWithPagesDocx } from "@/ai/loaders/docx-loader";
 import { extractTextFromTxt, extractTextWithPagesTxt } from "@/ai/loaders/txt-loader";
+import { parsePdfNativeMultimodal, chunkParsedElements } from "@/ai/loaders/layout-loader";
 import { ensureCollectionExists } from "@/ai/vector/qdrant";
 import { EmbeddingService } from "./embedding.service";
 import { VectorService, VectorPayload } from "./vector.service";
@@ -10,50 +11,35 @@ import { GraphExtractionService } from "./graph-extraction.service";
 import { v4 as uuidv4 } from "uuid";
 import tiktoken from "tiktoken";
 import { AuditService } from "./audit";
-
+import { generateDocumentHash, generateChunkHash } from "@/server/utils/chunk-hasher";
+ 
 export class DocumentService {
   /**
-   * Main entry point to upload a document to Supabase (Synchronous).
+   * Main entry point to upload a document to InsForge storage (Synchronous).
    * It creates a DB record with PROCESSING status and returns early.
    */
-  static async uploadDocument(file: File, organizationId: string, uploadedBy: string, knowledgeBaseId?: string) {
-    const supabase = await createClient();
+  static async uploadDocument(
+    file: File,
+    organizationId: string,
+    uploadedBy: string,
+    knowledgeBaseId?: string,
+    departmentId?: string | null,
+    collegeId?: string | null,
+    visibility: import("@prisma/client").DocumentVisibility = "DEPARTMENT"
+  ) {
+    const insforge = await createClient();
     
     const fileExt = file.name.split('.').pop();
     const fileName = `${uuidv4()}.${fileExt}`;
     const storagePath = `${organizationId}/${fileName}`;
 
-    // Auto-create the 'documents' bucket if it doesn't exist yet.
-    // Uses the service role key (admin) if available, otherwise falls through.
-    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      const { createClient: createAdminClient } = await import("@supabase/supabase-js");
-      const admin = createAdminClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY,
-        { auth: { persistSession: false } }
-      );
-      const { error: bucketError } = await admin.storage.createBucket("documents", {
-        public: false,
-        allowedMimeTypes: [
-          "application/pdf",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          "text/plain"
-        ],
-        fileSizeLimit: 10 * 1024 * 1024,
-      });
-      // Ignore "already exists" — this is idempotent
-      if (bucketError && !bucketError.message.toLowerCase().includes("already exist")) {
-        console.warn("[DocumentService] Could not auto-create bucket:", bucketError.message);
-      }
-    }
-
-    // 1. Upload to Supabase Storage (bucket: 'documents')
-    const { error: uploadError } = await supabase.storage
+    // 1. Upload to InsForge Storage (bucket: 'documents')
+    const { error: uploadError } = await insforge.storage
       .from('documents')
       .upload(storagePath, file);
 
     if (uploadError) {
-      throw new Error(`Failed to upload to Supabase: ${uploadError.message}`);
+      throw new Error(`Failed to upload to InsForge: ${uploadError.message}`);
     }
 
     // 2. Create Document record in Prisma
@@ -66,6 +52,9 @@ export class DocumentService {
         organizationId,
         knowledgeBaseId, // Optional KB relation
         uploadedBy,
+        departmentId: departmentId || null,
+        collegeId: collegeId || null,
+        visibility,
         processingStatus: "PROCESSING",
       },
     });
@@ -80,6 +69,9 @@ export class DocumentService {
         fileName: document.fileName,
         fileSize: document.fileSize,
         knowledgeBaseId,
+        departmentId,
+        collegeId,
+        visibility,
       },
     });
     
@@ -116,33 +108,59 @@ export class DocumentService {
       const detectedType = DocumentService.detectFileType(fileName, docRecord?.fileType);
       log(`Detected file type: ${detectedType}`);
 
-      // Step 1: Extract text with page info based on file type
-      log("Step 1: Extracting text...");
-      let extractionResult: {
-        pages: Array<{ pageNumber: number; text: string }>;
-        fullText: string;
-        numPages: number;
-      };
+      // Step 1: Extract text and layout elements based on file type
+      log("Step 1: Extracting text and layout elements...");
+      let text = "";
+      let layoutChunks: Array<{ text: string; pageNumber: number | null; metadata: any }> = [];
 
-      switch (detectedType) {
-        case "pdf":
-          extractionResult = await extractTextWithPages(buffer);
-          break;
-        case "docx":
-          extractionResult = await extractTextWithPagesDocx(buffer);
-          break;
-        case "txt":
-          extractionResult = await extractTextWithPagesTxt(buffer);
-          break;
-        default:
-          // Fallback: try PDF extraction for backward compatibility
-          log(`Unknown file type, falling back to PDF extraction`);
-          extractionResult = await extractTextWithPages(buffer);
-          break;
+      if (detectedType === "pdf") {
+        log("Parsing PDF using Layout-Aware Multimodal Gemini Vision via OpenRouter...");
+        const parsedElements = await parsePdfNativeMultimodal(buffer, fileName || "document.pdf");
+        
+        layoutChunks = await chunkParsedElements(parsedElements);
+        
+        text = parsedElements
+          .map((el) => `[Page ${el.pageNumber} - ${el.type.toUpperCase()}]\n${el.content}`)
+          .join("\n\n");
+          
+        log(`Layout extraction complete. Extracted ${parsedElements.length} elements, split into ${layoutChunks.length} chunks.`);
+      } else {
+        let extractionResult: {
+          pages: Array<{ pageNumber: number; text: string }>;
+          fullText: string;
+          numPages: number;
+        };
+
+        switch (detectedType) {
+          case "docx":
+            extractionResult = await extractTextWithPagesDocx(buffer);
+            break;
+          case "txt":
+            extractionResult = await extractTextWithPagesTxt(buffer);
+            break;
+          default:
+            log(`Unknown file type, falling back to PDF extraction`);
+            extractionResult = await extractTextWithPages(buffer);
+            break;
+        }
+
+        const { pages, fullText, numPages } = extractionResult;
+        text = fullText;
+        log(`Step 1 done. Text length: ${text.length} chars, Pages: ${numPages}`);
+        
+        log("Step 2: Chunking text with page metadata...");
+        const chunksWithMeta = await chunkTextWithMetadata(text, pages);
+        layoutChunks = chunksWithMeta.map((c) => ({
+          text: c.text,
+          pageNumber: c.pageNumber,
+          metadata: {
+            chunkType: "text",
+            title: null,
+            tableHeaders: [],
+            visualContext: null,
+          },
+        }));
       }
-
-      const { pages, fullText: text, numPages } = extractionResult;
-      log(`Step 1 done. Text length: ${text.length} chars, Pages: ${numPages}`);
 
       if (!text || text.trim().length === 0) {
         throw new Error("Document appears to be empty or contains no extractable text.");
@@ -153,16 +171,13 @@ export class DocumentService {
         data: { content: text },
       });
 
-      // Step 2: Chunk text with page metadata
-      log("Step 2: Chunking text with page metadata...");
-      const chunksWithMeta = await chunkTextWithMetadata(text, pages);
-      log(`Step 2 done. Chunks: ${chunksWithMeta.length}`);
-      if (chunksWithMeta.length === 0) {
-        throw new Error("No chunks produced from text.");
+      log(`Step 2: Chunk parsing completed. Total chunks: ${layoutChunks.length}`);
+      if (layoutChunks.length === 0) {
+        throw new Error("No chunks produced from document.");
       }
 
       // Step 3: Ensure Qdrant collection
-      log("Step 3: Ensuring Qdrant collection...");
+      log("Step 3: Ensuring Qdrant collection exists...");
       await ensureCollectionExists();
       log("Step 3 done.");
 
@@ -170,9 +185,26 @@ export class DocumentService {
       const BATCH_SIZE = 50;
       const encoder = tiktoken.encoding_for_model("text-embedding-3-small");
 
-      for (let i = 0; i < chunksWithMeta.length; i += BATCH_SIZE) {
-        const batchChunks = chunksWithMeta.slice(i, i + BATCH_SIZE);
-        const batchTexts = batchChunks.map((c) => c.text);
+      const docHash = generateDocumentHash(buffer);
+      const documentVersion = 1; // Default to canonical v1 for newly ingested documents
+
+      for (let i = 0; i < layoutChunks.length; i += BATCH_SIZE) {
+        const batchChunks = layoutChunks.slice(i, i + BATCH_SIZE);
+        
+        // Parent-Child Multi-Vector: Embed semantic summaries for tables/charts/images, keep raw content as target
+        const batchTexts = batchChunks.map((c) => {
+          if (
+            (c.metadata?.chunkType === "table" ||
+              c.metadata?.chunkType === "chart" ||
+              c.metadata?.chunkType === "image") &&
+            c.metadata?.summary
+          ) {
+            const titlePrefix = c.metadata.title ? `Document element: ${c.metadata.title}. ` : "";
+            return `${titlePrefix}Summary: ${c.metadata.summary}`;
+          }
+          return c.text;
+        });
+
         log(`Step 4: Embedding batch ${i / BATCH_SIZE + 1} (${batchTexts.length} chunks)...`);
 
         const vectors = await EmbeddingService.embedBatch(batchTexts, 3);
@@ -189,33 +221,67 @@ export class DocumentService {
           const globalIndex = i + j;
           const tokenCount = encoder.encode(chunkTextContent).length;
 
+          const { chunkHash, chunkId } = generateChunkHash(
+            documentId,
+            documentVersion,
+            globalIndex,
+            chunkTextContent
+          );
+
           const chunkRecord = await db.chunk.create({
             data: {
-              content: chunkTextContent,
+              content: chunkTextContent, // Full parent Markdown table / visual context
               chunkIndex: globalIndex,
               tokenCount,
               documentId,
               organizationId,
+              pageNumber: chunk.pageNumber,
               metadata: {
                 pageNumber: chunk.pageNumber,
+                chunkType: chunk.metadata?.chunkType || "text",
+                title: chunk.metadata?.title || null,
+                tableHeaders: chunk.metadata?.tableHeaders || [],
+                visualContext: chunk.metadata?.visualContext || null,
+                summary: chunk.metadata?.summary || null,
+                docHash,
+                chunkHash,
               },
             },
           });
 
           const payload: VectorPayload = {
             organizationId,
+            collegeId: docRecord?.collegeId || null,
+            departmentId: docRecord?.departmentId || null,
+            visibility: docRecord?.visibility || "DEPARTMENT",
+            uploadedBy: docRecord?.uploadedBy || null,
             documentId,
             documentName: fileName || "Unknown",
-            chunkId: chunkRecord.id,
+            documentVersion,
+            version: documentVersion,
+            isLatest: true,
+            docHash,
+            chunkId,
+            chunkHash,
             chunkIndex: globalIndex,
             chunkText: chunkTextContent,
+            pageNumber: chunk.pageNumber || null,
+            sectionHeader: chunk.metadata?.title || null,
+            createdAt: new Date().toISOString(),
             ...(knowledgeBaseId && { knowledgeBaseId }),
             metadata: {
               pageNumber: chunk.pageNumber,
+              chunkType: chunk.metadata?.chunkType || "text",
+              title: chunk.metadata?.title || null,
+              summary: chunk.metadata?.summary || null,
+              collegeId: docRecord?.collegeId || null,
+              departmentId: docRecord?.departmentId || null,
+              visibility: docRecord?.visibility || "DEPARTMENT",
+              uploadedBy: docRecord?.uploadedBy || null,
             },
           };
 
-          qdrantPoints.push({ id: chunkRecord.id, vector: vectors[j], payload });
+          qdrantPoints.push({ id: chunkId, vector: vectors[j], payload });
         }
 
         await VectorService.upsertBatch(qdrantPoints);
@@ -237,18 +303,18 @@ export class DocumentService {
       });
       log("✅ Processing COMPLETED");
 
-      // Log success event
+      // Log success event (non-blocking)
       const doc = await db.document.findUnique({ where: { id: documentId } });
-      await AuditService.logEvent({
+      AuditService.logEvent({
         orgId: organizationId,
         userId: doc?.uploadedBy,
         action: "DOCUMENT_PROCESSING_COMPLETED",
         metadata: {
           documentId,
           fileName: fileName || doc?.fileName,
-          chunksCount: chunksWithMeta.length,
+          chunksCount: layoutChunks.length,
         },
-      });
+      }).catch(() => {});
 
     } catch (error: any) {
       console.error(`[DocProcess:${documentId.slice(0,8)}] ❌ FAILED:`, error?.message ?? error);
@@ -257,9 +323,9 @@ export class DocumentService {
         data: { processingStatus: "FAILED" },
       });
 
-      // Log failure event
+      // Log failure event (non-blocking)
       const doc = await db.document.findUnique({ where: { id: documentId } });
-      await AuditService.logEvent({
+      AuditService.logEvent({
         orgId: organizationId,
         userId: doc?.uploadedBy,
         action: "DOCUMENT_PROCESSING_FAILED",
@@ -268,7 +334,7 @@ export class DocumentService {
           fileName: fileName || doc?.fileName,
           error: error?.message || String(error),
         },
-      });
+      }).catch(() => {});
 
       throw error;
     }

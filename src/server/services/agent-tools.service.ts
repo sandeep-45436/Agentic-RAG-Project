@@ -105,4 +105,27 @@ export class AgentToolsService {
       results: resultText,
     };
   }
+
+  /**
+   * Decision Intelligence tool for predictive insights.
+   */
+  static async decisionIntelligenceTool(queryType: "student_risk" | "department_health", context: ToolContext) {
+    console.log(`[AgentToolsService] Executing decisionIntelligenceTool: "${queryType}"`);
+    const { DecisionIntelligenceService } = await import("./decision-intelligence.service");
+
+    try {
+      if (queryType === "student_risk") {
+        const assessments = await DecisionIntelligenceService.assessStudentRisk(context.organizationId);
+        return { success: true, studentRiskAssessments: assessments };
+      } else if (queryType === "department_health") {
+        const reports = await DecisionIntelligenceService.evaluateDepartmentHealth(context.organizationId);
+        return { success: true, departmentHealthReports: reports };
+      }
+      return { success: false, error: "Unknown decision intelligence query type." };
+    } catch (error: any) {
+      console.error("[AgentToolsService] decisionIntelligenceTool failed:", error);
+      return { success: false, error: `Decision Intelligence tool failed: ${error.message}` };
+    }
+  }
 }
+

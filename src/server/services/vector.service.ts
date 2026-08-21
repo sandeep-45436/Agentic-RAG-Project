@@ -2,13 +2,24 @@ import { qdrant, GLOBAL_COLLECTION_NAME } from "@/ai/vector/qdrant";
 
 export type VectorPayload = {
   organizationId: string;
+  collegeId?: string | null;
+  departmentId?: string | null;
+  visibility?: string;
+  uploadedBy?: string | null;
   knowledgeBaseId?: string;
   documentId: string;
   documentName: string;
+  documentVersion?: number;
+  version?: number; // Compatibility alias for documentVersion
+  isLatest?: boolean;
+  docHash?: string;
   chunkId: string;
+  chunkHash?: string;
   chunkIndex: number;
   chunkText: string;
   pageNumber?: number | null;
+  sectionHeader?: string | null;
+  createdAt?: string;
   tags?: string[];
   metadata?: Record<string, any>;
 };
@@ -41,14 +52,16 @@ export class VectorService {
   }
 
   /**
-   * Searches Qdrant using semantic similarity, enforcing strict organization isolation.
-   * Returns results with similarity scores for use in hybrid fusion.
+   * Searches Qdrant using semantic similarity, enforcing strict organization isolation,
+   * pre-retrieval authorization filters, and latest version filtering.
    */
   static async similaritySearch(
     vector: number[],
     organizationId: string,
     limit: number = 20,
-    documentIds?: string[]
+    documentIds?: string[],
+    includeHistorical: boolean = false,
+    accessFilter?: { must?: any[]; should?: any[] }
   ): Promise<ScoredVectorResult[]> {
     try {
       const mustFilters: any[] = [
@@ -60,7 +73,17 @@ export class VectorService {
         },
       ];
 
-      // Inject document filter if specified for retrieval memory boosting
+      // Enforce latest version retrieval by default
+      if (!includeHistorical) {
+        mustFilters.push({
+          key: "isLatest",
+          match: {
+            value: true,
+          },
+        });
+      }
+
+      // Inject document filter if specified for retrieval memory boosting or pre-authorized doc scoping
       if (documentIds && documentIds.length > 0) {
         mustFilters.push({
           key: "documentId",
@@ -70,13 +93,29 @@ export class VectorService {
         });
       }
 
+      // Merge additional must filters from accessFilter if provided
+      if (accessFilter?.must && Array.isArray(accessFilter.must)) {
+        for (const item of accessFilter.must) {
+          if (item.key !== "organizationId") {
+            mustFilters.push(item);
+          }
+        }
+      }
+
+      const filterPayload: any = {
+        must: mustFilters,
+      };
+
+      // Add should clauses for departmental/college/visibility RBAC isolation
+      if (accessFilter?.should && Array.isArray(accessFilter.should) && accessFilter.should.length > 0) {
+        filterPayload.should = accessFilter.should;
+      }
+
       const results = await qdrant.search(GLOBAL_COLLECTION_NAME, {
         vector,
         limit,
         with_payload: true,
-        filter: {
-          must: mustFilters,
-        },
+        filter: filterPayload,
       });
 
       return results.map((hit) => ({
@@ -85,8 +124,54 @@ export class VectorService {
       }));
     } catch (error) {
       console.error("[VectorService] Similarity search failed:", error);
-      throw error;
+      return [];
+    }
+  }
+
+  /**
+   * Deletes all vector points associated with a specific document within an organization.
+   */
+  static async deleteByDocument(documentId: string, organizationId: string): Promise<void> {
+    try {
+      await qdrant.delete(GLOBAL_COLLECTION_NAME, {
+        wait: true,
+        filter: {
+          must: [
+            { key: "organizationId", match: { value: organizationId } },
+            { key: "documentId", match: { value: documentId } },
+          ],
+        },
+      });
+      console.log(`[VectorService] Deleted points for documentId=${documentId}, orgId=${organizationId}`);
+    } catch (error) {
+      console.error(`[VectorService] Failed to delete points for document ${documentId}:`, error);
+    }
+  }
+
+  /**
+   * Purges obsolete vector versions for a document, keeping only the latest documentVersion.
+   */
+  static async purgeObsoleteDocumentVersions(
+    documentId: string,
+    organizationId: string,
+    currentVersion: number
+  ): Promise<void> {
+    try {
+      await qdrant.delete(GLOBAL_COLLECTION_NAME, {
+        wait: true,
+        filter: {
+          must: [
+            { key: "organizationId", match: { value: organizationId } },
+            { key: "documentId", match: { value: documentId } },
+            { key: "isLatest", match: { value: false } },
+          ],
+        },
+      });
+      console.log(`[VectorService] Purged obsolete versions for document ${documentId} (< v${currentVersion})`);
+    } catch (error) {
+      console.error(`[VectorService] Failed to purge obsolete versions for document ${documentId}:`, error);
     }
   }
 }
+
 

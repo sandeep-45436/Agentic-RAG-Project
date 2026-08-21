@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 import { RetrievalLogService } from "@/server/services/retrieval-log.service";
 import { NextResponse } from "next/server";
@@ -11,8 +11,9 @@ export async function GET(
     const { queryId } = await params;
 
     // 1. Authenticate user
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const insforge = await createClient();
+    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
 
     if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });

@@ -12,10 +12,11 @@ import {
   BarChart2,
   MessageSquare,
   Search,
+  GraduationCap,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
+import { signOutAction, getCurrentUserRoleAction } from "@/server/actions/auth";
 
 import {
   Sidebar,
@@ -28,28 +29,41 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 
-const data = {
-  navMain: [
-    { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-    { title: "Chat", url: "/chat", icon: MessageSquare },
-    { title: "Documents", url: "/documents", icon: FileText },
-    { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },
-    { title: "Agents", url: "/agents", icon: Bot },
-    { title: "Analytics", url: "/analytics", icon: BarChart2 },
-    { title: "Retrieval Debug", url: "/retrieval-debug", icon: Search },
-    { title: "Settings", url: "/settings", icon: Settings2 },
-  ],
-};
+const studentNav = [
+  { title: "Chat Assistant", url: "/chat", icon: MessageSquare },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Settings", url: "/settings", icon: Settings2 },
+];
+
+const facultyAdminNav = [
+  { title: "Chat Assistant", url: "/chat", icon: MessageSquare },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Faculty Portal", url: "/faculty/dashboard", icon: GraduationCap },
+  { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },
+  { title: "Agents", url: "/agents", icon: Bot },
+  { title: "Analytics", url: "/analytics", icon: BarChart2 },
+  { title: "Settings", url: "/settings", icon: Settings2 },
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const router = useRouter();
+  const [isFacultyOrAdmin, setIsFacultyOrAdmin] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    getCurrentUserRoleAction().then((res) => {
+      setIsFacultyOrAdmin(res.isFacultyOrAdmin);
+    });
+  }, []);
+
+  const navItems = isFacultyOrAdmin ? facultyAdminNav : studentNav;
 
   const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
+    const res = await signOutAction();
+    if (res.success) {
+      router.push("/login");
+      router.refresh();
+    }
   };
 
   return (
@@ -63,7 +77,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight ml-2">
                 <span className="truncate font-bold">NexusIQ</span>
-                <span className="truncate text-xs text-muted-foreground font-medium">Enterprise RAG</span>
+                <span className="truncate text-xs text-muted-foreground font-medium">University AI Assistant</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -71,7 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu className="px-2 mt-4 space-y-1">
-          {data.navMain.map((item) => (
+          {navItems.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton isActive={pathname.startsWith(item.url)} tooltip={item.title} render={<Link href={item.url} />} className="rounded-md data-[active=true]:bg-muted data-[active=true]:font-medium text-muted-foreground hover:text-foreground">
                 <item.icon className="text-foreground/70" />

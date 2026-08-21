@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/insforge/client";
 import {
   Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip,
   PieChart, Pie, Cell, ResponsiveContainer,
@@ -175,9 +175,9 @@ export default function DashboardPage() {
   const [chartRange, setChartRange] = useState<"30d" | "7d">("30d");
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) {
+    const insforge = createClient();
+    insforge.auth.getCurrentUser().then((res: any) => {
+      if (res?.error || !res?.data?.user) {
         router.replace("/login");
       }
     });

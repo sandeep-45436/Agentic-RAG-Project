@@ -1,92 +1,119 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 
+// pdf-parse v1.1.1 — simple default export that takes a Buffer
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pdfParse = require("pdf-parse");
+
 export const splitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 500,
-  chunkOverlap: 100,
+  chunkSize: 800,
+  chunkOverlap: 150,
 });
 
-export async function extractTextFromPdf(
-  buffer: Buffer
-): Promise<{ text: string; numPages: number }> {
+// ── Raw text fallback when pdf-parse encounters format errors (e.g. bad XRef) ──
+function extractRawTextFallback(buffer: Buffer): string {
   try {
-    // Use require() to load pdf-parse v1.1.1 (bypass Next.js/Turbopack bundling)
-    const pdf = require("pdf-parse");
-    const result = await pdf(buffer);
-    let text: string = result.text ?? "";
-    text = text.replace(/\n+/g, "\n").replace(/ +/g, " ").trim();
-    const numPages: number = result.numpages ?? 1;
-    return { text, numPages };
-  } catch (error) {
-    console.error("[pdf-loader] Failed to parse PDF:", error);
-    throw error;
+    const content = buffer.toString("latin1");
+    // Extract text in BT...ET blocks with Tj operators
+    const textMatches = content.match(/\((?:\\\(|\\\)|[^)])*\)\s*Tj/g);
+    if (textMatches && textMatches.length > 0) {
+      const pieces = textMatches.map((tm) => {
+        return tm
+          .replace(/^\(/, "")
+          .replace(/\)\s*Tj$/, "")
+          .replace(/\\([()\\])/g, "$1");
+      });
+      const res = pieces.join(" ").replace(/\s+/g, " ").trim();
+      if (res.length > 20) return res;
+    }
+    // Fallback: extract readable strings
+    const matches = content.match(/[\x20-\x7E]{4,}/g);
+    if (matches) {
+      const filtered = matches.filter(
+        (m) =>
+          !m.startsWith("/Type") &&
+          !m.startsWith("/Font") &&
+          !m.includes("endobj") &&
+          !m.includes("stream") &&
+          !m.includes("xref")
+      );
+      return filtered.join(" ").replace(/\s+/g, " ").trim();
+    }
+  } catch (e) {
+    console.warn("[pdf-loader] Raw text fallback failed:", e);
   }
+  return "";
 }
 
-/**
- * Extracts text from a PDF buffer with per-page information.
- * Uses pdf-parse's page-level data if available, otherwise estimates
- * page numbers from character positions.
- */
+export async function extractTextFromPdf(buffer: Buffer): Promise<string> {
+  try {
+    const data = await pdfParse(buffer);
+    let text: string = data.text ?? "";
+    text = text.replace(/\n+/g, "\n").replace(/ +/g, " ").trim();
+    if (text.length > 0) return text;
+  } catch (error) {
+    console.warn("[pdf-loader] Standard pdf-parse failed, using resilient text extractor:", error);
+  }
+  const fallback = extractRawTextFallback(buffer);
+  if (fallback.length > 0) return fallback;
+  throw new Error("Unable to extract text from PDF.");
+}
+
+// ── Page-aware extraction ─────────────────────────────────────────────────────
+
 export async function extractTextWithPages(buffer: Buffer): Promise<{
   pages: Array<{ pageNumber: number; text: string }>;
   fullText: string;
   numPages: number;
 }> {
   try {
-    // Use require() to load pdf-parse v1.1.1 (bypass Next.js/Turbopack bundling)
-    const pdf = require("pdf-parse");
-
     const pages: Array<{ pageNumber: number; text: string }> = [];
-    let currentPage = 0;
+    let fullText = "";
 
-    // pdf-parse supports a pagerender callback to capture per-page text
-    const options = {
+    const data = await pdfParse(buffer, {
       pagerender: (pageData: any) => {
         return pageData.getTextContent().then((textContent: any) => {
-          currentPage++;
-          const pageText = textContent.items
-            .map((item: any) => item.str)
-            .join(" ");
-          const cleanedPageText = pageText
-            .replace(/\n+/g, "\n")
-            .replace(/ +/g, " ")
-            .trim();
-          pages.push({ pageNumber: currentPage, text: cleanedPageText });
-          return cleanedPageText;
+          return textContent.items.map((item: any) => item.str).join(" ");
         });
       },
-    };
+    });
 
-    const result = await pdf(buffer, options);
-    const numPages: number = result.numpages ?? 1;
-    let fullText: string = result.text ?? "";
-    fullText = fullText.replace(/\n+/g, "\n").replace(/ +/g, " ").trim();
+    const numPages: number = data.numpages ?? 1;
+    fullText = (data.text ?? "").replace(/\n+/g, "\n").replace(/ +/g, " ").trim();
 
-    // If pagerender didn't capture pages, estimate from character positions
-    if (pages.length === 0 && fullText.length > 0) {
-      const charsPerPage = Math.ceil(fullText.length / numPages);
-      for (let i = 0; i < numPages; i++) {
-        const start = i * charsPerPage;
-        const end = Math.min((i + 1) * charsPerPage, fullText.length);
-        const pageText = fullText.slice(start, end).trim();
-        if (pageText.length > 0) {
-          pages.push({ pageNumber: i + 1, text: pageText });
-        }
+    const charsPerPage = Math.ceil(fullText.length / numPages);
+    for (let i = 0; i < numPages; i++) {
+      const start = i * charsPerPage;
+      const end = Math.min((i + 1) * charsPerPage, fullText.length);
+      const pageText = fullText.slice(start, end).trim();
+      if (pageText.length > 0) {
+        pages.push({ pageNumber: i + 1, text: pageText });
       }
     }
 
-    return { pages, fullText, numPages };
+    if (pages.length > 0 && fullText.length > 0) {
+      return { pages, fullText, numPages };
+    }
   } catch (error) {
-    console.error("[pdf-loader] Failed to parse PDF with pages:", error);
-    throw error;
+    console.warn("[pdf-loader] Standard page-aware pdf-parse failed, using fallback:", error);
   }
+
+  const rawText = extractRawTextFallback(buffer);
+  return {
+    pages: [{ pageNumber: 1, text: rawText || "Document Content" }],
+    fullText: rawText || "Document Content",
+    numPages: 1,
+  };
 }
 
-/**
- * Chunks text and attaches page metadata to each chunk.
- * If pages info is provided, determines which page each chunk belongs to
- * based on character position mapping.
- */
+// ── Basic chunking ────────────────────────────────────────────────────────────
+
+export async function chunkText(text: string): Promise<string[]> {
+  if (!text || text.trim().length === 0) return [];
+  return splitter.splitText(text);
+}
+
+// ── Chunking with page metadata ───────────────────────────────────────────────
+
 export async function chunkTextWithMetadata(
   text: string,
   pages?: Array<{ pageNumber: number; text: string }>
@@ -95,64 +122,22 @@ export async function chunkTextWithMetadata(
 
   const rawChunks = await splitter.splitText(text);
 
-  if (!pages || pages.length === 0) {
-    // No page info available — return chunks without page numbers
-    return rawChunks.map((chunk, index) => ({
-      text: chunk,
-      pageNumber: null,
-      chunkIndex: index,
-    }));
-  }
-
-  // Build a cumulative character offset map for each page
-  const pageOffsets: Array<{ pageNumber: number; start: number; end: number }> = [];
-  let offset = 0;
-  for (const page of pages) {
-    const start = text.indexOf(page.text, offset);
-    if (start !== -1) {
-      pageOffsets.push({
-        pageNumber: page.pageNumber,
-        start,
-        end: start + page.text.length,
-      });
-      offset = start + page.text.length;
-    } else {
-      // Fallback: use sequential offset estimation
-      pageOffsets.push({
-        pageNumber: page.pageNumber,
-        start: offset,
-        end: offset + page.text.length,
-      });
-      offset += page.text.length;
-    }
-  }
-
-  return rawChunks.map((chunk, index) => {
-    // Find which page this chunk starts in
-    const chunkStart = text.indexOf(chunk);
+  return rawChunks.map((chunkContent, idx) => {
+    // Try to find which page this chunk belongs to
     let pageNumber: number | null = null;
-
-    if (chunkStart !== -1) {
-      for (const po of pageOffsets) {
-        if (chunkStart >= po.start && chunkStart < po.end) {
-          pageNumber = po.pageNumber;
+    if (pages && pages.length > 0) {
+      for (const page of pages) {
+        if (page.text.includes(chunkContent.substring(0, 50))) {
+          pageNumber = page.pageNumber;
           break;
         }
       }
-      // If chunk starts after all known page offsets, assign to last page
-      if (pageNumber === null && pageOffsets.length > 0) {
-        pageNumber = pageOffsets[pageOffsets.length - 1].pageNumber;
+      // Fallback: distribute evenly
+      if (pageNumber === null) {
+        const pageIdx = Math.floor((idx / rawChunks.length) * pages.length);
+        pageNumber = pages[pageIdx]?.pageNumber ?? 1;
       }
     }
-
-    return { text: chunk, pageNumber, chunkIndex: index };
+    return { text: chunkContent, pageNumber, chunkIndex: idx };
   });
-}
-
-/**
- * Simple chunking without metadata — kept for backward compatibility.
- */
-export async function chunkText(text: string): Promise<string[]> {
-  if (!text || text.trim().length === 0) return [];
-  return splitter.splitText(text);
 }

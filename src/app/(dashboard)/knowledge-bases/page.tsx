@@ -119,13 +119,17 @@ function NodePanel({
     .slice(0, 5) as { node: GraphNode; strength: number }[];
 
   return (
-    <aside className="w-64 shrink-0 bg-[#141720] border-l border-white/5 flex flex-col overflow-y-auto">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
-        <h3 className="text-sm font-semibold text-white">Node Details</h3>
-        <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
-          <X className="w-4 h-4" />
-        </button>
-      </div>
+    <>
+      {/* Mobile backdrop */}
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-30 lg:hidden" onClick={onClose} />
+
+      <aside className="fixed inset-y-0 right-0 z-40 w-full sm:w-80 lg:relative lg:w-72 shrink-0 bg-[#141720] border-l border-white/10 flex flex-col overflow-y-auto shadow-2xl lg:shadow-none animate-slide-up-fade">
+        <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/5">
+          <h3 className="text-sm font-semibold text-white">Node Details</h3>
+          <button onClick={onClose} className="p-1 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
       <div className="p-4 space-y-5">
         {/* Node identity */}
@@ -199,7 +203,8 @@ function NodePanel({
         </div>
       </div>
     </aside>
-  );
+  </>
+);
 }
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
@@ -261,48 +266,42 @@ export default function KnowledgeGraphPage() {
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
 
         {/* ── Header ── */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5 shrink-0 gap-3">
           <div>
-            <h1 className="text-xl font-bold text-white">Knowledge Graph</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-white">Knowledge Graph</h1>
             <p className="text-xs text-gray-400 mt-0.5">
               Visualize relationships between your documents, topics, and key concepts.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-gray-300 transition-colors">
-              <Filter className="w-3.5 h-3.5" /> Filters
-            </button>
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={handleRecalculate}
               disabled={recalculating}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-medium transition-colors"
+              className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-medium transition-colors"
             >
               {recalculating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
               {recalculating ? "Recalculating..." : "Add Source"}
-            </button>
-            <button className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-              <MoreHorizontal className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* ── Toolbar (legend + controls) ── */}
-        <div className="flex items-center justify-between px-4 py-2 border-b border-white/5 shrink-0 bg-[#141720]">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between px-3 sm:px-4 py-2 border-b border-white/5 shrink-0 bg-[#141720] overflow-x-auto scrollbar-none gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
             {TYPE_LABELS.map((t) => (
               <button
                 key={t}
                 onClick={() => toggleFilter(t)}
-                className={`flex items-center gap-1.5 text-xs transition-opacity ${activeFilters.has(t) ? "opacity-100" : "opacity-30"}`}
+                className={`flex items-center gap-1.5 text-xs transition-opacity shrink-0 ${activeFilters.has(t) ? "opacity-100" : "opacity-30"}`}
               >
                 <span className="w-2.5 h-2.5 rounded-full" style={{ background: NODE_COLORS[t] }} />
                 <span className="text-gray-300">{t}</span>
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer select-none">
-              Show Strength
+              <span className="hidden sm:inline">Show</span> Strength
               <button
                 onClick={() => setShowStrength((v) => !v)}
                 className={`relative w-8 h-4 rounded-full transition-colors ${showStrength ? "bg-indigo-600" : "bg-white/10"}`}
@@ -448,7 +447,7 @@ export default function KnowledgeGraphPage() {
           onClose={() => setSelectedNode(null)}
         />
       ) : (
-        <aside className="w-64 shrink-0 bg-[#141720] border-l border-white/5 flex flex-col overflow-y-auto">
+        <aside className="w-64 shrink-0 bg-[#141720] border-l border-white/5 hidden lg:flex flex-col overflow-y-auto">
           <div className="p-4 border-b border-white/5">
             <h3 className="text-sm font-semibold text-white">Node Details</h3>
             <p className="text-xs text-gray-500 mt-1">Click a node to see its details.</p>

@@ -17,10 +17,19 @@ import {
   Building2,
   ExternalLink,
   BookOpen,
+  Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 interface FacultySession {
   id: string;
@@ -71,6 +80,7 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
   const router = useRouter();
   const [faculty, setFaculty] = useState<FacultySession | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   // If on login page, render children directly without dashboard chrome
   const isLoginPage = pathname === "/faculty/login";
@@ -118,145 +128,172 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
     );
   }
 
-  return (
-    <div className="flex h-screen w-full bg-slate-950 text-slate-100 overflow-hidden font-sans">
-      {/* ── FACULTY SIDEBAR ────────────────────────────────────────── */}
-      <aside className="w-64 shrink-0 flex flex-col bg-slate-900/90 border-r border-slate-800/80 backdrop-blur-xl">
-        {/* Brand Header */}
-        <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
-          <Link href="/faculty/dashboard" className="flex items-center gap-3 group">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-              <GraduationCap className="h-5 w-5 text-white" />
+  const sidebarNavContent = (
+    <div className="flex flex-col h-full">
+      {/* Brand Header */}
+      <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
+        <Link href="/faculty/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 group">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+            <GraduationCap className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold tracking-tight text-white text-base">Faculty Portal</span>
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold tracking-tight text-white text-base">Faculty Portal</span>
-              </div>
-              <p className="text-xs text-indigo-400 font-medium">Smart University Academic</p>
-            </div>
-          </Link>
-        </div>
+            <p className="text-xs text-indigo-400 font-medium">Smart University Academic</p>
+          </div>
+        </Link>
+      </div>
 
-        {/* Active Faculty Card */}
-        {faculty && (
-          <div className="p-4 mx-3 mt-4 rounded-xl bg-slate-800/60 border border-slate-700/60 backdrop-blur">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10 border border-indigo-500/30 ring-2 ring-indigo-500/20">
-                <AvatarFallback className="bg-indigo-600 text-white font-bold text-xs">
-                  {faculty.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">{faculty.name}</p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-indigo-500/40 text-indigo-300 bg-indigo-500/10">
-                    {faculty.facultyCode}
-                  </Badge>
-                  <span className="text-[11px] text-slate-400 truncate">{faculty.departmentCode}</span>
-                </div>
+      {/* Active Faculty Card */}
+      {faculty && (
+        <div className="p-4 mx-3 mt-4 rounded-xl bg-slate-800/60 border border-slate-700/60 backdrop-blur">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10 border border-indigo-500/30 ring-2 ring-indigo-500/20">
+              <AvatarFallback className="bg-indigo-600 text-white font-bold text-xs">
+                {faculty.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-white truncate">{faculty.name}</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-indigo-500/40 text-indigo-300 bg-indigo-500/10">
+                  {faculty.facultyCode}
+                </Badge>
+                <span className="text-[11px] text-slate-400 truncate">{faculty.departmentCode}</span>
               </div>
-            </div>
-            <div className="mt-2.5 pt-2 border-t border-slate-700/50 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="h-3 w-3 text-emerald-400" />
-                Verified Faculty
-              </span>
-              <span className="text-slate-300 truncate max-w-[90px]">{faculty.departmentName}</span>
             </div>
           </div>
-        )}
-
-        {/* Navigation Menu */}
-        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
-          <p className="px-3 pb-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-            Academic Operations
-          </p>
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  isActive
-                    ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 shadow-sm"
-                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <item.icon className={`h-4 w-4 ${isActive ? "text-indigo-400" : "text-slate-400"}`} />
-                  <span>{item.title}</span>
-                </div>
-                {item.badge && (
-                  <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${
-                      isActive
-                        ? "bg-indigo-500/30 text-indigo-200"
-                        : "bg-slate-800 text-slate-400"
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Footer Actions */}
-        <div className="p-3 border-t border-slate-800/80 space-y-2">
-          <Link
-            href="/dashboard"
-            className="flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-lg transition-colors"
-          >
-            <span className="flex items-center gap-2">
-              <Building2 className="h-3.5 w-3.5 text-slate-400" />
-              Switch to Main Portal
+          <div className="mt-2.5 pt-2 border-t border-slate-700/50 flex items-center justify-between text-[11px] text-slate-400">
+            <span className="flex items-center gap-1">
+              <ShieldCheck className="h-3 w-3 text-emerald-400" />
+              Verified Faculty
             </span>
-            <ExternalLink className="h-3 w-3 text-slate-500" />
-          </Link>
-          <Button
-            variant="ghost"
-            onClick={handleLogout}
-            className="w-full justify-start text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-2 h-auto rounded-lg"
-          >
-            <LogOut className="h-3.5 w-3.5 mr-2" />
-            Faculty Sign Out
-          </Button>
+            <span className="text-slate-300 truncate max-w-[90px]">{faculty.departmentName}</span>
+          </div>
         </div>
+      )}
+
+      {/* Navigation Menu */}
+      <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+        <p className="px-3 pb-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+          Academic Operations
+        </p>
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setMobileOpen(false)}
+              className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                isActive
+                  ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 shadow-sm"
+                  : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <item.icon className={`h-4 w-4 ${isActive ? "text-indigo-400" : "text-slate-400"}`} />
+                <span>{item.title}</span>
+              </div>
+              {item.badge && (
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${
+                    isActive
+                      ? "bg-indigo-500/30 text-indigo-200"
+                      : "bg-slate-800 text-slate-400"
+                  }`}
+                >
+                  {item.badge}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Footer Actions */}
+      <div className="p-3 border-t border-slate-800/80 space-y-2 mt-auto">
+        <Link
+          href="/dashboard"
+          onClick={() => setMobileOpen(false)}
+          className="flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-lg transition-colors"
+        >
+          <span className="flex items-center gap-2">
+            <Building2 className="h-3.5 w-3.5 text-slate-400" />
+            Switch to Main Portal
+          </span>
+          <ExternalLink className="h-3 w-3 text-slate-500" />
+        </Link>
+        <Button
+          variant="ghost"
+          onClick={handleLogout}
+          className="w-full justify-start text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-2 h-auto rounded-lg"
+        >
+          <LogOut className="h-3.5 w-3.5 mr-2" />
+          Faculty Sign Out
+        </Button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex h-screen w-full bg-slate-950 text-slate-100 overflow-hidden font-sans">
+      {/* ── DESKTOP FACULTY SIDEBAR ────────────────────────────────────────── */}
+      <aside className="w-64 shrink-0 hidden md:flex flex-col bg-slate-900/90 border-r border-slate-800/80 backdrop-blur-xl">
+        {sidebarNavContent}
       </aside>
 
       {/* ── MAIN CONTENT AREA ──────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Bar */}
-        <header className="h-16 shrink-0 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-xl px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-semibold text-slate-300">
-              Smart University Academic Faculty Subsystem
+        <header className="h-16 shrink-0 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Mobile Sheet Trigger */}
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger
+                className="md:hidden p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
+                aria-label="Open Faculty Menu"
+              >
+                <Menu className="h-5 w-5" />
+              </SheetTrigger>
+              <SheetContent side="left" className="w-72 p-0 bg-slate-900 border-r border-slate-800 text-slate-100">
+                <SheetHeader className="sr-only">
+                  <SheetTitle>Faculty Navigation</SheetTitle>
+                  <SheetDescription>Faculty Portal navigation and actions.</SheetDescription>
+                </SheetHeader>
+                {sidebarNavContent}
+              </SheetContent>
+            </Sheet>
+
+            <span className="text-xs sm:text-sm font-semibold text-slate-300 truncate">
+              Faculty Subsystem
             </span>
-            <Badge variant="outline" className="hidden sm:inline-flex bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs">
+            <Badge variant="outline" className="hidden lg:inline-flex bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs shrink-0">
               Live ETR & RAG Synchronized
             </Badge>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {faculty && (
-              <div className="flex items-center gap-2 text-xs bg-slate-800/80 border border-slate-700/60 px-3 py-1.5 rounded-full text-slate-300">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-semibold text-slate-200">{faculty.title} {faculty.name}</span>
-                <span className="text-slate-500">|</span>
-                <span className="text-indigo-400 font-mono">{faculty.facultyCode}</span>
+              <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs bg-slate-800/80 border border-slate-700/60 px-2.5 sm:px-3 py-1.5 rounded-full text-slate-300">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="font-semibold text-slate-200 truncate max-w-[100px] sm:max-w-none">
+                  {faculty.title} {faculty.name}
+                </span>
+                <span className="text-slate-500 hidden sm:inline">|</span>
+                <span className="text-indigo-400 font-mono hidden sm:inline">{faculty.facultyCode}</span>
               </div>
             )}
           </div>
         </header>
 
         {/* Content Body */}
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
           <div className="max-w-7xl mx-auto space-y-6">{children}</div>
         </main>
       </div>

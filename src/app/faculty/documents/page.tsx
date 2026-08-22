@@ -485,9 +485,9 @@ export default function FacultyDocumentsPage() {
             </CardDescription>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             {/* Filter Tabs */}
-            <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px]">
+            <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] overflow-x-auto scrollbar-none max-w-full">
               <button
                 onClick={() => setActiveTab("ALL")}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all ${

@@ -210,80 +210,87 @@ function DetailPanel({ docId, onClose }: { docId: string; onClose: () => void })
   }, [docId]);
 
   return (
-    <aside className="w-72 shrink-0 bg-[#141720] border-l border-white/5 flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
-        <div className="flex items-center gap-2 min-w-0">
-          {detail && <FileIcon name={detail.fileName} type={detail.fileType} />}
-          <p className="text-xs font-medium text-white truncate">{detail?.fileName ?? "Loading..."}</p>
-        </div>
-        <button onClick={onClose} className="text-gray-500 hover:text-white shrink-0 ml-2"><X className="w-4 h-4" /></button>
-      </div>
+    <>
+      {/* Mobile backdrop */}
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-30 lg:hidden" onClick={onClose} />
 
-      {/* Tabs */}
-      <div className="flex border-b border-white/5 px-4">
-        {(["Details", "Chunks"] as const).map((t) => (
-          <button key={t} onClick={() => setTab(t)}
-            className={`py-2.5 px-3 text-xs font-medium border-b-2 transition-colors ${tab === t ? "border-indigo-500 text-white" : "border-transparent text-gray-500 hover:text-gray-300"}`}>
-            {t}
+      <aside className="fixed inset-y-0 right-0 z-40 w-full sm:w-80 lg:relative lg:w-80 shrink-0 bg-[#141720] border-l border-white/10 flex flex-col overflow-hidden shadow-2xl lg:shadow-none animate-slide-up-fade">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/5">
+          <div className="flex items-center gap-2 min-w-0">
+            {detail && <FileIcon name={detail.fileName} type={detail.fileType} />}
+            <p className="text-xs font-semibold text-white truncate">{detail?.fileName ?? "Loading..."}</p>
+          </div>
+          <button onClick={onClose} className="p-1 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 shrink-0 ml-2">
+            <X className="w-4 h-4" />
           </button>
-        ))}
-      </div>
-
-      {loading ? (
-        <div className="flex-1 flex items-center justify-center"><Loader2 className="w-5 h-5 animate-spin text-gray-500" /></div>
-      ) : !detail ? (
-        <div className="flex-1 flex items-center justify-center text-xs text-gray-500">Failed to load</div>
-      ) : (
-        <div className="flex-1 overflow-y-auto">
-          {tab === "Details" && (
-            <div className="p-4 space-y-4">
-              <h3 className="text-sm font-semibold text-white">Document Info</h3>
-              {[
-                { label: "File Type", value: detail.fileType.includes("pdf") ? "PDF" : detail.fileName.split(".").pop()?.toUpperCase() ?? "—" },
-                { label: "Size", value: fmtBytes(detail.fileSize) },
-                { label: "Chunks", value: detail._count.chunks.toLocaleString() },
-                { label: "Uploaded By", value: detail.uploadedBy ?? "—" },
-                { label: "Uploaded At", value: new Date(detail.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) },
-                { label: "Status", value: detail.processingStatus },
-                ...(detail.knowledgeBase ? [{ label: "Knowledge Base", value: detail.knowledgeBase.name }] : []),
-              ].map(({ label, value }) => (
-                <div key={label} className="flex items-start justify-between gap-2">
-                  <span className="text-xs text-gray-400 shrink-0">{label}</span>
-                  {label === "Status" ? (
-                    <StatusBadge status={value as string} />
-                  ) : (
-                    <span className="text-xs text-white text-right">{value}</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {tab === "Chunks" && (
-            <div className="p-4 space-y-2">
-              <p className="text-xs text-gray-400">{detail._count.chunks} total chunks — showing first 5</p>
-              {detail.chunks.map((c) => (
-                <div key={c.id} className="bg-[#1a1f2e] rounded-xl p-3 border border-white/5">
-                  <p className="text-[10px] text-indigo-400 font-medium mb-1">Chunk {c.chunkIndex + 1} · {c.tokenCount} tokens</p>
-                  <p className="text-[11px] text-gray-300 leading-relaxed line-clamp-4">{c.content}</p>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
-      )}
 
-      {/* Footer CTA */}
-      {detail?.signedUrl && (
-        <div className="p-4 border-t border-white/5">
-          <a href={detail.signedUrl} target="_blank" rel="noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors">
-            <Eye className="w-4 h-4" /> View Full Document <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+        {/* Tabs */}
+        <div className="flex border-b border-white/5 px-4">
+          {(["Details", "Chunks"] as const).map((t) => (
+            <button key={t} onClick={() => setTab(t)}
+              className={`py-2.5 px-3 text-xs font-medium border-b-2 transition-colors ${tab === t ? "border-indigo-500 text-white" : "border-transparent text-gray-500 hover:text-gray-300"}`}>
+              {t}
+            </button>
+          ))}
         </div>
-      )}
-    </aside>
+
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center"><Loader2 className="w-5 h-5 animate-spin text-gray-500" /></div>
+        ) : !detail ? (
+          <div className="flex-1 flex items-center justify-center text-xs text-gray-500">Failed to load</div>
+        ) : (
+          <div className="flex-1 overflow-y-auto">
+            {tab === "Details" && (
+              <div className="p-4 space-y-4">
+                <h3 className="text-sm font-semibold text-white">Document Info</h3>
+                {[
+                  { label: "File Type", value: detail.fileType.includes("pdf") ? "PDF" : detail.fileName.split(".").pop()?.toUpperCase() ?? "—" },
+                  { label: "Size", value: fmtBytes(detail.fileSize) },
+                  { label: "Chunks", value: detail._count.chunks.toLocaleString() },
+                  { label: "Uploaded By", value: detail.uploadedBy ?? "—" },
+                  { label: "Uploaded At", value: new Date(detail.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) },
+                  { label: "Status", value: detail.processingStatus },
+                  ...(detail.knowledgeBase ? [{ label: "Knowledge Base", value: detail.knowledgeBase.name }] : []),
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex items-start justify-between gap-2">
+                    <span className="text-xs text-gray-400 shrink-0">{label}</span>
+                    {label === "Status" ? (
+                      <StatusBadge status={value as string} />
+                    ) : (
+                      <span className="text-xs text-white text-right font-medium">{value}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {tab === "Chunks" && (
+              <div className="p-4 space-y-2">
+                <p className="text-xs text-gray-400">{detail._count.chunks} total chunks — showing first 5</p>
+                {detail.chunks.map((c) => (
+                  <div key={c.id} className="bg-[#1a1f2e] rounded-xl p-3 border border-white/5">
+                    <p className="text-[10px] text-indigo-400 font-medium mb-1">Chunk {c.chunkIndex + 1} · {c.tokenCount} tokens</p>
+                    <p className="text-[11px] text-gray-300 leading-relaxed line-clamp-4">{c.content}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Footer CTA */}
+        {detail?.signedUrl && (
+          <div className="p-4 border-t border-white/5">
+            <a href={detail.signedUrl} target="_blank" rel="noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors">
+              <Eye className="w-4 h-4" /> View Full Document <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        )}
+      </aside>
+    </>
   );
 }
 
@@ -351,40 +358,40 @@ export default function DocumentsPage() {
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
 
         {/* ── Top bar ── */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0 gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5 shrink-0 gap-3">
           <div>
-            <h1 className="text-xl font-bold text-white">University Documents</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-white">University Documents</h1>
             <p className="text-xs text-gray-400 mt-0.5">Explore institutional and course documents. Academic documents are managed via the Faculty Portal.</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {/* Search */}
-            <div className="relative hidden sm:block">
+            <div className="relative flex-1 sm:w-52">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search documents..."
-                className="bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 w-52"
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-3 py-1.5 sm:py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50"
               />
             </div>
             <a
               href="/faculty/documents"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-xs text-purple-300 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-xs text-purple-300 transition-colors shrink-0"
             >
-              🎓 Go to Faculty Portal
+              🎓 <span className="hidden xs:inline">Go to</span> Faculty Portal
             </a>
           </div>
         </div>
 
         {/* ── Tabs ── */}
-        <div className="flex items-center gap-1 px-6 border-b border-white/5 shrink-0">
+        <div className="flex items-center gap-1 px-4 sm:px-6 border-b border-white/5 shrink-0 overflow-x-auto scrollbar-none">
           {TABS.map((t) => (
             <button key={t} onClick={() => setTab(t)}
-              className={`py-3 px-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${tab === t ? "border-indigo-500 text-white" : "border-transparent text-gray-500 hover:text-gray-300"}`}>
+              className={`py-2.5 sm:py-3 px-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${tab === t ? "border-indigo-500 text-white" : "border-transparent text-gray-500 hover:text-gray-300"}`}>
               {t}
             </button>
           ))}
-          <span className="ml-auto text-[11px] text-gray-500 pb-3 whitespace-nowrap">
+          <span className="ml-auto text-[11px] text-gray-500 pb-2.5 sm:pb-3 whitespace-nowrap pl-4 hidden md:inline">
             {pagination.total.toLocaleString()} documents · {fmtBytes(totalStorage)} used
           </span>
         </div>

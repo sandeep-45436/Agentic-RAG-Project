@@ -221,9 +221,13 @@ function RetrievalDebugContent({
   );
 }
 
-// ── Context Panel ─────────────────────────────────────────────────────────────
+// ── Context Panel Content ───────────────────────────────────────────────────
 
-function ContextPanel({ chunks, model, temperature }: {
+function ContextPanelContent({
+  chunks,
+  model,
+  temperature,
+}: {
   chunks: Chunk[];
   model: string;
   temperature: number;
@@ -232,11 +236,7 @@ function ContextPanel({ chunks, model, temperature }: {
   const visible = showAll ? chunks : chunks.slice(0, 2);
 
   return (
-    <aside className="w-72 shrink-0 bg-[#141720] border-l border-white/5 flex flex-col overflow-y-auto">
-      <div className="p-5 border-b border-white/5">
-        <h3 className="text-sm font-semibold text-white">Context</h3>
-      </div>
-
+    <div className="flex flex-col h-full overflow-y-auto">
       {/* Relevant chunks */}
       <div className="p-4 space-y-3 flex-1">
         <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Relevant Chunks</p>
@@ -311,6 +311,23 @@ function ContextPanel({ chunks, model, temperature }: {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Context Panel (Desktop) ─────────────────────────────────────────────────
+
+function ContextPanel({ chunks, model, temperature }: {
+  chunks: Chunk[];
+  model: string;
+  temperature: number;
+}) {
+  return (
+    <aside className="w-72 shrink-0 bg-[#141720] border-l border-white/5 hidden xl:flex flex-col overflow-hidden">
+      <div className="p-4 border-b border-white/5">
+        <h3 className="text-sm font-semibold text-white">Context & Citations</h3>
+      </div>
+      <ContextPanelContent chunks={chunks} model={model} temperature={temperature} />
     </aside>
   );
 }
@@ -469,6 +486,10 @@ export default function ChatPage() {
   const [userInitials, setUserInitials] = useState("U");
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Mobile drawer states
+  const [mobileHistoryOpen, setMobileHistoryOpen] = useState(false);
+  const [mobileContextOpen, setMobileContextOpen] = useState(false);
 
   // Debug panel state
   const [debugOpen, setDebugOpen] = useState(false);
@@ -767,69 +788,132 @@ export default function ChatPage() {
     </div>
   );
 
+  const historyListContent = (
+    <div className="flex flex-col h-full bg-[#0f1117]">
+      <div className="p-3">
+        <button
+          onClick={() => {
+            createNew();
+            setMobileHistoryOpen(false);
+          }}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-500 text-white text-sm font-medium transition-all duration-200 shadow-md"
+        >
+          <Plus className="w-4 h-4" /> New Chat
+        </button>
+      </div>
+
+      <div className="px-3 pb-2">
+        <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider px-1 mb-1">
+          Recent Conversations
+        </p>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-2 space-y-0.5">
+        {historyLoading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
+          </div>
+        ) : history.length === 0 ? (
+          <p className="text-xs text-gray-500 text-center py-8 px-4">No conversations yet.</p>
+        ) : (
+          history.map((conv) => (
+            <div
+              key={conv.id}
+              onClick={() => {
+                loadConversation(conv.id);
+                setMobileHistoryOpen(false);
+              }}
+              className={`group flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
+                conversationId === conv.id
+                  ? "bg-white/10 text-white"
+                  : "text-gray-400 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-60" />
+              <span className="text-xs flex-1 truncate">{conv.title || "New Chat"}</span>
+              <button
+                onClick={(e) => deleteConv(conv.id, e)}
+                className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:text-red-400 transition-all"
+                title="Delete chat"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex h-[calc(100vh-3.5rem)] bg-[#0f1117] text-white overflow-hidden -m-6 md:-m-10">
 
-      {/* ── Left sidebar: conversation history ─────────────────── */}
-      <aside className="w-60 shrink-0 bg-[#0f1117] border-r border-white/5 flex flex-col hidden md:flex">
-        <div className="p-3">
-          <button
-            onClick={createNew}
-            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-500 text-white text-sm font-medium transition-all duration-200"
-          >
-            <Plus className="w-4 h-4" /> New Chat
-          </button>
-        </div>
-
-        <div className="px-3 pb-2">
-          <p className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider px-1 mb-1">
-            Recent
-          </p>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-2 space-y-0.5">
-          {historyLoading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
-            </div>
-          ) : history.length === 0 ? (
-            <p className="text-xs text-gray-500 text-center py-8 px-4">No conversations yet.</p>
-          ) : (
-            history.map((conv) => (
-              <div
-                key={conv.id}
-                onClick={() => loadConversation(conv.id)}
-                className={`group flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
-                  conversationId === conv.id
-                    ? "bg-white/10 text-white"
-                    : "text-gray-400 hover:bg-white/5 hover:text-white"
-                }`}
-              >
-                <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-60" />
-                <span className="text-xs flex-1 truncate">{conv.title || "New Chat"}</span>
-                <button
-                  onClick={(e) => deleteConv(conv.id, e)}
-                  className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:text-red-400 transition-all"
-                >
-                  <Trash2 className="w-3 h-3" />
-                </button>
-              </div>
-            ))
-          )}
-        </div>
+      {/* ── Left sidebar: conversation history (Desktop) ─────────── */}
+      <aside className="w-60 shrink-0 bg-[#0f1117] border-r border-white/5 flex-col hidden md:flex">
+        {historyListContent}
       </aside>
 
       {/* ── Main chat area ──────────────────────────────────────── */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
-          <h1 className="text-base font-semibold text-white">{currentTitle}</h1>
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 border-b border-white/5 shrink-0 gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            {/* Mobile Conversation History Drawer */}
+            <Sheet open={mobileHistoryOpen} onOpenChange={setMobileHistoryOpen}>
+              <SheetTrigger
+                className="md:hidden flex items-center gap-1.5 text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-2.5 py-1.5 transition-colors shrink-0"
+                aria-label="Open chats history"
+              >
+                <MessageSquare className="w-3.5 h-3.5 text-primary" />
+                <span className="hidden xs:inline">Chats</span>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[85vw] sm:max-w-xs bg-[#0f1117] border-r border-white/10 p-0 text-white">
+                <SheetHeader className="p-3 border-b border-white/5">
+                  <SheetTitle className="text-white text-sm">Conversations</SheetTitle>
+                  <SheetDescription className="text-xs text-gray-400">
+                    Switch or start new chats
+                  </SheetDescription>
+                </SheetHeader>
+                {historyListContent}
+              </SheetContent>
+            </Sheet>
+
+            <h1 className="text-sm sm:text-base font-semibold text-white truncate max-w-[140px] xs:max-w-[200px] sm:max-w-md">
+              {currentTitle}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Mobile Context / Citations Sheet */}
+            <Sheet open={mobileContextOpen} onOpenChange={setMobileContextOpen}>
+              <SheetTrigger
+                className="xl:hidden flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-2.5 py-1.5 transition-colors"
+                title="View source citations"
+              >
+                <FileText className="w-3.5 h-3.5 text-indigo-400" />
+                <span className="hidden sm:inline">Sources</span>
+                {chunks.length > 0 && (
+                  <span className="ml-0.5 px-1.5 py-0.2 rounded-full bg-primary/20 text-[10px] text-primary font-bold">
+                    {chunks.length}
+                  </span>
+                )}
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[85vw] sm:max-w-sm bg-[#141720] border-l border-white/10 p-0 text-white">
+                <SheetHeader className="p-4 border-b border-white/5">
+                  <SheetTitle className="text-white text-sm">Context & Citations</SheetTitle>
+                  <SheetDescription className="text-xs text-gray-400">
+                    Retrieved ground-truth university chunks
+                  </SheetDescription>
+                </SheetHeader>
+                <ContextPanelContent chunks={chunks} model="GPT-4o (via OpenRouter)" temperature={0.3} />
+              </SheetContent>
+            </Sheet>
+
             {/* Debug panel toggle — desktop */}
             <button
               onClick={() => setDebugOpen((v) => !v)}
-              className={`hidden md:flex items-center gap-2 text-xs border rounded-lg px-3 py-1.5 transition-all duration-200 ${
+              className={`hidden md:flex items-center gap-1.5 text-xs border rounded-lg px-3 py-1.5 transition-all duration-200 ${
                 debugOpen
                   ? "text-primary bg-primary/10 border-primary/30"
                   : "text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10"
@@ -843,10 +927,10 @@ export default function ChatPage() {
             {/* Debug panel toggle — mobile (sheet) */}
             <Sheet>
               <SheetTrigger
-                className="md:hidden flex items-center gap-2 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-3 py-1.5 transition-colors"
+                className="md:hidden flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-2.5 py-1.5 transition-colors"
               >
                 <Bug className="w-3.5 h-3.5" />
-                Debug
+                <span className="hidden sm:inline">Debug</span>
               </SheetTrigger>
               <SheetContent side="right" className="w-[85vw] sm:max-w-sm bg-background p-0">
                 <SheetHeader className="p-4 border-b border-border/50">
@@ -859,17 +943,25 @@ export default function ChatPage() {
               </SheetContent>
             </Sheet>
 
-            <button className="flex items-center gap-2 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-3 py-1.5 transition-colors">
-              <Share2 className="w-3.5 h-3.5" /> Share
-            </button>
-            <button className="p-1.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-              <MoreHorizontal className="w-4 h-4" />
+            <button
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({ title: currentTitle, url: window.location.href }).catch(() => {});
+                } else {
+                  copyText(window.location.href);
+                  alert("Chat link copied to clipboard!");
+                }
+              }}
+              className="flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-2.5 py-1.5 transition-colors"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Share</span>
             </button>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
           {messages.length === 0 ? (
             <EmptyState onSuggest={(q) => setInput(q)} />
           ) : (
@@ -938,7 +1030,7 @@ export default function ChatPage() {
         </div>
 
         {/* Input area */}
-        <div className="shrink-0 px-6 pb-5 pt-3 border-t border-white/5">
+        <div className="shrink-0 px-3 sm:px-6 pb-3 sm:pb-5 pt-2 sm:pt-3 border-t border-white/5">
           <form onSubmit={handleFormSubmit}>
             <div className="bg-[#1a1f2e] border border-white/10 focus-within:border-primary/50 rounded-2xl transition-colors overflow-hidden">
               <textarea
@@ -955,12 +1047,12 @@ export default function ChatPage() {
                     handleFormSubmit(e as any);
                   }
                 }}
-                placeholder="Ask anything about your data..."
+                placeholder="Ask anything about course syllabi, slides, policies..."
                 disabled={isLoading}
                 rows={1}
-                className="w-full bg-transparent text-sm text-white placeholder-gray-500 px-4 pt-3.5 pb-1 resize-none outline-none min-h-[44px] max-h-40"
+                className="w-full bg-transparent text-xs sm:text-sm text-white placeholder-gray-500 px-3.5 sm:px-4 pt-3 sm:pt-3.5 pb-1 resize-none outline-none min-h-[44px] max-h-40"
               />
-              <div className="flex items-center justify-between px-3 pb-3 pt-1">
+              <div className="flex items-center justify-between px-3 pb-2.5 pt-1">
                 <div className="flex items-center gap-1">
                   {[
                     { icon: Paperclip, label: "Attach" },
@@ -973,25 +1065,25 @@ export default function ChatPage() {
                       title={label}
                       className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors"
                     >
-                      <Icon className="w-4 h-4" />
+                      <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
                   ))}
                 </div>
                 <button
                   type="submit"
                   disabled={isLoading || !input?.trim()}
-                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-500 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-all hover:scale-105 active:scale-95 shrink-0"
+                  className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-500 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-all hover:scale-105 active:scale-95 shrink-0"
                 >
                   {isLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <Send className="w-4 h-4" />
+                    <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   )}
                 </button>
               </div>
             </div>
           </form>
-          <p className="text-center text-[11px] text-gray-600 mt-2.5">
+          <p className="text-center text-[10px] sm:text-[11px] text-gray-600 mt-2">
             AI can make mistakes. Please verify important information.
           </p>
         </div>
@@ -1019,7 +1111,7 @@ export default function ChatPage() {
         </aside>
       )}
 
-      {/* ── Right context panel (always visible on desktop when debug is closed) ── */}
+      {/* ── Right context panel (desktop: always visible on xl screens when debug is closed) ── */}
       {!debugOpen && (
         <ContextPanel
           chunks={chunks}

@@ -30,8 +30,8 @@ async function main() {
     console.log(`  - ${u.email} (${u.id}) -> Role: ${u.memberships[0]?.role}, Org: ${u.memberships[0]?.organizationId}`)
   );
 
-  // Let's test as MEMBER / STUDENT role
-  const studentUser = users.find((u) => u.memberships[0]?.role === "MEMBER" || u.memberships[0]?.role === "STUDENT") || users[0];
+  // Let's test as MEMBER role
+  const studentUser = users.find((u) => u.memberships[0]?.role === "MEMBER") || users[0];
   const orgId = doc.organizationId;
   console.log(`\n3. Testing Access Check with User: ${studentUser.email} (${studentUser.id}) Role: ${studentUser.memberships[0]?.role || "MEMBER"}...`);
 

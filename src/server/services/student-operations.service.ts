@@ -1,11 +1,9 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { db } from "@/server/db/prisma";
 
 export class StudentOperationsService {
   public static async getStudentFullProfile(identifier: string, organizationId: string) {
     try {
-      const student = await prisma.student.findFirst({
+      const student = await db.student.findFirst({
         where: {
           organizationId,
           OR: [
@@ -42,7 +40,7 @@ export class StudentOperationsService {
 
   public static async getAllProbationStudents(organizationId: string) {
     try {
-      return await prisma.student.findMany({
+      return await db.student.findMany({
         where: {
           organizationId,
           academicStatus: "Academic Probation",
@@ -65,7 +63,7 @@ export class StudentOperationsService {
    * outstanding fees, or suspension status.
    */
   public static async getExamIneligibleStudents(organizationId: string) {
-    const students = await prisma.student.findMany({
+    const students = await db.student.findMany({
       where: { organizationId, deletedAt: null },
       include: {
         user: true,
@@ -84,7 +82,7 @@ export class StudentOperationsService {
    * Returns students filtered by department with full profiles.
    */
   public static async getStudentsByDepartment(organizationId: string, departmentCode: string) {
-    return prisma.student.findMany({
+    return db.student.findMany({
       where: {
         organizationId,
         deletedAt: null,

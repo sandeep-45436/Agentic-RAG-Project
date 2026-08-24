@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { db } from "@/server/db/prisma";
 import { StudentRepository } from "@/server/repositories/student.repository";
 import { FacultyRepository } from "@/server/repositories/faculty.repository";
 import { CourseRepository } from "@/server/repositories/course.repository";
@@ -7,6 +8,10 @@ import { StudentOperationsService } from "@/server/services/student-operations.s
 import { AcademicAnalyticsRepository } from "@/server/repositories/academic-analytics.repository";
 import { ExaminationRepository } from "@/server/repositories/examination.repository";
 import { ExaminationAnalyticsRepository } from "@/server/repositories/examination-analytics.repository";
+import { HallTicketEngine } from "@/ai/examination/hall-ticket-engine";
+import { ExaminationSchedulingEngine, ScheduleItem } from "@/ai/examination/examination-scheduling-engine";
+import { InvigilationEngine, FacultyCandidate } from "@/ai/examination/invigilation-engine";
+import { FacultyService } from "@/server/services/faculty.service";
 
 export const UniversityDatabaseToolSchema = z.object({
   operation: z.enum([
@@ -59,13 +64,197 @@ export class UniversityDatabaseTool {
         }
 
         case "exam_eligibility": {
-          const list = await ExaminationRepository.getEligibilityRoster(examinationId || "exam_default", organizationId);
+          if (examinationId) {
+            const list = await ExaminationRepository.getEligibilityRoster(examinationId, organizationId);
+            if (list.length > 0) {
+              return { success: true, operation, records: list };
+            }
+          }
+          const records = await StudentOperationsService.getExamIneligibleStudents(organizationId);
           return {
             success: true,
             operation,
-            records: list,
+            records,
           };
         }
+
+        case "hall_ticket_status": {
+          if (studentId) {
+            const student = await StudentOperationsService.getStudentFullProfile(studentId, organizationId);
+            if (student) {
+              const totalAttendance = student.attendanceRecords.length > 0
+                ? student.attendanceRecords.reduce((acc, a) => acc + (a.percentage || 0), 0) / student.attendanceRecords.length
+                : 82.5;
+              const totalDue = student.financialAccounts.reduce((acc, f) => acc + f.balanceOutstanding, 0);
+
+              const decision = HallTicketEngine.evaluateEligibility(
+                {
+                  studentId: student.id,
+                  studentNumber: student.studentNumber,
+                  name: student.user?.name || "Student",
+                  academicStatus: student.academicStatus,
+                  attendancePercentage: totalAttendance,
+                  outstandingBalance: totalDue,
+                  internalMarksComplete: student.internalMarks.length > 0,
+                },
+                examinationId || "exam-fall-2026"
+              );
+              return {
+                success: true,
+                operation,
+                records: [decision],
+              };
+            }
+          }
+
+          // Fallback roster
+          const roster = await ExaminationRepository.getEligibilityRoster(examinationId || "seed-exam-001", organizationId);
+          return {
+            success: true,
+            operation,
+            records: roster,
+          };
+        }
+
+        case "exam_schedule": {
+          const exams = await ExaminationRepository.listExaminations(organizationId);
+          const schedules = await db.examinationSchedule.findMany({
+            where: {
+              ...(examinationId ? { examinationId } : {}),
+              examination: { organizationId },
+            },
+            include: {
+              courseSection: { include: { course: true } },
+              facility: true,
+              examination: true,
+            },
+            take: limit || 20,
+          });
+
+          return {
+            success: true,
+            operation,
+            examinations: exams,
+            records: schedules.map((s) => ({
+              scheduleId: s.id,
+              examName: s.examination?.name || "Term Exam",
+              courseCode: s.courseSection?.course?.code || "COURSE",
+              courseTitle: s.courseSection?.course?.title || "Subject",
+              examDate: s.examDate,
+              startTime: s.startTime,
+              endTime: s.endTime,
+              room: s.facility?.roomNumber || "Main Hall",
+              capacity: s.facility?.capacity || 60,
+            })),
+          };
+        }
+
+        case "exam_conflicts": {
+          const rawSchedules = await db.examinationSchedule.findMany({
+            where: { examination: { organizationId } },
+            include: {
+              courseSection: { include: { course: true, enrolments: true } },
+              facility: true,
+            },
+          });
+
+          const items: ScheduleItem[] = rawSchedules.map((s) => ({
+            id: s.id,
+            courseSectionId: s.courseSectionId || "cs-01",
+            courseName: s.courseSection?.course?.title || "Exam",
+            examDate: s.examDate.toISOString().split("T")[0],
+            startTime: typeof s.startTime === "string" ? s.startTime : s.startTime.toTimeString().slice(0, 5),
+            endTime: typeof s.endTime === "string" ? s.endTime : s.endTime.toTimeString().slice(0, 5),
+            roomId: s.facilityId || "room-01",
+            roomName: s.facility?.roomNumber || "Main Hall",
+            roomCapacity: s.facility?.capacity || 60,
+            enrolledStudentIds: s.courseSection?.enrolments?.map((e) => e.studentId) || [],
+          }));
+
+          const conflicts = ExaminationSchedulingEngine.detectConflicts(items);
+          return {
+            success: true,
+            operation,
+            totalSchedulesChecked: items.length,
+            conflictsCount: conflicts.length,
+            records: conflicts,
+          };
+        }
+
+        case "invigilation_analysis": {
+          const rawSchedules = await db.examinationSchedule.findMany({
+            where: { examination: { organizationId } },
+            include: {
+              courseSection: { include: { course: true, enrolments: true } },
+              facility: true,
+            },
+            take: 20,
+          });
+
+          const facultyList = await db.faculty.findMany({
+            where: { organizationId, deletedAt: null },
+            include: { user: true, department: true, invigilationAssignments: true },
+          });
+
+          const candidates: FacultyCandidate[] = facultyList.map((f) => ({
+            facultyId: f.id,
+            name: f.user?.name || f.title,
+            departmentId: f.departmentId,
+            departmentCode: f.department.code,
+            currentDutiesCount: f.invigilationAssignments.length,
+            isAvailable: true,
+          }));
+
+          const scheduleItems: ScheduleItem[] = rawSchedules.map((s) => ({
+            id: s.id,
+            courseSectionId: s.courseSectionId || "cs-01",
+            courseName: s.courseSection?.course?.title || "Course Exam",
+            examDate: s.examDate.toISOString().split("T")[0],
+            startTime: typeof s.startTime === "string" ? s.startTime : s.startTime.toTimeString().slice(0, 5),
+            endTime: typeof s.endTime === "string" ? s.endTime : s.endTime.toTimeString().slice(0, 5),
+            roomId: s.facilityId || "room-01",
+            roomName: s.facility?.roomNumber || "Hall",
+            roomCapacity: s.facility?.capacity || 50,
+            enrolledStudentIds: [],
+          }));
+
+          const report = InvigilationEngine.optimizeInvigilation(scheduleItems, candidates);
+          return {
+            success: true,
+            operation,
+            records: report,
+          };
+        }
+
+        case "exam_results": {
+          const results = await db.semesterResult.findMany({
+            where: {
+              student: { organizationId },
+              ...(studentId ? { studentId } : {}),
+            },
+            include: {
+              student: { include: { user: true, department: true } },
+            },
+            orderBy: { createdAt: "desc" },
+            take: limit || 20,
+          });
+
+          return {
+            success: true,
+            operation,
+            records: results.map((r) => ({
+              id: r.id,
+              studentName: r.student.user?.name || "Student",
+              studentNumber: r.student.studentNumber,
+              term: r.term,
+              sgpa: r.sgpa,
+              cgpa: r.cgpa,
+              backlogsCount: r.backlogsCount,
+              totalCredits: r.totalCredits,
+            })),
+          };
+        }
+
         case "probation_students": {
           const records = await StudentRepository.findProbationStudents(organizationId, gpaThreshold);
           return {
@@ -119,15 +308,6 @@ export class UniversityDatabaseTool {
               department: c.department.code,
               sectionsCount: c.sections.length,
             })),
-          };
-        }
-
-        case "exam_eligibility": {
-          const records = await StudentOperationsService.getExamIneligibleStudents(organizationId);
-          return {
-            success: true,
-            operation,
-            records,
           };
         }
 

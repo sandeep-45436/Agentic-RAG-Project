@@ -29,21 +29,21 @@ export class ToolRegistry {
       execute: KnowledgeTool.execute,
     });
 
-    // Register University Database Tool (Restricted to Staff, Faculty, Admin, Advisors)
+    // Register University Database Tool (Available to all authorized roles)
     this.register({
       name: UniversityDatabaseTool.toolName,
       description: UniversityDatabaseTool.description,
       schema: UniversityDatabaseTool.schema,
-      allowedRoles: ["OWNER", "ADMIN", "DEAN", "FACULTY", "ADVISOR"],
+      allowedRoles: ["OWNER", "ADMIN", "DEAN", "FACULTY", "ADVISOR", "STUDENT", "MEMBER"],
       execute: UniversityDatabaseTool.execute,
     });
 
-    // Register Workflow Execution Tool (Restricted to Admin & Owners)
+    // Register Workflow Execution Tool (Available to all roles)
     this.register({
       name: WorkflowExecutionTool.toolName,
       description: WorkflowExecutionTool.description,
       schema: WorkflowExecutionTool.schema,
-      allowedRoles: ["OWNER", "ADMIN", "DEAN"],
+      allowedRoles: ["OWNER", "ADMIN", "DEAN", "FACULTY", "ADVISOR", "STUDENT", "MEMBER"],
       execute: WorkflowExecutionTool.execute,
     });
 

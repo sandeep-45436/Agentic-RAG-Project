@@ -115,6 +115,8 @@ export default function AgentsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 8;
   
   // Running state for local agent triggers
   const [runningAgentIds, setRunningAgentIds] = useState<Record<string, boolean>>({});
@@ -457,7 +459,9 @@ export default function AgentsPage() {
                   </td>
                 </tr>
               ) : (
-                filteredAgents.map((agent) => {
+                filteredAgents
+                  .slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+                  .map((agent) => {
                   const isRunning = runningAgentIds[agent.id];
                   
                   return (
@@ -558,10 +562,6 @@ export default function AgentsPage() {
                           >
                             <BarChart2 className="w-3.5 h-3.5" />
                           </Link>
-
-                          <button className="p-2 rounded-lg border border-border/60 hover:bg-[#1c1f2a] hover:text-white text-muted-foreground transition-colors bg-card">
-                            <MoreHorizontal className="w-3.5 h-3.5" />
-                          </button>
                         </div>
                       </td>
                     </tr>
@@ -573,15 +573,26 @@ export default function AgentsPage() {
         </div>
 
         <div className="p-4 border-t border-white/5 flex items-center justify-between text-xs text-muted-foreground">
-          <span>Showing 1 to {filteredAgents.length} of {filteredAgents.length} agents</span>
+          <span>
+            Showing {filteredAgents.length > 0 ? (currentPage - 1) * PAGE_SIZE + 1 : 0} to{" "}
+            {Math.min(currentPage * PAGE_SIZE, filteredAgents.length)} of {filteredAgents.length} agents
+          </span>
           <div className="flex items-center gap-1.5">
-            <button className="px-2.5 py-1.5 border border-border/60 rounded-lg hover:bg-muted transition-colors disabled:opacity-40" disabled>
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage <= 1}
+              className="px-2.5 py-1.5 border border-border/60 rounded-lg hover:bg-muted transition-colors disabled:opacity-40"
+            >
               Prev
             </button>
-            <button className="px-3 py-1.5 bg-primary text-primary-foreground font-semibold rounded-lg">
-              1
-            </button>
-            <button className="px-2.5 py-1.5 border border-border/60 rounded-lg hover:bg-muted transition-colors disabled:opacity-40" disabled>
+            <span className="px-3 py-1.5 bg-primary text-primary-foreground font-semibold rounded-lg">
+              {currentPage}
+            </span>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(Math.ceil(filteredAgents.length / PAGE_SIZE) || 1, p + 1))}
+              disabled={currentPage >= Math.ceil(filteredAgents.length / PAGE_SIZE)}
+              className="px-2.5 py-1.5 border border-border/60 rounded-lg hover:bg-muted transition-colors disabled:opacity-40"
+            >
               Next
             </button>
           </div>

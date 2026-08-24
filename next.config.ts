@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   // Keep these packages as CommonJS requires — don't bundle them
   serverExternalPackages: [
     "pdf-parse",

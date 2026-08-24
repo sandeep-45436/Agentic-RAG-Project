@@ -1,0 +1,58 @@
+﻿version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agentic_rag_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/university_db?sslmode=disable
+      - NEXT_PUBLIC_INSFORGE_URL=https://3g428aji.ap-southeast.insforge.app
+      - NEXT_PUBLIC_INSFORGE_ANON_KEY=anon_a02244bc085b5c7fbe0c8d30a535a015d76c1bd236a3c65deef304e60273e113
+      - OPENROUTER_API_KEY=
+      - GEMINI_API_KEY=
+      - QDRANT_URL=
+      - QDRANT_API_KEY=
+      - NEO4J_URI=
+      - NEO4J_USERNAME=
+      - NEO4J_PASSWORD=
+      - DISABLE_RERANKER=true
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app_network
+
+  db:
+    image: postgres:16-alpine
+    container_name: agentic_rag_postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=university_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d university_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  app_network:
+    driver: bridge

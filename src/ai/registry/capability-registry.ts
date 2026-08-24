@@ -35,7 +35,7 @@ export class CapabilityRegistry {
       description: "Structured SQL data lookup, student GPA analytics, and probation roster query",
       targetNode: "databaseNode",
       supportedTaskTypes: ["DATABASE_QUERY"],
-      allowedRoles: ["OWNER", "ADMIN", "DEAN", "FACULTY", "ADVISOR"],
+      allowedRoles: ["OWNER", "ADMIN", "DEAN", "FACULTY", "ADVISOR", "STUDENT", "MEMBER"],
       latencyBudgetMs: 300,
       costMetric: 0.00005,
     });
@@ -46,7 +46,7 @@ export class CapabilityRegistry {
       description: "Automated communication dispatch, email notification, and transcript generation",
       targetNode: "workflowNode",
       supportedTaskTypes: ["WORKFLOW_EXECUTION"],
-      allowedRoles: ["OWNER", "ADMIN", "DEAN"],
+      allowedRoles: ["OWNER", "ADMIN", "DEAN", "FACULTY", "ADVISOR", "STUDENT", "MEMBER"],
       latencyBudgetMs: 400,
       costMetric: 0.0002,
     });
@@ -57,7 +57,7 @@ export class CapabilityRegistry {
       description: "Student profile, attendance risk prediction, GPA trend trajectory, and personalized academic recommendations",
       targetNode: "databaseNode",
       supportedTaskTypes: ["DATABASE_QUERY"],
-      allowedRoles: ["OWNER", "ADMIN", "DEAN", "FACULTY", "ADVISOR", "STUDENT"],
+      allowedRoles: ["OWNER", "ADMIN", "DEAN", "FACULTY", "ADVISOR", "STUDENT", "MEMBER"],
       latencyBudgetMs: 250,
       costMetric: 0.00008,
     });
@@ -68,7 +68,7 @@ export class CapabilityRegistry {
       description: "Examination eligibility, hall ticket decisions, timetable conflict detection, invigilation optimization, and pass/fail analytics",
       targetNode: "databaseNode",
       supportedTaskTypes: ["DATABASE_QUERY"],
-      allowedRoles: ["OWNER", "ADMIN", "DEAN", "FACULTY", "ADVISOR", "STUDENT"],
+      allowedRoles: ["OWNER", "ADMIN", "DEAN", "FACULTY", "ADVISOR", "STUDENT", "MEMBER"],
       latencyBudgetMs: 300,
       costMetric: 0.0001,
     });

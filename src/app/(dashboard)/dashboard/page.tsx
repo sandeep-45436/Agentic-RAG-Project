@@ -6,13 +6,16 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/insforge/client";
 import {
   Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip,
-  PieChart, Pie, Cell, ResponsiveContainer,
+  ResponsiveContainer,
 } from "recharts";
 import {
   FileText, MessageSquare, Zap, Users, ArrowUpRight,
   ArrowDownRight, Loader2, UploadCloud, Bot, Database,
-  BarChart2, ChevronRight, RefreshCw,
+  BarChart2, ChevronRight, RefreshCw, Sparkles, Building,
+  GraduationCap, ShieldCheck, CheckCircle2, XCircle, BookOpen,
+  Calendar, Layers, ArrowRight,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -26,6 +29,30 @@ interface DashboardData {
     tokensTrend: number | null;
     totalMembers: number;
     membersTrend: number | null;
+    authorizedDeptDocs?: number;
+  };
+  academicContext?: {
+    isStudent: boolean;
+    isFaculty: boolean;
+    role: string;
+    studentNumber: string;
+    major: string;
+    gpa: number;
+    academicStatus: string;
+    enrolledCoursesCount: number;
+    departmentId: string | null;
+    departmentCode: string;
+    departmentName: string;
+    authorizedDocsCount: number;
+    recentDepartmentDocs: Array<{
+      id: string;
+      fileName: string;
+      visibility: string;
+      departmentCode: string;
+      departmentName: string;
+      processingStatus: string;
+      createdAt: string;
+    }>;
   };
   tokenChart: { date: string; tokens: number }[];
   storage: {
@@ -65,13 +92,6 @@ function fmtNum(n: number) {
   return n.toString();
 }
 
-function fmtBytes(b: number) {
-  if (b >= 1e9) return (b / 1e9).toFixed(1) + " GB";
-  if (b >= 1e6) return (b / 1e6).toFixed(1) + " MB";
-  if (b >= 1e3) return (b / 1e3).toFixed(1) + " KB";
-  return b + " B";
-}
-
 function greeting() {
   const h = new Date().getHours();
   if (h < 12) return "Good morning";
@@ -86,93 +106,44 @@ function StatCard({
   iconBg,
   label,
   value,
-  trend,
+  subtext,
+  badge,
 }: {
   icon: React.ElementType;
   iconBg: string;
   label: string;
   value: string;
-  trend: number | null;
+  subtext?: string;
+  badge?: string;
 }) {
-  const up = trend === null ? null : trend >= 0;
   return (
-    <div className="bg-[#1a1f2e] border border-white/5 rounded-2xl p-5 flex items-start gap-4">
-      <div className={`${iconBg} p-3 rounded-xl shrink-0`}>
-        <Icon className="w-5 h-5 text-white" />
+    <div className="bg-[#141720] border border-white/5 rounded-2xl p-5 flex flex-col justify-between hover:border-indigo-500/30 transition-all shadow-md">
+      <div className="flex items-start justify-between gap-3">
+        <div className={`${iconBg} p-3 rounded-xl shrink-0`}>
+          <Icon className="w-5 h-5 text-white" />
+        </div>
+        {badge && (
+          <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px]">
+            {badge}
+          </Badge>
+        )}
       </div>
-      <div className="min-w-0">
+      <div className="mt-3">
         <p className="text-xs text-gray-400 font-medium">{label}</p>
-        <p className="text-2xl font-bold text-white mt-0.5">{value}</p>
-        {trend !== null && (
-          <p className={`text-xs mt-1 flex items-center gap-0.5 ${up ? "text-emerald-400" : "text-red-400"}`}>
-            {up ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-            {Math.abs(trend)}% from last month
-          </p>
-        )}
+        <p className="text-2xl font-bold text-white mt-1 tracking-tight">{value}</p>
+        {subtext && <p className="text-[11px] text-gray-400 mt-1">{subtext}</p>}
       </div>
     </div>
   );
 }
-
-// ── Activity Row ─────────────────────────────────────────────────────────────
-
-function ActivityRow({
-  type,
-  label,
-  sublabel,
-  time,
-}: {
-  type: "document" | "chat";
-  label: string;
-  sublabel: string;
-  time: string;
-}) {
-  return (
-    <div className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0">
-      <div
-        className={`p-2 rounded-lg shrink-0 ${
-          type === "document" ? "bg-red-500/15" : "bg-blue-500/15"
-        }`}
-      >
-        {type === "document" ? (
-          <FileText className="w-4 h-4 text-red-400" />
-        ) : (
-          <MessageSquare className="w-4 h-4 text-blue-400" />
-        )}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-white truncate">{label}</p>
-        <p className="text-xs text-gray-400 truncate">{sublabel}</p>
-      </div>
-      <span className="text-xs text-gray-500 shrink-0">{timeAgo(time)}</span>
-    </div>
-  );
-}
-
-// ── Donut tooltip ─────────────────────────────────────────────────────────────
-
-const DonutTooltip = ({ active, payload }: any) => {
-  if (active && payload?.length) {
-    return (
-      <div className="bg-[#1a1f2e] border border-white/10 rounded-lg px-3 py-2 text-xs text-white shadow-xl">
-        <p className="font-semibold">{payload[0].name}</p>
-        <p className="text-gray-300">{fmtBytes(payload[0].value)}</p>
-      </div>
-    );
-  }
-  return null;
-};
 
 // ── Main Component ────────────────────────────────────────────────────────────
-
-const STORAGE_COLORS = ["#6366f1", "#3b82f6", "#22c55e", "#f59e0b"];
 
 export default function DashboardPage() {
   const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [chartRange, setChartRange] = useState<"30d" | "7d">("30d");
 
   useEffect(() => {
     const insforge = createClient();
@@ -190,7 +161,6 @@ export default function DashboardPage() {
       .then(async (r) => {
         const contentType = r.headers.get("content-type");
         if (contentType && contentType.includes("text/html")) {
-          // Redirected to login page (unauthorized)
           window.location.href = "/login";
           return null;
         }
@@ -217,31 +187,10 @@ export default function DashboardPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const chartData =
-    chartRange === "7d" && data?.tokenChart
-      ? data.tokenChart.slice(-7)
-      : data?.tokenChart ?? [];
-
-  const storageDonut = data?.storage
-    ? [
-        { name: "Documents", value: data.storage.docBytes },
-        { name: "Embeddings", value: data.storage.embeddingBytes },
-        { name: "Knowledge Graph", value: data.storage.kbBytes },
-        { name: "Others", value: data.storage.otherBytes },
-      ]
-    : [];
-
-  const storagePct = data?.storage
-    ? Math.min(
-        Number(((data.storage.totalBytes / data.storage.limitBytes) * 100).toFixed(1)),
-        100
-      )
-    : 0;
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-7 h-7 animate-spin text-indigo-400" />
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
       </div>
     );
   }
@@ -249,7 +198,7 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
-        <div className="bg-[#1a1f2e] border border-red-500/20 rounded-2xl p-8 max-w-md text-center shadow-xl">
+        <div className="bg-[#141720] border border-red-500/20 rounded-2xl p-8 max-w-md text-center shadow-xl">
           <h2 className="text-lg font-semibold text-red-400 mb-2">Connection Issue</h2>
           <p className="text-sm text-gray-300 mb-6">{error}</p>
           <button
@@ -264,296 +213,312 @@ export default function DashboardPage() {
   }
 
   const s = data?.stats;
+  const ac = data?.academicContext;
+  const deptCode = ac?.departmentCode || "CSE";
+  const deptName = ac?.departmentName || "Computer Science & Engineering";
+  const studentName = data?.user?.name || "Student Scholar";
+  const authDocs = ac?.authorizedDocsCount ?? s?.authorizedDeptDocs ?? s?.totalDocs ?? 0;
 
   return (
-    <div className="min-h-screen bg-[#0f1117] text-white pb-12 px-1">
-      {/* ── Header ────────────────────────────────────────────── */}
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-white">
-            {greeting()}, {data?.user?.name || "User"} 👋
-          </h1>
-          <p className="text-sm text-gray-400 mt-1">
-            Here's what's happening with your workspace today.
-          </p>
+    <div className="min-h-screen bg-[#0f1117] text-white pb-12 px-1 space-y-6">
+      
+      {/* ── ACADEMIC HERO BANNER ────────────────────────────────────────────── */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-950 via-purple-950/70 to-slate-900 border border-indigo-500/20 p-6 lg:p-8 backdrop-blur-xl shadow-xl">
+        <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/40 text-xs font-semibold px-2.5 py-0.5">
+                Academic Year 2026-2027 • Fall Term
+              </Badge>
+              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs">
+                {ac?.academicStatus || "Good Standing"}
+              </Badge>
+              <span className="text-xs text-slate-400 font-mono">
+                {ac?.studentNumber || "STU-CS-101"}
+              </span>
+            </div>
+            
+            <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
+              {greeting()}, {studentName}
+            </h1>
+            
+            <p className="text-sm text-slate-300 max-w-xl leading-relaxed">
+              <span className="font-semibold text-indigo-300">{deptName} ({deptCode})</span>
+              {" • "}
+              <span>{ac?.enrolledCoursesCount || 5} Active Enrolled Courses</span>
+              {" • "}
+              <span className="text-emerald-400 font-medium">Department Retrieval Scope Active</span>
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <Link
+              href="/chat"
+              className="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-600/25 text-xs font-semibold px-4 py-2.5 transition-all gap-2"
+            >
+              <Bot className="h-4 w-4" />
+              Ask Department AI
+            </Link>
+            <Link
+              href="/documents"
+              className="inline-flex items-center justify-center border border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-slate-200 rounded-xl text-xs font-semibold px-4 py-2.5 transition-all gap-2"
+            >
+              <BookOpen className="h-4 w-4 text-indigo-400" />
+              Browse Notes
+            </Link>
+            <button
+              onClick={load}
+              className="p-2.5 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors"
+              title="Refresh metrics"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-        <button
-          onClick={load}
-          className="flex items-center gap-2 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-3 py-2 transition-colors"
-        >
-          <RefreshCw className="w-3.5 h-3.5" />
-          Refresh
-        </button>
       </div>
 
-      {/* ── Stat Cards ────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {/* ── 4 ACADEMIC STAT CARDS ──────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           icon={FileText}
-          iconBg="bg-indigo-500/80"
-          label="Total Documents"
-          value={fmtNum(s?.totalDocs ?? 0)}
-          trend={s?.docsTrend ?? null}
+          iconBg="bg-indigo-600"
+          label="Authorized Knowledge Base"
+          value={fmtNum(authDocs)}
+          subtext={`Syllabi & Notes in ${deptCode} + University-wide`}
+          badge="Live Synced"
+        />
+        <StatCard
+          icon={Building}
+          iconBg="bg-purple-600"
+          label="Active Knowledge Scope"
+          value={deptCode}
+          subtext={deptName}
+          badge="Scoped"
         />
         <StatCard
           icon={MessageSquare}
-          iconBg="bg-blue-500/80"
-          label="Total Conversations"
+          iconBg="bg-blue-600"
+          label="Grounded AI Consultations"
           value={fmtNum(s?.totalConversations ?? 0)}
-          trend={s?.conversationsTrend ?? null}
+          subtext="Verified Page-Level Citations"
         />
         <StatCard
-          icon={Zap}
-          iconBg="bg-emerald-500/80"
-          label="Tokens Used"
-          value={fmtNum(s?.totalTokens ?? 0)}
-          trend={s?.tokensTrend ?? null}
-        />
-        <StatCard
-          icon={Users}
-          iconBg="bg-amber-500/80"
-          label="Active Users"
-          value={fmtNum(s?.totalMembers ?? 0)}
-          trend={s?.membersTrend ?? null}
+          icon={Database}
+          iconBg="bg-emerald-600"
+          label="Cognitive Subsystems"
+          value="Hybrid RAG"
+          subtext="Qdrant + BM25 + Neo4j Graph"
+          badge="Online"
         />
       </div>
 
-      {/* ── Token Usage Chart + Recent Activity ───────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-4">
-        {/* Token chart */}
-        <div className="lg:col-span-3 bg-[#1a1f2e] border border-white/5 rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-white">Token Usage</h2>
-            <div className="flex gap-1 bg-white/5 rounded-lg p-0.5">
-              {(["7d", "30d"] as const).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setChartRange(r)}
-                  className={`text-xs px-3 py-1 rounded-md transition-colors ${
-                    chartRange === r
-                      ? "bg-indigo-600 text-white"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  Last {r === "7d" ? "7 days" : "30 days"}
-                </button>
-              ))}
-            </div>
-          </div>
-          <ResponsiveContainer width="100%" height={240}>
-            <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="tokenGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" vertical={false} />
-              <XAxis
-                dataKey="date"
-                tick={{ fill: "#9ca3af", fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-                interval={chartRange === "30d" ? 4 : 0}
-              />
-              <YAxis
-                tick={{ fill: "#9ca3af", fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(v) => fmtNum(v)}
-                width={50}
-              />
-              <Tooltip
-                content={({ active, payload, label }) =>
-                  active && payload?.length ? (
-                    <div className="bg-[#1a1f2e] border border-white/10 rounded-lg px-3 py-2 text-xs text-white shadow-xl">
-                      <p className="text-gray-400 mb-1">{label}</p>
-                      <p className="font-semibold">{fmtNum(payload[0].value as number)} tokens</p>
-                    </div>
-                  ) : null
-                }
-              />
-              <Area
-                type="monotone"
-                dataKey="tokens"
-                stroke="#6366f1"
-                strokeWidth={2.5}
-                fill="url(#tokenGrad)"
-                dot={false}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+      {/* ── TWO-COLUMN DETAILED VIEW ────────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Recent Activity */}
-        <div className="lg:col-span-2 bg-[#1a1f2e] border border-white/5 rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-semibold text-white">Recent Activity</h2>
-            <Link
-              href="/documents"
-              className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-            >
-              View all
-            </Link>
-          </div>
-          {!data?.activity.length ? (
-            <div className="flex flex-col items-center justify-center h-40 text-gray-500 text-sm">
-              No activity yet
+        {/* ── Left 2 Cols: Recent Department Materials & Activity ──────── */}
+        <div className="lg:col-span-2 space-y-6">
+          
+          {/* Department Course Materials Feed */}
+          <div className="bg-[#141720] border border-white/5 rounded-2xl p-5 space-y-4 shadow-md">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-indigo-400" />
+                <h3 className="text-sm font-bold text-white tracking-wide">
+                  Recent {deptCode} Course Materials & Syllabi
+                </h3>
+              </div>
+              <Link
+                href="/documents"
+                className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium"
+              >
+                View all <ChevronRight className="w-3 h-3" />
+              </Link>
             </div>
-          ) : (
-            data.activity.map((a) => (
-              <ActivityRow key={a.id} {...a} />
-            ))
-          )}
-        </div>
-      </div>
 
-      {/* ── Bottom Row: Top KBs + Storage + Quick Actions ─────── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Top Knowledge Bases */}
-        <div className="bg-[#1a1f2e] border border-white/5 rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-white">Knowledge Bases</h2>
-            <Link
-              href="/knowledge-bases"
-              className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-            >
-              View all
-            </Link>
-          </div>
-          {!data?.topKBs.length ? (
-            <div className="flex flex-col items-center justify-center h-32 text-gray-500 text-sm gap-2">
-              <Database className="w-7 h-7 opacity-30" />
-              No knowledge bases yet
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {data.topKBs.map((kb, i) => (
-                <div key={kb.id} className="flex items-center gap-3">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0"
-                    style={{
-                      background: ["#6366f1","#3b82f6","#22c55e","#f59e0b","#ec4899"][i % 5],
-                    }}
-                  >
-                    {kb.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{kb.name}</p>
-                  </div>
-                  <span className="text-xs text-gray-400 shrink-0">{kb.runs} docs</span>
+            <div className="divide-y divide-white/5">
+              {(!ac?.recentDepartmentDocs || ac.recentDepartmentDocs.length === 0) ? (
+                <div className="py-8 text-center text-xs text-gray-500">
+                  No materials uploaded yet for this department.
                 </div>
-              ))}
+              ) : (
+                ac.recentDepartmentDocs.map((doc) => (
+                  <div key={doc.id} className="py-3.5 flex items-center justify-between gap-3 hover:bg-white/[0.02] px-2 rounded-xl transition-colors">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="p-2 bg-indigo-500/15 rounded-lg shrink-0">
+                        <FileText className="w-4 h-4 text-indigo-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-white truncate">{doc.fileName}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[10px] text-indigo-300 font-mono bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">
+                            {doc.departmentCode}
+                          </span>
+                          <span className="text-[10px] text-gray-400">
+                            {timeAgo(doc.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Link
+                      href={`/chat`}
+                      className="shrink-0 text-[11px] text-indigo-400 hover:text-white bg-indigo-500/10 hover:bg-indigo-600 px-3 py-1.5 rounded-lg font-medium transition-all"
+                    >
+                      Ask AI
+                    </Link>
+                  </div>
+                ))
+              )}
             </div>
-          )}
+          </div>
+
+          {/* Activity Timeline */}
+          <div className="bg-[#141720] border border-white/5 rounded-2xl p-5 space-y-4 shadow-md">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-400" />
+              <h3 className="text-sm font-bold text-white tracking-wide">
+                Live Knowledge Platform Activity
+              </h3>
+            </div>
+
+            <div className="space-y-2.5">
+              {(!data?.activity || data.activity.length === 0) ? (
+                <p className="text-xs text-gray-500 py-4 text-center">No recent activity.</p>
+              ) : (
+                data.activity.map((act) => (
+                  <div key={act.id} className="flex items-center justify-between gap-3 py-2 border-b border-white/5 last:border-0">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`p-1.5 rounded-lg shrink-0 ${act.type === "document" ? "bg-purple-500/15 text-purple-400" : "bg-blue-500/15 text-blue-400"}`}>
+                        {act.type === "document" ? <FileText className="w-3.5 h-3.5" /> : <MessageSquare className="w-3.5 h-3.5" />}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-white truncate">{act.label}</p>
+                        <p className="text-[11px] text-gray-400 truncate">{act.sublabel}</p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-gray-500 shrink-0">{timeAgo(act.time)}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Storage Usage */}
-        <div className="bg-[#1a1f2e] border border-white/5 rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="text-base font-semibold text-white">Storage Usage</h2>
-            <span className="text-xs text-gray-400">
-              {data ? `${fmtBytes(data.storage.totalBytes)} / ${fmtBytes(data.storage.limitBytes)}` : "—"}
-            </span>
-          </div>
+        {/* ── Right Col: Scope Policy Card & Quick Shortcuts ──────────── */}
+        <div className="space-y-6">
 
-          {/* Progress bar */}
-          <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden mb-4">
-            <div
-              className="h-full bg-indigo-500 rounded-full transition-all"
-              style={{ width: `${storagePct}%` }}
-            />
-          </div>
-          <p className="text-xs text-gray-400 mb-4">{storagePct}% used</p>
+          {/* Active Knowledge Scope Card */}
+          <div className="bg-gradient-to-b from-[#161a29] to-[#121522] border border-indigo-500/30 rounded-2xl p-5 space-y-4 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-indigo-400" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+                  Access Authorization Policy
+                </h3>
+              </div>
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            </div>
 
-          {/* Donut */}
-          {data && (
-            <div className="flex items-center gap-4">
-              <ResponsiveContainer width={110} height={110}>
-                <PieChart>
-                  <Pie
-                    data={storageDonut}
-                    innerRadius={32}
-                    outerRadius={52}
-                    paddingAngle={2}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {storageDonut.map((_, i) => (
-                      <Cell key={i} fill={STORAGE_COLORS[i % STORAGE_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<DonutTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="space-y-2 flex-1">
-                {storageDonut.map((d, i) => (
-                  <div key={d.name} className="flex items-center gap-2">
-                    <span
-                      className="w-2 h-2 rounded-full shrink-0"
-                      style={{ background: STORAGE_COLORS[i] }}
-                    />
-                    <span className="text-xs text-gray-400 flex-1 truncate">{d.name}</span>
-                    <span className="text-xs text-white font-medium">{fmtBytes(d.value)}</span>
-                  </div>
-                ))}
+            <div className="bg-black/30 rounded-xl p-3 border border-white/5 space-y-2">
+              <p className="text-xs text-gray-300 font-medium">Your Scoped Retrieval Boundary:</p>
+              <div className="space-y-1.5 text-xs">
+                <div className="flex items-center gap-2 text-emerald-400">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>{deptCode} Department Documents</span>
+                </div>
+                <div className="flex items-center gap-2 text-emerald-400">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>University-Wide Regulations</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-500">
+                  <XCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>Other Academic Departments (Blocked)</span>
+                </div>
               </div>
             </div>
-          )}
 
-          <Link
-            href="/usage"
-            className="mt-4 flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-          >
-            View details <ChevronRight className="w-3 h-3" />
-          </Link>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="bg-[#1a1f2e] border border-white/5 rounded-2xl p-5">
-          <h2 className="text-base font-semibold text-white mb-4">Quick Actions</h2>
-          <div className="space-y-2">
-            {[
-              {
-                href: "/documents",
-                icon: UploadCloud,
-                label: "Upload Document",
-                color: "text-indigo-400 bg-indigo-500/10",
-              },
-              {
-                href: "/chat",
-                icon: MessageSquare,
-                label: "Start New Chat",
-                color: "text-blue-400 bg-blue-500/10",
-              },
-              {
-                href: "/knowledge-bases",
-                icon: Database,
-                label: "Create Knowledge Base",
-                color: "text-emerald-400 bg-emerald-500/10",
-              },
-              {
-                href: "/usage",
-                icon: BarChart2,
-                label: "View Analytics",
-                color: "text-amber-400 bg-amber-500/10",
-              },
-            ].map((action) => (
-              <Link
-                key={action.href}
-                href={action.href}
-                className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group"
-              >
-                <div className={`p-2 rounded-lg ${action.color}`}>
-                  <action.icon className="w-4 h-4" />
-                </div>
-                <span className="text-sm text-gray-300 group-hover:text-white transition-colors flex-1">
-                  {action.label}
-                </span>
-                <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-gray-400 transition-colors" />
-              </Link>
-            ))}
+            <Link
+              href="/chat"
+              className="w-full flex items-center justify-center gap-2 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-200 text-xs font-semibold py-2.5 rounded-xl transition-all"
+            >
+              Open Scoped Chat Portal <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
+
+          {/* Quick Academic Shortcuts */}
+          <div className="bg-[#141720] border border-white/5 rounded-2xl p-5 space-y-3 shadow-md">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400">
+              University Subsystems
+            </h3>
+
+            <div className="space-y-2">
+              <Link
+                href="/chat"
+                className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-500/15 rounded-lg text-blue-400">
+                    <MessageSquare className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-white group-hover:text-indigo-300">Department AI Chat</p>
+                    <p className="text-[10px] text-gray-400">Grounded Q&A with page citations</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
+              </Link>
+
+              <Link
+                href="/documents"
+                className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-500/15 rounded-lg text-purple-400">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-white group-hover:text-indigo-300">Academic Repository</p>
+                    <p className="text-[10px] text-gray-400">Course notes & regulations</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
+              </Link>
+
+              <Link
+                href="/faculty/timetables"
+                className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-amber-500/15 rounded-lg text-amber-400">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-white group-hover:text-indigo-300">Class & Lab Schedules</p>
+                    <p className="text-[10px] text-gray-400">Weekly timetable matrix</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
+              </Link>
+
+              <Link
+                href="/faculty/login"
+                className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-emerald-500/15 rounded-lg text-emerald-400">
+                    <GraduationCap className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-white group-hover:text-indigo-300">Faculty Portal Gateway</p>
+                    <p className="text-[10px] text-gray-400">Instructor auth & document uploads</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
+              </Link>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

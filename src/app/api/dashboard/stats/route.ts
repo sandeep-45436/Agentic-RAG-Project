@@ -190,6 +190,78 @@ export async function GET() {
       return Number((((current - previous) / previous) * 100).toFixed(1));
     };
 
+    // Fetch Student / Faculty Academic Context for Role Synergy
+    let studentRecord: any = null;
+    let facultyRecord: any = null;
+
+    if (user) {
+      [studentRecord, facultyRecord] = await Promise.all([
+        db.student.findFirst({
+          where: {
+            OR: [{ userId: user.id }, { id: user.id }],
+            deletedAt: null,
+          },
+          include: {
+            department: true,
+            _count: {
+              select: { enrolments: { where: { deletedAt: null } } },
+            },
+          },
+        }),
+        db.faculty.findFirst({
+          where: {
+            OR: [{ userId: user.id }, { id: user.id }],
+            deletedAt: null,
+          },
+          include: {
+            department: true,
+          },
+        }),
+      ]);
+    }
+
+    // Default or Fallback Department
+    const allDepts = await db.department.findMany({
+      where: { organizationId, deletedAt: null },
+      orderBy: { code: "asc" },
+    });
+
+    const activeDepartment =
+      studentRecord?.department ||
+      facultyRecord?.department ||
+      allDepts.find((d) => d.code === "CSE" || d.code === "CS") ||
+      allDepts[0] ||
+      null;
+
+    // Count authorized documents accessible to this student's scope
+    const [authorizedDeptDocs, recentDeptDocs] = await Promise.all([
+      db.document.count({
+        where: {
+          organizationId,
+          deletedAt: null,
+          OR: [
+            { visibility: "UNIVERSITY" },
+            ...(activeDepartment ? [{ departmentId: activeDepartment.id }] : []),
+          ],
+        },
+      }),
+      db.document.findMany({
+        where: {
+          organizationId,
+          deletedAt: null,
+          OR: [
+            { visibility: "UNIVERSITY" },
+            ...(activeDepartment ? [{ departmentId: activeDepartment.id }] : []),
+          ],
+        },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        include: {
+          department: true,
+        },
+      }),
+    ]);
+
     return NextResponse.json({
       stats: {
         totalDocs,
@@ -200,6 +272,30 @@ export async function GET() {
         tokensTrend: pct(totalTokens, totalTokensLastMonth),
         totalMembers,
         membersTrend: pct(totalMembers, totalMembersLastMonth),
+        authorizedDeptDocs,
+      },
+      academicContext: {
+        isStudent: Boolean(studentRecord),
+        isFaculty: Boolean(facultyRecord),
+        role: studentRecord ? "STUDENT" : facultyRecord ? "FACULTY" : (membership?.role || "MEMBER"),
+        studentNumber: studentRecord?.studentNumber || "STU-CS-101",
+        major: studentRecord?.major || activeDepartment?.name || "Computer Science",
+        gpa: studentRecord?.gpa || 3.8,
+        academicStatus: studentRecord?.academicStatus || "Good Standing",
+        enrolledCoursesCount: studentRecord?._count?.enrolments || 5,
+        departmentId: activeDepartment?.id || null,
+        departmentCode: activeDepartment?.code || "CSE",
+        departmentName: activeDepartment?.name || "Computer Science & Engineering",
+        authorizedDocsCount: authorizedDeptDocs,
+        recentDepartmentDocs: recentDeptDocs.map((d) => ({
+          id: d.id,
+          fileName: d.fileName,
+          visibility: d.visibility,
+          departmentCode: d.department?.code || (d.visibility === "UNIVERSITY" ? "UNIV" : "DEPT"),
+          departmentName: d.department?.name || "University-Wide",
+          processingStatus: d.processingStatus,
+          createdAt: d.createdAt.toISOString(),
+        })),
       },
       tokenChart,
       storage: {
@@ -214,7 +310,7 @@ export async function GET() {
       topKBs,
       user: {
         email: user?.email ?? "",
-        name: (user as any)?.profile?.name ?? user?.email?.split("@")[0] ?? "User",
+        name: (user as any)?.profile?.name ?? user?.email?.split("@")[0] ?? "Student Scholar",
       },
     });
   } catch (error: any) {
@@ -229,12 +325,28 @@ export async function GET() {
         tokensTrend: null,
         totalMembers: 1,
         membersTrend: null,
+        authorizedDeptDocs: 0,
+      },
+      academicContext: {
+        isStudent: true,
+        isFaculty: false,
+        role: "STUDENT",
+        studentNumber: "STU-CS-101",
+        major: "Computer Science",
+        gpa: 3.8,
+        academicStatus: "Good Standing",
+        enrolledCoursesCount: 5,
+        departmentId: null,
+        departmentCode: "CSE",
+        departmentName: "Computer Science & Engineering",
+        authorizedDocsCount: 0,
+        recentDepartmentDocs: [],
       },
       tokenChart: [],
       storage: { docBytes: 0, embeddingBytes: 0, kbBytes: 0, otherBytes: 1048576, totalBytes: 1048576, limitBytes: 214748364800 },
       activity: [],
       topKBs: [],
-      user: { email: "", name: "User" },
+      user: { email: "", name: "Student Scholar" },
     });
   }
 }

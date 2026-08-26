@@ -16,6 +16,8 @@ import {
   UserCheck,
   FileSpreadsheet,
   X,
+  Pencil,
+  Edit3,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,6 +33,7 @@ export default function FacultyTimetablesPage() {
   const [selectedDay, setSelectedDay] = useState("ALL");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // Add Form State
   const [courseCode, setCourseCode] = useState("CS401");
@@ -42,6 +45,12 @@ export default function FacultyTimetablesPage() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
+
+  // Edit / Rename Form State
+  const [editingSlot, setEditingSlot] = useState<any | null>(null);
+  const [editSubmitting, setEditSubmitting] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editSuccess, setEditSuccess] = useState<string | null>(null);
 
   // Bulk CSV state
   const [bulkData, setBulkData] = useState("");
@@ -105,6 +114,56 @@ export default function FacultyTimetablesPage() {
     }
   };
 
+  const handleOpenEdit = (slot: any) => {
+    setEditingSlot({
+      id: slot.id,
+      courseCode: slot.courseCode,
+      courseTitle: slot.courseTitle,
+      dayOfWeek: slot.dayOfWeek,
+      startTime: slot.startTime,
+      endTime: slot.endTime,
+      room: slot.room,
+      term: slot.term || "Fall 2026",
+      academicYear: slot.academicYear || "2026-2027",
+    });
+    setEditError(null);
+    setEditSuccess(null);
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSlot?.id) return;
+    setEditError(null);
+    setEditSuccess(null);
+    setEditSubmitting(true);
+
+    try {
+      const res = await fetch("/api/faculty/timetables", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingSlot),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to update timetable slot");
+      }
+
+      setEditSuccess("Timetable slot & course renamed successfully!");
+      fetchTimetables();
+      setTimeout(() => {
+        setShowEditModal(false);
+        setEditSuccess(null);
+        setEditingSlot(null);
+      }, 1000);
+    } catch (err: any) {
+      setEditError(err.message || "Failed to update timetable slot.");
+    } finally {
+      setEditSubmitting(false);
+    }
+  };
+
   const handleDeleteSlot = async (id: string) => {
     if (!confirm("Are you sure you want to remove this timetable slot?")) return;
     try {
@@ -119,7 +178,6 @@ export default function FacultyTimetablesPage() {
     setBulkError(null);
     setBulkSuccess(null);
     try {
-      // Parse CSV / lines format: CourseCode, CourseTitle, Day, StartTime, EndTime, Room
       const lines = bulkData.trim().split("\n");
       const entries: any[] = [];
 
@@ -192,7 +250,7 @@ export default function FacultyTimetablesPage() {
             Academic Timetable Management
           </h1>
           <p className="text-sm text-slate-400">
-            Manage weekly lecture sessions, laboratory hours, and room bookings across academic departments.
+            Manage, edit, and rename weekly lecture sessions, laboratory hours, and room bookings across academic departments.
           </p>
         </div>
 
@@ -222,6 +280,14 @@ export default function FacultyTimetablesPage() {
           >
             <Download className="mr-1.5 h-3.5 w-3.5 text-emerald-400" />
             Export CSV
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchTimetables}
+            className="border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800 rounded-xl text-xs"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
           </Button>
         </div>
       </div>
@@ -304,17 +370,29 @@ export default function FacultyTimetablesPage() {
                 </div>
 
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-[11px] text-slate-400 truncate max-w-[170px]">
+                  <span className="text-[11px] text-slate-400 truncate max-w-[150px]">
                     Faculty: {slot.faculty?.user?.name || "Assigned Department"}
                   </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteSlot(slot.id)}
-                    className="h-7 w-7 p-0 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title="Edit timetable slot & rename course"
+                      onClick={() => handleOpenEdit(slot)}
+                      className="h-7 w-7 p-0 text-slate-400 hover:text-purple-300 hover:bg-purple-500/10 rounded-lg"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title="Delete slot"
+                      onClick={() => handleDeleteSlot(slot.id)}
+                      className="h-7 w-7 p-0 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -325,7 +403,7 @@ export default function FacultyTimetablesPage() {
       {/* ── MODAL: ADD CLASS SLOT ─────────────────────────────────── */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <Card className="w-full max-w-lg bg-slate-900 border-slate-800 shadow-2xl">
+          <Card className="w-full max-w-lg bg-slate-900 border-slate-800 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
                 <CardTitle className="text-lg text-white font-semibold">Add Class / Lab Timetable Slot</CardTitle>
@@ -386,7 +464,7 @@ export default function FacultyTimetablesPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs text-slate-300">Course Title</Label>
+                  <Label className="text-xs text-slate-300">Course Title / Subject Name</Label>
                   <Input
                     value={courseTitle}
                     onChange={(e) => setCourseTitle(e.target.value)}
@@ -443,10 +521,175 @@ export default function FacultyTimetablesPage() {
         </div>
       )}
 
+      {/* ── MODAL: EDIT / RENAME CLASS SLOT ───────────────────────── */}
+      {showEditModal && editingSlot && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <Card className="w-full max-w-lg bg-slate-900 border-slate-800 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <div>
+                <CardTitle className="text-lg text-white font-semibold flex items-center gap-2">
+                  <Edit3 className="h-5 w-5 text-purple-400" />
+                  Edit / Rename Timetable Slot
+                </CardTitle>
+                <CardDescription className="text-xs text-slate-400">
+                  Update course title, code, schedule timing, or hall assignment.
+                </CardDescription>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditingSlot(null);
+                }}
+                className="text-slate-400 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+
+            <form onSubmit={handleSaveEdit}>
+              <CardContent className="space-y-3.5">
+                {editError && (
+                  <div className="flex items-center gap-2 p-2.5 bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs rounded-xl">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    <span>{editError}</span>
+                  </div>
+                )}
+                {editSuccess && (
+                  <div className="flex items-center gap-2 p-2.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs rounded-xl">
+                    <CheckCircle2 className="h-4 w-4 shrink-0" />
+                    <span>{editSuccess}</span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-slate-300">Course Code</Label>
+                    <Input
+                      value={editingSlot.courseCode || ""}
+                      onChange={(e) =>
+                        setEditingSlot({ ...editingSlot, courseCode: e.target.value })
+                      }
+                      placeholder="e.g. CS401"
+                      required
+                      className="bg-slate-950 border-slate-800 text-xs text-white rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-slate-300">Day of Week</Label>
+                    <select
+                      value={editingSlot.dayOfWeek || "Monday"}
+                      onChange={(e) =>
+                        setEditingSlot({ ...editingSlot, dayOfWeek: e.target.value })
+                      }
+                      className="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl px-3 py-2"
+                    >
+                      {DAYS.map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs text-slate-300">Course Title / Subject Name (Rename)</Label>
+                  <Input
+                    value={editingSlot.courseTitle || ""}
+                    onChange={(e) =>
+                      setEditingSlot({ ...editingSlot, courseTitle: e.target.value })
+                    }
+                    placeholder="e.g. Advanced Algorithms & Distributed Systems"
+                    required
+                    className="bg-slate-950 border-slate-800 text-xs text-white rounded-xl"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-slate-300">Start Time</Label>
+                    <Input
+                      value={editingSlot.startTime || ""}
+                      onChange={(e) =>
+                        setEditingSlot({ ...editingSlot, startTime: e.target.value })
+                      }
+                      placeholder="09:00 AM"
+                      required
+                      className="bg-slate-950 border-slate-800 text-xs text-white rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-slate-300">End Time</Label>
+                    <Input
+                      value={editingSlot.endTime || ""}
+                      onChange={(e) =>
+                        setEditingSlot({ ...editingSlot, endTime: e.target.value })
+                      }
+                      placeholder="10:30 AM"
+                      required
+                      className="bg-slate-950 border-slate-800 text-xs text-white rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-slate-300">Assigned Room / Hall</Label>
+                    <Input
+                      value={editingSlot.room || ""}
+                      onChange={(e) =>
+                        setEditingSlot({ ...editingSlot, room: e.target.value })
+                      }
+                      placeholder="e.g. Tech Hall 101"
+                      required
+                      className="bg-slate-950 border-slate-800 text-xs text-white rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-slate-300">Academic Term</Label>
+                    <Input
+                      value={editingSlot.term || "Fall 2026"}
+                      onChange={(e) =>
+                        setEditingSlot({ ...editingSlot, term: e.target.value })
+                      }
+                      placeholder="Fall 2026"
+                      className="bg-slate-950 border-slate-800 text-xs text-white rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <Button
+                    type="submit"
+                    disabled={editSubmitting}
+                    className="w-full bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold py-2.5"
+                  >
+                    {editSubmitting ? "Updating..." : "Save Changes & Rename"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowEditModal(false);
+                      setEditingSlot(null);
+                    }}
+                    className="border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs py-2.5"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            </form>
+          </Card>
+        </div>
+      )}
+
       {/* ── MODAL: BULK CSV IMPORT ────────────────────────────────── */}
       {showBulkModal && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <Card className="w-full max-w-lg bg-slate-900 border-slate-800 shadow-2xl">
+          <Card className="w-full max-w-lg bg-slate-900 border-slate-800 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
                 <CardTitle className="text-lg text-white font-semibold">Bulk Timetable Import</CardTitle>

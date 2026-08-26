@@ -283,6 +283,65 @@ export class FacultyService {
   }
 
   /**
+   * Update / Rename Timetable entry with collision check
+   */
+  static async updateTimetableEntry(id: string, data: {
+    courseCode?: string;
+    courseTitle?: string;
+    dayOfWeek?: string;
+    startTime?: string;
+    endTime?: string;
+    room?: string;
+    term?: string;
+    academicYear?: string;
+    facultyId?: string;
+  }) {
+    const existing = await db.timetableEntry.findUnique({ where: { id } });
+    if (!existing) {
+      throw new Error("Timetable slot not found.");
+    }
+
+    const checkDay = data.dayOfWeek || existing.dayOfWeek;
+    const checkStartTime = data.startTime || existing.startTime;
+    const checkRoom = data.room || existing.room;
+
+    // Collision check if room, day, or start time changed
+    if (data.dayOfWeek || data.startTime || data.room) {
+      const existingRoomSlot = await db.timetableEntry.findFirst({
+        where: {
+          organizationId: existing.organizationId,
+          dayOfWeek: checkDay,
+          startTime: checkStartTime,
+          room: { equals: checkRoom, mode: "insensitive" },
+          id: { not: id },
+        },
+      });
+
+      if (existingRoomSlot) {
+        throw new Error(`Room collision: ${checkRoom} is already booked on ${checkDay} at ${checkStartTime} for ${existingRoomSlot.courseCode}.`);
+      }
+    }
+
+    return await db.timetableEntry.update({
+      where: { id },
+      data: {
+        ...(data.courseCode ? { courseCode: data.courseCode.trim() } : {}),
+        ...(data.courseTitle ? { courseTitle: data.courseTitle.trim() } : {}),
+        ...(data.dayOfWeek ? { dayOfWeek: data.dayOfWeek } : {}),
+        ...(data.startTime ? { startTime: data.startTime } : {}),
+        ...(data.endTime ? { endTime: data.endTime } : {}),
+        ...(data.room ? { room: data.room.trim() } : {}),
+        ...(data.term ? { term: data.term } : {}),
+        ...(data.academicYear ? { academicYear: data.academicYear } : {}),
+        ...(data.facultyId !== undefined ? { facultyId: data.facultyId || null } : {}),
+      },
+      include: {
+        faculty: { include: { user: true } },
+      },
+    });
+  }
+
+  /**
    * Delete Timetable entry
    */
   static async deleteTimetableEntry(id: string) {

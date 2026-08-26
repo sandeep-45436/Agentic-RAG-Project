@@ -84,6 +84,45 @@ export async function POST(request: Request) {
   }
 }
 
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, courseCode, courseTitle, dayOfWeek, startTime, endTime, room, term, academicYear, facultyId } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Timetable entry ID is required" }, { status: 400 });
+    }
+
+    const updated = await FacultyService.updateTimetableEntry(id, {
+      courseCode,
+      courseTitle,
+      dayOfWeek,
+      startTime,
+      endTime,
+      room,
+      term,
+      academicYear,
+      facultyId,
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Timetable slot updated successfully",
+      entry: updated,
+    });
+  } catch (error: any) {
+    console.error("[API: /api/faculty/timetables PUT] Error:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to update timetable slot" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(request: Request) {
+  return PUT(request);
+}
+
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);

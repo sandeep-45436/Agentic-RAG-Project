@@ -6,17 +6,6 @@ import { syncUserToDatabase } from "@/server/actions/auth";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const missingEnvs: string[] = [];
-  if (!process.env.DATABASE_URL) missingEnvs.push("DATABASE_URL");
-  if (!process.env.NEXT_PUBLIC_INSFORGE_URL) missingEnvs.push("NEXT_PUBLIC_INSFORGE_URL");
-  if (!process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY) missingEnvs.push("NEXT_PUBLIC_INSFORGE_ANON_KEY");
-
-  if (missingEnvs.length > 0) {
-    return NextResponse.json({
-      error: `Missing environment variable(s) on Vercel: ${missingEnvs.join(", ")}. Please configure them in your Vercel Project Settings and redeploy.`
-    }, { status: 500 });
-  }
-
   let orgIdForLog: string | null = null;
   try {
     const insforge = await createClient();

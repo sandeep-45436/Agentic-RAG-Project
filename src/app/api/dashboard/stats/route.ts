@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/insforge/server";
-import { db } from "@/server/db/prisma";
+import { db, ensureDbConnected } from "@/server/db/prisma";
 import { syncUserToDatabase } from "@/server/actions/auth";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   let orgIdForLog: string | null = null;
   try {
+    await ensureDbConnected();
     const insforge = await createClient();
     const { data: userData } = await insforge.auth.getCurrentUser();
     let user = userData?.user;

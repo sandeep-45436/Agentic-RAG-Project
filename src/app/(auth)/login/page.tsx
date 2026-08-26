@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Bot } from "lucide-react";
+import { Bot, GraduationCap, Scale } from "lucide-react";
 
 import { loginAction } from "@/server/actions/auth";
 
@@ -92,6 +92,17 @@ export default function LoginPage() {
             Don't have an account?{" "}
             <Link href="/signup" className="text-primary hover:underline">
               Sign up
+            </Link>
+          </div>
+
+          <div className="pt-2 border-t border-border/60 w-full flex items-center justify-between text-xs text-muted-foreground">
+            <Link href="/faculty/login" className="hover:text-primary transition-colors flex items-center gap-1">
+              <GraduationCap className="h-3.5 w-3.5 text-purple-400" />
+              Faculty Portal
+            </Link>
+            <Link href="/hod/login" className="hover:text-primary transition-colors flex items-center gap-1">
+              <Scale className="h-3.5 w-3.5 text-blue-400" />
+              HOD Portal &rarr;
             </Link>
           </div>
         </CardFooter>

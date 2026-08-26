@@ -200,6 +200,125 @@ export class HODService {
   }
 
   /**
+   * Register a new HOD and provision their department governance account
+   */
+  static async registerHOD(data: {
+    name: string;
+    email: string;
+    departmentCode: string;
+    departmentName: string;
+    password: string;
+    title?: string;
+    designation?: string;
+    organizationId?: string;
+  }): Promise<{ success: boolean; session?: HODSessionData; error?: string }> {
+    try {
+      const {
+        name,
+        email,
+        departmentCode,
+        departmentName,
+        password,
+        title = "Professor & Head of Department",
+        designation = "Head of Department",
+        organizationId = "seed-org-001",
+      } = data;
+
+      const trimmedName = name.trim();
+      const trimmedEmail = email.trim().toLowerCase();
+      const rawDeptCode = departmentCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+      const trimmedDeptName = departmentName.trim();
+      const trimmedPassword = password.trim();
+
+      if (!trimmedName || !trimmedEmail || !rawDeptCode || !trimmedDeptName || !trimmedPassword) {
+        return { success: false, error: "All registration fields (Name, Email, Department Code, Department Name, Password) are required." };
+      }
+
+      // 1. Ensure Organization exists
+      const org = await db.organization.upsert({
+        where: { id: organizationId },
+        update: {},
+        create: { id: organizationId, name: "Smart University" },
+      });
+
+      // 2. Ensure Department exists or create it
+      const dept = await db.department.upsert({
+        where: {
+          organizationId_code: {
+            organizationId: org.id,
+            code: rawDeptCode,
+          },
+        },
+        update: {
+          name: trimmedDeptName,
+        },
+        create: {
+          organizationId: org.id,
+          code: rawDeptCode,
+          name: trimmedDeptName,
+          building: `${trimmedDeptName} Block`,
+          annualBudget: 1000000.0,
+        },
+      });
+
+      // 3. Ensure User account exists or create it
+      const user = await db.user.upsert({
+        where: { email: trimmedEmail },
+        update: { name: trimmedName },
+        create: { email: trimmedEmail, name: trimmedName },
+      });
+
+      // 4. Provision HOD Code (e.g. HOD-MECH-001)
+      const hodCode = `HOD-${rawDeptCode}-001`;
+
+      // 5. Create or update Faculty/HOD record
+      const faculty = await db.faculty.upsert({
+        where: { userId: user.id },
+        update: {
+          facultyCode: hodCode,
+          assignedPassword: trimmedPassword,
+          title,
+          designation,
+          departmentId: dept.id,
+        },
+        create: {
+          organizationId: org.id,
+          userId: user.id,
+          facultyCode: hodCode,
+          assignedPassword: trimmedPassword,
+          departmentId: dept.id,
+          title,
+          designation,
+          tenureStatus: "Tenured",
+          officeRoom: `${rawDeptCode} HOD Office Room 101`,
+        },
+        include: { user: true, department: true },
+      });
+
+      const hodSession: HODSessionData = {
+        id: faculty.id,
+        userId: user.id,
+        name: trimmedName,
+        email: trimmedEmail,
+        hodCode,
+        role: "HOD",
+        title,
+        designation,
+        departmentId: dept.id,
+        departmentCode: rawDeptCode,
+        departmentName: trimmedDeptName,
+        organizationId: org.id,
+        isMultiDepartment: false,
+      };
+
+      return { success: true, session: hodSession };
+    } catch (err: any) {
+      console.error("[HODService.registerHOD] Error:", err);
+      return { success: false, error: err.message || "Failed to register HOD." };
+    }
+  }
+
+  /**
    * Get all departments for Dean / Multi-department scope selector
    */
   static async listDepartments(organizationId = "seed-org-001") {

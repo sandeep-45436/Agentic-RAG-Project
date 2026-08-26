@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Bot, Mail, RefreshCw, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Bot, Mail, RefreshCw, ArrowLeft, CheckCircle2, GraduationCap, Scale } from "lucide-react";
 
 type Step = "signup" | "verify";
 
@@ -290,6 +290,17 @@ export default function SignupPage() {
             Already have an account?{" "}
             <Link href="/login" className="text-primary hover:underline">
               Sign in
+            </Link>
+          </div>
+
+          <div className="pt-2 border-t border-border/60 w-full flex items-center justify-between text-xs text-muted-foreground">
+            <Link href="/faculty/login" className="hover:text-primary transition-colors flex items-center gap-1">
+              <GraduationCap className="h-3.5 w-3.5 text-purple-400" />
+              Faculty Portal
+            </Link>
+            <Link href="/hod/login" className="hover:text-primary transition-colors flex items-center gap-1">
+              <Scale className="h-3.5 w-3.5 text-blue-400" />
+              HOD Sign In / Sign Up &rarr;
             </Link>
           </div>
         </CardFooter>

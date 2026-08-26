@@ -24,6 +24,7 @@ import {
   Terminal,
   Menu,
   X,
+  Scale,
 } from "lucide-react";
 
 // Preset interactive simulations for the live demo playground
@@ -194,6 +195,14 @@ export default function HomePage() {
             >
               <GraduationCap className="w-4 h-4 text-purple-400" />
               Faculty Portal
+            </Link>
+
+            <Link
+              href="/hod/login"
+              className="hidden md:inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600/10 hover:bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:border-blue-500/50 transition-all duration-200"
+            >
+              <Scale className="w-4 h-4 text-blue-400" />
+              HOD Portal
             </Link>
 
             <Link
@@ -679,6 +688,9 @@ export default function HomePage() {
             </Link>
             <Link href="/faculty/login" className="hover:text-slate-300 transition-colors">
               Faculty Portal
+            </Link>
+            <Link href="/hod/login" className="hover:text-slate-300 transition-colors">
+              HOD Portal
             </Link>
             <Link href="/login" className="hover:text-slate-300 transition-colors">
               Login

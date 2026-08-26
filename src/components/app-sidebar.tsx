@@ -13,6 +13,7 @@ import {
   MessageSquare,
   Search,
   GraduationCap,
+  Scale,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -39,6 +40,7 @@ const facultyAdminNav = [
   { title: "Chat Assistant", url: "/chat", icon: MessageSquare },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Faculty Portal", url: "/faculty/dashboard", icon: GraduationCap },
+  { title: "HOD Portal", url: "/hod/dashboard", icon: Scale },
   { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },
   { title: "Agents", url: "/agents", icon: Bot },
   { title: "Analytics", url: "/analytics", icon: BarChart2 },

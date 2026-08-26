@@ -743,8 +743,11 @@ export default function HomePage() {
             <Link href="/hod/login" className="hover:text-slate-300 transition-colors">
               HOD Portal
             </Link>
+            <Link href="/auth" className="hover:text-slate-300 transition-colors">
+              Auth Gateway
+            </Link>
             <Link href="/login" className="hover:text-slate-300 transition-colors">
-              Login
+              Student Login
             </Link>
           </div>
         </div>

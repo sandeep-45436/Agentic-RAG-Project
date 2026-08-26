@@ -60,7 +60,48 @@ export async function proxy(request: NextRequest) {
   const isAuthRoute = path.startsWith("/login") || path.startsWith("/signup");
   const isPublicRoute = path === "/" || path === "/pricing";
 
-  if (!hasSession && !isAuthRoute && !isPublicRoute && !path.startsWith("/auth") && !path.startsWith("/api") && !path.startsWith("/faculty")) {
+  // Dedicated HOD Portal Route Protection
+  if (path.startsWith("/hod")) {
+    const hasHodSession = !!request.cookies.get("hod_session")?.value;
+    const isHodAuthRoute = path === "/hod/login" || path === "/hod/signup" || path.startsWith("/hod/auth");
+
+    if (!hasHodSession && !isHodAuthRoute) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/hod/login";
+      return NextResponse.redirect(url);
+    }
+
+    if (hasHodSession && isHodAuthRoute) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/hod/dashboard";
+      return NextResponse.redirect(url);
+    }
+
+    return response;
+  }
+
+  // Dedicated Faculty Portal Route Protection
+  if (path.startsWith("/faculty")) {
+    const hasFacultySession = !!request.cookies.get("faculty_session")?.value;
+    const isFacultyAuthRoute = path === "/faculty/login";
+
+    if (!hasFacultySession && !isFacultyAuthRoute) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/faculty/login";
+      return NextResponse.redirect(url);
+    }
+
+    if (hasFacultySession && isFacultyAuthRoute) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/faculty/dashboard";
+      return NextResponse.redirect(url);
+    }
+
+    return response;
+  }
+
+  // Main Student / General Portal Route Protection
+  if (!hasSession && !isAuthRoute && !isPublicRoute && !path.startsWith("/auth") && !path.startsWith("/api")) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

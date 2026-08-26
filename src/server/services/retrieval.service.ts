@@ -60,7 +60,9 @@ export class RetrievalService {
     if (!query.trim()) throw new Error("Query cannot be empty.");
 
     const startTime = performance.now();
-    const cacheKey = `retrieval:${organizationId}:${CacheService.hashKey(query.trim().toLowerCase())}`;
+    const deptScope = accessContext?.departmentId || "GLOBAL";
+    const roleScope = accessContext?.userRole || "STUDENT";
+    const cacheKey = `retrieval:${organizationId}:${deptScope}:${roleScope}:${CacheService.hashKey(query.trim().toLowerCase())}`;
 
     try {
       // 1. Check cache first
@@ -201,7 +203,7 @@ export class RetrievalService {
         Promise.all(memoryVectorSearchPromises),
         Promise.all(memoryBm25SearchPromises),
         Promise.race([
-          GraphRetrievalService.retrieveGraphContext(rewrittenQuery, organizationId, entities),
+          GraphRetrievalService.retrieveGraphContext(rewrittenQuery, organizationId, entities, accessContext?.departmentId),
           new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500)),
         ]),
       ]);

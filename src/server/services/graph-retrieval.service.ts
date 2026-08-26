@@ -8,7 +8,8 @@ export class GraphRetrievalService {
   static async retrieveGraphContext(
     query: string,
     organizationId: string,
-    preComputedEntities?: string[]
+    preComputedEntities?: string[],
+    departmentId?: string | null
   ): Promise<string> {
     if (!query.trim()) return "";
 
@@ -31,16 +32,28 @@ Query: "${query}"
 
       if (entityNames.length === 0 || entityNames[0] === "") return "";
 
-      // 2. Query Neo4j for these entities and their 1-hop relationships
+      // 2. Query Neo4j for these entities and their 1-hop relationships with department scoping
       const session = neo4jDriver.session();
       const graphContexts: string[] = [];
 
       try {
         await session.executeRead(async (tx) => {
-          // Run all entity queries in parallel instead of sequentially
+          // Cypher query enforcing organizationId and department / university visibility scoping
           const cypher = `
             MATCH (n:Entity { organizationId: $organizationId })-[r]->(m:Entity { organizationId: $organizationId })
             WHERE toLower(n.name) CONTAINS toLower($name)
+              AND (
+                $departmentId IS NULL 
+                OR n.departmentId IS NULL 
+                OR n.departmentId = $departmentId 
+                OR n.visibility = 'UNIVERSITY'
+              )
+              AND (
+                $departmentId IS NULL 
+                OR m.departmentId IS NULL 
+                OR m.departmentId = $departmentId 
+                OR m.visibility = 'UNIVERSITY'
+              )
             RETURN n.name AS source, type(r) AS rel, m.name AS target
             LIMIT 5
           `;
@@ -48,6 +61,7 @@ Query: "${query}"
           const entityQueries = entityNames.map(async (entityName) => {
             const result = await tx.run(cypher, {
               organizationId,
+              departmentId: departmentId || null,
               name: entityName,
             });
             return result.records.map((record) => {

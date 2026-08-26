@@ -26,8 +26,8 @@ export class PromptService {
       : "";
 
     const rule2 = hasDocumentDelivery
-      ? `2. If the user asked a factual question AND the answer cannot be found in CONTEXT nor in the Document Delivery card, reply with: "I could not find that information in your documents."`
-      : `2. If the answer cannot be found in the CONTEXT, you MUST reply exactly with: "I could not find that information in your documents."`;
+      ? `2. If the user asked a factual question AND the answer cannot be found in CONTEXT nor in the Document Delivery card, reply with: "I couldn't find information for this request within your current department knowledge scope."`
+      : `2. If the answer cannot be found in the CONTEXT, you MUST reply with: "I couldn't find information for this request within your current department knowledge scope." Do not invent answers or guess outside of the provided CONTEXT.`;
 
     return `
 SYSTEM:

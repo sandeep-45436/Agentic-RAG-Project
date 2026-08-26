@@ -11,6 +11,7 @@ import {
   MoreHorizontal, Paperclip, AtSign, Command, Share2,
   ChevronRight, Bot,
   Bug, Eye, EyeOff, Clock, BarChart3,
+  Building, GraduationCap, Shield, CheckCircle2, XCircle,
 } from "lucide-react";
 import { createClient } from "@/utils/insforge/client";
 import {
@@ -334,12 +335,12 @@ function ContextPanel({ chunks, model, temperature }: {
 
 // ── Empty State ───────────────────────────────────────────────────────────────
 
-function EmptyState({ onSuggest }: { onSuggest: (q: string) => void }) {
+function EmptyState({ onSuggest, deptCode = "CSE" }: { onSuggest: (q: string) => void; deptCode?: string }) {
   const suggestions = [
-    "Summarize the key points from my documents",
-    "What are the main topics in my knowledge base?",
-    "Find information about financial performance",
-    "What were the Q2 highlights?",
+    `Explain the Unit 3 topics in Data Structures (${deptCode})`,
+    "What is the university attendance and academic regulations requirement?",
+    "Explain Digital Signal Processing and filter design",
+    `Summarize the key requirements from the ${deptCode} curriculum syllabus`,
   ];
   return (
     <div className="flex flex-col items-center justify-center h-full text-center px-8 gap-6">
@@ -347,19 +348,20 @@ function EmptyState({ onSuggest }: { onSuggest: (q: string) => void }) {
         <Sparkles className="w-8 h-8 text-primary" />
       </div>
       <div>
-        <h2 className="text-xl font-bold text-white">Ask your Knowledge Base</h2>
-        <p className="text-sm text-gray-400 mt-1.5 max-w-sm">
-          I can answer questions based on your uploaded documents with source citations.
+        <h2 className="text-xl font-bold text-white">Ask University AI Knowledge Base</h2>
+        <p className="text-sm text-gray-400 mt-1.5 max-w-md">
+          Ask questions scoped to your department (<span className="text-indigo-400 font-semibold">{deptCode}</span>) and university-wide official documents with ground-truth citations.
         </p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg">
-        {suggestions.map((s) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full max-w-xl">
+        {suggestions.map((s, idx) => (
           <button
             key={s}
             onClick={() => onSuggest(s)}
-            className="text-left text-xs text-gray-300 bg-[#1a1f2e] hover:bg-[#1e2435] border border-white/5 hover:border-primary/30 rounded-xl px-4 py-3 transition-all"
+            className="text-left text-xs text-gray-300 bg-[#1a1f2e] hover:bg-[#1e2435] border border-white/5 hover:border-primary/40 hover:text-white rounded-xl px-4 py-3 transition-all flex items-start gap-2 group"
           >
-            {s}
+            <span className="text-primary/60 group-hover:text-primary font-mono text-[11px] mt-0.5">0{idx + 1}.</span>
+            <span className="leading-relaxed">{s}</span>
           </button>
         ))}
       </div>
@@ -491,11 +493,32 @@ export default function ChatPage() {
   const [mobileHistoryOpen, setMobileHistoryOpen] = useState(false);
   const [mobileContextOpen, setMobileContextOpen] = useState(false);
 
-  // Debug panel state
   const [debugOpen, setDebugOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"simple" | "debug">("simple");
   const [debugChunks, setDebugChunks] = useState<DebugChunk[]>([]);
   const [retrievalLatency, setRetrievalLatency] = useState<number | null>(null);
+
+  // Department Knowledge Scope State
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
+  const [userScope, setUserScope] = useState<any>(null);
+
+  // Load departments and user scope
+  useEffect(() => {
+    fetch("/api/departments")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.departments && d.departments.length > 0) {
+          setDepartments(d.departments);
+          setUserScope(d.userScope);
+          const defaultDept = d.departments.find((dep: any) => dep.code === "CSE") || d.departments[0];
+          setSelectedDepartmentId(d.userScope?.primaryDepartmentId || defaultDept.id);
+        }
+      })
+      .catch((e) => console.error("Failed loading departments:", e));
+  }, []);
+
+  const selectedDepartment = departments.find((d) => d.id === selectedDepartmentId) || departments[0] || null;
 
   // Load user info
   useEffect(() => {
@@ -698,12 +721,13 @@ export default function ChatPage() {
         {
           body: {
             conversationId: currentId,
+            departmentId: selectedDepartmentId,
           },
         }
       );
       setInput("");
     },
-    [conversationId, input, sendMessage, loadHistory]
+    [conversationId, input, sendMessage, loadHistory, selectedDepartmentId]
   );
 
   const currentTitle = history.find((h) => h.id === conversationId)?.title ?? "New Chat";
@@ -910,6 +934,27 @@ export default function ChatPage() {
               </SheetContent>
             </Sheet>
 
+            {/* Department Scope Selector */}
+            <div className="flex items-center gap-1.5 bg-indigo-950/60 border border-indigo-500/30 rounded-xl px-2.5 py-1.5 shadow-sm">
+              <Building className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+              <span className="text-[11px] text-gray-400 hidden sm:inline font-medium">Scope:</span>
+              <select
+                value={selectedDepartmentId || ""}
+                onChange={(e) => {
+                  setSelectedDepartmentId(e.target.value);
+                  setChunks([]);
+                  setDebugChunks([]);
+                }}
+                className="bg-transparent text-xs font-semibold text-indigo-200 border-none outline-none focus:ring-0 cursor-pointer pr-1"
+              >
+                {departments.map((dept) => (
+                  <option key={dept.id} value={dept.id} className="bg-[#141720] text-white">
+                    {dept.code} - {dept.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Debug panel toggle — desktop */}
             <button
               onClick={() => setDebugOpen((v) => !v)}
@@ -960,10 +1005,44 @@ export default function ChatPage() {
           </div>
         </div>
 
+        {/* Knowledge Scope Banner */}
+        <div className="mx-3 sm:mx-6 mt-3 p-3 bg-[#131622] border border-indigo-500/20 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-2 shadow-md">
+          <div className="flex items-center gap-2.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" />
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-white tracking-wide">
+                  Active Knowledge Scope:
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-xs font-mono font-semibold border border-indigo-500/30">
+                  {selectedDepartment?.code || "CSE"}
+                </span>
+                <span className="text-xs text-gray-300 hidden sm:inline font-medium">
+                  {selectedDepartment?.name || "Computer Science & Engineering"}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3 text-[11px]">
+            <span className="flex items-center gap-1 text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+              {selectedDepartment?.code || "CSE"} Department
+            </span>
+            <span className="flex items-center gap-1 text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+              University-wide
+            </span>
+            <span className="flex items-center gap-1 text-gray-400 font-normal bg-white/5 px-2 py-0.5 rounded border border-white/10">
+              <XCircle className="w-3 h-3 text-gray-500" />
+              Other Departments
+            </span>
+          </div>
+        </div>
+
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
           {messages.length === 0 ? (
-            <EmptyState onSuggest={(q) => setInput(q)} />
+            <EmptyState onSuggest={(q) => setInput(q)} deptCode={selectedDepartment?.code || "CSE"} />
           ) : (
             messages.map((m: any) => {
               const textContent = getMessageContent(m);

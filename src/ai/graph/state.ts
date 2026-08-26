@@ -96,6 +96,14 @@ export const GraphState = Annotation.Root({
     reducer: (curr, update) => update || curr,
     default: () => "ADMIN",
   }),
+  departmentId: Annotation<string | null>({
+    reducer: (curr, update) => (update !== undefined ? update : curr),
+    default: () => null,
+  }),
+  collegeId: Annotation<string | null>({
+    reducer: (curr, update) => (update !== undefined ? update : curr),
+    default: () => null,
+  }),
 
   // Cognitive Plan & Planning State
   plan: Annotation<CognitivePlan | null>({

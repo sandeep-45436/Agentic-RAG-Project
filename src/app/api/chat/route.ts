@@ -12,6 +12,8 @@ import { RerankService } from "@/server/services/rerank.service";
 import { BM25Service } from "@/server/services/bm25.service";
 import { ModelConfig } from "@/ai/llm/model-config";
 
+import { DocumentAccessPolicy } from "@/server/services/document-access-policy";
+
 const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY || "";
 const openrouter = createOpenAI({
   baseURL: ModelConfig.baseUrl,
@@ -67,8 +69,16 @@ export async function POST(req: Request) {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    const { messages, conversationId } = await req.json();
+    const { messages, conversationId, departmentId: requestedDepartmentId } = await req.json();
     console.log("POST /api/chat messages:", JSON.stringify(messages, null, 2));
+    console.log("POST /api/chat requestedDepartmentId:", requestedDepartmentId);
+
+    // Server-enforce authoritative access context (never trust unverified client overrides)
+    const accessContext = await DocumentAccessPolicy.resolveStudentAccessContext(
+      userId || "api_key_auth",
+      organizationId,
+      requestedDepartmentId
+    );
 
     const latestMessage = messages[messages.length - 1];
     const userQuery = getMessageText(latestMessage);
@@ -77,13 +87,15 @@ export async function POST(req: Request) {
       await ConversationService.addMessage(conversationId, organizationId, "USER", userQuery);
     }
 
-    // Run Cognitive LangGraph Pipeline (sub-200ms performance)
+    // Run Cognitive LangGraph Pipeline (sub-200ms performance) with strictly scoped department context
     const startTime = performance.now();
     const finalState = await appGraph.invoke({
       messages,
       organizationId,
-      userId: userId || "api_key_auth",
-      userRole: userRole as any,
+      userId: accessContext.userId || userId || "api_key_auth",
+      userRole: (accessContext.userRole || userRole) as any,
+      departmentId: accessContext.departmentId,
+      collegeId: accessContext.collegeId,
     });
 
     const systemPrompt = finalState.finalPrompt;

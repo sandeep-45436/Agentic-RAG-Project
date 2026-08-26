@@ -19,7 +19,7 @@ export async function knowledgeAgent(state: typeof GraphState.State) {
   let errorOccurred = false;
 
   try {
-    const { messages, organizationId, queryAnalysis, plan } = state;
+    const { messages, organizationId, queryAnalysis, plan, userId, userRole, departmentId, collegeId } = state;
     const latestMessage = messages[messages.length - 1];
 
     if (!latestMessage || !organizationId) {
@@ -44,7 +44,7 @@ export async function knowledgeAgent(state: typeof GraphState.State) {
 
     // 1. Retrieval Strategy Selection
     const strategy = RetrievalStrategySelector.selectStrategy(targetQuery, queryAnalysis?.intentCategory);
-    console.log(`[KnowledgeAgent] Strategy selected: ${strategy.mode} (${strategy.reason})`);
+    console.log(`[KnowledgeAgent] Strategy selected: ${strategy.mode} (${strategy.reason}), Dept: ${departmentId || 'GLOBAL'}`);
 
     const chatHistory = messages
       .slice(0, -1)
@@ -54,12 +54,22 @@ export async function knowledgeAgent(state: typeof GraphState.State) {
         citations: (msg as any).citations ?? null,
       }));
 
-    // 2. Hybrid Retrieval Execution
+    // Build pre-retrieval access context
+    const accessContext: import("@/server/services/document-access-policy").DocumentAccessContext = {
+      organizationId,
+      userId,
+      userRole: (userRole as any) || "STUDENT",
+      departmentId,
+      collegeId,
+    };
+
+    // 2. Hybrid Retrieval Execution with strict pre-retrieval authorization
     const result = await RetrievalService.buildContextualPrompt(
       targetQuery,
       organizationId,
       chatHistory,
-      queryAnalysis || undefined
+      queryAnalysis || undefined,
+      accessContext
     );
 
     const rawChunks = result.chunks || [];

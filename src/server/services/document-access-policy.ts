@@ -289,6 +289,178 @@ export class DocumentAccessPolicy {
   }
 
   /**
+   * Resolves the authoritative DocumentAccessContext for a student/user on the server.
+   * Validates any client-requested department against the student's authorized primary/active department.
+   * Never trusts unverified client department overrides.
+   */
+  static async resolveStudentAccessContext(
+    userId: string,
+    organizationId: string,
+    requestedDepartmentId?: string | null
+  ): Promise<DocumentAccessContext> {
+    try {
+      // 1. Look up student profile linked to this user
+      const studentRecord = await db.student.findFirst({
+        where: {
+          OR: [
+            { userId: userId },
+            { id: userId },
+          ],
+          deletedAt: null,
+        },
+        include: {
+          department: true,
+        },
+      });
+
+      if (studentRecord) {
+        let effectiveDepartmentId = studentRecord.departmentId;
+
+        // If student requested a department, only allow it if it matches their assigned department
+        // or if they have explicit multi-department enrollment
+        if (requestedDepartmentId && requestedDepartmentId !== studentRecord.departmentId) {
+          // Check if there is an authorized course enrolment in requested department
+          const hasCrossDeptCourse = await db.enrolment.findFirst({
+            where: {
+              studentId: studentRecord.id,
+              courseSection: {
+                course: {
+                  departmentId: requestedDepartmentId,
+                },
+              },
+            },
+          });
+
+          if (hasCrossDeptCourse) {
+            effectiveDepartmentId = requestedDepartmentId;
+          } else {
+            console.warn(
+              `[DocumentAccessPolicy] Student ${studentRecord.id} requested unauthorized department ${requestedDepartmentId}. Falling back to authorized department ${studentRecord.departmentId}`
+            );
+            effectiveDepartmentId = studentRecord.departmentId;
+          }
+        }
+
+        return {
+          organizationId: studentRecord.organizationId || organizationId,
+          userId: studentRecord.userId || studentRecord.id,
+          userRole: "STUDENT",
+          departmentId: effectiveDepartmentId,
+          collegeId: null,
+        };
+      }
+
+      // 2. Fallback: Check if user has an authorized faculty record (in case faculty uses student portal)
+      const facultyRecord = await db.faculty.findFirst({
+        where: {
+          OR: [
+            { userId: userId },
+            { id: userId },
+          ],
+          deletedAt: null,
+        },
+      });
+
+      if (facultyRecord) {
+        return {
+          organizationId: facultyRecord.organizationId || organizationId,
+          userId: facultyRecord.userId || facultyRecord.id,
+          facultyId: facultyRecord.id,
+          userRole: (facultyRecord.designation === "HOD" ? "HOD" : "FACULTY") as any,
+          departmentId: facultyRecord.departmentId,
+          collegeId: null,
+        };
+      }
+
+      // 3. Fallback: Generic organization member
+      const membership = await db.membership.findFirst({
+        where: { userId: userId, organizationId: organizationId },
+      });
+
+      const role = (membership?.role || "MEMBER") as any;
+
+      // If requested department exists in the organization, allow standard members to scope to it if configured
+      let validatedDeptId: string | null = null;
+      if (requestedDepartmentId) {
+        const deptExists = await db.department.findFirst({
+          where: { id: requestedDepartmentId, organizationId, deletedAt: null },
+        });
+        if (deptExists) {
+          validatedDeptId = deptExists.id;
+        }
+      }
+
+      return {
+        organizationId,
+        userId,
+        userRole: role,
+        departmentId: validatedDeptId,
+        collegeId: null,
+      };
+    } catch (error) {
+      console.error("[DocumentAccessPolicy] resolveStudentAccessContext error:", error);
+      return {
+        organizationId,
+        userId,
+        userRole: "STUDENT",
+        departmentId: null,
+        collegeId: null,
+      };
+    }
+  }
+
+  /**
+   * Resolves the authoritative DocumentAccessContext for a faculty member from database records.
+   * Enforces immutable departmental ownership.
+   */
+  static async resolveFacultyAccessContext(
+    facultyIdOrUserId: string,
+    organizationId: string
+  ): Promise<DocumentAccessContext> {
+    const faculty = await db.faculty.findFirst({
+      where: {
+        OR: [{ id: facultyIdOrUserId }, { userId: facultyIdOrUserId }],
+        deletedAt: null,
+      },
+    });
+
+    if (faculty) {
+      return {
+        organizationId: faculty.organizationId || organizationId,
+        userId: faculty.userId || faculty.id,
+        facultyId: faculty.id,
+        userRole: (faculty.designation === "HOD" ? "HOD" : "FACULTY") as any,
+        departmentId: faculty.departmentId,
+        collegeId: null,
+      };
+    }
+
+    return {
+      organizationId,
+      userId: facultyIdOrUserId,
+      userRole: "FACULTY",
+      departmentId: null,
+      collegeId: null,
+    };
+  }
+
+  /**
+   * Validates whether a specific document citation is permitted for the given access context.
+   */
+  static isDocumentAuthorized(
+    context: DocumentAccessContext,
+    doc: {
+      organizationId: string;
+      departmentId?: string | null;
+      collegeId?: string | null;
+      visibility: DocumentVisibility | string;
+      uploadedBy?: string | null;
+    }
+  ): boolean {
+    return this.canAccessDocument(context, doc);
+  }
+
+  /**
    * Fetches the list of all Document IDs that this context is authorized to retrieve.
    * Used by BM25Service and Neo4j for exact SQL/Cypher pre-retrieval scoping.
    */
@@ -309,3 +481,4 @@ export class DocumentAccessPolicy {
     return docs.map((d) => d.id);
   }
 }
+

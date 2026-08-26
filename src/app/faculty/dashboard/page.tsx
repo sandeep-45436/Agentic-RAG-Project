@@ -31,6 +31,17 @@ export default function FacultyDashboardPage() {
   const [recentDocs, setRecentDocs] = useState<any[]>([]);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("faculty_user");
+        if (raw) {
+          const user = JSON.parse(raw);
+          setProfile(user);
+          setLoading(false);
+        }
+      } catch {}
+    }
+
     Promise.all([
       fetch("/api/faculty/auth/session")
         .then((r) => (r.ok ? r.json() : { authenticated: false }))
@@ -43,7 +54,7 @@ export default function FacultyDashboardPage() {
         if (sessionData?.profile) {
           setProfile(sessionData.profile);
         } else if (sessionData?.faculty) {
-          setProfile(sessionData.faculty);
+          setProfile((prev: any) => ({ ...prev, ...sessionData.faculty }));
         }
         if (docsData?.documents && Array.isArray(docsData.documents)) {
           setRecentDocs(docsData.documents.slice(0, 5));

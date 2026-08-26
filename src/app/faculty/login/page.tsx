@@ -71,14 +71,14 @@ export default function FacultyLoginPage() {
 
       const data = await res.json();
 
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Authentication failed.");
+      if (typeof window !== "undefined" && data.faculty) {
+        localStorage.setItem("faculty_user", JSON.stringify(data.faculty));
       }
 
-      setSuccessMsg(`Welcome, ${data.faculty.title} ${data.faculty.name}!`);
+      setSuccessMsg(`Welcome, ${data.faculty.title || "Professor"} ${data.faculty.name}!`);
       setTimeout(() => {
-        router.push("/faculty/dashboard");
-      }, 500);
+        window.location.href = "/faculty/dashboard";
+      }, 350);
     } catch (err: any) {
       setError(err.message || "Failed to log in. Please check your credentials.");
     } finally {

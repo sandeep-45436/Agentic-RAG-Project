@@ -84,9 +84,21 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
       return;
     }
 
-    let active = true;
-    setLoading(true);
+    // 1. Instant hydration from localStorage
+    let storedUser: any = null;
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("faculty_user");
+        if (raw) {
+          storedUser = JSON.parse(raw);
+          setFaculty(storedUser);
+          setLoading(false);
+        }
+      } catch {}
+    }
 
+    // 2. Background verification with session API
+    let active = true;
     fetch("/api/faculty/auth/session")
       .then((res) => res.json())
       .then((data) => {
@@ -94,39 +106,60 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
         if (data.authenticated && data.faculty) {
           setFaculty(data.faculty);
           setLoading(false);
-        } else {
-          router.replace("/faculty/login");
+          try {
+            localStorage.setItem("faculty_user", JSON.stringify(data.faculty));
+          } catch {}
+        } else if (!storedUser) {
+          window.location.href = "/faculty/login";
         }
       })
       .catch((err) => {
-        console.warn("Faculty session error:", err);
-        if (active) router.replace("/faculty/login");
+        console.warn("Faculty session check:", err);
+        if (!storedUser && active) {
+          window.location.href = "/faculty/login";
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
       });
 
     return () => {
       active = false;
     };
-  }, [pathname, isLoginPage, router]);
+  }, [pathname, isLoginPage]);
 
   const handleLogout = async () => {
     try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("faculty_user");
+      }
       await fetch("/api/faculty/auth/logout", { method: "POST" });
     } catch {}
-    router.replace("/faculty/login");
+    window.location.href = "/faculty/login";
   };
 
   if (isLoginPage) {
     return <>{children}</>;
   }
 
-  if (loading || !faculty) {
+  if (loading && !faculty) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-slate-100">
         <div className="flex flex-col items-center gap-3">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
           <p className="text-sm text-slate-400 font-medium animate-pulse">
-            Authenticating Faculty Credentials...
+            Opening Faculty Portal...
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!faculty) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-slate-100">
+        <div className="flex flex-col items-center gap-3">
+          <p className="text-sm text-slate-400">Redirecting to Faculty Sign In...</p>
         </div>
       </div>
     );

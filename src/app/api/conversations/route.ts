@@ -13,21 +13,32 @@ export async function GET() {
     const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    let membership = await db.membership.findFirst({ where: { userId: user.id } });
-    if (!membership) {
+    let memberships = await db.membership.findMany({
+      where: { userId: user.id },
+      include: { organization: { include: { _count: { select: { documents: true } } } } },
+    });
+
+    if (memberships.length === 0) {
       await syncUserToDatabase();
-      membership = await db.membership.findFirst({ where: { userId: user.id } });
-      if (!membership) return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      memberships = await db.membership.findMany({
+        where: { userId: user.id },
+        include: { organization: { include: { _count: { select: { documents: true } } } } },
+      });
     }
+
+    if (memberships.length === 0) {
+      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+    }
+
+    const preferred = memberships.find(m => m.organizationId === "seed-org-001" || m.organization._count.documents > 0) || memberships[0];
+    const organizationId = preferred.organizationId;
 
     const conversations = await ConversationService.getConversations(
       user.id,
-      membership.organizationId
+      organizationId
     );
 
-    // Successfully retrieved conversations
-console.log("GET /api/conversations: retrieved", conversations.length, "conversations");
-return NextResponse.json({ conversations });
+    return NextResponse.json({ conversations });
   } catch (error: any) {
     console.error("GET /api/conversations error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -41,18 +52,31 @@ export async function POST(req: Request) {
     const user = userData?.user;
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    let membership = await db.membership.findFirst({ where: { userId: user.id } });
-    if (!membership) {
+    let memberships = await db.membership.findMany({
+      where: { userId: user.id },
+      include: { organization: { include: { _count: { select: { documents: true } } } } },
+    });
+
+    if (memberships.length === 0) {
       await syncUserToDatabase();
-      membership = await db.membership.findFirst({ where: { userId: user.id } });
-      if (!membership) return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      memberships = await db.membership.findMany({
+        where: { userId: user.id },
+        include: { organization: { include: { _count: { select: { documents: true } } } } },
+      });
     }
+
+    if (memberships.length === 0) {
+      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+    }
+
+    const preferred = memberships.find(m => m.organizationId === "seed-org-001" || m.organization._count.documents > 0) || memberships[0];
+    const organizationId = preferred.organizationId;
 
     const { title } = await req.json().catch(() => ({}));
 
     const conversation = await ConversationService.createConversation(
       user.id,
-      membership.organizationId,
+      organizationId,
       title
     );
 

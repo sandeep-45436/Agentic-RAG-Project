@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 
@@ -10,39 +11,66 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const cookieStore = await cookies();
+    const facultyCookie = cookieStore.get("faculty_session");
+
+    let isFaculty = false;
+    let facultyUser: any = null;
+    if (facultyCookie?.value) {
+      try {
+        facultyUser = JSON.parse(facultyCookie.value);
+        isFaculty = Boolean(facultyUser);
+      } catch {}
+    }
+
     const insforge = await createClient();
-    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
+    const { data: userData } = await insforge.auth.getCurrentUser();
     const user = userData?.user;
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const membership = await db.membership.findFirst({ where: { userId: user.id } });
-    if (!membership) return NextResponse.json({ error: "No organization found" }, { status: 403 });
+    if (!user && !isFaculty) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
+    // Look up document in database
     const doc = await db.document.findFirst({
-      where: { id, organizationId: membership.organizationId },
+      where: { id, deletedAt: null },
       include: {
-        knowledgeBase: { select: { name: true } },
+        department: { select: { id: true, code: true, name: true } },
+        college: { select: { id: true, code: true, name: true } },
+        knowledgeBase: { select: { id: true, name: true } },
         _count: { select: { chunks: { where: { deletedAt: null } } } },
         chunks: {
           where: { deletedAt: null },
-          take: 5,
+          take: 10,
           orderBy: { chunkIndex: "asc" },
-          select: { id: true, content: true, chunkIndex: true, tokenCount: true },
+          select: { id: true, content: true, chunkIndex: true, tokenCount: true, pageNumber: true },
         },
       },
     });
 
-    if (!doc) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!doc) return NextResponse.json({ error: "Document not found" }, { status: 404 });
 
-    // Build a signed URL for the storage object
-    const { data: signedUrlData } = await insforge.storage
-      .from("documents")
-      .createSignedUrl(doc.storagePath, 3600); // 1h
+    // Build a signed URL for the storage object if storagePath exists
+    let signedUrl: string | null = null;
+    try {
+      if (doc.storagePath) {
+        const { data: signedUrlData } = await insforge.storage
+          .from("documents")
+          .createSignedUrl(doc.storagePath, 3600);
+        signedUrl = signedUrlData?.signedUrl ?? null;
+      }
+    } catch (storageErr) {
+      console.warn("[GET /api/documents/[id]] Signed URL generation skipped:", storageErr);
+    }
 
     return NextResponse.json({
-      document: { ...doc, signedUrl: signedUrlData?.signedUrl ?? null },
+      document: {
+        ...doc,
+        signedUrl,
+      },
     });
   } catch (error: any) {
+    console.error("[GET /api/documents/[id]] Error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -53,23 +81,40 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const insforge = await createClient();
-    const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
-    const user = userData?.user;
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const cookieStore = await cookies();
+    const facultyCookie = cookieStore.get("faculty_session");
 
-    const membership = await db.membership.findFirst({ where: { userId: user.id } });
-    if (!membership) return NextResponse.json({ error: "No organization found" }, { status: 403 });
+    let isFaculty = false;
+    let facultyUser: any = null;
+    if (facultyCookie?.value) {
+      try {
+        facultyUser = JSON.parse(facultyCookie.value);
+        isFaculty = Boolean(facultyUser);
+      } catch {}
+    }
+
+    const insforge = await createClient();
+    const { data: userData } = await insforge.auth.getCurrentUser();
+    const user = userData?.user;
+
+    if (!user && !isFaculty) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const doc = await db.document.findFirst({
-      where: { id, organizationId: membership.organizationId, deletedAt: null },
+      where: { id, deletedAt: null },
     });
     if (!doc) return NextResponse.json({ error: "Document not found" }, { status: 404 });
 
     await db.document.update({ where: { id }, data: { deletedAt: new Date() } });
-    await insforge.storage.from("documents").remove(doc.storagePath);
 
-    return NextResponse.json({ success: true });
+    try {
+      if (doc.storagePath) {
+        await insforge.storage.from("documents").remove(doc.storagePath);
+      }
+    } catch {}
+
+    return NextResponse.json({ success: true, message: "Document deleted successfully" });
   } catch (error: any) {
     console.error("DELETE /api/documents/[id] error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

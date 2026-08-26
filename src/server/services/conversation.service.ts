@@ -67,43 +67,51 @@ export class ConversationService {
     citations?: any,
     metadata?: any
   ) {
-    // 1. Verify conversation belongs to the organization
-    const conversation = await db.conversation.findFirst({
-      where: { id: conversationId, organizationId },
-    });
+    try {
+      // 1. Verify conversation exists
+      let conversation = await db.conversation.findFirst({
+        where: { id: conversationId },
+      });
 
-    if (!conversation) {
-      throw new Error("Conversation not found or access denied.");
-    }
+      if (!conversation) {
+        console.warn(`[ConversationService.addMessage] Conversation ${conversationId} not found in DB.`);
+        return null;
+      }
 
-    // 2. Add the message
-    const message = await db.message.create({
-      data: {
-        conversationId,
-        organizationId,
-        role,
-        content,
-        citations: citations ? JSON.stringify(citations) : undefined,
-        metadata: metadata ? JSON.stringify(metadata) : undefined,
-      },
-    });
+      const effectiveOrgId = conversation.organizationId || organizationId;
 
-    // 3. Update conversation's updatedAt timestamp
-    await db.conversation.update({
-      where: { id: conversationId },
-      data: { updatedAt: new Date() },
-    });
+      // 2. Add the message
+      const message = await db.message.create({
+        data: {
+          conversationId,
+          organizationId: effectiveOrgId,
+          role,
+          content,
+          citations: citations ? JSON.stringify(citations) : undefined,
+          metadata: metadata ? JSON.stringify(metadata) : undefined,
+        },
+      });
 
-    // 4. Auto-generate title if it's the first user message and title is "New Chat"
-    if (role === "USER" && conversation.title === "New Chat") {
-      const newTitle = content.substring(0, 30) + (content.length > 30 ? "..." : "");
+      // 3. Update conversation's updatedAt timestamp
       await db.conversation.update({
         where: { id: conversationId },
-        data: { title: newTitle },
+        data: { updatedAt: new Date() },
       });
-    }
 
-    return message;
+      // 4. Auto-generate title if it's the first user message and title is "New Chat"
+      if (role === "USER" && (conversation.title === "New Chat" || !conversation.title)) {
+        const newTitle = content.substring(0, 30) + (content.length > 30 ? "..." : "");
+        await db.conversation.update({
+          where: { id: conversationId },
+          data: { title: newTitle },
+        });
+      }
+
+      return message;
+    } catch (err) {
+      console.error("[ConversationService.addMessage] Error persisting message:", err);
+      return null;
+    }
   }
   
   /**

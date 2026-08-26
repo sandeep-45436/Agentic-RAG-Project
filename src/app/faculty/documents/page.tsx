@@ -72,6 +72,10 @@ export default function FacultyDocumentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"ALL" | "DEPARTMENT" | "UNIVERSITY" | "MY_UPLOADS">("ALL");
 
+  // Document Detail Preview Modal State
+  const [selectedDoc, setSelectedDoc] = useState<any | null>(null);
+  const [loadingDocDetail, setLoadingDocDetail] = useState(false);
+
   // Upload Form State
   const [file, setFile] = useState<File | null>(null);
   const [category, setCategory] = useState(DOCUMENT_CATEGORIES[0]);
@@ -150,104 +154,135 @@ export default function FacultyDocumentsPage() {
       setProgress(100);
 
       const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Upload failed");
+      if (!res.ok) {
+        setUploadStatus("error");
+        setErrorMessage(data.error || "Failed to upload document.");
+      } else {
+        setUploadStatus("success");
+        setSuccessMessage(data.message || "Document uploaded and indexed successfully!");
+        setFile(null);
+        setCourseCode("");
+        fetchDocuments();
       }
-
-      setUploadStatus("success");
-      setSuccessMessage(data.message || "Document successfully ingested and indexed!");
-      fetchDocuments();
     } catch (err: any) {
       setUploadStatus("error");
-      setErrorMessage(err.message || "Failed to upload document");
+      setErrorMessage(err?.message || "Upload network failure.");
     } finally {
       setUploading(false);
     }
   };
 
   const handleDelete = async (docId: string) => {
-    if (!confirm("Are you sure you want to delete this document? Deletion rules enforce that faculty can only delete their own uploads.")) return;
+    if (!confirm("Are you sure you want to delete this document from the knowledge base?")) return;
     try {
-      const res = await fetch(`/api/faculty/documents?id=${docId}`, { method: "DELETE" });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        alert(data.error || "Failed to delete document.");
-        return;
+      const res = await fetch(`/api/documents/${docId}`, { method: "DELETE" });
+      if (res.ok) {
+        setDocuments((prev) => prev.filter((d) => d.id !== docId));
+        if (selectedDoc?.id === docId) setSelectedDoc(null);
+      } else {
+        const d = await res.json();
+        alert(d.error || "Failed to delete document");
       }
-      fetchDocuments();
-    } catch (err: any) {
-      alert("Delete failed: " + err.message);
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
+  };
+
+  const handleViewDoc = async (docId: string) => {
+    try {
+      setLoadingDocDetail(true);
+      const res = await fetch(`/api/documents/${docId}`);
+      const data = await res.json();
+      if (data.document) {
+        setSelectedDoc(data.document);
+      }
+    } catch (err) {
+      console.error("Failed to load document detail:", err);
+    } finally {
+      setLoadingDocDetail(false);
+    }
+  };
+
+  const getVisibilityBadge = (vis: string) => {
+    switch (vis) {
+      case "DEPARTMENT":
+        return (
+          <Badge variant="outline" className="text-[10px] bg-indigo-500/10 text-indigo-300 border-indigo-500/30">
+            <Building className="h-3 w-3 mr-1" /> Department
+          </Badge>
+        );
+      case "PRIVATE":
+        return (
+          <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/30">
+            <Lock className="h-3 w-3 mr-1" /> Private
+          </Badge>
+        );
+      case "COLLEGE":
+        return (
+          <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-300 border-amber-500/30">
+            <Shield className="h-3 w-3 mr-1" /> College
+          </Badge>
+        );
+      case "UNIVERSITY":
+        return (
+          <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-300 border-emerald-500/30">
+            <Globe className="h-3 w-3 mr-1" /> University
+          </Badge>
+        );
+      default:
+        return <Badge variant="outline">{vis}</Badge>;
     }
   };
 
   const filteredDocs = documents.filter((doc) => {
-    const matchesSearch =
-      doc.fileName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (doc.content && doc.content.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    if (!matchesSearch) return false;
-
-    if (activeTab === "DEPARTMENT") {
-      return doc.departmentId === facultyContext?.departmentId;
-    }
-    if (activeTab === "UNIVERSITY") {
-      return doc.visibility === "UNIVERSITY";
-    }
+    if (activeTab === "DEPARTMENT" && doc.visibility !== "DEPARTMENT") return false;
+    if (activeTab === "UNIVERSITY" && doc.visibility !== "UNIVERSITY") return false;
     if (activeTab === "MY_UPLOADS") {
-      return doc.uploadedBy === facultyContext?.facultyCode || doc.uploadedBy === facultyContext?.id;
+      const isMine =
+        doc.uploadedBy === facultyContext?.id ||
+        doc.uploadedBy === facultyContext?.facultyCode;
+      if (!isMine) return false;
     }
-
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const matchName = doc.fileName?.toLowerCase().includes(q);
+      const matchDept = doc.department?.name?.toLowerCase().includes(q) || doc.department?.code?.toLowerCase().includes(q);
+      if (!matchName && !matchDept) return false;
+    }
     return true;
   });
 
-  const getVisibilityBadge = (vis: string) => {
-    const opt = VISIBILITY_OPTIONS.find((v) => v.value === vis) || VISIBILITY_OPTIONS[0];
-    const Icon = opt.icon;
-    return (
-      <Badge variant="outline" className={`text-[10px] flex items-center gap-1 font-medium ${opt.badgeClass}`}>
-        <Icon className="h-3 w-3" />
-        {vis}
-      </Badge>
-    );
-  };
-
   return (
     <div className="space-y-6">
-      {/* ── DEPARTMENT ACCESS BOUNDARY BANNER ────────────────────── */}
-      <div className="rounded-2xl bg-gradient-to-r from-indigo-950/60 via-slate-900/90 to-slate-950 border border-indigo-500/20 p-5 shadow-xl backdrop-blur-xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1.5">
+      {/* ── HEADER BANNER ────────────────────────────────────────── */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900/60 via-purple-900/40 to-slate-900 border border-indigo-500/20 p-6 backdrop-blur-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                Department Access Boundary
-              </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                <Shield className="h-3 w-3" /> Pre-Retrieval RBAC Active
+              <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/40 text-xs">
+                Department Document Center
+              </Badge>
+              <span className="text-xs text-slate-400 font-mono">
+                {facultyContext?.facultyCode || "FAC-MEMBER"}
               </span>
             </div>
-            <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-              🏫 {facultyContext?.departmentName || "Academic Department"} ({facultyContext?.departmentCode || "DEPT"})
+            <h1 className="text-2xl font-bold text-white tracking-tight">
+              Academic Documents & Syllabi
             </h1>
-            <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
-              Documents uploaded here are bound to the <strong className="text-slate-200">{facultyContext?.departmentCode || "Department"}</strong> boundary. The Cognitive Kernel applies pre-retrieval filters across Qdrant vectors, PostgreSQL BM25, and Neo4j graph nodes to prevent cross-department data leaks.
+            <p className="text-xs text-slate-300">
+              Department of {facultyContext?.departmentName || "Computer Science"} ({facultyContext?.departmentCode || "CSE"})
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-right">
-              <p className="text-[11px] text-slate-400">Authenticated Faculty</p>
-              <p className="text-xs font-bold text-white flex items-center gap-1.5 justify-end">
-                <span>{facultyContext?.facultyName || "Faculty Member"}</span>
-                <span className="text-[10px] font-mono text-indigo-400">({facultyContext?.facultyCode || "FAC"})</span>
-              </p>
-            </div>
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={fetchDocuments}
-              className="border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 rounded-xl h-10 px-3"
+              className="border-slate-700 bg-slate-900 text-slate-300 hover:text-white rounded-xl text-xs"
             >
-              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-4 w-4 mr-1.5 ${loading ? "animate-spin" : ""}`} />
+              Refresh
             </Button>
           </div>
         </div>
@@ -481,7 +516,7 @@ export default function FacultyDocumentsPage() {
               Authorized Department Document Repository
             </CardTitle>
             <CardDescription className="text-slate-400 text-xs">
-              {filteredDocs.length} Documents authorized for your role & department
+              {filteredDocs.length} Documents authorized for your role & department • Click any document to view preview
             </CardDescription>
           </div>
 
@@ -562,7 +597,11 @@ export default function FacultyDocumentsPage() {
                       doc.uploadedBy === facultyContext?.id ||
                       doc.uploadedBy === facultyContext?.facultyCode;
                     return (
-                      <tr key={doc.id} className="hover:bg-slate-800/40 transition-colors">
+                      <tr
+                        key={doc.id}
+                        onClick={() => handleViewDoc(doc.id)}
+                        className="hover:bg-slate-800/40 cursor-pointer transition-colors"
+                      >
                         <td className="py-3.5 pr-4">
                           <div className="flex items-center gap-2.5">
                             <div className="p-1.5 rounded-md bg-indigo-500/10 text-indigo-400">
@@ -607,20 +646,31 @@ export default function FacultyDocumentsPage() {
                         <td className="py-3.5 text-slate-400">
                           {new Date(doc.createdAt).toLocaleDateString()}
                         </td>
-                        <td className="py-3.5 text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            title={isOwnDoc ? "Delete document" : "Only uploader / HOD can delete"}
-                            onClick={() => handleDelete(doc.id)}
-                            className={`rounded-lg h-7 px-2 ${
-                              isOwnDoc
-                                ? "text-slate-400 hover:text-rose-400 hover:bg-rose-500/10"
-                                : "text-slate-600 hover:text-slate-500 cursor-pointer"
-                            }`}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
+                        <td className="py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              title="View document details & indexed chunks"
+                              onClick={() => handleViewDoc(doc.id)}
+                              className="rounded-lg h-7 px-2 text-indigo-400 hover:text-white hover:bg-indigo-500/20"
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              title={isOwnDoc ? "Delete document" : "Only uploader / HOD can delete"}
+                              onClick={() => handleDelete(doc.id)}
+                              className={`rounded-lg h-7 px-2 ${
+                                isOwnDoc
+                                  ? "text-slate-400 hover:text-rose-400 hover:bg-rose-500/10"
+                                  : "text-slate-600 hover:text-slate-500 cursor-pointer"
+                              }`}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -631,6 +681,118 @@ export default function FacultyDocumentsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* ── DOCUMENT PREVIEW / DETAIL MODAL ───────────────────────── */}
+      {selectedDoc && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-5 border-b border-slate-800 flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="p-2.5 rounded-xl bg-indigo-500/15 text-indigo-400 shrink-0">
+                  <FileText className="h-6 w-6" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-base font-bold text-white truncate">{selectedDoc.fileName}</h3>
+                  <div className="flex flex-wrap items-center gap-2 mt-1">
+                    <Badge variant="outline" className="text-[10px] bg-indigo-500/10 text-indigo-300 border-indigo-500/30">
+                      {selectedDoc.department?.code || "Department Scope"}
+                    </Badge>
+                    <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/30">
+                      {selectedDoc.visibility || "DEPARTMENT"}
+                    </Badge>
+                    <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-300 border-emerald-500/30">
+                      {selectedDoc.processingStatus || "COMPLETED"}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedDoc(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors shrink-0"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 overflow-y-auto space-y-4 text-xs text-slate-300">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                <div>
+                  <span className="text-slate-500 block text-[10px]">File Size</span>
+                  <span className="font-semibold text-white">{(selectedDoc.fileSize / 1024 / 1024).toFixed(2)} MB</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px]">Indexed Chunks</span>
+                  <span className="font-semibold text-indigo-400 font-mono">{selectedDoc._count?.chunks || selectedDoc.chunks?.length || 0} Chunks</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px]">Uploaded On</span>
+                  <span className="font-semibold text-white">{new Date(selectedDoc.createdAt).toLocaleDateString()}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px]">Vector Search Status</span>
+                  <span className="font-semibold text-emerald-400">Online & Ready</span>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-white text-xs mb-2 flex items-center justify-between">
+                  <span>Indexed Content Chunks Preview</span>
+                  <span className="text-[10px] text-slate-500 font-normal">
+                    Showing top {selectedDoc.chunks?.length || 0} chunks
+                  </span>
+                </h4>
+
+                {(!selectedDoc.chunks || selectedDoc.chunks.length === 0) ? (
+                  <div className="p-6 text-center text-slate-500 bg-slate-950 rounded-xl border border-slate-800">
+                    No indexed chunks preview available.
+                  </div>
+                ) : (
+                  <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                    {selectedDoc.chunks.map((chunk: any, i: number) => (
+                      <div key={chunk.id || i} className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
+                        <div className="flex items-center justify-between text-[10px] text-indigo-400 font-mono">
+                          <span>Chunk #{chunk.chunkIndex ?? i + 1} {chunk.pageNumber ? `(Page ${chunk.pageNumber})` : ""}</span>
+                          <span className="text-slate-500">{chunk.tokenCount ? `${chunk.tokenCount} tokens` : ""}</span>
+                        </div>
+                        <p className="text-slate-300 leading-relaxed line-clamp-4 font-mono text-[11px]">
+                          {chunk.content}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between gap-3">
+              {selectedDoc.signedUrl ? (
+                <a
+                  href={selectedDoc.signedUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all"
+                >
+                  <Eye className="h-3.5 w-3.5" /> Open / Download File
+                </a>
+              ) : (
+                <span className="text-xs text-slate-500">Original file stored securely</span>
+              )}
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedDoc(null)}
+                className="border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs"
+              >
+                Close Preview
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

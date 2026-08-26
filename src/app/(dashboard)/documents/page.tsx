@@ -15,6 +15,9 @@ interface Doc {
   fileSize: number;
   fileType: string;
   processingStatus: string;
+  visibility?: string;
+  departmentId?: string | null;
+  department?: { id: string; code: string; name: string } | null;
   createdAt: string;
   uploadedBy: string | null;
   knowledgeBase: { name: string } | null;
@@ -335,13 +338,13 @@ export default function DocumentsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
-  // Poll processing docs
+  // Live auto-polling every 5 seconds for instant sync when faculty uploads documents
   useEffect(() => {
     const iv = setInterval(() => {
-      if (docs.some((d) => d.processingStatus === "PROCESSING")) load(pagination.page);
-    }, 8000);
+      load(pagination.page);
+    }, 5000);
     return () => clearInterval(iv);
-  }, [docs, pagination.page]);
+  }, [load, pagination.page]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Delete this document? This cannot be undone.")) return;
@@ -360,8 +363,13 @@ export default function DocumentsPage() {
         {/* ── Top bar ── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5 shrink-0 gap-3">
           <div>
-            <h1 className="text-lg sm:text-xl font-bold text-white">University Documents</h1>
-            <p className="text-xs text-gray-400 mt-0.5">Explore institutional and course documents. Academic documents are managed via the Faculty Portal.</p>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg sm:text-xl font-bold text-white">University Documents</h1>
+              <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live Synced
+              </span>
+            </div>
+            <p className="text-xs text-gray-400 mt-0.5">Explore institutional and departmental course documents. Academic documents uploaded by faculty appear here in real time.</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {/* Search */}
@@ -402,6 +410,7 @@ export default function DocumentsPage() {
             <thead className="sticky top-0 bg-[#0f1117] border-b border-white/5 z-10">
               <tr>
                 <th className="text-left px-6 py-3 text-gray-500 font-medium">Name</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Scope</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium hidden md:table-cell">Chunks</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium hidden md:table-cell">Size</th>
@@ -411,9 +420,9 @@ export default function DocumentsPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="text-center py-16"><Loader2 className="w-5 h-5 animate-spin text-gray-500 mx-auto" /></td></tr>
+                <tr><td colSpan={7} className="text-center py-16"><Loader2 className="w-5 h-5 animate-spin text-gray-500 mx-auto" /></td></tr>
               ) : docs.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-16 text-gray-500">No documents found.</td></tr>
+                <tr><td colSpan={7} className="text-center py-16 text-gray-500">No documents found in your department scope.</td></tr>
               ) : docs.map((doc) => (
                 <tr
                   key={doc.id}
@@ -425,6 +434,15 @@ export default function DocumentsPage() {
                       <FileIcon name={doc.fileName} type={doc.fileType} />
                       <span className="text-white font-medium truncate max-w-[180px] md:max-w-xs">{doc.fileName}</span>
                     </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono border ${
+                      doc.visibility === "UNIVERSITY"
+                        ? "bg-purple-500/15 text-purple-300 border-purple-500/30"
+                        : "bg-indigo-500/15 text-indigo-300 border-indigo-500/30"
+                    }`}>
+                      {doc.department?.code || (doc.visibility === "UNIVERSITY" ? "UNIV-WIDE" : "DEPT")}
+                    </span>
                   </td>
                   <td className="px-4 py-3"><StatusBadge status={doc.processingStatus} /></td>
                   <td className="px-4 py-3 text-gray-400 hidden md:table-cell">

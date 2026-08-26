@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 import { DocumentService } from "@/server/services/document.service";
+import { DocumentAccessPolicy } from "@/server/services/document-access-policy";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { validateApiKeyRequest } from "@/server/utils/api-key-auth";
 
@@ -18,13 +19,20 @@ export async function POST(request: Request) {
 
     if (user) {
       userId = user.id;
-      let membership = await db.membership.findFirst({ where: { userId: user.id } });
-      if (!membership) {
+      let memberships = await db.membership.findMany({
+        where: { userId: user.id },
+        include: { organization: { include: { _count: { select: { documents: true } } } } },
+      });
+      if (memberships.length === 0) {
         await syncUserToDatabase();
-        membership = await db.membership.findFirst({ where: { userId: user.id } });
+        memberships = await db.membership.findMany({
+          where: { userId: user.id },
+          include: { organization: { include: { _count: { select: { documents: true } } } } },
+        });
       }
-      if (membership) {
-        organizationId = membership.organizationId;
+      const preferred = memberships.find(m => m.organizationId === "seed-org-001" || m.organization._count.documents > 0) || memberships[0];
+      if (preferred) {
+        organizationId = preferred.organizationId;
       }
     } else {
       // Fallback to API Key authentication
@@ -49,11 +57,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Only PDF files are supported" }, { status: 400 });
     }
 
-    // Save the file to InsForge Storage + create DB record
+    // Resolve student/faculty access context for department tagging
+    const accessContext = userId
+      ? await DocumentAccessPolicy.resolveStudentAccessContext(userId, organizationId)
+      : null;
+
+    // Save the file to InsForge Storage + create DB record with department scope
     const document = await DocumentService.uploadDocument(
       file,
       organizationId,
-      userId || "api_key_auth"
+      userId || "api_key_auth",
+      undefined,
+      accessContext?.departmentId || undefined,
+      undefined,
+      "DEPARTMENT"
     );
 
     // Read buffer before the response closes

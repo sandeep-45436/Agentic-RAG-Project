@@ -18,18 +18,11 @@ import {
   ExternalLink,
   BookOpen,
   Menu,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 
 interface FacultySession {
   id: string;
@@ -83,7 +76,7 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // If on login page, render children directly without dashboard chrome
-  const isLoginPage = pathname === "/faculty/login";
+  const isLoginPage = pathname === "/faculty/login" || pathname?.startsWith("/faculty/login");
 
   useEffect(() => {
     if (isLoginPage) {
@@ -140,7 +133,7 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
   }
 
   const sidebarNavContent = (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-slate-900 border-r border-slate-800">
       {/* Brand Header */}
       <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
         <Link href="/faculty/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 group">
@@ -154,6 +147,14 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
             <p className="text-xs text-indigo-400 font-medium">Smart University Academic</p>
           </div>
         </Link>
+        {mobileOpen && (
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="md:hidden p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        )}
       </div>
 
       {/* Active Faculty Card */}
@@ -163,10 +164,10 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
             <Avatar className="h-10 w-10 border border-indigo-500/30 ring-2 ring-indigo-500/20">
               <AvatarFallback className="bg-indigo-600 text-white font-bold text-xs">
                 {faculty.name
-                  .split(" ")
+                  ?.split(" ")
                   .map((n) => n[0])
                   .join("")
-                  .slice(0, 2)}
+                  .slice(0, 2) || "FC"}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
@@ -259,27 +260,32 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
         {sidebarNavContent}
       </aside>
 
+      {/* ── MOBILE SLIDING DRAWER ─────────────────────────────────── */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div className="relative z-10 w-72 h-full shadow-2xl flex flex-col bg-slate-900 animate-in slide-in-from-left duration-200">
+            {sidebarNavContent}
+          </div>
+        </div>
+      )}
+
       {/* ── MAIN CONTENT AREA ──────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Bar */}
         <header className="h-16 shrink-0 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            {/* Mobile Sheet Trigger */}
-            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-              <SheetTrigger
-                className="md:hidden p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
-                aria-label="Open Faculty Menu"
-              >
-                <Menu className="h-5 w-5" />
-              </SheetTrigger>
-              <SheetContent side="left" className="w-72 p-0 bg-slate-900 border-r border-slate-800 text-slate-100">
-                <SheetHeader className="sr-only">
-                  <SheetTitle>Faculty Navigation</SheetTitle>
-                  <SheetDescription>Faculty Portal navigation and actions.</SheetDescription>
-                </SheetHeader>
-                {sidebarNavContent}
-              </SheetContent>
-            </Sheet>
+            {/* Mobile Hamburger Button */}
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="md:hidden p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
+              aria-label="Open Faculty Menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
 
             <span className="text-xs sm:text-sm font-semibold text-slate-300 truncate">
               Faculty Subsystem

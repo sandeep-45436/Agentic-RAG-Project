@@ -181,7 +181,7 @@ export default function HomePage() {
               Features
             </a>
             <a href="#roles" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
-              Student vs Faculty
+              3 Campus Portals
             </a>
             <a href="#faq" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
               FAQ
@@ -247,7 +247,7 @@ export default function HomePage() {
                 onClick={() => setMobileNavOpen(false)}
                 className="text-sm font-medium text-slate-300 hover:text-white transition-colors py-1"
               >
-                Student vs Faculty Roles
+                3 Campus Portals
               </a>
               <a
                 href="#faq"
@@ -266,6 +266,14 @@ export default function HomePage() {
               >
                 <GraduationCap className="w-4 h-4 text-purple-400" />
                 Access Faculty Portal
+              </Link>
+              <Link
+                href="/hod/login"
+                onClick={() => setMobileNavOpen(false)}
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-semibold bg-blue-600/10 text-blue-300 border border-blue-500/30"
+              >
+                <Scale className="w-4 h-4 text-blue-400" />
+                Access HOD Portal
               </Link>
               <Link
                 href="/chat"
@@ -303,22 +311,30 @@ export default function HomePage() {
           </p>
 
           {/* Primary Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full justify-center max-w-md">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 w-full justify-center max-w-2xl">
             <Link
               href="/chat"
-              className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-xl shadow-indigo-600/30 hover:shadow-indigo-600/50 hover:scale-[1.02] transition-all duration-300"
+              className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-xl shadow-indigo-600/30 hover:shadow-indigo-600/50 hover:scale-[1.02] transition-all duration-300"
             >
               <MessageSquare className="w-4 h-4" />
-              Launch Student AI Chat
-              <ArrowRight className="w-4 h-4" />
+              Student AI Chat
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
 
             <Link
-              href="/faculty/dashboard"
-              className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-7 py-4 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] text-white border border-white/10 hover:border-white/20 font-semibold text-sm backdrop-blur-lg hover:scale-[1.02] transition-all duration-300"
+              href="/faculty/login"
+              className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-200 border border-purple-500/40 hover:border-purple-500/60 font-semibold text-xs backdrop-blur-lg hover:scale-[1.02] transition-all duration-300"
             >
               <GraduationCap className="w-4 h-4 text-purple-400" />
-              Faculty & Dean Portal
+              Faculty Portal
+            </Link>
+
+            <Link
+              href="/hod/login"
+              className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-200 border border-blue-500/40 hover:border-blue-500/60 font-semibold text-xs backdrop-blur-lg hover:scale-[1.02] transition-all duration-300"
+            >
+              <Scale className="w-4 h-4 text-blue-400" />
+              HOD Operations Portal
             </Link>
           </div>
 
@@ -541,74 +557,109 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Student Persona Card */}
-            <div className="p-8 rounded-3xl bg-gradient-to-br from-indigo-950/40 via-slate-900/60 to-slate-950 border border-indigo-500/30 relative overflow-hidden flex flex-col justify-between">
+            <div className="p-7 rounded-3xl bg-gradient-to-br from-indigo-950/40 via-slate-900/60 to-slate-950 border border-indigo-500/30 relative overflow-hidden flex flex-col justify-between">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-bold mb-4">
                   <MessageSquare className="w-3.5 h-3.5" />
                   Student Experience
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3">AI Academic Chat Assistant</h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                  Designed for effortless study and rapid discovery. Ask complex questions about syllabus, prerequisites, lecture topics, and instant page slicing.
+                <h3 className="text-xl font-bold text-white mb-2">Student AI Chat</h3>
+                <p className="text-slate-400 text-xs leading-relaxed mb-5">
+                  Natural language discovery across syllabi, prerequisites, lecture slides, and PDF page range slice downloads.
                 </p>
-                <ul className="space-y-3 text-xs text-slate-300 mb-8">
+                <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    Natural language queries for all course materials
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    Instant page range PDF downloads
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    Instant page range PDF extract downloads
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    Citations directly to textbook source
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    Direct citation badges to source textbooks and notes
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    Weekly schedule & exam hall info
                   </li>
                 </ul>
               </div>
 
               <Link
                 href="/chat"
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors"
               >
-                Go to Student Chat Assistant <ArrowRight className="w-3.5 h-3.5" />
+                Launch Student Chat <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
             {/* Faculty Persona Card */}
-            <div className="p-8 rounded-3xl bg-gradient-to-br from-purple-950/40 via-slate-900/60 to-slate-950 border border-purple-500/30 relative overflow-hidden flex flex-col justify-between">
+            <div className="p-7 rounded-3xl bg-gradient-to-br from-purple-950/40 via-slate-900/60 to-slate-950 border border-purple-500/30 relative overflow-hidden flex flex-col justify-between">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-purple-500/20 text-purple-300 text-xs font-bold mb-4">
                   <GraduationCap className="w-3.5 h-3.5" />
-                  Faculty & Administration
+                  Faculty & Lecturers
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3">Faculty Operations Portal</h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                  The central command hub for professors, department heads, and deans to publish syllabi, exam schedules, and department policies.
+                <h3 className="text-xl font-bold text-white mb-2">Faculty Portal</h3>
+                <p className="text-slate-400 text-xs leading-relaxed mb-5">
+                  Course document uploads, automated RAG vectorization, timetable collision detection, and anti-malpractice exam seating.
                 </p>
-                <ul className="space-y-3 text-xs text-slate-300 mb-8">
+                <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-purple-400" />
-                    Department-wide document upload with automatic embedding
+                    <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                    Upload syllabus, notes & model papers
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-purple-400" />
-                    Seating arrangements, exam schedules, and timetables
+                    <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                    Weekly class timetable management
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-purple-400" />
-                    Document visibility toggles (Department vs. University)
+                    <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                    Zig-zag exam seating allocations
                   </li>
                 </ul>
               </div>
 
               <Link
                 href="/faculty/login"
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-colors"
               >
                 Access Faculty Portal <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {/* HOD & Dean Persona Card */}
+            <div className="p-7 rounded-3xl bg-gradient-to-br from-blue-950/40 via-slate-900/60 to-slate-950 border border-blue-500/30 relative overflow-hidden flex flex-col justify-between">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-xs font-bold mb-4">
+                  <Scale className="w-3.5 h-3.5" />
+                  Department Heads & Deans
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">HOD Operations Portal</h3>
+                <p className="text-slate-400 text-xs leading-relaxed mb-5">
+                  Department health index, AI command center, faculty workload optimization, student academic risk, and policy-grounded approvals.
+                </p>
+                <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                    7-Dimension Department Health Index
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                    HOD AI Command Center & What Changed
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                    Student risk & exam condonation proposals
+                  </li>
+                </ul>
+              </div>
+
+              <Link
+                href="/hod/login"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors"
+              >
+                Access HOD Portal <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>

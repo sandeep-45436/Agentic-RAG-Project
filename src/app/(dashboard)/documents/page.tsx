@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import {
   Search, Upload, Filter, MoreHorizontal, ChevronLeft, ChevronRight,
   FileText, Loader2, CheckCircle2, AlertCircle, Clock, Trash2,
-  X, ExternalLink, Eye,
+  X, ExternalLink, Eye, Building,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -301,6 +301,8 @@ function DetailPanel({ docId, onClose }: { docId: string; onClose: () => void })
 
 export default function DocumentsPage() {
   const [docs, setDocs] = useState<Doc[]>([]);
+  const [departments, setDepartments] = useState<Array<{ id: string; code: string; name: string }>>([]);
+  const [selectedDeptId, setSelectedDeptId] = useState<string>("ALL");
   const [pagination, setPagination] = useState<Pagination>({ page: 1, pageSize: 10, total: 0, pages: 1 });
   const [totalStorage, setTotalStorage] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -312,39 +314,44 @@ export default function DocumentsPage() {
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const searchTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const load = useCallback((p = 1, s = search, t = tab) => {
+  const load = useCallback((p = 1, s = search, t = tab, deptId = selectedDeptId) => {
     setLoading(true);
     const params = new URLSearchParams({ page: String(p), pageSize: "10" });
     const st = TAB_STATUS[t];
     if (st) params.set("status", st);
     if (s) params.set("search", s);
+    if (deptId && deptId !== "ALL") params.set("departmentId", deptId);
+    if (deptId === "ALL") params.set("departmentId", "ALL");
+
     fetch(`/api/documents?${params}`)
       .then((r) => r.json())
       .then((d) => {
         setDocs(d.documents ?? []);
+        if (d.departments && d.departments.length > 0) {
+          setDepartments(d.departments);
+        }
         setPagination(d.pagination ?? { page: 1, pageSize: 10, total: 0, pages: 1 });
         setTotalStorage(d.totalStorageBytes ?? 0);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [search, tab]);
+  }, [search, tab, selectedDeptId]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { load(1, search, tab); }, [tab]);
+  // Initial load and tab change
+  useEffect(() => { load(1, search, tab, selectedDeptId); }, [tab, selectedDeptId]);
 
   useEffect(() => {
     if (searchTimer.current) clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => load(1, search, tab), 400);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    searchTimer.current = setTimeout(() => load(1, search, tab, selectedDeptId), 400);
   }, [search]);
 
   // Live auto-polling every 5 seconds for instant sync when faculty uploads documents
   useEffect(() => {
     const iv = setInterval(() => {
-      load(pagination.page);
+      load(pagination.page, search, tab, selectedDeptId);
     }, 5000);
     return () => clearInterval(iv);
-  }, [load, pagination.page]);
+  }, [load, pagination.page, search, tab, selectedDeptId]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Delete this document? This cannot be undone.")) return;
@@ -364,29 +371,52 @@ export default function DocumentsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5 shrink-0 gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-xl font-bold text-white">University Documents</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-white">University Documents & Notes</h1>
               <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live Synced
               </span>
             </div>
-            <p className="text-xs text-gray-400 mt-0.5">Explore institutional and departmental course documents. Academic documents uploaded by faculty appear here in real time.</p>
+            <p className="text-xs text-gray-400 mt-0.5">Explore institutional and departmental course materials. Academic documents uploaded by faculty appear here in real time.</p>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            {/* Department Scope Selector */}
+            <div className="flex items-center gap-1.5 bg-indigo-950/60 border border-indigo-500/30 rounded-xl px-2.5 py-1.5 shadow-sm">
+              <Building className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+              <span className="text-[11px] text-gray-400 font-medium hidden sm:inline">Scope:</span>
+              <select
+                value={selectedDeptId}
+                onChange={(e) => {
+                  setSelectedDeptId(e.target.value);
+                }}
+                className="bg-transparent text-xs font-semibold text-indigo-200 border-none outline-none focus:ring-0 cursor-pointer pr-1"
+              >
+                <option value="ALL" className="bg-[#141720] text-white">
+                  All Departments & University
+                </option>
+                {departments.map((dept) => (
+                  <option key={dept.id} value={dept.id} className="bg-[#141720] text-white">
+                    {dept.code} - {dept.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Search */}
-            <div className="relative flex-1 sm:w-52">
+            <div className="relative flex-1 sm:w-48">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search documents..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-3 py-1.5 sm:py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50"
+                className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50"
               />
             </div>
+
             <a
               href="/faculty/documents"
-              className="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-xs text-purple-300 transition-colors shrink-0"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-xs text-purple-300 transition-colors shrink-0"
             >
-              🎓 <span className="hidden xs:inline">Go to</span> Faculty Portal
+              🎓 <span className="hidden xs:inline">Faculty</span> Portal
             </a>
           </div>
         </div>
@@ -422,7 +452,25 @@ export default function DocumentsPage() {
               {loading ? (
                 <tr><td colSpan={7} className="text-center py-16"><Loader2 className="w-5 h-5 animate-spin text-gray-500 mx-auto" /></td></tr>
               ) : docs.length === 0 ? (
-                <tr><td colSpan={7} className="text-center py-16 text-gray-500">No documents found in your department scope.</td></tr>
+                <tr>
+                  <td colSpan={7} className="text-center py-16 text-gray-400">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <FileText className="w-8 h-8 text-gray-600 mb-1" />
+                      <p className="font-semibold text-white">No documents found in selected scope</p>
+                      <p className="text-xs text-gray-500 max-w-sm">
+                        Select "All Departments & University" or switch to another department to view course materials uploaded by faculty.
+                      </p>
+                      {selectedDeptId !== "ALL" && (
+                        <button
+                          onClick={() => setSelectedDeptId("ALL")}
+                          className="mt-2 text-xs text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 px-3 py-1.5 rounded-lg border border-indigo-500/20"
+                        >
+                          View All Departments
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
               ) : docs.map((doc) => (
                 <tr
                   key={doc.id}

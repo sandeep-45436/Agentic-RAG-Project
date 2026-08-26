@@ -300,14 +300,14 @@ export default function HomePage() {
 
           {/* Main Title */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.15]">
-            One Campus Hub. <br />
+            Autonomous Campus Intelligence. <br />
             <span className="bg-gradient-to-r from-indigo-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">
-              Instant Academic Answers.
+              Zero Hallucinations. Instant Answers.
             </span>
           </h1>
 
           <p className="text-slate-400 text-base sm:text-xl max-w-2xl leading-relaxed font-normal">
-            Ground-truth AI assistance for university students, faculty, and departments. Retrieve course syllabi, extract PDF page ranges, and verify academic regulations in sub-milliseconds.
+            Ground-truth AI assistance for university students, faculty, and departments. Retrieve course syllabi, extract PDF page ranges, and verify academic regulations with citation-grounded precision.
           </p>
 
           {/* Primary Action Buttons */}

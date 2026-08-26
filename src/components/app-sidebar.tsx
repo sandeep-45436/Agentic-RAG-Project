@@ -33,6 +33,7 @@ import {
 const studentNav = [
   { title: "Chat Assistant", url: "/chat", icon: MessageSquare },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Browse Notes & Docs", url: "/documents", icon: BookOpen },
   { title: "Settings", url: "/settings", icon: Settings2 },
 ];
 

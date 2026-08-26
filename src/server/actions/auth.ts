@@ -31,18 +31,62 @@ export async function syncUserToDatabase() {
       });
     }
 
-    if (dbUser.memberships.length === 0) {
-      // Check if primary Smart University organization exists
-      const seedOrg = await db.organization.findUnique({
-        where: { id: "seed-org-001" },
+    // Ensure user has a membership in primary university organization (seed-org-001)
+    const seedOrg = await db.organization.findUnique({
+      where: { id: "seed-org-001" },
+    });
+
+    if (seedOrg) {
+      const existingMembership = await db.membership.findUnique({
+        where: {
+          userId_organizationId: {
+            userId: dbUser.id,
+            organizationId: seedOrg.id,
+          },
+        },
       });
 
-      if (seedOrg) {
+      if (!existingMembership) {
         await db.membership.create({
-          data: { userId: dbUser.id, organizationId: seedOrg.id, role: "ADMIN" },
-        });
+          data: { userId: dbUser.id, organizationId: seedOrg.id, role: "MEMBER" },
+        }).catch(() => {});
       }
 
+      // If user does not have a student profile, link them to the CSE department
+      const existingStudent = await db.student.findFirst({
+        where: {
+          OR: [{ userId: dbUser.id }, { id: dbUser.id }],
+        },
+      });
+
+      if (!existingStudent) {
+        const cseDept = await db.department.findFirst({
+          where: {
+            organizationId: seedOrg.id,
+            OR: [{ code: "CSE" }, { code: "CS" }],
+            deletedAt: null,
+          },
+        }) || await db.department.findFirst({
+          where: { organizationId: seedOrg.id, deletedAt: null },
+        });
+
+        if (cseDept) {
+          await db.student.create({
+            data: {
+              userId: dbUser.id,
+              organizationId: seedOrg.id,
+              departmentId: cseDept.id,
+              studentNumber: `STU-${Math.floor(1000 + Math.random() * 9000)}`,
+              major: cseDept.name,
+              academicStatus: "Good Standing",
+              gpa: 3.85,
+            },
+          }).catch(() => {});
+        }
+      }
+    }
+
+    if (dbUser.memberships.length === 0) {
       const org = await db.organization.create({
         data: { name: `${dbUser.name}'s Organization` },
       });

@@ -64,7 +64,7 @@ export async function GET(req: Request) {
       where.fileName = { contains: search, mode: "insensitive" };
     }
 
-    const [docs, count, storage] = await Promise.all([
+    const [docs, count, storage, departments] = await Promise.all([
       db.document.findMany({
         where,
         orderBy: { createdAt: "desc" },
@@ -97,12 +97,18 @@ export async function GET(req: Request) {
         where,
         _sum: { fileSize: true },
       }),
+      db.department.findMany({
+        where: { organizationId, deletedAt: null },
+        select: { id: true, code: true, name: true },
+        orderBy: { code: "asc" },
+      }),
     ]);
 
     return NextResponse.json({
       documents: docs,
       pagination: { page, pageSize, total: count, pages: Math.ceil(count / pageSize) },
       totalStorageBytes: storage._sum.fileSize ?? 0,
+      departments,
       scope: {
         departmentId: accessContext.departmentId,
         userRole: accessContext.userRole,

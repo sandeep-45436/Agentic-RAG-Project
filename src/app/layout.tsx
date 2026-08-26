@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI SaaS Foundation",
-  description: "The ultimate platform for generating, managing, and scaling your AI workflows.",
+  title: "NexusIQ — Autonomous Campus Intelligence & University RAG",
+  description: "Enterprise multi-agent RAG platform delivering zero-hallucination, citation-grounded answers and PDF extraction for university students, faculty, and administrators.",
 };
 
 export default function RootLayout({

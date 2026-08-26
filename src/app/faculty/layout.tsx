@@ -91,31 +91,42 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
       return;
     }
 
+    let active = true;
+    setLoading(true);
+
     fetch("/api/faculty/auth/session")
       .then((res) => res.json())
       .then((data) => {
+        if (!active) return;
         if (data.authenticated && data.faculty) {
           setFaculty(data.faculty);
+          setLoading(false);
         } else {
-          router.push("/faculty/login");
+          router.replace("/faculty/login");
         }
       })
-      .catch(() => {
-        router.push("/faculty/login");
-      })
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        console.warn("Faculty session error:", err);
+        if (active) router.replace("/faculty/login");
+      });
+
+    return () => {
+      active = false;
+    };
   }, [pathname, isLoginPage, router]);
 
   const handleLogout = async () => {
-    await fetch("/api/faculty/auth/logout", { method: "POST" });
-    router.push("/faculty/login");
+    try {
+      await fetch("/api/faculty/auth/logout", { method: "POST" });
+    } catch {}
+    router.replace("/faculty/login");
   };
 
   if (isLoginPage) {
     return <>{children}</>;
   }
 
-  if (loading) {
+  if (loading || !faculty) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-slate-100">
         <div className="flex flex-col items-center gap-3">

@@ -1,9 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-  // Keep these packages as CommonJS requires — don't bundle them
+  // Keep these packages external — don't bundle them
   serverExternalPackages: [
+    "@prisma/client",
+    "prisma",
     "pdf-parse",
     "@langchain/community",
     "tiktoken",
@@ -11,7 +12,6 @@ const nextConfig: NextConfig = {
     "@xenova/transformers",
   ],
 
-  // Turbopack also needs the externals declared separately
   turbopack: {
     resolveExtensions: [".ts", ".tsx", ".js", ".jsx"],
   },

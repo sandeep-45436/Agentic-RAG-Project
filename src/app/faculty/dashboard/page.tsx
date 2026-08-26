@@ -32,18 +32,24 @@ export default function FacultyDashboardPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/faculty/auth/session").then((r) => r.json()),
-      fetch("/api/faculty/documents").then((r) => r.json()),
+      fetch("/api/faculty/auth/session")
+        .then((r) => (r.ok ? r.json() : { authenticated: false }))
+        .catch(() => ({ authenticated: false })),
+      fetch("/api/faculty/documents")
+        .then((r) => (r.ok ? r.json() : { documents: [] }))
+        .catch(() => ({ documents: [] })),
     ])
       .then(([sessionData, docsData]) => {
-        if (sessionData.profile) {
+        if (sessionData?.profile) {
           setProfile(sessionData.profile);
+        } else if (sessionData?.faculty) {
+          setProfile(sessionData.faculty);
         }
-        if (docsData.documents) {
+        if (docsData?.documents && Array.isArray(docsData.documents)) {
           setRecentDocs(docsData.documents.slice(0, 5));
         }
       })
-      .catch(console.error)
+      .catch((err) => console.warn("Dashboard data fetch warning:", err))
       .finally(() => setLoading(false));
   }, []);
 

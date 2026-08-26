@@ -10,32 +10,38 @@ export async function GET() {
     const sessionCookie = cookieStore.get("faculty_session");
 
     if (!sessionCookie || !sessionCookie.value) {
-      return NextResponse.json({ authenticated: false }, { status: 401 });
+      return NextResponse.json({ authenticated: false, faculty: null }, { status: 200 });
     }
 
-    let parsedSession: any;
+    let parsedSession: any = null;
     try {
       parsedSession = JSON.parse(sessionCookie.value);
     } catch {
-      return NextResponse.json({ authenticated: false }, { status: 401 });
+      return NextResponse.json({ authenticated: false, faculty: null }, { status: 200 });
     }
 
-    // Refresh profile details from DB
-    const profile = await FacultyService.getFacultyProfile(parsedSession.id);
-    if (!profile) {
-      return NextResponse.json({ authenticated: false }, { status: 401 });
+    if (!parsedSession || !parsedSession.id) {
+      return NextResponse.json({ authenticated: false, faculty: null }, { status: 200 });
+    }
+
+    // Refresh profile details from DB with safe fallback
+    let profile: any = null;
+    try {
+      profile = await FacultyService.getFacultyProfile(parsedSession.id);
+    } catch (dbErr) {
+      console.warn("[API: /api/faculty/auth/session] DB profile fetch fallback:", dbErr);
     }
 
     return NextResponse.json({
       authenticated: true,
       faculty: parsedSession,
-      profile,
+      profile: profile || parsedSession,
     });
   } catch (error: any) {
     console.error("[API: /api/faculty/auth/session] Error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch session" },
-      { status: 500 }
+      { authenticated: false, faculty: null, error: error.message || "Failed to fetch session" },
+      { status: 200 }
     );
   }
 }

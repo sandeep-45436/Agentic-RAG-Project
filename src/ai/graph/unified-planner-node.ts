@@ -68,11 +68,14 @@ function routeFromSubTasks(
   const hasDatabase = subTasks.some((t) => t.type === "DATABASE_QUERY");
   const hasDocumentDelivery = subTasks.some((t) => t.type === "DOCUMENT_DELIVERY");
 
-  // Document delivery takes priority if explicitly requested
-  if (hasDocumentDelivery) return "DOCUMENT_DELIVERY";
+  // If both knowledge and document delivery exist, route to COMBINED (Knowledge first, then DocumentDelivery)
+  if (hasKnowledge && hasDocumentDelivery) return "COMBINED";
 
-  // If both knowledge and database tasks exist, route to COMBINED
+  // If both knowledge and database tasks exist, route to COMBINED (Knowledge first, then Database)
   if (hasKnowledge && hasDatabase) return "COMBINED";
+
+  // Pure document delivery request
+  if (hasDocumentDelivery) return "DOCUMENT_DELIVERY";
 
   const firstType = subTasks[0]?.type;
   if (firstType === "DATABASE_QUERY") return "DATABASE";
@@ -303,24 +306,50 @@ export async function unifiedPlannerNode(
         agents = [];
         tools = [];
       } else if (intentCategory === "MULTI_STEP_COGNITIVE_GOAL") {
-        subTasks = [
-          {
-            id: "task-1",
-            type: "DATABASE_QUERY",
-            query: rawQuery,
-            status: "pending",
-            dependsOn: [],
-          },
-          {
-            id: "task-2",
-            type: "KNOWLEDGE_LOOKUP",
-            query: rawQuery,
-            status: "pending",
-            dependsOn: [],
-          },
-        ];
-        agents = ["DatabaseAgent", "KnowledgeAgent"];
-        tools = ["university_database_query", "knowledge_retrieval"];
+        const isDocDeliveryGoal = Boolean(
+          intentResult.entities?.documentType ||
+          /\b(pdf|document|file|ppt|slides|pages|handout)\b/i.test(rawQuery)
+        );
+
+        if (isDocDeliveryGoal) {
+          subTasks = [
+            {
+              id: "task-1",
+              type: "KNOWLEDGE_LOOKUP",
+              query: rawQuery,
+              status: "pending",
+              dependsOn: [],
+            },
+            {
+              id: "task-2",
+              type: "DOCUMENT_DELIVERY",
+              query: rawQuery,
+              status: "pending",
+              dependsOn: ["task-1"],
+            },
+          ];
+          agents = ["KnowledgeAgent", "DocumentDeliveryAgent"];
+          tools = ["knowledge_retrieval", "document_delivery"];
+        } else {
+          subTasks = [
+            {
+              id: "task-1",
+              type: "DATABASE_QUERY",
+              query: rawQuery,
+              status: "pending",
+              dependsOn: [],
+            },
+            {
+              id: "task-2",
+              type: "KNOWLEDGE_LOOKUP",
+              query: rawQuery,
+              status: "pending",
+              dependsOn: [],
+            },
+          ];
+          agents = ["DatabaseAgent", "KnowledgeAgent"];
+          tools = ["university_database_query", "knowledge_retrieval"];
+        }
       } else {
         subTasks = [
           {

@@ -155,11 +155,15 @@ export class DocumentAccessPolicy {
 
     // College-level documents
     if (vis === "COLLEGE") {
+      if (!doc.collegeId) return true;
+      if (context.departmentId === "ALL") return true;
       return Boolean(context.collegeId && doc.collegeId === context.collegeId);
     }
 
     // Department-level documents
     if (vis === "DEPARTMENT") {
+      if (!doc.departmentId) return true;
+      if (context.departmentId === "ALL") return true;
       return Boolean(context.departmentId && doc.departmentId === context.departmentId);
     }
 
@@ -193,6 +197,17 @@ export class DocumentAccessPolicy {
       };
     }
 
+    if (!context.departmentId || context.departmentId === "ALL") {
+      return {
+        must: [
+          {
+            key: "organizationId",
+            match: { value: context.organizationId },
+          },
+        ],
+      };
+    }
+
     // Build permissions-based OR/should clauses
     const shouldClauses: any[] = [
       // 1. University-wide visibility
@@ -200,19 +215,23 @@ export class DocumentAccessPolicy {
         key: "visibility",
         match: { value: "UNIVERSITY" },
       },
-    ];
-
-    // 2. Department-level visibility
-    if (context.departmentId) {
-      shouldClauses.push({
+      // 2. Department-level visibility for matching department
+      {
         must: [
           { key: "visibility", match: { value: "DEPARTMENT" } },
           { key: "departmentId", match: { value: context.departmentId } },
         ],
-      });
-    }
+      },
+      // 3. Department documents without a specific department assignment (general institutional)
+      {
+        must: [
+          { key: "visibility", match: { value: "DEPARTMENT" } },
+          { is_empty: { key: "departmentId" } },
+        ],
+      },
+    ];
 
-    // 3. College-level visibility
+    // 4. College-level visibility
     if (context.collegeId) {
       shouldClauses.push({
         must: [
@@ -222,7 +241,7 @@ export class DocumentAccessPolicy {
       });
     }
 
-    // 4. Private documents owned by this user/faculty
+    // 5. Private documents owned by this user/faculty
     const uploaderId = context.userId || context.facultyId;
     if (uploaderId && role !== "STUDENT" && role !== "MEMBER") {
       shouldClauses.push({
@@ -261,7 +280,7 @@ export class DocumentAccessPolicy {
     }
 
     // If user requested all departments or is browsing campus-wide repository
-    if (context.departmentId === "ALL") {
+    if (!context.departmentId || context.departmentId === "ALL") {
       return {
         organizationId: context.organizationId,
         deletedAt: null,
@@ -269,7 +288,11 @@ export class DocumentAccessPolicy {
       };
     }
 
-    const orClauses: any[] = [{ visibility: "UNIVERSITY" }];
+    const orClauses: any[] = [
+      { visibility: "UNIVERSITY" },
+      { visibility: "DEPARTMENT", departmentId: null },
+      { visibility: "COLLEGE", collegeId: null },
+    ];
 
     if (context.departmentId) {
       orClauses.push({

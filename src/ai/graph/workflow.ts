@@ -166,12 +166,17 @@ const workflow = new StateGraph(GraphState)
     documentDeliveryNode: "documentDeliveryNode",
   })
 
-  // Knowledge path: knowledge → citation → conditional verification skip
+  // Knowledge path: knowledge → database / documentDelivery / citation
   .addConditionalEdges("knowledgeNode", (state: typeof GraphState.State): string => {
-    if (state.routedPath === "COMBINED") return "databaseNode";
+    if (state.routedPath === "COMBINED") {
+      const hasDocDelivery = state.plan?.subTasks?.some((t) => t.type === "DOCUMENT_DELIVERY");
+      if (hasDocDelivery) return "documentDeliveryNode";
+      return "databaseNode";
+    }
     return "citationNode";
   }, {
     databaseNode: "databaseNode",
+    documentDeliveryNode: "documentDeliveryNode",
     citationNode: "citationNode",
   })
 

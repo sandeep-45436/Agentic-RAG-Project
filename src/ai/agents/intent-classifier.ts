@@ -61,19 +61,19 @@ export class IntentClassifier {
     }
 
     // 2.1. Document Delivery Detection
-    const hasDocumentRequest = /\b(give me|download|send me|get me|retrieve|fetch|provide|extract)\b.*\b(pdf|document|course material|material|pages|handout|ppt|powerpoint|presentation|slides|deck|file)\b/i.test(text)
-      || /\b(extract\s+(\d+[\s,\-to]+\d+|pages?)|get pages|get section|download pdf|course pdf|cnip)\b/i.test(text)
+    const hasDocumentRequest = /\b(give|download|send|get|retrieve|fetch|provide|extract|show|open|share)\b.*\b(pdf|document|course material|material|pages|handout|ppt|powerpoint|presentation|slides|deck|file)\b/i.test(text)
+      || /\b(extract\s+(\d+[\s,\-to]+\d+|pages?)|get pages|get section|download pdf|course pdf|cnip|give (a|the|me)?\s*(file|pdf|ppt|document))\b/i.test(text)
       || /\b(\d+[\s,\-to]+\d+\s*pages?)\b/i.test(text)
       || /\b(pages?\s+(\d+[\s,\-to]+\d+|containing|about|on|from|for))\b/i.test(text);
-    const hasExplanationRequest = /\b(explain|describe|what is|how does|tell me about|summarize)\b/i.test(text);
+    const hasExplanationRequest = /\b(explain|describe|what is|how does|tell me about|summarize|concept|meaning|details|overview|understand|teach)\b/i.test(text);
 
     // Extract document type entity
-    const docTypeMatch = text.match(/\b(pdf|ppt|powerpoint|presentation|slides|deck|syllabus|course material|material|handbook|handout|notes|textbook)\b/i);
+    const docTypeMatch = text.match(/\b(pdf|ppt|powerpoint|presentation|slides|deck|syllabus|course material|material|handbook|handout|notes|textbook|file)\b/i);
     if (docTypeMatch) {
       entities.documentType = docTypeMatch[1].toUpperCase();
     }
 
-    // Dual request: explain + give PDF → MULTI_STEP_COGNITIVE_GOAL
+    // Dual request: explain + give PDF/file → MULTI_STEP_COGNITIVE_GOAL
     if (hasDocumentRequest && hasExplanationRequest) {
       return {
         category: "MULTI_STEP_COGNITIVE_GOAL",

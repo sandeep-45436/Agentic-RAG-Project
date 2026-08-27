@@ -64,6 +64,10 @@ export async function ensureCollectionExists() {
       { name: "isLatest", schema: "bool" },
       { name: "documentId", schema: "keyword" },
       { name: "knowledgeBaseId", schema: "keyword" },
+      { name: "visibility", schema: "keyword" },
+      { name: "departmentId", schema: "keyword" },
+      { name: "collegeId", schema: "keyword" },
+      { name: "uploadedBy", schema: "keyword" },
     ];
 
     for (const idx of indexesToCreate) {

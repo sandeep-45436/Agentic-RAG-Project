@@ -146,7 +146,7 @@ export class DocumentAccessPolicy {
     if (doc.organizationId !== context.organizationId) return false;
 
     const role = (context.userRole || "FACULTY").toUpperCase();
-    if (["OWNER", "ADMIN", "DEAN"].includes(role)) return true;
+    if (["OWNER", "ADMIN", "DEAN", "FACULTY"].includes(role)) return true;
 
     const vis = doc.visibility as DocumentVisibility;
 
@@ -156,14 +156,14 @@ export class DocumentAccessPolicy {
     // College-level documents
     if (vis === "COLLEGE") {
       if (!doc.collegeId) return true;
-      if (context.departmentId === "ALL") return true;
+      if (!context.departmentId || context.departmentId === "ALL") return true;
       return Boolean(context.collegeId && doc.collegeId === context.collegeId);
     }
 
     // Department-level documents
     if (vis === "DEPARTMENT") {
       if (!doc.departmentId) return true;
-      if (context.departmentId === "ALL") return true;
+      if (!context.departmentId || context.departmentId === "ALL") return true;
       return Boolean(context.departmentId && doc.departmentId === context.departmentId);
     }
 
@@ -175,7 +175,7 @@ export class DocumentAccessPolicy {
       );
     }
 
-    return false;
+    return true;
   }
 
   /**

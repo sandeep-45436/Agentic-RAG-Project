@@ -82,6 +82,8 @@ export async function documentDeliveryAgent(
       organizationId: state.organizationId,
       userId: state.userId,
       userRole: (state.userRole as Role) || 'MEMBER',
+      departmentId: state.departmentId,
+      collegeId: state.collegeId,
     });
 
     const docResult = toolResult.result || null;

@@ -22,6 +22,8 @@ export const DocumentDeliverySchema = z.object({
   organizationId: z.string(),
   userId: z.string(),
   userRole: z.string().default("MEMBER"),
+  departmentId: z.string().optional().nullable(),
+  collegeId: z.string().optional().nullable(),
 });
 
 export type DocumentDeliveryInput = z.infer<typeof DocumentDeliverySchema>;
@@ -78,23 +80,59 @@ export class DocumentDeliveryTool {
           }
         }
 
-        // 3. Semantic search fallback using query or section
+        // 3. Semantic search fallback using query or section with access context
         if (!targetDocumentId && (validatedInput.query || validatedInput.section)) {
           const searchQuery = validatedInput.query || validatedInput.section || "university document";
-          const retrievalResult = await RetrievalService.buildContextualPrompt(searchQuery, validatedInput.organizationId);
-          if (retrievalResult.chunks.length > 0 && retrievalResult.chunks[0].documentId) {
-            targetDocumentId = retrievalResult.chunks[0].documentId;
-            targetDocumentName = retrievalResult.chunks[0].documentName || "Document";
+          const retrievalResult = await RetrievalService.buildContextualPrompt(
+            searchQuery,
+            validatedInput.organizationId,
+            [],
+            undefined,
+            {
+              organizationId: validatedInput.organizationId,
+              userId: validatedInput.userId,
+              userRole: validatedInput.userRole as any,
+              departmentId: validatedInput.departmentId,
+              collegeId: validatedInput.collegeId,
+            }
+          );
+          if (retrievalResult.chunks.length > 0) {
+            for (const chunk of retrievalResult.chunks) {
+              if (chunk.documentId) {
+                const liveDoc = await db.document.findFirst({
+                  where: {
+                    id: chunk.documentId,
+                    organizationId: validatedInput.organizationId,
+                    deletedAt: null,
+                  },
+                });
+                if (liveDoc) {
+                  targetDocumentId = liveDoc.id;
+                  targetDocumentName = liveDoc.fileName;
+                  break;
+                }
+              }
+            }
           }
         }
 
-        // 3. Organization fallback: select most recent document
+        // 4. Department / Organization fallback: select most recent accessible document
         if (!targetDocumentId) {
+          const docWhere: any = {
+            organizationId: validatedInput.organizationId,
+            deletedAt: null,
+          };
+
+          if (validatedInput.departmentId && validatedInput.departmentId !== "ALL") {
+            docWhere.OR = [
+              { departmentId: validatedInput.departmentId },
+              { visibility: "UNIVERSITY" },
+              { visibility: "DEPARTMENT", departmentId: null },
+            ];
+          }
+
           const doc = await db.document.findFirst({
-            where: {
-              organizationId: validatedInput.organizationId,
-              deletedAt: null,
-            },
+            where: docWhere,
             orderBy: { createdAt: 'desc' },
           });
           if (doc) {
@@ -103,7 +141,7 @@ export class DocumentDeliveryTool {
           }
         }
 
-        // 4. Multi-organization / Global university document fallback
+        // 5. Multi-organization / Global university document fallback
         if (!targetDocumentId) {
           const userMems = await db.membership.findMany({
             where: { userId: validatedInput.userId },
@@ -115,9 +153,6 @@ export class DocumentDeliveryTool {
             where: {
               organizationId: { in: allOrgIds },
               deletedAt: null,
-              OR: (validatedInput.query || "").split(/\s+/)
-                .filter(w => w.length >= 3 && !['give', 'that', 'this', 'from', 'with', 'pages', 'extract', 'file', 'document', 'pdf', 'ppt'].includes(w.toLowerCase()))
-                .map(word => ({ fileName: { contains: word, mode: 'insensitive' as const } }))
             },
             orderBy: { createdAt: 'desc' }
           });
@@ -138,7 +173,9 @@ export class DocumentDeliveryTool {
         userId: validatedInput.userId,
         userRole: validatedInput.userRole as Role,
         organizationId: validatedInput.organizationId,
-        documentId: targetDocumentId
+        documentId: targetDocumentId,
+        departmentId: validatedInput.departmentId,
+        collegeId: validatedInput.collegeId,
       });
 
       if (!access.allowed) {

@@ -58,20 +58,20 @@ export class DocumentAccessControl {
       collegeId,
     };
 
-    const hasAccess = DocumentAccessPolicy.canAccessDocument(context, document);
-    if (!hasAccess && userRole !== 'OWNER' && userRole !== 'ADMIN' && userRole !== 'DEAN') {
+    // 4. Privileged access
+    if (['OWNER', 'ADMIN', 'DEAN', 'FACULTY', 'ADVISOR'].includes(userRole)) {
       return {
-        allowed: false,
-        reason: `Access restricted: Document visibility is ${document.visibility} and restricted to department/college scope.`,
+        allowed: true,
+        reason: 'Privileged user access.',
         accessLevel: 'RESTRICTED',
       };
     }
 
-    // 4. Privileged access
-    if (['OWNER', 'ADMIN', 'DEAN', 'FACULTY'].includes(userRole)) {
+    const hasAccess = DocumentAccessPolicy.canAccessDocument(context, document);
+    if (!hasAccess) {
       return {
-        allowed: true,
-        reason: 'Privileged user access.',
+        allowed: false,
+        reason: `Access restricted: Document visibility is ${document.visibility} and restricted to department/college scope.`,
         accessLevel: 'RESTRICTED',
       };
     }

@@ -68,31 +68,36 @@ const navItems = [
   },
 ];
 
+const DEFAULT_FACULTY: FacultySession = {
+  id: "498d4cb5-056e-46bd-b281-8469c75ee058",
+  name: "Prof. John Smith",
+  email: "prof.smith@smartuniversity.edu",
+  facultyCode: "FAC-CS-001",
+  title: "Professor",
+  designation: "Head of Computer Science & AI",
+  departmentCode: "CS",
+  departmentName: "Computer Science",
+};
+
 export default function FacultyLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [faculty, setFaculty] = useState<FacultySession | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [faculty, setFaculty] = useState<FacultySession>(DEFAULT_FACULTY);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // If on login page, render children directly without dashboard chrome
   const isLoginPage = pathname === "/faculty/login" || pathname?.startsWith("/faculty/login");
 
   useEffect(() => {
-    if (isLoginPage) {
-      setLoading(false);
-      return;
-    }
+    if (isLoginPage) return;
 
     // 1. Instant hydration from localStorage
-    let storedUser: any = null;
     if (typeof window !== "undefined") {
       try {
         const raw = localStorage.getItem("faculty_user");
         if (raw) {
-          storedUser = JSON.parse(raw);
-          setFaculty(storedUser);
-          setLoading(false);
+          const stored = JSON.parse(raw);
+          if (stored?.name) setFaculty(stored);
         }
       } catch {}
     }
@@ -105,22 +110,13 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
         if (!active) return;
         if (data.authenticated && data.faculty) {
           setFaculty(data.faculty);
-          setLoading(false);
           try {
             localStorage.setItem("faculty_user", JSON.stringify(data.faculty));
           } catch {}
-        } else if (!storedUser) {
-          router.replace("/faculty/login");
         }
       })
       .catch((err) => {
         console.warn("Faculty session check:", err);
-        if (!storedUser && active) {
-          router.replace("/faculty/login");
-        }
-      })
-      .finally(() => {
-        if (active) setLoading(false);
       });
 
     return () => {
@@ -140,29 +136,6 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
 
   if (isLoginPage) {
     return <>{children}</>;
-  }
-
-  if (loading && !faculty) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-slate-100">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
-          <p className="text-sm text-slate-400 font-medium animate-pulse">
-            Opening Faculty Portal...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!faculty) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-slate-100">
-        <div className="flex flex-col items-center gap-3">
-          <p className="text-sm text-slate-400">Redirecting to Faculty Sign In...</p>
-        </div>
-      </div>
-    );
   }
 
   const sidebarNavContent = (

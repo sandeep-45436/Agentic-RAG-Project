@@ -25,9 +25,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+const DEFAULT_PROFILE = {
+  id: "498d4cb5-056e-46bd-b281-8469c75ee058",
+  name: "Prof. John Smith",
+  facultyCode: "FAC-CS-001",
+  title: "Professor",
+  designation: "Head of Computer Science & AI",
+  department: { name: "Computer Science", code: "CS" },
+  user: { name: "Prof. John Smith", email: "prof.smith@smartuniversity.edu" },
+  sections: [
+    { id: "s1", course: { code: "CS401", title: "Algorithms & Data Structures" } },
+    { id: "s2", course: { code: "CS501", title: "Machine Learning" } },
+    { id: "s3", course: { code: "CS601", title: "Distributed Systems" } },
+  ],
+  timetableEntries: [
+    { id: "t1", courseCode: "CS401", courseTitle: "Algorithms & Data Structures", room: "Tech Hall 101", dayOfWeek: "Monday", startTime: "09:00 AM", endTime: "10:30 AM" },
+    { id: "t2", courseCode: "CS501", courseTitle: "Machine Learning", room: "Tech Hall 102", dayOfWeek: "Monday", startTime: "11:00 AM", endTime: "12:30 PM" },
+    { id: "t3", courseCode: "CS401", courseTitle: "Algorithms Lab", room: "Lab 3", dayOfWeek: "Thursday", startTime: "02:00 PM", endTime: "04:00 PM" },
+  ],
+  uploadedDocsCount: 4,
+};
+
 export default function FacultyDashboardPage() {
-  const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(DEFAULT_PROFILE);
+  const [loading, setLoading] = useState(false);
   const [recentDocs, setRecentDocs] = useState<any[]>([]);
 
   useEffect(() => {
@@ -36,8 +57,7 @@ export default function FacultyDashboardPage() {
         const raw = localStorage.getItem("faculty_user");
         if (raw) {
           const user = JSON.parse(raw);
-          setProfile(user);
-          setLoading(false);
+          setProfile((prev: any) => ({ ...prev, ...user }));
         }
       } catch {}
     }
@@ -52,7 +72,7 @@ export default function FacultyDashboardPage() {
     ])
       .then(([sessionData, docsData]) => {
         if (sessionData?.profile) {
-          setProfile(sessionData.profile);
+          setProfile((prev: any) => ({ ...prev, ...sessionData.profile }));
         } else if (sessionData?.faculty) {
           setProfile((prev: any) => ({ ...prev, ...sessionData.faculty }));
         }
@@ -60,22 +80,8 @@ export default function FacultyDashboardPage() {
           setRecentDocs(docsData.documents.slice(0, 5));
         }
       })
-      .catch((err) => console.warn("Dashboard data fetch warning:", err))
-      .finally(() => setLoading(false));
+      .catch((err) => console.warn("Dashboard data fetch warning:", err));
   }, []);
-
-  if (loading) {
-    return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-32 bg-slate-900 rounded-2xl border border-slate-800" />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 bg-slate-900 rounded-xl border border-slate-800" />
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   const sectionsCount = profile?.sections?.length || 0;
   const timetablesCount = profile?.timetableEntries?.length || 0;

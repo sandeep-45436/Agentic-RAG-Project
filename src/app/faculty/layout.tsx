@@ -110,13 +110,13 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
             localStorage.setItem("faculty_user", JSON.stringify(data.faculty));
           } catch {}
         } else if (!storedUser) {
-          window.location.href = "/faculty/login";
+          router.replace("/faculty/login");
         }
       })
       .catch((err) => {
         console.warn("Faculty session check:", err);
         if (!storedUser && active) {
-          window.location.href = "/faculty/login";
+          router.replace("/faculty/login");
         }
       })
       .finally(() => {
@@ -126,7 +126,7 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
     return () => {
       active = false;
     };
-  }, [pathname, isLoginPage]);
+  }, [pathname, isLoginPage, router]);
 
   const handleLogout = async () => {
     try {

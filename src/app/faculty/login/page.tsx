@@ -71,14 +71,18 @@ export default function FacultyLoginPage() {
 
       const data = await res.json();
 
+      if (!res.ok || !data.success || !data.faculty) {
+        throw new Error(data.error || "Invalid faculty credentials.");
+      }
+
       if (typeof window !== "undefined" && data.faculty) {
         localStorage.setItem("faculty_user", JSON.stringify(data.faculty));
       }
 
       setSuccessMsg(`Welcome, ${data.faculty.title || "Professor"} ${data.faculty.name}!`);
       setTimeout(() => {
-        window.location.href = "/faculty/dashboard";
-      }, 350);
+        router.replace("/faculty/dashboard");
+      }, 200);
     } catch (err: any) {
       setError(err.message || "Failed to log in. Please check your credentials.");
     } finally {

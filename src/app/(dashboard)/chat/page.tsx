@@ -934,25 +934,15 @@ export default function ChatPage() {
               </SheetContent>
             </Sheet>
 
-            {/* Department Scope Selector */}
-            <div className="flex items-center gap-1.5 bg-indigo-950/60 border border-indigo-500/30 rounded-xl px-2.5 py-1.5 shadow-sm">
-              <Building className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-              <span className="text-[11px] text-gray-400 hidden sm:inline font-medium">Scope:</span>
-              <select
-                value={selectedDepartmentId || ""}
-                onChange={(e) => {
-                  setSelectedDepartmentId(e.target.value);
-                  setChunks([]);
-                  setDebugChunks([]);
-                }}
-                className="bg-transparent text-xs font-semibold text-indigo-200 border-none outline-none focus:ring-0 cursor-pointer pr-1"
-              >
-                {departments.map((dept) => (
-                  <option key={dept.id} value={dept.id} className="bg-[#141720] text-white">
-                    {dept.code} - {dept.name}
-                  </option>
-                ))}
-              </select>
+            {/* Clean Automatic Logged-in Department Scope Badge */}
+            <div className="hidden sm:flex items-center gap-2 bg-indigo-950/40 border border-indigo-500/20 rounded-xl px-3 py-1.5">
+              <GraduationCap className="w-4 h-4 text-indigo-400 shrink-0" />
+              <span className="text-xs font-bold text-white">
+                {selectedDepartment?.code || "CS"}
+              </span>
+              <span className="text-[11px] text-slate-400 truncate max-w-[160px]">
+                {selectedDepartment?.name || "Department Knowledge Scope"}
+              </span>
             </div>
 
             {/* Debug panel toggle — desktop */}
@@ -1002,40 +992,6 @@ export default function ChatPage() {
               <Share2 className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Share</span>
             </button>
-          </div>
-        </div>
-
-        {/* Knowledge Scope Banner */}
-        <div className="mx-3 sm:mx-6 mt-3 p-3 bg-[#131622] border border-indigo-500/20 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-2 shadow-md">
-          <div className="flex items-center gap-2.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" />
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-white tracking-wide">
-                  Active Knowledge Scope:
-                </span>
-                <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-xs font-mono font-semibold border border-indigo-500/30">
-                  {selectedDepartment?.code || "CSE"}
-                </span>
-                <span className="text-xs text-gray-300 hidden sm:inline font-medium">
-                  {selectedDepartment?.name || "Computer Science & Engineering"}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3 text-[11px]">
-            <span className="flex items-center gap-1 text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-              {selectedDepartment?.code || "CSE"} Department
-            </span>
-            <span className="flex items-center gap-1 text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-              University-wide
-            </span>
-            <span className="flex items-center gap-1 text-gray-400 font-normal bg-white/5 px-2 py-0.5 rounded border border-white/10">
-              <XCircle className="w-3 h-3 text-gray-500" />
-              Other Departments
-            </span>
           </div>
         </div>
 

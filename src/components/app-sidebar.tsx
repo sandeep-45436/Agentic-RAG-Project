@@ -54,8 +54,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [isFacultyOrAdmin, setIsFacultyOrAdmin] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    getCurrentUserRoleAction().then((res) => {
-      setIsFacultyOrAdmin(res.isFacultyOrAdmin);
+    getCurrentUserRoleAction().then((res: any) => {
+      setIsFacultyOrAdmin(Boolean(res?.isFacultyOrAdmin));
     });
   }, []);
 

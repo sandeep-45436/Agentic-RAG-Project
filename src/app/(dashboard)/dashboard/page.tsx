@@ -13,7 +13,7 @@ import {
   ArrowDownRight, Loader2, UploadCloud, Bot, Database,
   BarChart2, ChevronRight, RefreshCw, Sparkles, Building,
   GraduationCap, ShieldCheck, CheckCircle2, XCircle, BookOpen,
-  Calendar, Layers, ArrowRight,
+  Calendar, Layers, ArrowRight, Eye, Download,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -144,6 +144,27 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Document Viewer Modal State
+  const [viewerDocId, setViewerDocId] = useState<string | null>(null);
+  const [viewerDoc, setViewerDoc] = useState<any | null>(null);
+  const [loadingDoc, setLoadingDoc] = useState(false);
+
+  const openDocViewer = async (id: string) => {
+    setViewerDocId(id);
+    setLoadingDoc(true);
+    try {
+      const res = await fetch(`/api/documents/${id}`);
+      const data = await res.json();
+      if (data.document) {
+        setViewerDoc(data.document);
+      }
+    } catch (err) {
+      console.error("Failed to load document preview:", err);
+    } finally {
+      setLoadingDoc(false);
+    }
+  };
 
   useEffect(() => {
     const insforge = createClient();
@@ -361,12 +382,20 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    <Link
-                      href={`/chat`}
-                      className="shrink-0 text-[11px] text-indigo-400 hover:text-white bg-indigo-500/10 hover:bg-indigo-600 px-3 py-1.5 rounded-lg font-medium transition-all"
-                    >
-                      Ask AI
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openDocViewer(doc.id)}
+                        className="shrink-0 text-[11px] text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1 border border-white/10"
+                      >
+                        <Eye className="w-3 h-3 text-cyan-400" /> View
+                      </button>
+                      <Link
+                        href={`/chat`}
+                        className="shrink-0 text-[11px] text-indigo-400 hover:text-white bg-indigo-500/10 hover:bg-indigo-600 px-3 py-1.5 rounded-lg font-medium transition-all"
+                      >
+                        Ask AI
+                      </Link>
+                    </div>
                   </div>
                 ))
               )}
@@ -521,6 +550,106 @@ export default function DashboardPage() {
 
         </div>
       </div>
+
+      {/* Document Viewer Modal */}
+      {viewerDocId && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="p-2 bg-indigo-500/10 rounded-xl text-indigo-400">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold text-white truncate">
+                    {viewerDoc?.fileName || "Loading Document..."}
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    {viewerDoc?.department?.name || deptName} • {viewerDoc?.visibility || "DEPARTMENT"} Scope
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => { setViewerDocId(null); setViewerDoc(null); }}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            {loadingDoc ? (
+              <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-400 text-xs">
+                <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
+                <span>Loading document metadata and extracted chunks...</span>
+              </div>
+            ) : viewerDoc ? (
+              <div className="flex-1 overflow-y-auto space-y-4 text-xs pr-1">
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-2 bg-slate-950/70 p-3 rounded-xl border border-slate-800 font-mono text-[11px]">
+                  <div>
+                    <span className="text-slate-500 block text-[10px]">Total Size</span>
+                    <span className="font-bold text-white">{(viewerDoc.fileSize / 1024).toFixed(1)} KB</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block text-[10px]">RAG Chunks</span>
+                    <span className="font-bold text-cyan-400">{viewerDoc._count?.chunks || viewerDoc.chunks?.length || 0} Chunks</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block text-[10px]">Status</span>
+                    <span className="font-bold text-emerald-400">{viewerDoc.processingStatus}</span>
+                  </div>
+                </div>
+
+                {/* Chunks Preview */}
+                <div className="space-y-2">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                    Extracted Text Chunks ({viewerDoc.chunks?.length || 0} displayed)
+                  </span>
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {viewerDoc.chunks && viewerDoc.chunks.length > 0 ? (
+                      viewerDoc.chunks.map((c: any, i: number) => (
+                        <div key={i} className="p-3 rounded-xl bg-slate-950 border border-slate-800/80 space-y-1">
+                          <span className="text-[10px] font-mono text-indigo-400 block font-semibold">
+                            Chunk {c.chunkIndex + 1} {c.pageNumber ? `(Page ${c.pageNumber})` : ""} · {c.tokenCount} Tokens
+                          </span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed line-clamp-3">
+                            {c.content}
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-slate-500 italic py-2">No chunks indexed.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+                  <Link
+                    href={`/chat`}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-colors"
+                  >
+                    <Bot className="w-4 h-4" /> Ask Questions in Chat
+                  </Link>
+
+                  {viewerDoc.signedUrl && (
+                    <a
+                      href={viewerDoc.signedUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 text-xs font-semibold transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Download Full Document
+                    </a>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <p className="text-rose-400 text-center py-6">Failed to load document details.</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,9 +2,9 @@
 
 import { db } from "@/server/db/prisma";
 import { createClient, createAuthClient } from "@/utils/insforge/server";
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 
-export async function syncUserToDatabase() {
+export async function syncUserToDatabase(departmentCode?: string) {
   try {
     const insforge = await createClient();
     const { data, error } = await insforge.auth.getCurrentUser();
@@ -52,32 +52,51 @@ export async function syncUserToDatabase() {
         }).catch(() => {});
       }
 
-      // If user does not have a student profile, link them to the CSE department
-      const existingStudent = await db.student.findFirst({
+      // Resolve requested or default department
+      const targetDeptCode = departmentCode?.trim() || "CS";
+      let targetDept = await db.department.findFirst({
         where: {
-          OR: [{ userId: dbUser.id }, { id: dbUser.id }],
+          organizationId: seedOrg.id,
+          OR: [
+            { code: { equals: targetDeptCode, mode: "insensitive" } },
+            { code: targetDeptCode === "CS" ? "CSE" : targetDeptCode },
+          ],
+          deletedAt: null,
         },
       });
 
-      if (!existingStudent) {
-        const cseDept = await db.department.findFirst({
-          where: {
-            organizationId: seedOrg.id,
-            OR: [{ code: "CSE" }, { code: "CS" }],
-            deletedAt: null,
-          },
-        }) || await db.department.findFirst({
+      if (!targetDept) {
+        targetDept = await db.department.findFirst({
           where: { organizationId: seedOrg.id, deletedAt: null },
         });
+      }
 
-        if (cseDept) {
+      if (targetDept) {
+        const existingStudent = await db.student.findFirst({
+          where: {
+            OR: [{ userId: dbUser.id }, { id: dbUser.id }],
+          },
+        });
+
+        if (existingStudent) {
+          // If department changed or specified, update it
+          if (departmentCode && existingStudent.departmentId !== targetDept.id) {
+            await db.student.update({
+              where: { id: existingStudent.id },
+              data: {
+                departmentId: targetDept.id,
+                major: targetDept.name,
+              },
+            });
+          }
+        } else {
           await db.student.create({
             data: {
               userId: dbUser.id,
               organizationId: seedOrg.id,
-              departmentId: cseDept.id,
+              departmentId: targetDept.id,
               studentNumber: `STU-${Math.floor(1000 + Math.random() * 9000)}`,
-              major: cseDept.name,
+              major: targetDept.name,
               academicStatus: "Good Standing",
               gpa: 3.85,
             },
@@ -102,7 +121,7 @@ export async function syncUserToDatabase() {
   }
 }
 
-export async function loginAction(formData: { email: string; password: string }) {
+export async function loginAction(formData: { email: string; password: string; departmentCode?: string }) {
   try {
     const authClient = await createAuthClient();
     const { error } = await authClient.signInWithPassword({
@@ -112,7 +131,16 @@ export async function loginAction(formData: { email: string; password: string })
 
     if (error) return { success: false, error: error.message };
 
-    await syncUserToDatabase();
+    const cookieStore = await cookies();
+    if (formData.departmentCode) {
+      cookieStore.set("student_department", formData.departmentCode, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        sameSite: "lax",
+      });
+    }
+
+    await syncUserToDatabase(formData.departmentCode);
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to sign in" };
@@ -123,6 +151,7 @@ export async function signupAction(formData: {
   email: string;
   password: string;
   fullName: string;
+  departmentCode?: string;
 }) {
   try {
     const authClient = await createAuthClient();
@@ -134,6 +163,15 @@ export async function signupAction(formData: {
 
     if (error) return { success: false, error: error.message };
 
+    const cookieStore = await cookies();
+    if (formData.departmentCode) {
+      cookieStore.set("student_department", formData.departmentCode, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        sameSite: "lax",
+      });
+    }
+
     if (data?.requireEmailVerification) {
       return {
         success: true,
@@ -142,7 +180,7 @@ export async function signupAction(formData: {
       };
     }
 
-    await syncUserToDatabase();
+    await syncUserToDatabase(formData.departmentCode);
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to sign up" };
@@ -159,52 +197,43 @@ export async function verifyEmailAction(formData: { email: string; otp: string }
 
     if (error) return { success: false, error: error.message };
 
-    await syncUserToDatabase();
+    const cookieStore = await cookies();
+    const deptCookie = cookieStore.get("student_department")?.value;
+
+    await syncUserToDatabase(deptCookie);
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to verify email" };
   }
 }
 
-export async function resendVerificationAction(formData: { email: string }) {
+export async function logoutAction() {
   try {
     const insforge = await createClient();
-    const { error } = await (insforge.auth as any).resendVerificationEmail({
-      email: formData.email,
-    });
-    if (error) return { success: false, error: error.message };
-    return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err.message || "Failed to resend code" };
-  }
-}
-
-export async function signOutAction() {
-  try {
-    const authClient = await createAuthClient();
-    await authClient.signOut();
+    await insforge.auth.signOut();
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to sign out" };
   }
 }
 
+export const signOutAction = logoutAction;
+
 export async function getCurrentUserRoleAction() {
   try {
     const insforge = await createClient();
     const { data } = await insforge.auth.getCurrentUser();
-    if (!data?.user) return { role: "ADMIN", isFacultyOrAdmin: true };
+    if (!data?.user) return { role: "MEMBER", isFacultyOrAdmin: false };
 
-    const mem = await db.membership.findFirst({
+    const membership = await db.membership.findFirst({
       where: { userId: data.user.id },
-      orderBy: { createdAt: "desc" },
     });
 
-    const role = mem?.role || "ADMIN";
-    const isFacultyOrAdmin = true;
+    const role = membership?.role || "MEMBER";
+    const isFacultyOrAdmin = ["OWNER", "ADMIN", "FACULTY", "DEAN"].includes(role.toUpperCase());
 
     return { role, isFacultyOrAdmin };
-  } catch (err) {
-    return { role: "ADMIN", isFacultyOrAdmin: true };
+  } catch {
+    return { role: "MEMBER", isFacultyOrAdmin: false };
   }
 }

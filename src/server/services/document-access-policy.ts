@@ -360,6 +360,27 @@ export class DocumentAccessPolicy {
 
       // Default/fallback department resolver
       const getDefaultDept = async () => {
+        let cookieDeptCode: string | undefined;
+        try {
+          const { cookies } = await import("next/headers");
+          const cookieStore = await cookies();
+          cookieDeptCode = cookieStore.get("student_department")?.value;
+        } catch {}
+
+        if (cookieDeptCode) {
+          const matched = await db.department.findFirst({
+            where: {
+              organizationId,
+              deletedAt: null,
+              OR: [
+                { code: { equals: cookieDeptCode, mode: "insensitive" } },
+                { code: cookieDeptCode === "CS" ? "CSE" : cookieDeptCode },
+              ],
+            },
+          });
+          if (matched) return matched;
+        }
+
         return (
           (await db.department.findFirst({
             where: {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createClient } from "@/utils/insforge/server";
 import { db, ensureDbConnected } from "@/server/db/prisma";
 import { syncUserToDatabase } from "@/server/actions/auth";
@@ -211,12 +212,20 @@ export async function GET() {
     }
 
     // Default or Fallback Department
+    const cookieStore = await cookies();
+    const deptCookie = cookieStore.get("student_department")?.value;
+
     const allDepts = await db.department.findMany({
       where: { organizationId, deletedAt: null },
       orderBy: { code: "asc" },
     });
 
+    const cookieDept = deptCookie
+      ? allDepts.find((d) => d.code.toLowerCase() === deptCookie.toLowerCase() || (deptCookie.toUpperCase() === "CS" && d.code === "CSE"))
+      : null;
+
     const activeDepartment =
+      cookieDept ||
       studentRecord?.department ||
       facultyRecord?.department ||
       allDepts.find((d) => d.code === "CSE" || d.code === "CS") ||

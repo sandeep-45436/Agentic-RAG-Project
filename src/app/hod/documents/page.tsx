@@ -31,6 +31,25 @@ export default function HODDocumentsPage() {
   const [activeScope, setActiveScope] = useState<string>("ALL");
   const [search, setSearch] = useState("");
 
+  // Document View Modal State
+  const [selectedDoc, setSelectedDoc] = useState<any | null>(null);
+  const [loadingDocDetail, setLoadingDocDetail] = useState(false);
+
+  const handleViewDoc = async (docId: string) => {
+    try {
+      setLoadingDocDetail(true);
+      const res = await fetch(`/api/documents/${docId}`);
+      const data = await res.json();
+      if (data.document) {
+        setSelectedDoc(data.document);
+      }
+    } catch (err) {
+      console.error("Failed to load document detail:", err);
+    } finally {
+      setLoadingDocDetail(false);
+    }
+  };
+
   // Syllabus Comparison State
   const [comparing, setComparing] = useState(false);
   const [compareDiff, setCompareDiff] = useState<any | null>(null);
@@ -285,14 +304,94 @@ export default function HODDocumentsPage() {
 
             <CardFooter className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
               <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
-              <Badge variant="outline" className="text-[9px] bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
-                <CheckCircle2 className="h-2.5 w-2.5 mr-1" />
-                RAG Online
-              </Badge>
+              <button
+                onClick={() => handleViewDoc(doc.id)}
+                className="text-[11px] text-blue-400 hover:text-white flex items-center gap-1 font-semibold"
+              >
+                <Eye className="h-3 w-3" /> Inspect Document
+              </button>
             </CardFooter>
           </Card>
         ))}
       </div>
+
+      {/* Document Inspector Modal */}
+      {selectedDoc && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="p-2 bg-blue-500/10 rounded-xl text-blue-400">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold text-white truncate">{selectedDoc.fileName}</h3>
+                  <p className="text-[11px] text-slate-400">
+                    {selectedDoc.department?.name || activeDepartment} • {selectedDoc.visibility} Scope
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedDoc(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-4 text-xs pr-1">
+              <div className="grid grid-cols-3 gap-2 bg-slate-950/70 p-3 rounded-xl border border-slate-800 font-mono text-[11px]">
+                <div>
+                  <span className="text-slate-500 block text-[10px]">Total Size</span>
+                  <span className="font-bold text-white">{(selectedDoc.fileSize / 1024).toFixed(1)} KB</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px]">Indexed Chunks</span>
+                  <span className="font-bold text-blue-400">{selectedDoc._count?.chunks || selectedDoc.chunks?.length || 0} Chunks</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px]">Processing Status</span>
+                  <span className="font-bold text-emerald-400">{selectedDoc.processingStatus}</span>
+                </div>
+              </div>
+
+              {/* Chunks */}
+              <div className="space-y-2">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  Extracted Text Chunks Preview
+                </span>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {selectedDoc.chunks && selectedDoc.chunks.length > 0 ? (
+                    selectedDoc.chunks.map((c: any, i: number) => (
+                      <div key={i} className="p-3 rounded-xl bg-slate-950 border border-slate-800/80 space-y-1">
+                        <span className="text-[10px] font-mono text-indigo-400 block font-semibold">
+                          Chunk {c.chunkIndex + 1} {c.pageNumber ? `(Page ${c.pageNumber})` : ""} · {c.tokenCount} Tokens
+                        </span>
+                        <p className="text-[11px] text-slate-300 leading-relaxed line-clamp-3">{c.content}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-slate-500 italic py-2">No chunks indexed.</p>
+                  )}
+                </div>
+              </div>
+
+              {selectedDoc.signedUrl && (
+                <div className="pt-3 border-t border-slate-800 flex justify-end">
+                  <a
+                    href={selectedDoc.signedUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-colors"
+                  >
+                    Open Document File ↗
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

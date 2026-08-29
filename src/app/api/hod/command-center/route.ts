@@ -3,6 +3,19 @@ import { HODService } from "@/server/services/hod.service";
 
 export const dynamic = "force-dynamic";
 
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const departmentCode = searchParams.get("department") || "CS";
+
+    const summary = await HODService.getDepartmentCommandCenterSummary(departmentCode);
+    return NextResponse.json({ success: true, summary });
+  } catch (error: any) {
+    console.error("[API: /api/hod/command-center GET] Error:", error);
+    return NextResponse.json({ error: error.message || "Failed to load command center summary" }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -15,7 +28,7 @@ export async function POST(request: Request) {
     const report = await HODService.queryAICommandCenter(query, departmentCode);
     return NextResponse.json({ success: true, report });
   } catch (error: any) {
-    console.error("[API: /api/hod/command-center] Error:", error);
+    console.error("[API: /api/hod/command-center POST] Error:", error);
     return NextResponse.json({ error: error.message || "Failed to process query in HOD Command Center" }, { status: 500 });
   }
 }

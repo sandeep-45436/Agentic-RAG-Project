@@ -50,10 +50,16 @@ export const useHOD = () => useContext(HODContext);
 
 const navItems = [
   {
-    title: "Department Health & AI",
+    title: "Command Center",
     href: "/hod/dashboard",
     icon: LayoutDashboard,
-    badge: "AI Hub",
+    badge: "Live Pulse",
+  },
+  {
+    title: "Approval Center",
+    href: "/hod/approvals",
+    icon: ShieldCheck,
+    badge: "Action Queue",
   },
   {
     title: "Faculty & Workload",
@@ -62,7 +68,7 @@ const navItems = [
     badge: "Workload Engine",
   },
   {
-    title: "Student Risk & Advisory",
+    title: "Student Governance",
     href: "/hod/students",
     icon: GraduationCap,
     badge: "Risk Radar",
@@ -86,22 +92,28 @@ const navItems = [
     badge: "Invigilation",
   },
   {
+    title: "Facilities & Labs",
+    href: "/hod/facilities",
+    icon: Building,
+    badge: null,
+  },
+  {
+    title: "Research & Grants",
+    href: "/hod/research",
+    icon: FlaskConical,
+    badge: "Grants",
+  },
+  {
     title: "Department Documents",
     href: "/hod/documents",
     icon: FileText,
     badge: "Syllabus Diff",
   },
   {
-    title: "Research & Grants",
-    href: "/hod/research",
-    icon: FlaskConical,
-    badge: "$140k+",
-  },
-  {
-    title: "Facilities & Labs",
-    href: "/hod/facilities",
-    icon: Building,
-    badge: null,
+    title: "Governance Audit Trail",
+    href: "/hod/audit",
+    icon: Scale,
+    badge: "Audit Log",
   },
   {
     title: "Operations Reports",

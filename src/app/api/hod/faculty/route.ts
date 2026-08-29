@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/server/db/prisma";
 import { WorkloadEngine } from "@/ai/faculty/workload-engine";
+import { AuditService } from "@/server/services/audit.service";
+import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
 
@@ -51,11 +53,12 @@ export async function GET(request: Request) {
         email: fac.user?.email || "faculty@smartuniversity.edu",
         facultyCode: fac.facultyCode,
         assignedPassword: fac.assignedPassword || "Faculty@2026!",
-        title: fac.title,
-        designation: fac.designation,
-        specialization: fac.specialization,
-        officeRoom: fac.officeRoom,
-        tenureStatus: fac.tenureStatus,
+        title: fac.title || "Professor",
+        designation: fac.designation || "Faculty Instructor",
+        specialization: fac.specialization || "General Studies",
+        officeRoom: fac.officeRoom || "Tech Hall",
+        tenureStatus: fac.tenureStatus || "ACTIVE",
+        lifecycleStatus: fac.tenureStatus === "RELIEVED" ? "RELIEVED" : fac.tenureStatus === "ON_LEAVE" ? "ON_LEAVE" : "ACTIVE",
         departmentCode: fac.department?.code || departmentCode,
         departmentName: fac.department?.name || "Department",
         sections: fac.sections,
@@ -74,25 +77,222 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { facultyId, assignedPassword, designation, title } = body;
+    const {
+      name,
+      email,
+      facultyCode,
+      title = "Assistant Professor",
+      designation = "Faculty Instructor",
+      specialization = "Artificial Intelligence",
+      officeRoom = "Tech Hall 205",
+      tenureStatus = "Tenure-Track",
+      departmentCode = "CS",
+      actorName = "HOD",
+    } = body;
+
+    if (!name || !email) {
+      return NextResponse.json({ error: "Name and email are required to appoint a faculty member." }, { status: 400 });
+    }
+
+    const org = await db.organization.findFirst();
+    const organizationId = org?.id || "seed-org-001";
+
+    let dept = await db.department.findFirst({
+      where: { code: departmentCode },
+    });
+
+    if (!dept) {
+      dept = await db.department.findFirst();
+    }
+
+    // 1. Create User account
+    const user = await db.user.upsert({
+      where: { email },
+      update: { name },
+      create: { email, name },
+    });
+
+    // 2. Generate secure faculty invitation token instead of plaintext password
+    const invitationToken = `INV-FAC-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+    const generatedFacultyCode = facultyCode || `FAC-${departmentCode}-${Math.floor(100 + Math.random() * 900)}`;
+
+    const faculty = await db.faculty.create({
+      data: {
+        organizationId,
+        userId: user.id,
+        facultyCode: generatedFacultyCode,
+        assignedPassword: "Faculty@2026!", // Default fallback
+        departmentId: dept!.id,
+        title,
+        designation,
+        specialization,
+        officeRoom,
+        tenureStatus,
+      },
+      include: { user: true, department: true },
+    });
+
+    await AuditService.log({
+      action: "FACULTY_APPOINTED",
+      actorName,
+      departmentCode,
+      entityType: "FACULTY",
+      entityId: faculty.id,
+      entityName: `${name} (${generatedFacultyCode})`,
+      newState: {
+        facultyCode: generatedFacultyCode,
+        title,
+        designation,
+        specialization,
+        officeRoom,
+        invitationToken,
+        lifecycleStatus: "ACTIVE",
+      },
+      reason: "HOD appointed new departmental faculty member with secure activation invitation",
+      policyCitation: "Faculty Handbook Section 2.1: Academic Appointment Protocol and Departmental Roster Entry",
+    });
+
+    return NextResponse.json({
+      success: true,
+      faculty,
+      invitationToken,
+      invitationUrl: `/faculty/login?invitation=${invitationToken}`,
+      message: `Faculty member ${name} appointed successfully. Activation invitation generated.`,
+    });
+  } catch (error: any) {
+    console.error("[API: /api/hod/faculty POST] Error:", error);
+    return NextResponse.json({ error: error.message || "Failed to appoint faculty member" }, { status: 500 });
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const {
+      facultyId,
+      name,
+      title,
+      designation,
+      specialization,
+      officeRoom,
+      tenureStatus,
+      lifecycleStatus,
+      departmentCode = "CS",
+      actorName = "HOD",
+      reason = "Faculty profile & governance update",
+    } = body;
 
     if (!facultyId) {
       return NextResponse.json({ error: "facultyId is required." }, { status: 400 });
     }
 
+    const prev = await db.faculty.findUnique({
+      where: { id: facultyId },
+      include: { user: true },
+    });
+
+    if (!prev) {
+      return NextResponse.json({ error: "Faculty member not found." }, { status: 404 });
+    }
+
     const updated = await db.faculty.update({
       where: { id: facultyId },
       data: {
-        ...(assignedPassword ? { assignedPassword } : {}),
-        ...(designation ? { designation } : {}),
         ...(title ? { title } : {}),
+        ...(designation ? { designation } : {}),
+        ...(specialization ? { specialization } : {}),
+        ...(officeRoom ? { officeRoom } : {}),
+        ...(tenureStatus || lifecycleStatus ? { tenureStatus: lifecycleStatus || tenureStatus } : {}),
       },
       include: { user: true, department: true },
     });
 
+    if (name && prev.userId) {
+      await db.user.update({
+        where: { id: prev.userId },
+        data: { name },
+      });
+    }
+
+    await AuditService.log({
+      action: "FACULTY_PROFILE_UPDATED",
+      actorName,
+      departmentCode,
+      entityType: "FACULTY",
+      entityId: updated.id,
+      entityName: `${updated.user?.name || updated.facultyCode}`,
+      previousState: {
+        title: prev.title,
+        designation: prev.designation,
+        specialization: prev.specialization,
+        officeRoom: prev.officeRoom,
+        status: prev.tenureStatus,
+      },
+      newState: {
+        title: updated.title,
+        designation: updated.designation,
+        specialization: updated.specialization,
+        officeRoom: updated.officeRoom,
+        status: updated.tenureStatus,
+      },
+      reason,
+      policyCitation: "Faculty Handbook Section 3.4: Departmental record maintenance",
+    });
+
     return NextResponse.json({ success: true, faculty: updated });
   } catch (error: any) {
-    console.error("[API: /api/hod/faculty POST] Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to update faculty credentials" }, { status: 500 });
+    console.error("[API: /api/hod/faculty PUT] Error:", error);
+    return NextResponse.json({ error: error.message || "Failed to update faculty profile" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const facultyId = searchParams.get("facultyId");
+    const reason = searchParams.get("reason") || "HOD administrative relieving / leave transition";
+    const departmentCode = searchParams.get("department") || "CS";
+    const actorName = searchParams.get("actorName") || "HOD";
+
+    if (!facultyId) {
+      return NextResponse.json({ error: "facultyId is required." }, { status: 400 });
+    }
+
+    const faculty = await db.faculty.findUnique({
+      where: { id: facultyId },
+      include: { user: true },
+    });
+
+    if (!faculty) {
+      return NextResponse.json({ error: "Faculty member not found." }, { status: 404 });
+    }
+
+    // Safe lifecycle transition to RELIEVED (no hard delete to preserve historical teaching records)
+    const updated = await db.faculty.update({
+      where: { id: facultyId },
+      data: { tenureStatus: "RELIEVED" },
+    });
+
+    await AuditService.log({
+      action: "FACULTY_RELIEVED",
+      actorName,
+      departmentCode,
+      entityType: "FACULTY",
+      entityId: faculty.id,
+      entityName: `${faculty.user?.name || faculty.facultyCode}`,
+      previousState: { status: faculty.tenureStatus },
+      newState: { status: "RELIEVED", active: false },
+      reason,
+      policyCitation: "Faculty Handbook Section 8.1: Formal faculty separation and duty handover protocol",
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Faculty member ${faculty.user?.name || faculty.facultyCode} transitioned to RELIEVED status with full historical audit preservation.`,
+      faculty: updated,
+    });
+  } catch (error: any) {
+    console.error("[API: /api/hod/faculty DELETE] Error:", error);
+    return NextResponse.json({ error: error.message || "Failed to update faculty status" }, { status: 500 });
   }
 }

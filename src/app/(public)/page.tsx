@@ -37,6 +37,14 @@ import {
   Eye,
   Sliders,
   ChevronRight,
+  Play,
+  RotateCcw,
+  Scissors,
+  CheckCheck,
+  BarChart3,
+  Filter,
+  Users,
+  AlertTriangle,
 } from "lucide-react";
 
 // Preset interactive simulations for the live demo playground
@@ -50,6 +58,13 @@ const DEMO_PRESETS = [
     latency: "34ms",
     confidence: "98.4%",
     source: "CS401_Algorithms_Syllabus_Exam_Schedule.pdf",
+    reasoningSteps: [
+      "Tokenizing user query into 14 semantic tokens",
+      "Validating RBAC: Course Catalog CS401 (Public Tenant: CS Dept)",
+      "Executing Qdrant Cosine Similarity (Score: 0.984) + BM25 Lexical Matching",
+      "Cross-encoder reranking over 8 chunk candidates",
+      "Deterministic synthesis with exact textbook and ordinance citations",
+    ],
     answer:
       "For **CS401: Advanced Algorithms & Data Structures**:\n\n• **Credits**: 4.0 Credits\n• **Prerequisites**: CS201 (Basic Data Structures) and MATH301 (Linear Algebra)\n• **Key Syllabus Topics**: Dynamic Programming, Amortized Analysis, Graph Algorithms (Dijkstra, Bellman-Ford, Tarjan's SCC), Network Flows, and NP-Completeness.",
     hasDownload: false,
@@ -63,6 +78,13 @@ const DEMO_PRESETS = [
     latency: "42ms",
     confidence: "100%",
     source: "CNIP PPT.pdf (v1)",
+    reasoningSteps: [
+      "Parsing goal: Headless PDF Slice Request for pages [6, 7, 8, 9]",
+      "Locating binary artifact in secure storage (Key: docs/cnip_v1.pdf)",
+      "Spawning headless binary stream worker to isolate byte range 0x4F00-0x9A20",
+      "Compiling 4-page extracted document slice (Size: 1.4 MB)",
+      "Generating time-bounded cryptographically signed download URI",
+    ],
     answer:
       "Here is your requested 4-page slice extracted directly from the professor's presentation slide deck:",
     hasDownload: true,
@@ -82,6 +104,13 @@ const DEMO_PRESETS = [
     latency: "28ms",
     confidence: "99.1%",
     source: "Smart_University_Academic_Regulations_2026.pdf",
+    reasoningSteps: [
+      "Matching query to University Governance Ordinance 12.3",
+      "Retrieving verified attendance rules across all departmental bylaws",
+      "Evaluating threshold logic: 75% standard, 65-74% condonation window",
+      "Cross-referencing HOD formal medical condonation workflow",
+      "Generating policy-grounded verdict with zero hallucination guarantee",
+    ],
     answer:
       "According to the **Smart University Academic Regulations 2026**:\n\n• **Minimum Attendance**: 75% across all registered lecture and laboratory courses.\n• **Medical Condonation**: Attendance between 65% and 74% can be condoned by HOD with verified medical documentation.\n• **Debarment**: Attendance below 65% results in automatic course debarment (Grade 'F-ATT').",
     hasDownload: false,
@@ -95,6 +124,13 @@ const DEMO_PRESETS = [
     latency: "31ms",
     confidence: "97.8%",
     source: "Faculty_Research_and_Workload_Policy.pdf",
+    reasoningSteps: [
+      "Querying Faculty Handbook Section 4.1 & Workload Engine",
+      "Verifying maximum contact hours constraint: 15 hrs/week ceiling",
+      "Checking automated proposal generation for overloaded instructors",
+      "Retrieving HOD Approval Center 1-click execution governance",
+      "Formulating verified operational answer",
+    ],
     answer:
       "Based on the **Faculty Operations & Workload Policy**:\n\n• **Max Teaching Cap**: 15 contact hours/week per instructor.\n• **Workload Engine**: Automatically flags overloads and submits Section Redistribution Proposals.\n• **HOD Authority**: HOD can balance section assignments via the Approval Center with 1-click execution.",
     hasDownload: false,
@@ -130,12 +166,43 @@ export default function HomePage() {
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
   const [activePipelineStep, setActivePipelineStep] = React.useState(2);
 
-  // Typing simulator effect
-  React.useEffect(() => {
-    setIsTyping(true);
+  // Multi-stage Reasoning Animation State
+  const [isReasoning, setIsReasoning] = React.useState(false);
+  const [reasoningStepIndex, setReasoningStepIndex] = React.useState(0);
+
+  // Interactive PDF Slicer Simulator State
+  const [sliceStartPage, setSliceStartPage] = React.useState(6);
+  const [sliceEndPage, setSliceEndPage] = React.useState(9);
+  const [isSlicingLaser, setIsSlicingLaser] = React.useState(false);
+  const [sliceGenerated, setSliceGenerated] = React.useState(false);
+
+  // Custom User Playground Query
+  const [customQuery, setCustomQuery] = React.useState("");
+
+  // Trigger reasoning & typing sequence
+  const runInferenceSimulation = (preset = selectedDemo) => {
+    setIsReasoning(true);
+    setReasoningStepIndex(0);
+    setIsTyping(false);
     setTypedText("");
+
+    // Cycle through reasoning steps
+    let step = 0;
+    const reasoningInterval = setInterval(() => {
+      step++;
+      if (step < preset.reasoningSteps.length) {
+        setReasoningStepIndex(step);
+      } else {
+        clearInterval(reasoningInterval);
+        setIsReasoning(false);
+        startTyping(preset.answer);
+      }
+    }, 400);
+  };
+
+  const startTyping = (fullText: string) => {
+    setIsTyping(true);
     let idx = 0;
-    const fullText = selectedDemo.answer;
     const timer = setInterval(() => {
       if (idx < fullText.length) {
         setTypedText(fullText.slice(0, idx + 4));
@@ -146,14 +213,17 @@ export default function HomePage() {
         clearInterval(timer);
       }
     }, 15);
-    return () => clearInterval(timer);
+  };
+
+  React.useEffect(() => {
+    runInferenceSimulation(selectedDemo);
   }, [selectedDemo]);
 
   // Automated pipeline step cycle animation
   React.useEffect(() => {
     const interval = setInterval(() => {
       setActivePipelineStep((prev) => (prev % 4) + 1);
-    }, 3000);
+    }, 3200);
     return () => clearInterval(interval);
   }, []);
 
@@ -163,21 +233,30 @@ export default function HomePage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleTriggerLaserSlice = () => {
+    setIsSlicingLaser(true);
+    setSliceGenerated(false);
+    setTimeout(() => {
+      setIsSlicingLaser(false);
+      setSliceGenerated(true);
+    }, 1200);
+  };
+
   return (
-    <div className="min-h-screen bg-[#06080e] text-slate-100 font-sans selection:bg-indigo-500/30 selection:text-indigo-200 relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#05070d] text-slate-100 font-sans selection:bg-indigo-500/30 selection:text-indigo-200 relative overflow-x-hidden">
       {/* ─────────────────────────────────────────────────────────────────── */}
       {/* BACKGROUND COSMIC AURORA & GLOWING LIGHTS                           */}
       {/* ─────────────────────────────────────────────────────────────────── */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1300px] h-[600px] bg-gradient-to-tr from-indigo-600/20 via-cyan-500/15 to-purple-600/15 blur-[140px] pointer-events-none -z-10 rounded-full animate-glow-pulse" />
-      <div className="absolute top-[35%] right-[-10%] w-[700px] h-[700px] bg-emerald-500/8 blur-[160px] pointer-events-none -z-10 rounded-full animate-float-delayed" />
-      <div className="absolute top-[65%] left-[-10%] w-[700px] h-[700px] bg-indigo-600/10 blur-[170px] pointer-events-none -z-10 rounded-full animate-float" />
-      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-cyan-500/8 blur-[150px] pointer-events-none -z-10 rounded-full" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1400px] h-[650px] bg-gradient-to-tr from-indigo-600/20 via-cyan-500/15 to-purple-600/20 blur-[150px] pointer-events-none -z-10 rounded-full animate-glow-pulse" />
+      <div className="absolute top-[30%] right-[-10%] w-[750px] h-[750px] bg-emerald-500/10 blur-[170px] pointer-events-none -z-10 rounded-full animate-float-delayed" />
+      <div className="absolute top-[60%] left-[-10%] w-[750px] h-[750px] bg-indigo-600/12 blur-[180px] pointer-events-none -z-10 rounded-full animate-float" />
+      <div className="absolute bottom-0 right-1/4 w-[650px] h-[650px] bg-cyan-500/10 blur-[160px] pointer-events-none -z-10 rounded-full" />
 
       {/* Cyber Grid Pattern Overlay */}
       <div
         className="absolute inset-0 opacity-[0.035] pointer-events-none -z-10"
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.15) 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)`,
           backgroundSize: "48px 48px",
         }}
       />
@@ -185,11 +264,12 @@ export default function HomePage() {
       {/* ─────────────────────────────────────────────────────────────────── */}
       {/* 1. STICKY LUMINOUS NAVIGATION HEADER                                */}
       {/* ─────────────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 backdrop-blur-2xl bg-[#06080e]/85 border-b border-white/[0.08] transition-all duration-300">
+      <header className="sticky top-0 z-50 backdrop-blur-2xl bg-[#05070d]/85 border-b border-white/[0.08] transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-cyan-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 group-hover:scale-105 group-hover:shadow-indigo-500/50 transition-all duration-300">
-              <Sparkles className="w-5 h-5 animate-spin-slow" />
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-cyan-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 group-hover:scale-105 group-hover:shadow-indigo-500/50 transition-all duration-300 relative">
+              <Sparkles className="w-5 h-5 animate-pulse" />
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#05070d] animate-ping" />
             </div>
             <div>
               <span className="text-base sm:text-lg font-black tracking-tight text-white flex items-center gap-2">
@@ -208,11 +288,14 @@ export default function HomePage() {
             <a href="#portals" className="hover:text-white transition-colors flex items-center gap-1">
               <span>Campus Portals</span>
             </a>
-            <a href="#pipeline" className="hover:text-white transition-colors flex items-center gap-1">
-              <span>Cognitive Pipeline</span>
-            </a>
             <a href="#playground" className="hover:text-white transition-colors flex items-center gap-1">
-              <span>Live Simulator</span>
+              <span>Live Playground</span>
+            </a>
+            <a href="#slicer" className="hover:text-white transition-colors flex items-center gap-1">
+              <span>PDF Slicer</span>
+            </a>
+            <a href="#pipeline" className="hover:text-white transition-colors flex items-center gap-1">
+              <span>Neural Pipeline</span>
             </a>
             <a href="#features" className="hover:text-white transition-colors flex items-center gap-1">
               <span>Features</span>
@@ -264,11 +347,14 @@ export default function HomePage() {
               <a href="#portals" onClick={() => setMobileNavOpen(false)} className="text-slate-300 hover:text-white">
                 Campus Portals
               </a>
-              <a href="#pipeline" onClick={() => setMobileNavOpen(false)} className="text-slate-300 hover:text-white">
-                Cognitive Pipeline
-              </a>
               <a href="#playground" onClick={() => setMobileNavOpen(false)} className="text-slate-300 hover:text-white">
-                Live Simulator
+                Live Playground
+              </a>
+              <a href="#slicer" onClick={() => setMobileNavOpen(false)} className="text-slate-300 hover:text-white">
+                PDF Slicer
+              </a>
+              <a href="#pipeline" onClick={() => setMobileNavOpen(false)} className="text-slate-300 hover:text-white">
+                Neural Pipeline
               </a>
               <a href="#features" onClick={() => setMobileNavOpen(false)} className="text-slate-300 hover:text-white">
                 Features
@@ -314,13 +400,13 @@ export default function HomePage() {
         {/* ─────────────────────────────────────────────────────────────────── */}
         <section className="w-full text-center flex flex-col items-center space-y-8 max-w-5xl pt-4 pb-14 relative">
           {/* Floating Capability Badge Left */}
-          <div className="hidden lg:flex items-center gap-2 absolute top-12 left-0 p-2.5 rounded-2xl bg-slate-900/80 border border-cyan-500/30 backdrop-blur-xl shadow-xl animate-float text-xs text-cyan-300 font-mono">
+          <div className="hidden lg:flex items-center gap-2 absolute top-12 left-0 p-3 rounded-2xl bg-slate-900/90 border border-cyan-500/40 backdrop-blur-xl shadow-2xl animate-float text-xs text-cyan-300 font-mono">
             <Zap className="w-4 h-4 text-cyan-400" />
             <span>⚡ Sub-35ms Hybrid Vector Search</span>
           </div>
 
           {/* Floating Capability Badge Right */}
-          <div className="hidden lg:flex items-center gap-2 absolute top-12 right-0 p-2.5 rounded-2xl bg-slate-900/80 border border-emerald-500/30 backdrop-blur-xl shadow-xl animate-float-delayed text-xs text-emerald-300 font-mono">
+          <div className="hidden lg:flex items-center gap-2 absolute top-12 right-0 p-3 rounded-2xl bg-slate-900/90 border border-emerald-500/40 backdrop-blur-xl shadow-2xl animate-float-delayed text-xs text-emerald-300 font-mono">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
             <span>🛡️ 100% Policy Grounded (Zero Hallucination)</span>
           </div>
@@ -335,7 +421,7 @@ export default function HomePage() {
           {/* Hero Main Headline */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.12]">
             Autonomous Campus Intelligence. <br />
-            <span className="bg-gradient-to-r from-indigo-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-indigo-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent animate-gradientShift">
               Zero Hallucinations. Instant Decisions.
             </span>
           </h1>
@@ -349,7 +435,7 @@ export default function HomePage() {
             {/* Student Card */}
             <Link
               href="/chat"
-              className="group p-5 rounded-2xl bg-gradient-to-b from-indigo-950/40 to-slate-900/60 border border-indigo-500/30 hover:border-indigo-500/60 hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-300 flex flex-col justify-between text-left hover:-translate-y-1"
+              className="group p-5 rounded-2xl bg-gradient-to-b from-indigo-950/40 to-slate-900/60 border border-indigo-500/30 hover:border-indigo-500/60 hover:shadow-2xl hover:shadow-indigo-500/25 transition-all duration-300 flex flex-col justify-between text-left hover:-translate-y-1.5"
             >
               <div className="space-y-2">
                 <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -371,7 +457,7 @@ export default function HomePage() {
             {/* Faculty Card */}
             <Link
               href="/faculty/login"
-              className="group p-5 rounded-2xl bg-gradient-to-b from-purple-950/40 to-slate-900/60 border border-purple-500/30 hover:border-purple-500/60 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 flex flex-col justify-between text-left hover:-translate-y-1"
+              className="group p-5 rounded-2xl bg-gradient-to-b from-purple-950/40 to-slate-900/60 border border-purple-500/30 hover:border-purple-500/60 hover:shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 flex flex-col justify-between text-left hover:-translate-y-1.5"
             >
               <div className="space-y-2">
                 <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -393,7 +479,7 @@ export default function HomePage() {
             {/* HOD Card */}
             <Link
               href="/hod/login"
-              className="group p-5 rounded-2xl bg-gradient-to-b from-blue-950/40 to-slate-900/60 border border-blue-500/30 hover:border-blue-500/60 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 flex flex-col justify-between text-left hover:-translate-y-1"
+              className="group p-5 rounded-2xl bg-gradient-to-b from-blue-950/40 to-slate-900/60 border border-blue-500/30 hover:border-blue-500/60 hover:shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 flex flex-col justify-between text-left hover:-translate-y-1.5"
             >
               <div className="space-y-2">
                 <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -435,7 +521,309 @@ export default function HomePage() {
         </section>
 
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* 3. ANIMATED COGNITIVE DATAFLOW PIPELINE                            */}
+        {/* 3. INTERACTIVE LIVE PLAYGROUND WITH AGENT REASONING STREAM          */}
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        <section id="playground" className="w-full py-16 scroll-mt-24 border-t border-white/[0.06]">
+          <div className="text-center mb-10 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-500/10 text-indigo-400 text-xs font-semibold mb-2">
+              <Terminal className="w-3.5 h-3.5" />
+              Live Cognitive Playground & Reasoning Engine
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Test Real University Queries in Real-Time
+            </h2>
+            <p className="text-slate-400 text-xs sm:text-sm mt-2">
+              Click any question below or type your own to watch our multi-stage agent reasoning, vector scoring, and sub-second execution.
+            </p>
+          </div>
+
+          {/* Interactive Preset Buttons */}
+          <div className="flex flex-wrap justify-center gap-2.5 mb-8">
+            {DEMO_PRESETS.map((preset) => {
+              const isSelected = selectedDemo.id === preset.id;
+              return (
+                <button
+                  key={preset.id}
+                  onClick={() => {
+                    setSelectedDemo(preset);
+                    runInferenceSimulation(preset);
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 border ${
+                    isSelected
+                      ? "bg-indigo-600 text-white border-indigo-400 shadow-xl shadow-indigo-600/30 scale-105"
+                      : "bg-slate-900/80 text-slate-300 border-slate-800 hover:bg-slate-800 hover:border-slate-700"
+                  }`}
+                >
+                  <span>{preset.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Simulated Chat Interface Card */}
+          <div className="w-full max-w-4xl mx-auto rounded-3xl bg-[#080b13] border border-slate-800 shadow-2xl overflow-hidden relative backdrop-blur-2xl">
+            {/* Top Terminal Bar */}
+            <div className="px-5 py-3.5 bg-[#0e1320] border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-rose-500/80" />
+                <span className="w-3 h-3 rounded-full bg-amber-500/80" />
+                <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                <span className="ml-3 text-xs font-mono text-slate-400 flex items-center gap-2">
+                  <span>Routing Agent:</span>
+                  <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold text-[11px]">
+                    {selectedDemo.routedNode}
+                  </span>
+                </span>
+              </div>
+              <div className="flex items-center gap-4 text-xs font-mono text-slate-400">
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-cyan-400" /> {selectedDemo.latency}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> {selectedDemo.confidence} Grounded
+                </span>
+                <button
+                  onClick={() => runInferenceSimulation(selectedDemo)}
+                  className="flex items-center gap-1 text-[11px] text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2 py-1 rounded-lg transition-colors"
+                >
+                  <RotateCcw className="w-3 h-3" /> Re-run
+                </button>
+              </div>
+            </div>
+
+            {/* Simulated Chat Dialogue */}
+            <div className="p-6 sm:p-8 space-y-6">
+              {/* User Prompt */}
+              <div className="flex items-start gap-3 sm:gap-4">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0">
+                  You
+                </div>
+                <div className="flex-1 bg-slate-900/90 border border-slate-800 rounded-2xl rounded-tl-none p-4 text-xs sm:text-sm text-slate-200 font-medium">
+                  <p>{selectedDemo.query}</p>
+                </div>
+              </div>
+
+              {/* Dynamic Agent Multi-Stage Reasoning Visualizer */}
+              {isReasoning && (
+                <div className="p-4 rounded-2xl bg-indigo-950/30 border border-indigo-500/30 space-y-3 animate-pulse">
+                  <div className="flex items-center justify-between text-xs font-mono text-indigo-300">
+                    <span className="flex items-center gap-2">
+                      <Cpu className="w-4 h-4 animate-spin text-indigo-400" />
+                      Multi-Agent Neural Reasoning in Progress...
+                    </span>
+                    <span className="text-[10px] bg-indigo-500/20 px-2 py-0.5 rounded text-indigo-300">
+                      Step {reasoningStepIndex + 1} / {selectedDemo.reasoningSteps.length}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 font-mono text-[11px]">
+                    {selectedDemo.reasoningSteps.map((step, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex items-center gap-2 transition-opacity ${
+                          idx <= reasoningStepIndex ? "text-slate-200 opacity-100" : "text-slate-600 opacity-40"
+                        }`}
+                      >
+                        {idx < reasoningStepIndex ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        ) : idx === reasoningStepIndex ? (
+                          <span className="w-3.5 h-3.5 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin" />
+                        ) : (
+                          <span className="w-3.5 h-3.5 rounded-full bg-slate-800" />
+                        )}
+                        <span>{step}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* AI Grounded Response */}
+              {!isReasoning && (
+                <div className="flex items-start gap-3 sm:gap-4 animate-slide-up-fade">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-500/20">
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 bg-[#101524] border border-indigo-500/20 rounded-2xl rounded-tl-none p-5 text-xs sm:text-sm text-slate-200 space-y-4 shadow-xl">
+                    <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                      <span className="text-[11px] font-mono text-indigo-400 flex items-center gap-1.5 truncate">
+                        <BookOpen className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">Source: {selectedDemo.source}</span>
+                      </span>
+                      <button
+                        onClick={handleCopy}
+                        className="text-xs text-slate-400 hover:text-white flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] transition-colors shrink-0 ml-2"
+                      >
+                        <Copy className="w-3 h-3" />
+                        {copied ? "Copied!" : "Copy"}
+                      </button>
+                    </div>
+
+                    <div className="text-slate-300 leading-relaxed whitespace-pre-line text-xs sm:text-sm">
+                      {typedText}
+                      {isTyping && <span className="inline-block w-2 h-4 ml-1 bg-indigo-400 animate-pulse" />}
+                    </div>
+
+                    {/* Render Download Card for Page Slice Presets */}
+                    {selectedDemo.hasDownload && selectedDemo.downloadCard && (
+                      <div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-indigo-950/80 to-slate-900 border border-indigo-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 rounded-xl bg-indigo-500/20 text-indigo-300 shrink-0">
+                            <FileText className="w-5 h-5" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-white truncate">
+                              {selectedDemo.downloadCard.fileName}
+                            </p>
+                            <p className="text-[11px] text-slate-400 font-mono">
+                              Pages {selectedDemo.downloadCard.pages} · {selectedDemo.downloadCard.size} · ID: {selectedDemo.downloadCard.artifactId}
+                            </p>
+                          </div>
+                        </div>
+                        <Link
+                          href="/chat"
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors shadow-md shadow-indigo-600/30 shrink-0"
+                        >
+                          <Download className="w-3.5 h-3.5" /> Download Slice
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Interaction Bar */}
+            <div className="px-6 py-4 bg-[#0b0f1a] border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+              <span className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                PostgreSQL & Qdrant Vector Store Grounded
+              </span>
+              <Link
+                href="/chat"
+                className="text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1"
+              >
+                Open Full Student Chat Interface <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        {/* 4. INTERACTIVE ON-DEMAND PDF SLICER SIMULATOR                       */}
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        <section id="slicer" className="w-full py-16 scroll-mt-24 border-t border-white/[0.06]">
+          <div className="max-w-4xl mx-auto rounded-3xl bg-gradient-to-br from-indigo-950/40 via-slate-900/70 to-slate-950 border border-cyan-500/30 p-8 sm:p-10 shadow-2xl relative overflow-hidden backdrop-blur-2xl">
+            <div className="text-center mb-8 space-y-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-cyan-500/10 text-cyan-400 text-xs font-semibold">
+                <Scissors className="w-3.5 h-3.5" />
+                Interactive PDF Slice Engine
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-bold text-white">
+                Experience Headless Sub-Second PDF Slicing
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto">
+                Select your start and end pages from the 48-page lecture deck and trigger a real-time binary byte slice extraction.
+              </p>
+            </div>
+
+            {/* Interactive Slicer Controls */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-950/80 p-6 rounded-2xl border border-slate-800 mb-6">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                  <span>Start Page:</span>
+                  <span className="text-cyan-400 font-mono font-bold text-sm">Page {sliceStartPage}</span>
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="48"
+                  value={sliceStartPage}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setSliceStartPage(val);
+                    if (val > sliceEndPage) setSliceEndPage(val);
+                  }}
+                  className="w-full accent-cyan-400 cursor-pointer"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                  <span>End Page:</span>
+                  <span className="text-cyan-400 font-mono font-bold text-sm">Page {sliceEndPage}</span>
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="48"
+                  value={sliceEndPage}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setSliceEndPage(val);
+                    if (val < sliceStartPage) setSliceStartPage(val);
+                  }}
+                  className="w-full accent-cyan-400 cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* Simulated Document Pages Grid with Cutting Laser Beam */}
+            <div className="relative p-6 rounded-2xl bg-slate-900 border border-slate-800 mb-6 overflow-hidden">
+              {isSlicingLaser && (
+                <div className="absolute inset-0 z-20 pointer-events-none flex flex-col justify-center">
+                  <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] animate-pulse" />
+                  <span className="text-[10px] font-mono text-cyan-300 text-center mt-2 bg-black/60 py-0.5">
+                    ⚡ Headless PDF Slicer: Isolating byte range 0x{sliceStartPage * 1024}-0x{sliceEndPage * 1024}...
+                  </span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-center gap-3 flex-wrap">
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((pg) => {
+                  const isIncluded = pg >= sliceStartPage && pg <= sliceEndPage;
+                  return (
+                    <div
+                      key={pg}
+                      className={`w-14 h-18 rounded-lg p-2 flex flex-col justify-between text-center transition-all duration-300 border ${
+                        isIncluded
+                          ? "bg-cyan-950/60 border-cyan-400 shadow-lg shadow-cyan-500/30 scale-105"
+                          : "bg-slate-950 border-slate-800 opacity-40"
+                      }`}
+                    >
+                      <div className="w-full h-1 bg-slate-700 rounded" />
+                      <span className="text-[10px] font-mono font-bold text-white">p.{pg}</span>
+                      <div className="w-full h-1 bg-slate-700 rounded" />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Trigger Button & Download Result */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <button
+                onClick={handleTriggerLaserSlice}
+                disabled={isSlicingLaser}
+                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white text-xs font-bold shadow-xl shadow-cyan-600/30 flex items-center justify-center gap-2 transition-all hover:scale-105"
+              >
+                <Scissors className="w-4 h-4" />
+                {isSlicingLaser ? "Executing Laser Slicing..." : "Execute Headless Slice"}
+              </button>
+
+              {sliceGenerated && (
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-xs animate-slide-up-fade">
+                  <CheckCheck className="w-4 h-4 text-emerald-400" />
+                  <span>
+                    Successfully sliced {sliceEndPage - sliceStartPage + 1} pages (Pages {sliceStartPage}–{sliceEndPage}) in 38ms!
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* ─────────────────────────────────────────────────────────────────── */}
+        {/* 5. ANIMATED COGNITIVE DATAFLOW PIPELINE                            */}
         {/* ─────────────────────────────────────────────────────────────────── */}
         <section id="pipeline" className="w-full py-16 scroll-mt-24 border-t border-white/[0.06]">
           <div className="text-center mb-12 max-w-2xl mx-auto">
@@ -536,149 +924,7 @@ export default function HomePage() {
         </section>
 
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* 4. INTERACTIVE LIVE PLAYGROUND SIMULATOR                           */}
-        {/* ─────────────────────────────────────────────────────────────────── */}
-        <section id="playground" className="w-full py-16 scroll-mt-24 border-t border-white/[0.06]">
-          <div className="text-center mb-10 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-500/10 text-indigo-400 text-xs font-semibold mb-2">
-              <Terminal className="w-3.5 h-3.5" />
-              Live Interactive Playground
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Test Real University Queries in Real-Time
-            </h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-2">
-              Click any sample question below to witness our router, Qdrant vector retrieval, and PDF slice extraction in action.
-            </p>
-          </div>
-
-          {/* Interactive Preset Buttons */}
-          <div className="flex flex-wrap justify-center gap-2.5 mb-8">
-            {DEMO_PRESETS.map((preset) => {
-              const isSelected = selectedDemo.id === preset.id;
-              return (
-                <button
-                  key={preset.id}
-                  onClick={() => setSelectedDemo(preset)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 border ${
-                    isSelected
-                      ? "bg-indigo-600 text-white border-indigo-400 shadow-xl shadow-indigo-600/30 scale-105"
-                      : "bg-slate-900/80 text-slate-300 border-slate-800 hover:bg-slate-800 hover:border-slate-700"
-                  }`}
-                >
-                  <span>{preset.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Simulated Chat Interface Card */}
-          <div className="w-full max-w-4xl mx-auto rounded-3xl bg-[#090c15] border border-slate-800 shadow-2xl overflow-hidden relative backdrop-blur-2xl">
-            {/* Top Terminal Bar */}
-            <div className="px-5 py-3.5 bg-[#0f1422] border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-rose-500/80" />
-                <span className="w-3 h-3 rounded-full bg-amber-500/80" />
-                <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
-                <span className="ml-3 text-xs font-mono text-slate-400 flex items-center gap-2">
-                  <span>Routing Agent:</span>
-                  <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold text-[11px]">
-                    {selectedDemo.routedNode}
-                  </span>
-                </span>
-              </div>
-              <div className="flex items-center gap-4 text-xs font-mono text-slate-400">
-                <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-cyan-400" /> {selectedDemo.latency}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> {selectedDemo.confidence} Grounded
-                </span>
-              </div>
-            </div>
-
-            {/* Simulated Chat Dialogue */}
-            <div className="p-6 sm:p-8 space-y-6">
-              {/* User Prompt */}
-              <div className="flex items-start gap-3 sm:gap-4">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0">
-                  You
-                </div>
-                <div className="flex-1 bg-slate-900/90 border border-slate-800 rounded-2xl rounded-tl-none p-4 text-xs sm:text-sm text-slate-200 font-medium">
-                  <p>{selectedDemo.query}</p>
-                </div>
-              </div>
-
-              {/* AI Grounded Response */}
-              <div className="flex items-start gap-3 sm:gap-4">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-500/20">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <div className="flex-1 bg-[#111726] border border-indigo-500/20 rounded-2xl rounded-tl-none p-5 text-xs sm:text-sm text-slate-200 space-y-4 shadow-lg">
-                  <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
-                    <span className="text-[11px] font-mono text-indigo-400 flex items-center gap-1.5 truncate">
-                      <BookOpen className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">Source: {selectedDemo.source}</span>
-                    </span>
-                    <button
-                      onClick={handleCopy}
-                      className="text-xs text-slate-400 hover:text-white flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] transition-colors shrink-0 ml-2"
-                    >
-                      <Copy className="w-3 h-3" />
-                      {copied ? "Copied!" : "Copy"}
-                    </button>
-                  </div>
-
-                  <div className="text-slate-300 leading-relaxed whitespace-pre-line text-xs sm:text-sm">
-                    {typedText}
-                    {isTyping && <span className="inline-block w-2 h-4 ml-1 bg-indigo-400 animate-pulse" />}
-                  </div>
-
-                  {/* Render Download Card for Page Slice Presets */}
-                  {selectedDemo.hasDownload && selectedDemo.downloadCard && (
-                    <div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-indigo-950/80 to-slate-900 border border-indigo-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-3 rounded-xl bg-indigo-500/20 text-indigo-300 shrink-0">
-                          <FileText className="w-5 h-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold text-white truncate">
-                            {selectedDemo.downloadCard.fileName}
-                          </p>
-                          <p className="text-[11px] text-slate-400 font-mono">
-                            Pages {selectedDemo.downloadCard.pages} · {selectedDemo.downloadCard.size} · ID: {selectedDemo.downloadCard.artifactId}
-                          </p>
-                        </div>
-                      </div>
-                      <Link
-                        href="/chat"
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors shadow-md shadow-indigo-600/30 shrink-0"
-                      >
-                        <Download className="w-3.5 h-3.5" /> Download Slice
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Interaction Bar */}
-            <div className="px-6 py-4 bg-[#0d121e] border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-              <span className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                PostgreSQL & Vector Store Grounded
-              </span>
-              <Link
-                href="/chat"
-                className="text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1"
-              >
-                Open Full Student Chat Interface <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* 5. ENTERPRISE BENTO GRID FEATURES                                   */}
+        {/* 6. ENTERPRISE BENTO GRID FEATURES                                   */}
         {/* ─────────────────────────────────────────────────────────────────── */}
         <section id="features" className="w-full py-16 border-t border-white/[0.06] scroll-mt-24">
           <div className="text-center mb-16 max-w-2xl mx-auto">
@@ -760,7 +1006,7 @@ export default function HomePage() {
         </section>
 
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* 6. FAQ SECTION                                                     */}
+        {/* 7. FAQ SECTION                                                     */}
         {/* ─────────────────────────────────────────────────────────────────── */}
         <section id="faq" className="w-full py-16 border-t border-white/[0.06] scroll-mt-24 max-w-4xl">
           <div className="text-center mb-12">
@@ -799,7 +1045,7 @@ export default function HomePage() {
         </section>
 
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* 7. HIGH-IMPACT BOTTOM CTA                                          */}
+        {/* 8. HIGH-IMPACT BOTTOM CTA                                          */}
         {/* ─────────────────────────────────────────────────────────────────── */}
         <section className="w-full py-16 text-center">
           <div className="p-12 rounded-3xl bg-gradient-to-r from-indigo-950/50 via-purple-950/40 to-cyan-950/50 border border-indigo-500/30 max-w-4xl mx-auto flex flex-col items-center space-y-6 shadow-2xl backdrop-blur-2xl">
@@ -834,7 +1080,7 @@ export default function HomePage() {
       </main>
 
       {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* 8. FOOTER DIRECTORY                                                 */}
+      {/* 9. FOOTER DIRECTORY                                                 */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       <footer className="border-t border-white/[0.08] bg-[#04060a] py-8 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">

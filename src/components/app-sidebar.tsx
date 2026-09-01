@@ -14,6 +14,7 @@ import {
   Search,
   GraduationCap,
   Scale,
+  FlaskConical,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -37,6 +38,7 @@ const studentNav = [
   { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },
   { title: "Agents", url: "/agents", icon: Bot },
   { title: "Analytics", url: "/analytics", icon: BarChart2 },
+  { title: "RAG Evaluation", url: "/evaluation", icon: FlaskConical },
   { title: "Settings", url: "/settings", icon: Settings2 },
 ];
 
@@ -48,6 +50,7 @@ const facultyAdminNav = [
   { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },
   { title: "Agents", url: "/agents", icon: Bot },
   { title: "Analytics", url: "/analytics", icon: BarChart2 },
+  { title: "RAG Evaluation", url: "/evaluation", icon: FlaskConical },
   { title: "Settings", url: "/settings", icon: Settings2 },
 ];
 

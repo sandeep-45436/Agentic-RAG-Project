@@ -910,3 +910,80 @@ model ExamSeatingArrangement {
 
 
 
+
+// ────────────────────────────────────────────────────────────────────────────
+// RAG EVALUATION PIPELINE MODELS
+// ────────────────────────────────────────────────────────────────────────────
+
+enum EvalDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum EvalRunStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+/// A single evaluation question used to benchmark retrieval quality.
+model EvalQuestion {
+  id                  String        @id @default(uuid())
+  organizationId      String
+  question            String        @db.Text
+  expectedAnswer      String        @db.Text
+  relevantCategories  String[]      // e.g. ["policy","academic","financial","faculty"]
+  intentCategory      String        @default("INFORMATION_RETRIEVAL")
+  difficulty          EvalDifficulty @default(MEDIUM)
+  createdAt           DateTime      @default(now())
+
+  evalResults EvalResult[]
+
+  @@index([organizationId])
+}
+
+/// One complete batch evaluation run across all questions.
+model EvalRun {
+  id              String        @id @default(uuid())
+  organizationId  String
+  startedAt       DateTime      @default(now())
+  completedAt     DateTime?
+  totalQuestions  Int           @default(0)
+  recall5         Float?        // Mean Recall@5 across all questions
+  mrr             Float?        // Mean Reciprocal Rank
+  ndcg5           Float?        // Mean NDCG@5
+  precision5      Float?        // Mean Precision@5
+  avgFaithfulness Float?
+  avgHallucination Float?
+  avgLatencyMs    Float?
+  status          EvalRunStatus @default(PENDING)
+  errorMessage    String?
+
+  evalResults EvalResult[]
+
+  @@index([organizationId, startedAt])
+}
+
+/// Per-question result within an EvalRun.
+model EvalResult {
+  id                        String   @id @default(uuid())
+  evalRunId                 String
+  evalQuestionId            String
+  retrievedDocumentCategories String[]
+  recall5Hit                Boolean  @default(false)
+  reciprocalRank            Float    @default(0)
+  dcg5                      Float    @default(0)
+  precision5                Float    @default(0)
+  faithfulnessScore         Float?
+  hallucinationScore        Float?
+  latencyMs                 Int      @default(0)
+  createdAt                 DateTime @default(now())
+
+  evalRun      EvalRun      @relation(fields: [evalRunId], references: [id], onDelete: Cascade)
+  evalQuestion EvalQuestion @relation(fields: [evalQuestionId], references: [id], onDelete: Cascade)
+
+  @@index([evalRunId])
+  @@index([evalQuestionId])
+}

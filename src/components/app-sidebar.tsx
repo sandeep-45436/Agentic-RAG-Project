@@ -34,6 +34,9 @@ const studentNav = [
   { title: "Chat Assistant", url: "/chat", icon: MessageSquare },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Browse Notes & Docs", url: "/documents", icon: BookOpen },
+  { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },
+  { title: "Agents", url: "/agents", icon: Bot },
+  { title: "Analytics", url: "/analytics", icon: BarChart2 },
   { title: "Settings", url: "/settings", icon: Settings2 },
 ];
 

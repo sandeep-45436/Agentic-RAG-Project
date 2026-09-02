@@ -266,8 +266,8 @@ export default function EvaluationPage() {
       };
       setSelectedRun(tempRun);
 
-      // 2. Process questions in parallel chunks of 3 for smooth, fast streaming
-      const BATCH_SIZE = 3;
+      // 2. Process questions in small batches of 2 to preserve DB connection limits
+      const BATCH_SIZE = 2;
       const chunks: string[][] = [];
       for (let i = 0; i < questionIds.length; i += BATCH_SIZE) {
         chunks.push(questionIds.slice(i, i + BATCH_SIZE));

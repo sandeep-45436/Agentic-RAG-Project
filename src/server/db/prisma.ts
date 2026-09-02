@@ -1,9 +1,19 @@
 import { PrismaClient } from "@prisma/client";
 
 const prismaClientSingleton = () => {
+  let url = process.env.DATABASE_URL || "";
+  if (url) {
+    // Clamp connection_limit to 5 so serverless workers never exhaust the database's 30 max connections limit
+    if (url.includes("connection_limit=")) {
+      url = url.replace(/connection_limit=\d+/, "connection_limit=5");
+    } else {
+      url += (url.includes("?") ? "&" : "?") + "connection_limit=5";
+    }
+  }
+
   return new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
-    datasourceUrl: process.env.DATABASE_URL,
+    datasourceUrl: url || undefined,
   });
 };
 
@@ -15,7 +25,8 @@ const globalForPrisma = globalThis as unknown as {
 
 export const db = globalForPrisma.prisma ?? prismaClientSingleton();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+// Always cache Prisma instance on globalThis across all environments (including production lambdas)
+globalForPrisma.prisma = db;
 
 /**
  * Ensures the Prisma connection pool is warmed up.

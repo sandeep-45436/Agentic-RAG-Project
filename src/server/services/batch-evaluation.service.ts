@@ -171,27 +171,39 @@ export class BatchEvaluationService {
       });
     }
 
-    // Evaluate current batch concurrently for maximum throughput
-    const batchResults: QuestionResult[] = await Promise.all(
-      targetQuestions.map((q) => BatchEvaluationService.evaluateQuestion(q, run.organizationId))
-    );
+    // Evaluate batch questions sequentially to prevent DB connection spikes
+    const batchResults: QuestionResult[] = [];
+    for (const q of targetQuestions) {
+      const res = await BatchEvaluationService.evaluateQuestion(q, run.organizationId);
+      batchResults.push(res);
+    }
 
-    // Save individual results
+    // Save individual results with retry logic for transient connection pooling limits
     for (const result of batchResults) {
-      await db.evalResult.create({
-        data: {
-          evalRunId,
-          evalQuestionId: result.questionId,
-          retrievedDocumentCategories: result.retrievedCategories,
-          recall5Hit: result.recall5Hit,
-          reciprocalRank: result.reciprocalRank,
-          dcg5: result.dcg5,
-          precision5: result.precision5,
-          faithfulnessScore: result.faithfulnessScore,
-          hallucinationScore: result.hallucinationScore,
-          latencyMs: result.latencyMs,
-        },
-      });
+      let saved = false;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          await db.evalResult.create({
+            data: {
+              evalRunId,
+              evalQuestionId: result.questionId,
+              retrievedDocumentCategories: result.retrievedCategories,
+              recall5Hit: result.recall5Hit,
+              reciprocalRank: result.reciprocalRank,
+              dcg5: result.dcg5,
+              precision5: result.precision5,
+              faithfulnessScore: result.faithfulnessScore,
+              hallucinationScore: result.hallucinationScore,
+              latencyMs: result.latencyMs,
+            },
+          });
+          saved = true;
+          break;
+        } catch (err: any) {
+          if (attempt === 3) throw err;
+          await new Promise((resolve) => setTimeout(resolve, 400 * attempt));
+        }
+      }
     }
 
     // Tally accumulated results for this run

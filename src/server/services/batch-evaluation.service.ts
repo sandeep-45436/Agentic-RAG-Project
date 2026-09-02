@@ -45,25 +45,273 @@ function computeNDCG(relevance: boolean[], k: number): number {
 
 export class BatchEvaluationService {
   /**
-   * Triggers a batch evaluation run asynchronously. Returns the evalRunId immediately.
+   * Resolves the target organization for evaluation, prioritizing organizations with documents or seed-org-001.
    */
-  static async triggerRun(organizationId: string): Promise<string> {
-    const run = await db.evalRun.create({
-      data: { organizationId, status: "RUNNING" },
+  static async resolveOrganization(userId: string): Promise<string> {
+    const memberships = await db.membership.findMany({
+      where: { userId, deletedAt: null },
+      include: { organization: { include: { _count: { select: { documents: true } } } } },
     });
 
+    if (memberships.length === 0) {
+      throw new Error("No organization found for user");
+    }
+
+    const preferred =
+      memberships.find((m) => m.organizationId === "seed-org-001" || (m.organization?._count?.documents ?? 0) > 0) ||
+      memberships[0];
+
+    return preferred.organizationId;
+  }
+
+  /**
+   * Creates a new evaluation run without blocking, returning the run metadata and question IDs.
+   */
+  static async createRun(
+    organizationId: string,
+    options?: {
+      preset?: "quick" | "standard" | "full";
+      limit?: number;
+      difficulty?: "EASY" | "MEDIUM" | "HARD";
+      categories?: string[];
+    }
+  ): Promise<{ runId: string; totalQuestions: number; questionIds: string[] }> {
+    // Auto-seed questions if needed
+    let questionCount = await db.evalQuestion.count({ where: { organizationId } });
+    if (questionCount === 0) {
+      const benchmarkQuestions = await db.evalQuestion.findMany({
+        where: { organizationId: "seed-org-001" },
+      });
+      if (benchmarkQuestions.length > 0) {
+        await db.evalQuestion.createMany({
+          data: benchmarkQuestions.map((q) => ({
+            organizationId,
+            question: q.question,
+            expectedAnswer: q.expectedAnswer,
+            relevantCategories: q.relevantCategories,
+            intentCategory: q.intentCategory,
+            difficulty: q.difficulty,
+          })),
+        });
+      }
+    }
+
+    // Determine target questions
+    const whereClause: any = { organizationId };
+    if (options?.difficulty) {
+      whereClause.difficulty = options.difficulty;
+    }
+
+    let limit = options?.limit;
+    if (options?.preset === "quick") limit = 5;
+    else if (options?.preset === "standard") limit = 15;
+
+    const questions = await db.evalQuestion.findMany({
+      where: whereClause,
+      select: { id: true },
+      orderBy: { createdAt: "asc" },
+      take: limit,
+    });
+
+    const run = await db.evalRun.create({
+      data: {
+        organizationId,
+        status: "RUNNING",
+        totalQuestions: questions.length,
+      },
+    });
+
+    return {
+      runId: run.id,
+      totalQuestions: questions.length,
+      questionIds: questions.map((q) => q.id),
+    };
+  }
+
+  /**
+   * Evaluates a batch of questions for an active run (typically 3-5 at a time concurrently).
+   * Saves results and aggregates running metrics.
+   */
+  static async evaluateQuestionsBatch(
+    evalRunId: string,
+    organizationId: string,
+    questionIds?: string[],
+    batchSize = 4
+  ): Promise<{
+    batchResults: QuestionResult[];
+    completedCount: number;
+    totalQuestions: number;
+    isCompleted: boolean;
+    runningMetrics: EvalMetrics;
+  }> {
+    const run = await db.evalRun.findUnique({ where: { id: evalRunId } });
+    if (!run) throw new Error("Evaluation run not found");
+
+    // Identify which questions need evaluation
+    let targetQuestions: any[] = [];
+    if (questionIds && questionIds.length > 0) {
+      targetQuestions = await db.evalQuestion.findMany({
+        where: { id: { in: questionIds } },
+      });
+    } else {
+      // Find questions that haven't been evaluated yet for this run
+      const evaluated = await db.evalResult.findMany({
+        where: { evalRunId },
+        select: { evalQuestionId: true },
+      });
+      const evaluatedIds = evaluated.map((e) => e.evalQuestionId);
+
+      targetQuestions = await db.evalQuestion.findMany({
+        where: {
+          organizationId: run.organizationId,
+          id: { notIn: evaluatedIds },
+        },
+        orderBy: { createdAt: "asc" },
+        take: batchSize,
+      });
+    }
+
+    // Evaluate current batch concurrently for maximum throughput
+    const batchResults: QuestionResult[] = await Promise.all(
+      targetQuestions.map((q) => BatchEvaluationService.evaluateQuestion(q, run.organizationId))
+    );
+
+    // Save individual results
+    for (const result of batchResults) {
+      await db.evalResult.create({
+        data: {
+          evalRunId,
+          evalQuestionId: result.questionId,
+          retrievedDocumentCategories: result.retrievedCategories,
+          recall5Hit: result.recall5Hit,
+          reciprocalRank: result.reciprocalRank,
+          dcg5: result.dcg5,
+          precision5: result.precision5,
+          faithfulnessScore: result.faithfulnessScore,
+          hallucinationScore: result.hallucinationScore,
+          latencyMs: result.latencyMs,
+        },
+      });
+    }
+
+    // Tally accumulated results for this run
+    const allResults = await db.evalResult.findMany({
+      where: { evalRunId },
+    });
+
+    const n = allResults.length;
+    const totalQ = run.totalQuestions || n;
+    const isCompleted = n >= totalQ || targetQuestions.length === 0;
+
+    const recall5 = n > 0 ? allResults.filter((r) => r.recall5Hit).length / n : 0;
+    const mrr = n > 0 ? allResults.reduce((s, r) => s + r.reciprocalRank, 0) / n : 0;
+    const ndcg5 = n > 0 ? allResults.reduce((s, r) => s + r.dcg5, 0) / n : 0;
+    const precision5 = n > 0 ? allResults.reduce((s, r) => s + r.precision5, 0) / n : 0;
+    const avgLatencyMs = n > 0 ? allResults.reduce((s, r) => s + r.latencyMs, 0) / n : 0;
+
+    const faithResults = allResults.filter((r) => r.faithfulnessScore !== null);
+    const avgFaithfulness =
+      faithResults.length > 0
+        ? faithResults.reduce((s, r) => s + (r.faithfulnessScore ?? 0), 0) / faithResults.length
+        : null;
+    const avgHallucination =
+      faithResults.length > 0
+        ? faithResults.reduce((s, r) => s + (r.hallucinationScore ?? 0), 0) / faithResults.length
+        : null;
+
+    if (isCompleted) {
+      await db.evalRun.update({
+        where: { id: evalRunId },
+        data: {
+          status: "COMPLETED",
+          completedAt: new Date(),
+          totalQuestions: n,
+          recall5,
+          mrr,
+          ndcg5,
+          precision5,
+          avgFaithfulness,
+          avgHallucination,
+          avgLatencyMs,
+        },
+      });
+    }
+
+    return {
+      batchResults,
+      completedCount: n,
+      totalQuestions: totalQ,
+      isCompleted,
+      runningMetrics: {
+        recall5,
+        mrr,
+        ndcg5,
+        precision5,
+        avgFaithfulness: avgFaithfulness ?? 0,
+        avgHallucination: avgHallucination ?? 0,
+        avgLatencyMs,
+      },
+    };
+  }
+
+  /**
+   * Cancels a running evaluation run, aggregating whatever partial results exist.
+   */
+  static async cancelRun(evalRunId: string): Promise<void> {
+    const allResults = await db.evalResult.findMany({ where: { evalRunId } });
+    const n = allResults.length;
+
+    if (n > 0) {
+      const recall5 = allResults.filter((r) => r.recall5Hit).length / n;
+      const mrr = allResults.reduce((s, r) => s + r.reciprocalRank, 0) / n;
+      const ndcg5 = allResults.reduce((s, r) => s + r.dcg5, 0) / n;
+      const precision5 = allResults.reduce((s, r) => s + r.precision5, 0) / n;
+      const avgLatencyMs = allResults.reduce((s, r) => s + r.latencyMs, 0) / n;
+
+      await db.evalRun.update({
+        where: { id: evalRunId },
+        data: {
+          status: "FAILED",
+          completedAt: new Date(),
+          errorMessage: "Run stopped by user (partial results saved)",
+          totalQuestions: n,
+          recall5,
+          mrr,
+          ndcg5,
+          precision5,
+          avgLatencyMs,
+        },
+      });
+    } else {
+      await db.evalRun.update({
+        where: { id: evalRunId },
+        data: {
+          status: "FAILED",
+          completedAt: new Date(),
+          errorMessage: "Run stopped by user",
+        },
+      });
+    }
+  }
+
+  /**
+   * Triggers a batch evaluation run asynchronously (CLI or server fallback).
+   */
+  static async triggerRun(organizationId: string): Promise<string> {
+    const { runId } = await BatchEvaluationService.createRun(organizationId);
+
     // Run in background — non-blocking
-    BatchEvaluationService.executeRun(run.id, organizationId).catch((err) => {
-      console.error(`[BatchEval] Run ${run.id} failed:`, err);
+    BatchEvaluationService.executeRun(runId, organizationId).catch((err) => {
+      console.error(`[BatchEval] Run ${runId} failed:`, err);
       db.evalRun
         .update({
-          where: { id: run.id },
+          where: { id: runId },
           data: { status: "FAILED", errorMessage: String(err), completedAt: new Date() },
         })
         .catch(() => {});
     });
 
-    return run.id;
+    return runId;
   }
 
   /**
@@ -94,68 +342,28 @@ export class BatchEvaluationService {
       return { recall5: 0, mrr: 0, ndcg5: 0, precision5: 0, avgFaithfulness: 0, avgHallucination: 0, avgLatencyMs: 0 };
     }
 
-    const results: QuestionResult[] = [];
-
-    for (const q of questions) {
-      const result = await BatchEvaluationService.evaluateQuestion(q, organizationId);
-      results.push(result);
-
-      // Persist per-question result
-      await db.evalResult.create({
-        data: {
-          evalRunId,
-          evalQuestionId: q.id,
-          retrievedDocumentCategories: result.retrievedCategories,
-          recall5Hit: result.recall5Hit,
-          reciprocalRank: result.reciprocalRank,
-          dcg5: result.dcg5,
-          precision5: result.precision5,
-          faithfulnessScore: result.faithfulnessScore,
-          hallucinationScore: result.hallucinationScore,
-          latencyMs: result.latencyMs,
-        },
-      });
+    // Process in parallel batches of 4
+    const BATCH_SIZE = 4;
+    for (let i = 0; i < questions.length; i += BATCH_SIZE) {
+      const slice = questions.slice(i, i + BATCH_SIZE);
+      await BatchEvaluationService.evaluateQuestionsBatch(
+        evalRunId,
+        organizationId,
+        slice.map((q) => q.id),
+        slice.length
+      );
     }
 
-    // Aggregate metrics
-    const n = results.length;
-    const recall5 = results.filter((r) => r.recall5Hit).length / n;
-    const mrr = results.reduce((s, r) => s + r.reciprocalRank, 0) / n;
-    const ndcg5 = results.reduce((s, r) => s + r.dcg5, 0) / n;
-    const precision5 = results.reduce((s, r) => s + r.precision5, 0) / n;
-    const avgLatencyMs = results.reduce((s, r) => s + r.latencyMs, 0) / n;
-
-    const faithResults = results.filter((r) => r.faithfulnessScore !== null);
-    const avgFaithfulness =
-      faithResults.length > 0
-        ? faithResults.reduce((s, r) => s + (r.faithfulnessScore ?? 0), 0) / faithResults.length
-        : null;
-    const avgHallucination =
-      faithResults.length > 0
-        ? faithResults.reduce((s, r) => s + (r.hallucinationScore ?? 0), 0) / faithResults.length
-        : null;
-
-    await db.evalRun.update({
-      where: { id: evalRunId },
-      data: {
-        status: "COMPLETED",
-        completedAt: new Date(),
-        totalQuestions: n,
-        recall5,
-        mrr,
-        ndcg5,
-        precision5,
-        avgFaithfulness,
-        avgHallucination,
-        avgLatencyMs,
-      },
-    });
-
-    console.log(
-      `[BatchEval] Run ${evalRunId} complete — Recall@5=${recall5.toFixed(3)} MRR=${mrr.toFixed(3)} NDCG@5=${ndcg5.toFixed(3)} Precision@5=${precision5.toFixed(3)} LatencyMs=${avgLatencyMs.toFixed(0)}`
-    );
-
-    return { recall5, mrr, ndcg5, precision5, avgFaithfulness: avgFaithfulness ?? 0, avgHallucination: avgHallucination ?? 0, avgLatencyMs };
+    const updated = await db.evalRun.findUnique({ where: { id: evalRunId } });
+    return {
+      recall5: updated?.recall5 ?? 0,
+      mrr: updated?.mrr ?? 0,
+      ndcg5: updated?.ndcg5 ?? 0,
+      precision5: updated?.precision5 ?? 0,
+      avgFaithfulness: updated?.avgFaithfulness ?? 0,
+      avgHallucination: updated?.avgHallucination ?? 0,
+      avgLatencyMs: updated?.avgLatencyMs ?? 0,
+    };
   }
 
   /**
@@ -284,14 +492,85 @@ EXPECTED ANSWER: ${expectedAnswer.slice(0, 300)}`;
   }
 
   /**
-   * Returns a list of all eval runs for an org, most recent first.
+   * Returns a list of all eval runs for an org, most recent first, with auto-healing for stale runs.
    */
   static async listRuns(organizationId: string) {
-    return db.evalRun.findMany({
+    // Auto-heal stale runs (> 3 minutes with status RUNNING)
+    const staleCutoff = new Date(Date.now() - 3 * 60 * 1000);
+    const staleRuns = await db.evalRun.findMany({
+      where: {
+        organizationId,
+        status: "RUNNING",
+        startedAt: { lt: staleCutoff },
+      },
+      include: {
+        evalResults: true,
+      },
+    });
+
+    for (const stale of staleRuns) {
+      const n = stale.evalResults.length;
+      if (n > 0) {
+        const recall5 = stale.evalResults.filter((r) => r.recall5Hit).length / n;
+        const mrr = stale.evalResults.reduce((s, r) => s + r.reciprocalRank, 0) / n;
+        const ndcg5 = stale.evalResults.reduce((s, r) => s + r.dcg5, 0) / n;
+        const precision5 = stale.evalResults.reduce((s, r) => s + r.precision5, 0) / n;
+        const avgLatencyMs = stale.evalResults.reduce((s, r) => s + r.latencyMs, 0) / n;
+
+        await db.evalRun.update({
+          where: { id: stale.id },
+          data: {
+            status: "COMPLETED",
+            completedAt: new Date(),
+            totalQuestions: n,
+            recall5,
+            mrr,
+            ndcg5,
+            precision5,
+            avgLatencyMs,
+          },
+        });
+      } else {
+        await db.evalRun.update({
+          where: { id: stale.id },
+          data: {
+            status: "FAILED",
+            completedAt: new Date(),
+            errorMessage: "Timed out before questions could be evaluated",
+          },
+        });
+      }
+    }
+
+    const runs = await db.evalRun.findMany({
       where: { organizationId },
+      include: {
+        _count: {
+          select: { evalResults: true },
+        },
+      },
       orderBy: { startedAt: "desc" },
       take: 20,
     });
+
+    return runs.map((run) => ({
+      ...run,
+      completedQuestions: run._count.evalResults,
+    }));
+  }
+
+  /**
+   * Cleans any running runs for an org immediately.
+   */
+  static async cleanStaleRuns(organizationId: string) {
+    const running = await db.evalRun.findMany({
+      where: { organizationId, status: "RUNNING" },
+      include: { evalResults: true },
+    });
+
+    for (const run of running) {
+      await BatchEvaluationService.cancelRun(run.id);
+    }
   }
 
   /**

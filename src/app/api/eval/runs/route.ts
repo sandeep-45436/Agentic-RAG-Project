@@ -37,14 +37,31 @@ export async function POST() {
     if (!membership) return NextResponse.json({ error: "No organization found" }, { status: 403 });
 
     // Check question count first
-    const questionCount = await db.evalQuestion.count({
+    let questionCount = await db.evalQuestion.count({
       where: { organizationId: membership.organizationId },
     });
     if (questionCount === 0) {
-      return NextResponse.json(
-        { error: "No evaluation questions found. Run `npx tsx scripts/seed-eval-dataset.ts` first." },
-        { status: 400 }
-      );
+      const benchmarkQuestions = await db.evalQuestion.findMany({
+        where: { organizationId: "seed-org-001" },
+      });
+      if (benchmarkQuestions.length > 0) {
+        await db.evalQuestion.createMany({
+          data: benchmarkQuestions.map((q) => ({
+            organizationId: membership.organizationId,
+            question: q.question,
+            expectedAnswer: q.expectedAnswer,
+            relevantCategories: q.relevantCategories,
+            intentCategory: q.intentCategory,
+            difficulty: q.difficulty,
+          })),
+        });
+        questionCount = benchmarkQuestions.length;
+      } else {
+        return NextResponse.json(
+          { error: "No evaluation questions found. Run `npx tsx scripts/seed-eval-dataset.ts` first." },
+          { status: 400 }
+        );
+      }
     }
 
     const evalRunId = await BatchEvaluationService.triggerRun(membership.organizationId);

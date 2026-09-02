@@ -344,34 +344,61 @@ const QUESTIONS: QuestionSeed[] = [
 ];
 
 async function main() {
-  console.log(`[SeedEval] Seeding ${QUESTIONS.length} evaluation questions for org: ${ORGANIZATION_ID}`);
-
-  let created = 0;
-  let skipped = 0;
-
-  for (const q of QUESTIONS) {
-    try {
-      await db.evalQuestion.create({
-        data: {
-          organizationId: ORGANIZATION_ID,
-          question: q.question,
-          expectedAnswer: q.expectedAnswer,
-          relevantCategories: q.relevantCategories,
-          intentCategory: q.intentCategory,
-          difficulty: q.difficulty,
-        },
-      });
-      created++;
-    } catch (err: any) {
-      if (err?.code === "P2002") {
-        skipped++;
-      } else {
-        console.warn(`[SeedEval] Could not create question "${q.question.slice(0, 40)}...":`, err?.message);
-      }
-    }
+  // Determine target organizations: explicitly specified or all active orgs + seed-org-001
+  let targetOrgs: string[] = [];
+  if (process.env.SEED_ORG_ID) {
+    targetOrgs = [process.env.SEED_ORG_ID];
+  } else {
+    const memberships = await db.membership.findMany({
+      where: { deletedAt: null },
+      select: { organizationId: true },
+      distinct: ["organizationId"],
+    });
+    const orgIds = new Set<string>(memberships.map((m) => m.organizationId));
+    orgIds.add("seed-org-001");
+    targetOrgs = Array.from(orgIds);
   }
 
-  console.log(`[SeedEval] Done. Created: ${created}, Skipped: ${skipped}`);
+  console.log(`[SeedEval] Seeding ${QUESTIONS.length} evaluation questions across orgs:`, targetOrgs);
+
+  for (const orgId of targetOrgs) {
+    let created = 0;
+    let skipped = 0;
+
+    for (const q of QUESTIONS) {
+      try {
+        // Avoid duplicate insertion
+        const existing = await db.evalQuestion.findFirst({
+          where: { organizationId: orgId, question: q.question },
+        });
+        if (existing) {
+          skipped++;
+          continue;
+        }
+
+        await db.evalQuestion.create({
+          data: {
+            organizationId: orgId,
+            question: q.question,
+            expectedAnswer: q.expectedAnswer,
+            relevantCategories: q.relevantCategories,
+            intentCategory: q.intentCategory,
+            difficulty: q.difficulty,
+          },
+        });
+        created++;
+      } catch (err: any) {
+        if (err?.code === "P2002") {
+          skipped++;
+        } else {
+          console.warn(`[SeedEval] Could not create question "${q.question.slice(0, 40)}...":`, err?.message);
+        }
+      }
+    }
+    console.log(`[SeedEval] Org ${orgId} -> Created: ${created}, Skipped/Existing: ${skipped}`);
+  }
+
+  console.log(`[SeedEval] All done.`);
   await db.$disconnect();
 }
 

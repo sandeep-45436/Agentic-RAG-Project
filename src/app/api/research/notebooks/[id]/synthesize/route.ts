@@ -16,18 +16,8 @@ export async function POST(
     const insforge = await createClient();
     const { data: userData } = await insforge.auth.getCurrentUser();
     if (!userData?.user) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
-    const userId = userData.user.id;
-    const membership = await db.membership.findFirst({ where: { userId, deletedAt: null } });
-    if (!membership) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
-
-    const provCtx = await DocumentAccessPolicy.resolveFacultyAccessContext(userId, membership.organizationId);
-    const ctx = {
-      userId,
-      organizationId: membership.organizationId,
-      departmentId: provCtx.departmentId ?? null,
-      collegeId: provCtx.collegeId ?? null,
-      userRole: provCtx.userRole ?? "MEMBER",
-    };
+    const ctx = await ResearchNotebookService.resolveUserContext(userData.user.id);
+    if (!ctx) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
 
     const body = await req.json().catch(() => ({}));
     const mode = body.mode ?? "summary";

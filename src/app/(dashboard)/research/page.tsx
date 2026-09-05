@@ -303,6 +303,8 @@ export default function ResearchWorkspacePage() {
   };
 
   const activeWorkspace = workspaces.find((w) => w.id === selectedWorkspaceId);
+  const hasActiveSources = activeSources.some((s) => s.status === "ACTIVE");
+  const hasSyncingSources = activeSources.some((s) => s.status === "SYNCING");
 
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-7xl space-y-6">
@@ -468,11 +470,24 @@ export default function ResearchWorkspacePage() {
                               <FileText className="size-4 text-indigo-500 shrink-0" />
                               <span className="truncate font-medium">{src.fileName}</span>
                             </div>
-                            <Badge variant="secondary" className="text-[10px] shrink-0">
+                            <Badge variant={src.status === "ACTIVE" ? "default" : "secondary"} className="text-[10px] shrink-0">
                               {src.status}
                             </Badge>
                           </div>
                         ))}
+                      </div>
+                    )}
+
+                    {!loadingSources && !hasActiveSources && activeSources.length === 0 && (
+                      <div className="mt-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs flex items-center gap-2">
+                        <AlertCircle className="size-4 shrink-0" />
+                        <span>No sources attached to this workspace yet. Create a new workspace and select valid documents from the picker.</span>
+                      </div>
+                    )}
+                    {!loadingSources && !hasActiveSources && activeSources.length > 0 && hasSyncingSources && (
+                      <div className="mt-3 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-700 dark:text-blue-400 text-xs flex items-center gap-2">
+                        <Loader2 className="size-4 animate-spin shrink-0" />
+                        <span>Sources are currently syncing with the research engine. They will be active in a moment...</span>
                       </div>
                     )}
                   </div>
@@ -485,9 +500,10 @@ export default function ResearchWorkspacePage() {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {/* Study Guide */}
                       <button
-                        disabled={synthesizing}
+                        disabled={synthesizing || !hasActiveSources}
                         onClick={() => handleRunSynthesis("study_guide")}
-                        className="p-3.5 rounded-lg border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all text-left group disabled:opacity-50"
+                        title={hasActiveSources ? "Generate Study Guide" : "Add at least one active source to enable"}
+                        className="p-3.5 rounded-lg border border-border hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <div className="p-2 rounded-md bg-indigo-500/10 text-indigo-500 w-fit mb-2 group-hover:scale-110 transition-transform">
                           <BookOpen className="size-5" />
@@ -498,9 +514,10 @@ export default function ResearchWorkspacePage() {
 
                       {/* Deep Dive (Podcast) */}
                       <button
-                        disabled={synthesizing}
+                        disabled={synthesizing || !hasActiveSources}
                         onClick={() => handleRunSynthesis("podcast")}
-                        className="p-3.5 rounded-lg border border-border hover:border-purple-500/50 hover:bg-purple-500/5 transition-all text-left group disabled:opacity-50"
+                        title={hasActiveSources ? "Generate Deep Dive Script" : "Add at least one active source to enable"}
+                        className="p-3.5 rounded-lg border border-border hover:border-purple-500/50 hover:bg-purple-500/5 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <div className="p-2 rounded-md bg-purple-500/10 text-purple-500 w-fit mb-2 group-hover:scale-110 transition-transform">
                           <Headphones className="size-5" />
@@ -511,9 +528,10 @@ export default function ResearchWorkspacePage() {
 
                       {/* Executive Summary */}
                       <button
-                        disabled={synthesizing}
+                        disabled={synthesizing || !hasActiveSources}
                         onClick={() => handleRunSynthesis("summary")}
-                        className="p-3.5 rounded-lg border border-border hover:border-blue-500/50 hover:bg-blue-500/5 transition-all text-left group disabled:opacity-50"
+                        title={hasActiveSources ? "Generate Executive Summary" : "Add at least one active source to enable"}
+                        className="p-3.5 rounded-lg border border-border hover:border-blue-500/50 hover:bg-blue-500/5 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <div className="p-2 rounded-md bg-blue-500/10 text-blue-500 w-fit mb-2 group-hover:scale-110 transition-transform">
                           <FileSearch className="size-5" />
@@ -524,9 +542,10 @@ export default function ResearchWorkspacePage() {
 
                       {/* Evidence FAQ */}
                       <button
-                        disabled={synthesizing}
+                        disabled={synthesizing || !hasActiveSources}
                         onClick={() => handleRunSynthesis("faq")}
-                        className="p-3.5 rounded-lg border border-border hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all text-left group disabled:opacity-50"
+                        title={hasActiveSources ? "Generate Evidence FAQ" : "Add at least one active source to enable"}
+                        className="p-3.5 rounded-lg border border-border hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <div className="p-2 rounded-md bg-emerald-500/10 text-emerald-500 w-fit mb-2 group-hover:scale-110 transition-transform">
                           <HelpCircle className="size-5" />
@@ -544,21 +563,21 @@ export default function ResearchWorkspacePage() {
                     </h3>
                     <div className="flex gap-2">
                       <Input
-                        placeholder="e.g. Compare the key concepts between these syllabi and identify curricular gaps..."
+                        placeholder={hasActiveSources ? "e.g. Compare the key concepts between these syllabi and identify curricular gaps..." : "Attach active sources first to query this workspace..."}
                         value={customPrompt}
                         onChange={(e) => setCustomPrompt(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter" && !e.shiftKey && customPrompt.trim()) {
+                          if (e.key === "Enter" && !e.shiftKey && customPrompt.trim() && hasActiveSources) {
                             e.preventDefault();
                             handleRunSynthesis("summary", customPrompt);
                           }
                         }}
-                        disabled={synthesizing}
+                        disabled={synthesizing || !hasActiveSources}
                         className="text-xs"
                       />
                       <Button
                         size="sm"
-                        disabled={synthesizing || !customPrompt.trim()}
+                        disabled={synthesizing || !customPrompt.trim() || !hasActiveSources}
                         onClick={() => handleRunSynthesis("summary", customPrompt)}
                         className="bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 text-xs"
                       >

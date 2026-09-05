@@ -13,18 +13,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const insforge = await createClient();
     const { data: userData } = await insforge.auth.getCurrentUser();
     if (!userData?.user) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
-    const userId = userData.user.id;
-    const membership = await db.membership.findFirst({ where: { userId, deletedAt: null } });
-    if (!membership) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
-
-    const provCtx = await DocumentAccessPolicy.resolveFacultyAccessContext(userId, membership.organizationId);
-    const ctx = {
-      userId,
-      organizationId: membership.organizationId,
-      departmentId: provCtx.departmentId ?? null,
-      collegeId: provCtx.collegeId ?? null,
-      userRole: provCtx.userRole ?? "MEMBER",
-    };
+    const ctx = await ResearchNotebookService.resolveUserContext(userData.user.id);
+    if (!ctx) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
 
     await ResearchNotebookService.syncNotebook(ctx, id);
     return NextResponse.json({ success: true, message: "Sync triggered" }, { status: 202 });

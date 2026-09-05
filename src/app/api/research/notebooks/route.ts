@@ -11,33 +11,16 @@ import { getProviderMeta } from "@/server/research/provider.factory";
 
 export const dynamic = "force-dynamic";
 
-async function resolveContext(req: Request) {
+async function resolveContext() {
   const insforge = await createClient();
   const { data: userData } = await insforge.auth.getCurrentUser();
   if (!userData?.user) return null;
-  const userId = userData.user.id;
-
-  const membership = await db.membership.findFirst({
-    where: { userId, deletedAt: null },
-    orderBy: { createdAt: "asc" },
-  });
-  if (!membership) return null;
-
-  // Use existing DocumentAccessPolicy to resolve department/college/role
-  const ctx = await DocumentAccessPolicy.resolveFacultyAccessContext(userId, membership.organizationId);
-
-  return {
-    userId,
-    organizationId: membership.organizationId,
-    departmentId: ctx.departmentId ?? null,
-    collegeId: ctx.collegeId ?? null,
-    userRole: ctx.userRole ?? membership.role,
-  };
+  return ResearchNotebookService.resolveUserContext(userData.user.id);
 }
 
 export async function GET() {
   try {
-    const ctx = await resolveContext(new Request("http://x"));
+    const ctx = await resolveContext();
     if (!ctx) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
 
     const notebooks = await ResearchNotebookService.getAuthorizedNotebooks(ctx);
@@ -51,7 +34,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const ctx = await resolveContext(req);
+    const ctx = await resolveContext();
     if (!ctx) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
 
     const body = await req.json();

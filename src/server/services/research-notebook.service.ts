@@ -78,6 +78,43 @@ export interface SourceSummary {
 
 export class ResearchNotebookService {
   /**
+   * Resolves the authoritative faculty user context for research workspaces.
+   * Prioritizes the active university workspace organization containing documents or seed-org-001.
+   */
+  static async resolveUserContext(userId: string): Promise<ResolvedUserContext | null> {
+    const memberships = await db.membership.findMany({
+      where: { userId, deletedAt: null },
+      include: {
+        organization: {
+          include: {
+            _count: {
+              select: { documents: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (memberships.length === 0) return null;
+
+    // Prioritize organization containing documents or seed-org-001
+    const preferred =
+      memberships.find(
+        (m) => m.organizationId === "seed-org-001" || (m.organization?._count?.documents ?? 0) > 0
+      ) || memberships[0];
+
+    const ctx = await DocumentAccessPolicy.resolveFacultyAccessContext(userId, preferred.organizationId);
+
+    return {
+      userId,
+      organizationId: preferred.organizationId,
+      departmentId: ctx.departmentId ?? null,
+      collegeId: ctx.collegeId ?? null,
+      userRole: ctx.userRole ?? preferred.role ?? "MEMBER",
+    };
+  }
+
+  /**
    * Create a new research notebook and synchronize the specified documents.
    *
    * @param ctx        Server-resolved user context (NEVER from request body)
@@ -95,6 +132,11 @@ export class ResearchNotebookService {
 
     // 1. Authorize each document
     const authorizedDocs = await ResearchNotebookService.authorizeDocuments(ctx, documentIds);
+    if (authorizedDocs.length === 0) {
+      throw new Error(
+        "No authorized documents could be added to this workspace. Please verify that the selected documents exist in your active organization."
+      );
+    }
 
     // 2. Create notebook record in DB (CREATING status)
     const notebook = await db.researchNotebook.create({
@@ -131,12 +173,15 @@ export class ResearchNotebookService {
       },
     });
 
-    // 4. Sync sources asynchronously (non-blocking)
-    ResearchNotebookService.syncSources(ctx, notebook.id, authorizedDocs).catch((err) => {
-      console.error(`[ResearchNotebookService] Background sync failed for notebook ${notebook.id}:`, err);
-    });
+    // 4. Sync sources immediately
+    await ResearchNotebookService.syncSources(ctx, notebook.id, authorizedDocs);
 
-    return ResearchNotebookService.toNotebookSummary(notebook, providerMeta, 0, 0);
+    return ResearchNotebookService.toNotebookSummary(
+      notebook,
+      providerMeta,
+      authorizedDocs.length,
+      0
+    );
   }
 
   /**
@@ -152,7 +197,9 @@ export class ResearchNotebookService {
     const authorizedDocs = await ResearchNotebookService.authorizeDocuments(ctx, documentIds);
     const denied = documentIds.length - authorizedDocs.length;
 
-    ResearchNotebookService.syncSources(ctx, notebookId, authorizedDocs).catch(() => {});
+    if (authorizedDocs.length > 0) {
+      await ResearchNotebookService.syncSources(ctx, notebookId, authorizedDocs);
+    }
 
     await AuditService.logEvent({
       orgId: ctx.organizationId,

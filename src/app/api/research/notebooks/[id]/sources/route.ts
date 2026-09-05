@@ -10,21 +10,11 @@ import { ResearchNotebookService } from "@/server/services/research-notebook.ser
 
 export const dynamic = "force-dynamic";
 
-async function getCtx(req: Request) {
+async function getCtx() {
   const insforge = await createClient();
   const { data: userData } = await insforge.auth.getCurrentUser();
   if (!userData?.user) return null;
-  const userId = userData.user.id;
-  const membership = await db.membership.findFirst({ where: { userId, deletedAt: null } });
-  if (!membership) return null;
-  const ctx = await DocumentAccessPolicy.resolveFacultyAccessContext(userId, membership.organizationId);
-  return {
-    userId,
-    organizationId: membership.organizationId,
-    departmentId: ctx.departmentId ?? null,
-    collegeId: ctx.collegeId ?? null,
-    userRole: ctx.userRole ?? "MEMBER",
-  };
+  return ResearchNotebookService.resolveUserContext(userData.user.id);
 }
 
 export async function POST(
@@ -33,7 +23,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const ctx = await getCtx(req);
+    const ctx = await getCtx();
     if (!ctx) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
 
     const { documentIds } = await req.json() as { documentIds?: string[] };
@@ -55,7 +45,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const ctx = await getCtx(req);
+    const ctx = await getCtx();
     if (!ctx) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
 
     const { documentId } = await req.json() as { documentId?: string };

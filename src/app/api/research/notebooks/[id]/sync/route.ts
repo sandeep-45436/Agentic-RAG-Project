@@ -7,8 +7,9 @@ import { ResearchNotebookService } from "@/server/services/research-notebook.ser
 
 export const dynamic = "force-dynamic";
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const insforge = await createClient();
     const { data: userData } = await insforge.auth.getCurrentUser();
     if (!userData?.user) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
@@ -25,7 +26,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       userRole: provCtx.userRole ?? "MEMBER",
     };
 
-    await ResearchNotebookService.syncNotebook(ctx, params.id);
+    await ResearchNotebookService.syncNotebook(ctx, id);
     return NextResponse.json({ success: true, message: "Sync triggered" }, { status: 202 });
   } catch (err: any) {
     if (err.message === "RESEARCH_ACCESS_DENIED") return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });

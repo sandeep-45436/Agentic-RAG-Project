@@ -334,10 +334,12 @@ export class ResearchNotebookService {
       throw new Error("Active research provider does not support multi-document synthesis.");
     }
 
-    const payload = docs.map((d) => ({
-      fileName: d.fileName,
-      textContent: d.content,
-    }));
+    const payload = docs
+      .filter((d): d is typeof d & { content: string } => typeof d.content === "string" && d.content.length > 0)
+      .map((d) => ({
+        fileName: d.fileName,
+        textContent: d.content,
+      }));
 
     const result = await provider.synthesizeNotebook({
       sources: payload,

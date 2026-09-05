@@ -7,8 +7,9 @@ import { ResearchNotebookService } from "@/server/services/research-notebook.ser
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const insforge = await createClient();
     const { data: userData } = await insforge.auth.getCurrentUser();
     if (!userData?.user) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
@@ -25,7 +26,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       userRole: provCtx.userRole ?? "MEMBER",
     };
 
-    const result = await ResearchNotebookService.getNotebookStatus(ctx, params.id);
+    const result = await ResearchNotebookService.getNotebookStatus(ctx, id);
     return NextResponse.json(result);
   } catch (err: any) {
     if (err.message === "NOTEBOOK_NOT_FOUND") return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });

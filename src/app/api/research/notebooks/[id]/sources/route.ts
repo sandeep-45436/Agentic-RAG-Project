@@ -29,9 +29,10 @@ async function getCtx(req: Request) {
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const ctx = await getCtx(req);
     if (!ctx) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
 
@@ -40,7 +41,7 @@ export async function POST(
       return NextResponse.json({ error: "documentIds required" }, { status: 422 });
     }
 
-    const result = await ResearchNotebookService.addDocumentsToNotebook(ctx, params.id, documentIds);
+    const result = await ResearchNotebookService.addDocumentsToNotebook(ctx, id, documentIds);
     return NextResponse.json(result, { status: 202 });
   } catch (err: any) {
     if (err.message === "RESEARCH_ACCESS_DENIED") return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
@@ -50,16 +51,17 @@ export async function POST(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const ctx = await getCtx(req);
     if (!ctx) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
 
     const { documentId } = await req.json() as { documentId?: string };
     if (!documentId) return NextResponse.json({ error: "documentId required" }, { status: 422 });
 
-    await ResearchNotebookService.removeDocumentFromNotebook(ctx, params.id, documentId);
+    await ResearchNotebookService.removeDocumentFromNotebook(ctx, id, documentId);
     return NextResponse.json({ success: true });
   } catch (err: any) {
     if (err.message === "RESEARCH_ACCESS_DENIED") return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });

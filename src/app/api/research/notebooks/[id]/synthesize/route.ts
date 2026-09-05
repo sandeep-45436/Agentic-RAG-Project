@@ -9,9 +9,10 @@ export const dynamic = "force-dynamic";
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const insforge = await createClient();
     const { data: userData } = await insforge.auth.getCurrentUser();
     if (!userData?.user) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
@@ -34,7 +35,7 @@ export async function POST(
 
     const result = await ResearchNotebookService.synthesizeNotebook(
       ctx,
-      params.id,
+      id,
       mode,
       customPrompt
     );

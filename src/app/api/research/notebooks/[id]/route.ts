@@ -33,14 +33,15 @@ async function getAuth(req: Request) {
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const auth = await getAuth(req);
     if (!auth) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
 
     const ctx = await resolveContext(auth.userId, auth.organizationId);
-    const { notebook, sources } = await ResearchNotebookService.getNotebookStatus(ctx, params.id);
+    const { notebook, sources } = await ResearchNotebookService.getNotebookStatus(ctx, id);
     return NextResponse.json({ notebook, sources });
   } catch (err: any) {
     if (err.message === "NOTEBOOK_NOT_FOUND") return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
@@ -51,14 +52,15 @@ export async function GET(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const auth = await getAuth(req);
     if (!auth) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
 
     const ctx = await resolveContext(auth.userId, auth.organizationId);
-    await ResearchNotebookService.deleteNotebook(ctx, params.id);
+    await ResearchNotebookService.deleteNotebook(ctx, id);
     return NextResponse.json({ success: true });
   } catch (err: any) {
     if (err.message === "RESEARCH_ACCESS_DENIED") return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });

@@ -7,8 +7,9 @@ import { ResearchNotebookService } from "@/server/services/research-notebook.ser
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const insforge = await createClient();
     const { data: userData } = await insforge.auth.getCurrentUser();
     if (!userData?.user) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
@@ -25,7 +26,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       userRole: provCtx.userRole ?? "MEMBER",
     };
 
-    const webUrl = await ResearchNotebookService.getNotebookWebUrl(ctx, params.id);
+    const webUrl = await ResearchNotebookService.getNotebookWebUrl(ctx, id);
     if (!webUrl) {
       return NextResponse.json({ error: "No workspace URL available yet" }, { status: 404 });
     }

@@ -43,6 +43,7 @@ next-env.d.ts
 
 # scratch scripts
 /scratch
+test_reportlab.pdf
 
 
 .vercel

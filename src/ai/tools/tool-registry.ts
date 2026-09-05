@@ -2,6 +2,7 @@ import { KnowledgeTool } from "./knowledge.tool";
 import { UniversityDatabaseTool } from "./university-db.tool";
 import { WorkflowExecutionTool } from "./workflow.tool";
 import { DocumentDeliveryTool } from "./document-delivery.tool";
+import { ResearchNotebookTool } from "./research-notebook.tool";
 
 export type Role = "OWNER" | "ADMIN" | "DEAN" | "FACULTY" | "ADVISOR" | "STUDENT" | "MEMBER";
 
@@ -54,6 +55,16 @@ export class ToolRegistry {
       schema: DocumentDeliveryTool.schema,
       allowedRoles: ["OWNER", "ADMIN", "DEAN", "FACULTY", "ADVISOR", "STUDENT", "MEMBER"],
       execute: DocumentDeliveryTool.execute,
+    });
+
+    // Register Research Notebook Tool — deep multi-document research via provider abstraction
+    // Not for normal knowledge retrieval; planner routes only explicit research requests here
+    this.register({
+      name: ResearchNotebookTool.toolName,
+      description: ResearchNotebookTool.description,
+      schema: ResearchNotebookTool.schema,
+      allowedRoles: ["OWNER", "ADMIN", "DEAN", "FACULTY", "ADVISOR", "STUDENT", "MEMBER"],
+      execute: ResearchNotebookTool.execute,
     });
 
     this.isInitialized = true;

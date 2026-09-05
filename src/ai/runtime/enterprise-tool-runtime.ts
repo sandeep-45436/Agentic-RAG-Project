@@ -12,11 +12,12 @@ export class EnterpriseToolRuntime {
   private static metricsMap = new Map<string, { count: number; totalMs: number; errors: number }>();
 
   public static async executeTool(
-    toolName: "vector" | "sql" | "web" | "decision",
+    toolName: "vector" | "sql" | "web" | "decision" | "research_notebook",
     argument: string,
     context: ToolContext,
     timeoutBudgetMs: number = 800
   ): Promise<any> {
+    const effectiveTimeout = toolName === "research_notebook" ? Math.max(timeoutBudgetMs, 15000) : timeoutBudgetMs;
     const startTime = Date.now();
 
     // 1. RBAC Policy Enforcement
@@ -50,11 +51,29 @@ export class EnterpriseToolRuntime {
               ? "department_health"
               : "student_risk";
             return await AgentToolsService.decisionIntelligenceTool(arg, context);
+          } else if (toolName === "research_notebook") {
+            const { ResearchNotebookTool } = require("@/ai/tools/research-notebook.tool");
+            let parsed: any = {};
+            try {
+              parsed = typeof argument === "object" ? argument : JSON.parse(argument);
+            } catch {
+              parsed = { operation: "GET_STATUS", notebookId: argument };
+            }
+            return await ResearchNotebookTool.execute({
+              ...parsed,
+              userContext: {
+                userId: context.userId,
+                organizationId: context.organizationId,
+                departmentId: (context as any).departmentId ?? null,
+                collegeId: (context as any).collegeId ?? null,
+                userRole: (context as any).userRole ?? "MEMBER",
+              },
+            });
           }
           throw new Error(`Unknown tool: ${toolName}`);
         })();
 
-        payload = await withTimeout(toolPromise, timeoutBudgetMs, `tool-${toolName}`);
+        payload = await withTimeout(toolPromise, effectiveTimeout, `tool-${toolName}`);
         success = true;
       } catch (err: any) {
         retries--;

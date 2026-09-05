@@ -15,6 +15,7 @@ import {
   GraduationCap,
   Scale,
   FlaskConical,
+  BookMarked,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -34,6 +35,7 @@ import {
 const studentNav = [
   { title: "Chat Assistant", url: "/chat", icon: MessageSquare },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Research Workspace", url: "/research", icon: BookMarked },
   { title: "Browse Notes & Docs", url: "/documents", icon: BookOpen },
   { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },
   { title: "Agents", url: "/agents", icon: Bot },
@@ -45,6 +47,7 @@ const studentNav = [
 const facultyAdminNav = [
   { title: "Chat Assistant", url: "/chat", icon: MessageSquare },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Research Workspace", url: "/research", icon: BookMarked },
   { title: "Faculty Portal", url: "/faculty/dashboard", icon: GraduationCap },
   { title: "HOD Portal", url: "/hod/dashboard", icon: Scale },
   { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },

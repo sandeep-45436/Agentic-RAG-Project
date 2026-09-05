@@ -105,11 +105,12 @@ export default function ResearchWorkspacePage() {
       setError(null);
       const res = await fetch("/api/research/notebooks");
       if (!res.ok) throw new Error("Failed to load research workspaces");
-      const data: WorkspaceSummary[] = await res.json();
-      setWorkspaces(data);
+      const data = await res.json();
+      const list: WorkspaceSummary[] = Array.isArray(data) ? data : (data.notebooks || []);
+      setWorkspaces(list);
 
-      if (data.length > 0 && !selectedWorkspaceId) {
-        setSelectedWorkspaceId(data[0].id);
+      if (list.length > 0 && !selectedWorkspaceId) {
+        setSelectedWorkspaceId(list[0].id);
       }
     } catch (err: any) {
       setError(err.message);

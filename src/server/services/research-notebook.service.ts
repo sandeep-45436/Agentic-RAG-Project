@@ -68,8 +68,8 @@ export interface SourceSummary {
   fileName: string;
   status: string;
   isStale: boolean;
-  currentDocumentVersion: bigint;
-  syncedDocumentVersion: bigint;
+  currentDocumentVersion: string;
+  syncedDocumentVersion: string;
   errorMessage: string | null;
   updatedAt: string;
 }
@@ -292,8 +292,8 @@ export class ResearchNotebookService {
         fileName: doc?.fileName ?? "Unknown",
         status: s.status,
         isStale: s.status === "STALE",
-        currentDocumentVersion: currentVersion,
-        syncedDocumentVersion: s.documentVersion,
+        currentDocumentVersion: currentVersion.toString(),
+        syncedDocumentVersion: s.documentVersion.toString(),
         errorMessage: s.errorMessage,
         updatedAt: s.updatedAt.toISOString(),
       };
@@ -369,11 +369,21 @@ export class ResearchNotebookService {
 
     const notebooks = await db.researchNotebook.findMany({
       where: { id: { in: notebookIds }, organizationId: ctx.organizationId, deletedAt: null },
+      include: {
+        sources: {
+          where: { removedAt: null },
+          select: { id: true, status: true },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
 
     const providerMeta = getProviderMeta();
-    return notebooks.map((nb) => ResearchNotebookService.toNotebookSummary(nb, providerMeta, 0, 0));
+    return notebooks.map((nb) => {
+      const totalSources = nb.sources.length;
+      const staleSources = nb.sources.filter((s) => s.status === "STALE").length;
+      return ResearchNotebookService.toNotebookSummary(nb, providerMeta, totalSources, staleSources);
+    });
   }
 
   /**

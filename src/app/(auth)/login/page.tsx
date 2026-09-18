@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Bot, GraduationCap, Scale, Building2, ShieldCheck, Sparkles } from "lucide-react";
+import { Bot, GraduationCap, Scale, Building2, ShieldCheck, Sparkles, Landmark } from "lucide-react";
 import { loginAction } from "@/server/actions/auth";
 
 const DEPARTMENTS = [
@@ -128,14 +128,22 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <div className="pt-3 border-t border-slate-800/80 w-full flex items-center justify-between text-xs text-slate-400">
-            <Link href="/faculty/login" className="hover:text-purple-300 transition-colors flex items-center gap-1">
-              <GraduationCap className="h-3.5 w-3.5 text-purple-400" />
-              Faculty Portal
+          <div className="pt-3 border-t border-slate-800/80 w-full grid grid-cols-2 gap-2 text-xs text-slate-400">
+            <Link href="/principal" className="hover:text-amber-300 transition-colors flex items-center gap-1.5 p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-semibold">
+              <Landmark className="h-3.5 w-3.5 text-amber-400" />
+              <span>Principal Portal</span>
             </Link>
-            <Link href="/hod/login" className="hover:text-blue-300 transition-colors flex items-center gap-1">
+            <Link href="/skills" className="hover:text-cyan-300 transition-colors flex items-center gap-1.5 p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-semibold">
+              <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Skills Arena</span>
+            </Link>
+            <Link href="/faculty/login" className="hover:text-purple-300 transition-colors flex items-center gap-1 p-1">
+              <GraduationCap className="h-3.5 w-3.5 text-purple-400" />
+              <span>Faculty Portal</span>
+            </Link>
+            <Link href="/hod/login" className="hover:text-blue-300 transition-colors flex items-center gap-1 p-1 justify-end">
               <Scale className="h-3.5 w-3.5 text-blue-400" />
-              HOD Portal &rarr;
+              <span>HOD Portal &rarr;</span>
             </Link>
           </div>
         </CardFooter>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Sparkles,
   MessageSquare,
+  Landmark,
   FileText,
   Search,
   ShieldCheck,
@@ -305,29 +306,45 @@ export default function HomePage() {
             </a>
           </nav>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Link
+              href="/principal"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 hover:border-amber-400/80 shadow-md shadow-amber-500/10 hover-lift transition-all"
+            >
+              <Landmark className="w-3.5 h-3.5 text-amber-400" />
+              <span>Principal</span>
+            </Link>
+
+            <Link
+              href="/skills"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 hover:border-cyan-400/80 shadow-md shadow-cyan-500/10 hover-lift transition-all"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Skills Hub</span>
+            </Link>
+
             <Link
               href="/faculty/login"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold bg-purple-600/10 hover:bg-purple-600/20 text-purple-300 border border-purple-500/30 hover:border-purple-500/60 transition-all duration-200"
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-600/10 hover:bg-purple-600/20 text-purple-300 border border-purple-500/30 hover:border-purple-500/60 transition-all duration-200"
             >
-              <GraduationCap className="w-4 h-4 text-purple-400" />
-              Faculty Portal
+              <GraduationCap className="w-3.5 h-3.5 text-purple-400" />
+              <span>Faculty</span>
             </Link>
 
             <Link
               href="/hod/login"
-              className="hidden md:inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600/10 hover:bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:border-blue-500/60 transition-all duration-200"
+              className="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-600/10 hover:bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:border-blue-500/60 transition-all duration-200"
             >
-              <Scale className="w-4 h-4 text-blue-400" />
-              HOD Portal
+              <Scale className="w-3.5 h-3.5 text-blue-400" />
+              <span>HOD</span>
             </Link>
 
             <Link
-              href="/chat"
-              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white shadow-lg shadow-indigo-600/30 hover:shadow-indigo-500/50 hover:scale-[1.02] transition-all duration-300"
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white shadow-lg shadow-indigo-600/30 hover:shadow-indigo-500/50 hover:scale-[1.02] transition-all duration-300"
             >
-              <MessageSquare className="w-4 h-4" />
-              <span>Student Chat</span>
+              <Users className="w-3.5 h-3.5" />
+              <span>Student Hub</span>
             </Link>
 
             <button
@@ -366,6 +383,30 @@ export default function HomePage() {
 
             <div className="pt-3 border-t border-white/10 flex flex-col gap-2.5">
               <Link
+                href="/principal"
+                onClick={() => setMobileNavOpen(false)}
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40"
+              >
+                <Landmark className="w-4 h-4 text-amber-400" />
+                Principal Command Center
+              </Link>
+              <Link
+                href="/skills"
+                onClick={() => setMobileNavOpen(false)}
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
+              >
+                <Sparkles className="w-4 h-4 text-cyan-400" />
+                Skill Development Hub
+              </Link>
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileNavOpen(false)}
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-indigo-600/30 text-indigo-300 border border-indigo-500/40"
+              >
+                <Users className="w-4 h-4 text-indigo-400" />
+                Student Academic Operations
+              </Link>
+              <Link
                 href="/faculty/login"
                 onClick={() => setMobileNavOpen(false)}
                 className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-semibold bg-purple-600/10 text-purple-300 border border-purple-500/30"
@@ -380,14 +421,6 @@ export default function HomePage() {
               >
                 <Scale className="w-4 h-4 text-blue-400" />
                 Access HOD Portal
-              </Link>
-              <Link
-                href="/chat"
-                onClick={() => setMobileNavOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-indigo-600 text-white"
-              >
-                <MessageSquare className="w-4 h-4" />
-                Launch Student AI Chat
               </Link>
             </div>
           </div>
@@ -430,44 +463,108 @@ export default function HomePage() {
             Ground-truth academic intelligence for university students, faculty, and department heads. Retrieve syllabi, slice PDF slides on demand, balance faculty workloads, and govern academic policies with verifiable provenance.
           </p>
 
-          {/* 3 Core Portals Quick-Launch Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 w-full max-w-4xl" id="portals">
-            {/* Student Card */}
+          {/* 5 Core University Operational Portals Quick-Launch Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 w-full max-w-5xl" id="portals">
+            {/* 1. Principal Portal */}
             <Link
-              href="/chat"
-              className="group p-5 rounded-2xl bg-gradient-to-b from-indigo-950/40 to-slate-900/60 border border-indigo-500/30 hover:border-indigo-500/60 hover:shadow-2xl hover:shadow-indigo-500/25 transition-all duration-300 flex flex-col justify-between text-left hover:-translate-y-1.5"
+              href="/principal"
+              className="group p-5 rounded-2xl bg-gradient-to-b from-amber-950/30 via-slate-900/80 to-slate-950/90 border border-amber-500/40 hover:border-amber-400/80 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-300 flex flex-col justify-between text-left hover-lift"
             >
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <MessageSquare className="w-5 h-5" />
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Landmark className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    Executive
+                  </span>
                 </div>
-                <h3 className="text-base font-bold text-white group-hover:text-indigo-300 transition-colors">
-                  Student AI Chat
+                <h3 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors">
+                  Principal Command Center
                 </h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Discover prerequisites, course schedules, and download on-demand PDF page slice extractions.
+                  Macro University Cockpit, 9-Department Matrix, Strategic AI reasoning engine, and NAAC/NIRF Governance.
                 </p>
               </div>
-              <div className="pt-4 flex items-center gap-1.5 text-xs font-semibold text-indigo-400">
-                <span>Launch Chat</span>
+              <div className="pt-4 flex items-center gap-1.5 text-xs font-semibold text-amber-400">
+                <span>Enter Principal Portal</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
 
-            {/* Faculty Card */}
+            {/* 2. Skill Development Portal */}
             <Link
-              href="/faculty/login"
-              className="group p-5 rounded-2xl bg-gradient-to-b from-purple-950/40 to-slate-900/60 border border-purple-500/30 hover:border-purple-500/60 hover:shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 flex flex-col justify-between text-left hover:-translate-y-1.5"
+              href="/skills"
+              className="group p-5 rounded-2xl bg-gradient-to-b from-cyan-950/30 via-slate-900/80 to-slate-950/90 border border-cyan-500/40 hover:border-cyan-400/80 hover:shadow-2xl hover:shadow-cyan-500/20 transition-all duration-300 flex flex-col justify-between text-left hover-lift"
             >
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <GraduationCap className="w-5 h-5" />
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Sparkles className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                    Skill Portal
+                  </span>
                 </div>
-                <h3 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors">
-                  Faculty Portal
+                <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
+                  Skill Development Hub
                 </h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Upload course syllabi into vector RAG, view weekly teaching timetables, and inspect seating layouts.
+                  6 Industry Tracks, Interactive Assessment Arena, Live 6-Axis Radar Telemetry & Verified Certifications.
+                </p>
+              </div>
+              <div className="pt-4 flex items-center gap-1.5 text-xs font-semibold text-cyan-400">
+                <span>Enter Skill Hub</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            {/* 3. Student Hub */}
+            <Link
+              href="/dashboard"
+              className="group p-5 rounded-2xl bg-gradient-to-b from-indigo-950/30 via-slate-900/80 to-slate-950/90 border border-indigo-500/40 hover:border-indigo-400/80 hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-300 flex flex-col justify-between text-left hover-lift"
+            >
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Users className="w-5 h-5 text-indigo-400" />
+                  </div>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    Academic Hub
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white group-hover:text-indigo-300 transition-colors">
+                  Student Operations Hub
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Live Attendance, GPA Tracking, Course Schedules, Ledger Balances, and Multi-turn RAG Assistant.
+                </p>
+              </div>
+              <div className="pt-4 flex items-center gap-1.5 text-xs font-semibold text-indigo-400">
+                <span>Open Student Hub</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            {/* 4. Faculty Portal */}
+            <Link
+              href="/faculty/login"
+              className="group p-5 rounded-2xl bg-gradient-to-b from-purple-950/30 via-slate-900/80 to-slate-950/90 border border-purple-500/40 hover:border-purple-400/80 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 flex flex-col justify-between text-left hover-lift"
+            >
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <GraduationCap className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                    Faculty
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors">
+                  Faculty Operations Portal
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Weekly Teaching Timetables, Course Syllabi Vector RAG, Seating Layouts, and Research Grants.
                 </p>
               </div>
               <div className="pt-4 flex items-center gap-1.5 text-xs font-semibold text-purple-400">
@@ -476,24 +573,29 @@ export default function HomePage() {
               </div>
             </Link>
 
-            {/* HOD Card */}
+            {/* 5. HOD Portal */}
             <Link
               href="/hod/login"
-              className="group p-5 rounded-2xl bg-gradient-to-b from-blue-950/40 to-slate-900/60 border border-blue-500/30 hover:border-blue-500/60 hover:shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 flex flex-col justify-between text-left hover:-translate-y-1.5"
+              className="group p-5 rounded-2xl bg-gradient-to-b from-blue-950/30 via-slate-900/80 to-slate-950/90 border border-blue-500/40 hover:border-blue-400/80 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 flex flex-col justify-between text-left hover-lift sm:col-span-2 lg:col-span-2"
             >
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Scale className="w-5 h-5" />
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Scale className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                    Governance
+                  </span>
                 </div>
                 <h3 className="text-base font-bold text-white group-hover:text-blue-300 transition-colors">
-                  HOD Command Center
+                  HOD Department Command Center
                 </h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  7-Dimension department health score, faculty workload balancing, at-risk radar, and Approval Center.
+                  7-Dimension Department Health Index, Faculty Workload Rebalancer, At-Risk Student Radars, and Policy Condonation Approval Docket.
                 </p>
               </div>
               <div className="pt-4 flex items-center gap-1.5 text-xs font-semibold text-blue-400">
-                <span>HOD Governance</span>
+                <span>HOD Governance Center</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>

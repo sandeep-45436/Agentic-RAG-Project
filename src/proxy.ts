@@ -58,7 +58,13 @@ export async function proxy(request: NextRequest) {
 
   const hasSession = !!result.accessToken;
   const isAuthRoute = path.startsWith("/login") || path.startsWith("/signup");
-  const isPublicRoute = path === "/" || path === "/pricing";
+  const isPublicRoute =
+    path === "/" ||
+    path === "/pricing" ||
+    path.startsWith("/principal") ||
+    path.startsWith("/skills") ||
+    path.startsWith("/chat") ||
+    path.startsWith("/research");
 
   // Dedicated HOD Portal Route Protection
   if (path.startsWith("/hod")) {

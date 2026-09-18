@@ -100,18 +100,18 @@ export default function PrincipalDashboardPage() {
   };
 
   const ov = overview || {
-    totalColleges: 6,
-    totalDepartments: 24,
-    totalStudents: 14850,
-    totalFaculty: 620,
-    totalResearchFundingUsd: 18450000,
-    overallPlacementRate: 94.6,
-    naacAccreditationScore: 3.78,
-    nirfNationalRank: 14,
-    examIntegrityScore: 98.4,
-    annualBudgetTotalUsd: 42500000,
-    annualBudgetSpentUsd: 31800000,
-    studentFacultyRatio: "1:24",
+    totalColleges: 1,
+    totalDepartments: 9,
+    totalStudents: 900,
+    totalFaculty: 90,
+    totalResearchFundingUsd: 32800000,
+    overallPlacementRate: 95.2,
+    naacAccreditationScore: 3.82,
+    nirfNationalRank: 12,
+    examIntegrityScore: 99.1,
+    annualBudgetTotalUsd: 17500000,
+    annualBudgetSpentUsd: 13090000,
+    studentFacultyRatio: "1:10",
   };
 
   return (
@@ -141,7 +141,7 @@ export default function PrincipalDashboardPage() {
             </h1>
 
             <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Plenary institutional oversight across 6 constituent colleges, 24 academic departments, 14,850+ scholars, and autonomous policy enforcement engines.
+              Plenary institutional oversight across {ov.totalColleges} constituent college, {ov.totalDepartments} academic departments, {ov.totalStudents.toLocaleString()} verified scholars, and autonomous policy enforcement engines.
             </p>
           </div>
 
@@ -205,7 +205,7 @@ export default function PrincipalDashboardPage() {
           </div>
           <div className="mt-2">
             <p className="text-2xl font-black text-white font-mono">{ov.totalColleges} / {ov.totalDepartments}</p>
-            <p className="text-[10px] text-cyan-300 mt-0.5">24 Scoped Units</p>
+            <p className="text-[10px] text-cyan-300 mt-0.5">{ov.totalDepartments} Scoped Branches</p>
           </div>
         </div>
 

@@ -211,6 +211,19 @@ export async function GET() {
       ]);
     }
 
+    if (!studentRecord) {
+      studentRecord = await db.student.findFirst({
+        where: { deletedAt: null },
+        include: {
+          department: true,
+          _count: {
+            select: { enrolments: { where: { deletedAt: null } } },
+          },
+        },
+        orderBy: { gpa: "desc" },
+      });
+    }
+
     // Default or Fallback Department
     const cookieStore = await cookies();
     const deptCookie = cookieStore.get("student_department")?.value;

@@ -27,22 +27,22 @@ import { Badge } from "@/components/ui/badge";
 import { PortalSwitcher } from "@/components/portal-switcher";
 
 const DEFAULT_PROFILE = {
-  id: "498d4cb5-056e-46bd-b281-8469c75ee058",
-  name: "Prof. John Smith",
-  facultyCode: "FAC-CS-001",
+  id: "faculty-cse-001",
+  name: "Prof. CSE 001",
+  facultyCode: "FAC-CSE-001",
   title: "Professor",
-  designation: "Head of Computer Science & AI",
-  department: { name: "Computer Science", code: "CS" },
-  user: { name: "Prof. John Smith", email: "prof.smith@smartuniversity.edu" },
+  designation: "Chair of Computer Science & Engineering",
+  department: { name: "Computer Science & Engineering", code: "CSE" },
+  user: { name: "Prof. CSE 001", email: "fac.cse.001@university.edu" },
   sections: [
-    { id: "s1", course: { code: "CS401", title: "Algorithms & Data Structures" } },
-    { id: "s2", course: { code: "CS501", title: "Machine Learning" } },
-    { id: "s3", course: { code: "CS601", title: "Distributed Systems" } },
+    { id: "s1", course: { code: "CSE401", title: "Advanced Agentic AI & Distributed Neural Systems" } },
+    { id: "s2", course: { code: "CSE301", title: "Distributed Database Engineering" } },
+    { id: "s3", course: { code: "CSE201", title: "Algorithmic Complexity & Parallelism" } },
   ],
   timetableEntries: [
-    { id: "t1", courseCode: "CS401", courseTitle: "Algorithms & Data Structures", room: "Tech Hall 101", dayOfWeek: "Monday", startTime: "09:00 AM", endTime: "10:30 AM" },
-    { id: "t2", courseCode: "CS501", courseTitle: "Machine Learning", room: "Tech Hall 102", dayOfWeek: "Monday", startTime: "11:00 AM", endTime: "12:30 PM" },
-    { id: "t3", courseCode: "CS401", courseTitle: "Algorithms Lab", room: "Lab 3", dayOfWeek: "Thursday", startTime: "02:00 PM", endTime: "04:00 PM" },
+    { id: "t1", courseCode: "CSE401", courseTitle: "Advanced Agentic AI & Distributed Neural Systems", room: "Turing Hall 101", dayOfWeek: "Monday", startTime: "09:00 AM", endTime: "10:30 AM" },
+    { id: "t2", courseCode: "CSE301", courseTitle: "Distributed Database Engineering", room: "Turing Hall 102", dayOfWeek: "Wednesday", startTime: "11:00 AM", endTime: "12:30 PM" },
+    { id: "t3", courseCode: "CSE401", courseTitle: "Neural Architectures Lab", room: "Computing Core Lab", dayOfWeek: "Thursday", startTime: "02:00 PM", endTime: "04:00 PM" },
   ],
   uploadedDocsCount: 4,
 };

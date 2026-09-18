@@ -16,6 +16,7 @@ import {
   Calendar, Layers, ArrowRight, Eye, Download,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { PortalSwitcher } from "@/components/portal-switcher";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -117,21 +118,21 @@ function StatCard({
   badge?: string;
 }) {
   return (
-    <div className="bg-[#141720] border border-white/5 rounded-2xl p-5 flex flex-col justify-between hover:border-indigo-500/30 transition-all shadow-md">
+    <div className="rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover-lift bg-gradient-to-b from-[#161a26] to-[#121520] border border-white/10 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/10 shadow-md">
       <div className="flex items-start justify-between gap-3">
-        <div className={`${iconBg} p-3 rounded-xl shrink-0`}>
+        <div className={`${iconBg} p-3 rounded-xl shrink-0 shadow-md`}>
           <Icon className="w-5 h-5 text-white" />
         </div>
         {badge && (
-          <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px]">
+          <Badge className="bg-emerald-500/15 text-emerald-300 border-emerald-500/30 text-[10px] font-semibold">
             {badge}
           </Badge>
         )}
       </div>
-      <div className="mt-3">
-        <p className="text-xs text-gray-400 font-medium">{label}</p>
-        <p className="text-2xl font-bold text-white mt-1 tracking-tight">{value}</p>
-        {subtext && <p className="text-[11px] text-gray-400 mt-1">{subtext}</p>}
+      <div className="mt-4">
+        <p className="text-xs text-slate-400 font-medium">{label}</p>
+        <p className="text-2xl font-black text-white mt-1 tracking-tight font-mono">{value}</p>
+        {subtext && <p className="text-[11px] text-slate-400 mt-1 leading-tight">{subtext}</p>}
       </div>
     </div>
   );
@@ -243,6 +244,9 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#0f1117] text-white pb-12 px-1 space-y-6">
       
+      {/* ── 0. UNIVERSAL PORTAL SWITCHER MATRIX ──────────────────────────── */}
+      <PortalSwitcher />
+
       {/* ── ACADEMIC HERO BANNER ────────────────────────────────────────────── */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-950 via-purple-950/70 to-slate-900 border border-indigo-500/20 p-6 lg:p-8 backdrop-blur-xl shadow-xl">
         <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />

@@ -16,7 +16,7 @@ import { AcademicAnalyticsRepository } from "@/server/repositories/academic-anal
  */
 export async function databaseAgent(state: typeof GraphState.State) {
   const stageStart = StageTimer.start("databaseNode");
-  let cacheHit = false;
+  const cacheHit = false;
   let errorOccurred = false;
 
   try {

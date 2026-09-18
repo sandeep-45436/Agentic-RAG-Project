@@ -744,7 +744,7 @@ export default function EvaluationPage() {
           </div>
         ) : (
           <div className="space-y-2.5">
-            {filteredResults.map((r, idx) => {
+            {filteredResults.map((r) => {
               const expanded = expandedRows.has(r.id);
               const rankColor =
                 r.reciprocalRank === 1
@@ -766,7 +766,11 @@ export default function EvaluationPage() {
                     onClick={() =>
                       setExpandedRows((prev) => {
                         const next = new Set(prev);
-                        next.has(r.id) ? next.delete(r.id) : next.add(r.id);
+                        if (next.has(r.id)) {
+                          next.delete(r.id);
+                        } else {
+                          next.add(r.id);
+                        }
                         return next;
                       })
                     }

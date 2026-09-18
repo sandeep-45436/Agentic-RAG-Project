@@ -69,7 +69,7 @@ export class ConversationService {
   ) {
     try {
       // 1. Verify conversation exists
-      let conversation = await db.conversation.findFirst({
+      const conversation = await db.conversation.findFirst({
         where: { id: conversationId },
       });
 

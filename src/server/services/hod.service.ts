@@ -141,7 +141,7 @@ export class HODService {
 
       if (matchedHod) {
         if (trimmedPass === matchedHod.pass || trimmedPass === "Faculty@CS2026!" || trimmedPass === "Faculty@MATH2026!" || trimmedPass === "Faculty@EE2026!") {
-          let dbDept = await db.department.findFirst({ where: { code: matchedHod.deptCode } });
+          const dbDept = await db.department.findFirst({ where: { code: matchedHod.deptCode } });
           const hodSession: HODSessionData = {
             id: faculty?.id || `hod_${matchedHod.deptCode.toLowerCase()}`,
             userId: faculty?.userId || null,
@@ -691,7 +691,7 @@ export class HODService {
       });
     }
 
-    let recommendedActions = [
+    const recommendedActions = [
       {
         action: `Schedule Departmental Remedial Program for ${departmentCode}`,
         impact: "Anticipated +0.35 GPA improvement within 3 weeks",
@@ -712,7 +712,7 @@ export class HODService {
       },
     ];
 
-    let policyEvidence = [
+    const policyEvidence = [
       {
         title: "Academic Regulation 4.2",
         citation: "Mandatory departmental remedial program required when course failure rate exceeds 25% in midterm evaluations.",
@@ -754,7 +754,7 @@ export class HODService {
    * Action Proposals (Multi-Tiered Human-in-the-Loop Workflow from Live DB)
    */
   static async getActionProposals(departmentCode = "CS"): Promise<ActionProposal[]> {
-    let proposals: ActionProposal[] = [];
+    const proposals: ActionProposal[] = [];
 
     try {
       const isAll = departmentCode === "ALL";

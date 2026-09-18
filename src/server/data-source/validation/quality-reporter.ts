@@ -237,7 +237,7 @@ export class DataQualityValidator {
       facultyValid = faculty.length;
     } catch {}
 
-    let resultTotal = 0, resultValid = 0;
+    const resultTotal = 0, resultValid = 0;
 
     // Build Domain Summaries
     const buildDomainQuality = (domain: string, total: number, valid: number): DomainQuality => {

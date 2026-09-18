@@ -77,7 +77,7 @@ export class BatchEvaluationService {
     }
   ): Promise<{ runId: string; totalQuestions: number; questionIds: string[] }> {
     // Auto-seed questions if needed
-    let questionCount = await db.evalQuestion.count({ where: { organizationId } });
+    const questionCount = await db.evalQuestion.count({ where: { organizationId } });
     if (questionCount === 0) {
       const benchmarkQuestions = await db.evalQuestion.findMany({
         where: { organizationId: "seed-org-001" },

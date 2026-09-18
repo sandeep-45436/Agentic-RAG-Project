@@ -8,7 +8,7 @@ import { StageTimer } from "@/ai/instrumentation/stage-timer";
  */
 export async function citationAgent(state: typeof GraphState.State) {
   const stageStart = StageTimer.start("citationNode");
-  let cacheHit = false;
+  const cacheHit = false;
   let errorOccurred = false;
 
   try {

@@ -7,7 +7,7 @@ import { StageTimer } from "@/ai/instrumentation/stage-timer";
  */
 export async function memoryAgent(state: typeof GraphState.State) {
   const stageStart = StageTimer.start("memoryNode");
-  let cacheHit = false;
+  const cacheHit = false;
   let errorOccurred = false;
 
   try {

@@ -8,7 +8,7 @@ import { EvidenceVerifier } from "@/ai/knowledge/evidence-verifier";
  */
 export async function verificationAgent(state: typeof GraphState.State) {
   const stageStart = StageTimer.start("verificationNode");
-  let cacheHit = false;
+  const cacheHit = false;
   let errorOccurred = false;
 
   try {

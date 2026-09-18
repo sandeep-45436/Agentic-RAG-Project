@@ -24,6 +24,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PortalSwitcher } from "@/components/portal-switcher";
 
 const DEFAULT_PROFILE = {
   id: "498d4cb5-056e-46bd-b281-8469c75ee058",
@@ -108,6 +109,9 @@ export default function FacultyDashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* ── PORTAL SWITCHER MATRIX ─────────────────────────────────── */}
+      <PortalSwitcher />
+
       {/* ── HERO BANNER ────────────────────────────────────────────── */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900/60 via-purple-900/40 to-slate-900 border border-indigo-500/20 p-6 lg:p-8 backdrop-blur-xl">
         <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
@@ -150,7 +154,7 @@ export default function FacultyDashboardPage() {
 
       {/* ── TOP STATS ──────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl">
+        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl hover-lift hover:border-indigo-500/40 transition-all shadow-md">
           <CardContent className="p-5 flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-xs font-medium text-slate-400">Department Documents</p>
@@ -163,7 +167,7 @@ export default function FacultyDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl">
+        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl hover-lift hover:border-indigo-500/40 transition-all shadow-md">
           <CardContent className="p-5 flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-xs font-medium text-slate-400">Assigned Courses</p>
@@ -176,7 +180,7 @@ export default function FacultyDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl">
+        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl hover-lift hover:border-indigo-500/40 transition-all shadow-md">
           <CardContent className="p-5 flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-xs font-medium text-slate-400">Weekly Classes</p>
@@ -189,7 +193,7 @@ export default function FacultyDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl">
+        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl hover-lift hover:border-indigo-500/40 transition-all shadow-md">
           <CardContent className="p-5 flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-xs font-medium text-slate-400">Invigilation Duties</p>

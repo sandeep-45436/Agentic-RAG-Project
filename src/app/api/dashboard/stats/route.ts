@@ -12,7 +12,7 @@ export async function GET() {
     await ensureDbConnected();
     const insforge = await createClient();
     const { data: userData } = await insforge.auth.getCurrentUser();
-    let user = userData?.user;
+    const user = userData?.user;
     let membership = null;
 
     if (user) {

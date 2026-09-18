@@ -183,7 +183,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Student not found." }, { status: 404 });
       }
 
-      let att = student.attendanceRecords[0];
+      const att = student.attendanceRecords[0];
       const prevPercentage = att?.percentage || 60.0;
       const targetPct = Math.max(parseFloat(condonedPercentage) || 75.0, prevPercentage);
       const newAttended = Math.round((targetPct / 100) * (att?.totalClasses || 40));

@@ -6,16 +6,16 @@ import {
   Bot,
   LayoutDashboard,
   Settings2,
-  FileText,
   LogOut,
   Sparkles,
   BarChart2,
   MessageSquare,
-  Search,
   GraduationCap,
   Scale,
   FlaskConical,
   BookMarked,
+  Zap,
+  Landmark,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -35,6 +35,7 @@ import {
 const studentNav = [
   { title: "Chat Assistant", url: "/chat", icon: MessageSquare },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Skill Development", url: "/skills", icon: Zap },
   { title: "Research Workspace", url: "/research", icon: BookMarked },
   { title: "Browse Notes & Docs", url: "/documents", icon: BookOpen },
   { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },
@@ -47,9 +48,11 @@ const studentNav = [
 const facultyAdminNav = [
   { title: "Chat Assistant", url: "/chat", icon: MessageSquare },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Research Workspace", url: "/research", icon: BookMarked },
+  { title: "Skill Development", url: "/skills", icon: Zap },
+  { title: "Principal Portal", url: "/principal", icon: Landmark },
   { title: "Faculty Portal", url: "/faculty/dashboard", icon: GraduationCap },
   { title: "HOD Portal", url: "/hod/dashboard", icon: Scale },
+  { title: "Research Workspace", url: "/research", icon: BookMarked },
   { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },
   { title: "Agents", url: "/agents", icon: Bot },
   { title: "Analytics", url: "/analytics", icon: BarChart2 },

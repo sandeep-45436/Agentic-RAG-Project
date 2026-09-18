@@ -35,6 +35,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useHOD } from "../layout";
+import { PortalSwitcher } from "@/components/portal-switcher";
 
 export default function HODDashboardPage() {
   const { session, activeDepartment, isDean } = useHOD();
@@ -138,6 +139,9 @@ export default function HODDashboardPage() {
 
   return (
     <div className="space-y-6 font-sans">
+      {/* ── PORTAL SWITCHER MATRIX ─────────────────────────────────── */}
+      <PortalSwitcher />
+
       {/* ─────────────────────────────────────────────────────────────────── */}
       {/* 1. TOP HEADER & OPERATIONAL BRIEF BANNER                            */}
       {/* ─────────────────────────────────────────────────────────────────── */}

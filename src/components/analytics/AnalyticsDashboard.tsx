@@ -6,7 +6,7 @@ import {
   LineChart, Line 
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Activity, Zap, Clock, CreditCard, Box, TrendingUp } from 'lucide-react';
+import { Activity, Zap, Clock, CreditCard, Box } from 'lucide-react';
 
 type DashboardData = {
   eventsToday: number;
@@ -42,7 +42,7 @@ export function AnalyticsDashboard({ data }: { data: DashboardData }) {
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Cost */}
-        <Card>
+        <Card className="hover-lift transition-all hover:border-indigo-500/40 shadow-soft">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Estimated Cost</CardTitle>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
@@ -54,7 +54,7 @@ export function AnalyticsDashboard({ data }: { data: DashboardData }) {
         </Card>
 
         {/* Tokens */}
-        <Card>
+        <Card className="hover-lift transition-all hover:border-indigo-500/40 shadow-soft">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Tokens</CardTitle>
             <Zap className="h-4 w-4 text-muted-foreground" />
@@ -68,7 +68,7 @@ export function AnalyticsDashboard({ data }: { data: DashboardData }) {
         </Card>
 
         {/* Requests */}
-        <Card>
+        <Card className="hover-lift transition-all hover:border-indigo-500/40 shadow-soft">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Requests Today</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
@@ -82,7 +82,7 @@ export function AnalyticsDashboard({ data }: { data: DashboardData }) {
         </Card>
 
         {/* Latency */}
-        <Card>
+        <Card className="hover-lift transition-all hover:border-indigo-500/40 shadow-soft">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Avg Latency</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />

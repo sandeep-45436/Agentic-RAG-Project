@@ -208,8 +208,8 @@ export class RetrievalService {
         ]),
       ]);
 
-      let allVectorResults: Array<{ payload: VectorPayload; score: number }> = [];
-      let allBm25Results: import("./bm25.service").BM25Result[] = [];
+      const allVectorResults: Array<{ payload: VectorPayload; score: number }> = [];
+      const allBm25Results: import("./bm25.service").BM25Result[] = [];
       let graphContext: string | null = null;
       let retrievalType = "hybrid";
 

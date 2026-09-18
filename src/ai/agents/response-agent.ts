@@ -40,7 +40,7 @@ function formatDocumentDeliveryCard(delivery: NonNullable<typeof GraphState.Stat
  */
 export async function responseAgent(state: typeof GraphState.State) {
   const stageStart = StageTimer.start("responseNode");
-  let cacheHit = false;
+  const cacheHit = false;
   let errorOccurred = false;
 
   try {

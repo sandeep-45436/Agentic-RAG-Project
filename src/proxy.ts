@@ -64,7 +64,9 @@ export async function proxy(request: NextRequest) {
     path.startsWith("/principal") ||
     path.startsWith("/skills") ||
     path.startsWith("/chat") ||
-    path.startsWith("/research");
+    path.startsWith("/research") ||
+    path.startsWith("/student") ||
+    path.startsWith("/dashboard");
 
   // Dedicated HOD Portal Route Protection
   if (path.startsWith("/hod")) {
@@ -88,6 +90,11 @@ export async function proxy(request: NextRequest) {
 
   // Dedicated Faculty Portal Route Protection
   if (path.startsWith("/faculty")) {
+    // Permit public access to faculty profile dossier
+    if (path.startsWith("/faculty/profile")) {
+      return response;
+    }
+
     const hasFacultySession = !!request.cookies.get("faculty_session")?.value;
     const isFacultyAuthRoute = path === "/faculty/login";
 

@@ -366,4 +366,92 @@
 
 .animate-border-glow {
   animation: borderGlowPulse 3s ease-in-out infinite;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * LIGHT-MODE PREMIUM GLASSMORPHISM & ORGANIC FLOATING ANIMATIONS
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+@keyframes blobFloat {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.12);
+  }
+  66% {
+    transform: translate(-25px, 20px) scale(0.92);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@keyframes blobFloatAlt {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-35px, 40px) scale(0.94);
+  }
+  66% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob-1 {
+  animation: blobFloat 14s ease-in-out infinite;
+}
+
+.animate-blob-2 {
+  animation: blobFloatAlt 18s ease-in-out infinite 2s;
+}
+
+.animate-blob-3 {
+  animation: blobFloat 22s ease-in-out infinite 4s;
+}
+
+/* Light Theme Card and Glow Utilities */
+.light-glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px) saturate(190%);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+}
+
+.light-glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.light-glass-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 35px -10px rgba(99, 102, 241, 0.12), 0 10px 15px -3px rgba(15, 23, 42, 0.04);
+  border-color: rgba(165, 180, 252, 0.7);
+}
+
+.light-glow-indigo {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 255, 0.9) 100%);
+  border: 1px solid rgba(199, 210, 254, 0.8);
+  box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.1);
+}
+
+.light-glow-amber {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 251, 235, 0.9) 100%);
+  border: 1px solid rgba(253, 230, 138, 0.85);
+  box-shadow: 0 10px 30px -5px rgba(245, 158, 11, 0.1);
+}
+
+.light-glow-emerald {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(236, 253, 245, 0.9) 100%);
+  border: 1px solid rgba(167, 243, 208, 0.85);
+  box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.1);
+}
+
+.light-glow-cyan {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 253, 250, 0.9) 100%);
+  border: 1px solid rgba(165, 243, 252, 0.85);
+  box-shadow: 0 10px 30px -5px rgba(6, 182, 212, 0.1);
 }

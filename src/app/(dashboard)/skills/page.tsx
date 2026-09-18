@@ -33,7 +33,6 @@ import {
   Tooltip,
 } from "recharts";
 import { Badge } from "@/components/ui/badge";
-import { PortalSwitcher } from "@/components/portal-switcher";
 
 export default function SkillDevelopmentPortalPage() {
   const [data, setData] = useState<any>(null);
@@ -77,8 +76,39 @@ export default function SkillDevelopmentPortalPage() {
 
   return (
     <div className="space-y-6 pb-12 font-sans">
-      {/* ── 1. PORTAL SWITCHER MATRIX ─────────────────────────────────── */}
-      <PortalSwitcher />
+      {/* ── 1. ALITS INSTITUTIONAL SKILLS HEADER ──────────────────────── */}
+      <div className="light-glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
+        <div className="flex items-center gap-3.5">
+          <div className="relative h-11 w-36 sm:w-44 flex items-center justify-start">
+            <img
+              src="/images/college-logo.png"
+              alt="ALITS University Logo"
+              className="h-10 object-contain drop-shadow-sm"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = "none";
+              }}
+            />
+          </div>
+          <div className="h-7 w-[1px] bg-slate-200 hidden sm:block" />
+          <div>
+            <span className="text-xs font-bold text-slate-900 block tracking-tight">
+              Anantha Lakshmi Institute of Technology & Sciences
+            </span>
+            <span className="text-[11px] text-slate-500 font-medium">
+              Career Competency Accelerator & Skills Radar System
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Link
+            href="/student/profile"
+            className="text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-50 border border-indigo-200/80 px-3.5 py-2 rounded-xl transition-colors"
+          >
+            My Student Profile →
+          </Link>
+        </div>
+      </div>
 
       {/* ── 2. HERO BANNER WITH ADVANCED NEON GLOW ───────────────────── */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-cyan-950/40 to-slate-900 border border-cyan-500/30 p-6 lg:p-8 backdrop-blur-2xl shadow-2xl">

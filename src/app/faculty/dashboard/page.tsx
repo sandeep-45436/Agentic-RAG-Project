@@ -20,11 +20,11 @@ import {
   GraduationCap,
   Eye,
   X,
+  User,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PortalSwitcher } from "@/components/portal-switcher";
 
 const DEFAULT_PROFILE = {
   id: "faculty-cse-001",
@@ -108,9 +108,42 @@ export default function FacultyDashboardPage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* ── PORTAL SWITCHER MATRIX ─────────────────────────────────── */}
-      <PortalSwitcher />
+    <div className="space-y-6 pb-12 font-sans">
+      {/* ── ALITS FACULTY INSTITUTIONAL BRAND HEADER ──────────────────────── */}
+      <div className="light-glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
+        <div className="flex items-center gap-3.5">
+          <div className="relative h-11 w-36 sm:w-44 flex items-center justify-start">
+            <img
+              src="/images/college-logo.png"
+              alt="ALITS University Logo"
+              className="h-10 object-contain drop-shadow-sm"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = "none";
+              }}
+            />
+          </div>
+          <div className="h-7 w-[1px] bg-slate-200 hidden sm:block" />
+          <div>
+            <span className="text-xs font-bold text-slate-900 block tracking-tight">
+              Anantha Lakshmi Institute of Technology & Sciences
+            </span>
+            <span className="text-[11px] text-slate-500 font-medium">
+              Faculty Academic Administration & Research Operations
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <Link
+            href="/faculty/profile"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl shadow-md shadow-indigo-600/20 text-xs font-bold px-4 py-2.5 transition-all hover:scale-105"
+          >
+            <User className="h-4 w-4" />
+            My Faculty Profile & Dossier ({profile?.facultyCode || "FAC-CSE-001"})
+            <ChevronRight className="h-3.5 w-3.5 opacity-80" />
+          </Link>
+        </div>
+      </div>
 
       {/* ── HERO BANNER ────────────────────────────────────────────── */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900/60 via-purple-900/40 to-slate-900 border border-indigo-500/20 p-6 lg:p-8 backdrop-blur-xl">

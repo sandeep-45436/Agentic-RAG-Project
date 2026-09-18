@@ -25,7 +25,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PortalSwitcher } from "@/components/portal-switcher";
 
 export default function PrincipalDashboardPage() {
   const [overview, setOverview] = useState<any>(null);
@@ -116,8 +115,41 @@ export default function PrincipalDashboardPage() {
 
   return (
     <div className="space-y-6 pb-12 font-sans">
-      {/* ── 1. PORTAL SWITCHER MATRIX ─────────────────────────────────── */}
-      <PortalSwitcher />
+      {/* ── ALITS PRINCIPAL INSTITUTIONAL BRAND HEADER ────────────────────── */}
+      <div className="light-glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
+        <div className="flex items-center gap-3.5">
+          <div className="relative h-11 w-36 sm:w-44 flex items-center justify-start">
+            <img
+              src="/images/college-logo.png"
+              alt="ALITS University Logo"
+              className="h-10 object-contain drop-shadow-sm"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = "none";
+              }}
+            />
+          </div>
+          <div className="h-7 w-[1px] bg-slate-200 hidden sm:block" />
+          <div>
+            <span className="text-xs font-bold text-slate-900 block tracking-tight">
+              Anantha Lakshmi Institute of Technology & Sciences
+            </span>
+            <span className="text-[11px] text-slate-500 font-medium">
+              Office of the Principal • Executive Operations Cockpit
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <Link
+            href="/principal/profile"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 rounded-xl shadow-md shadow-amber-500/20 text-xs font-bold px-4 py-2.5 transition-all hover:scale-105"
+          >
+            <ShieldCheck className="h-4 w-4" />
+            Principal Executive Dossier
+            <ChevronRight className="h-3.5 w-3.5 opacity-80" />
+          </Link>
+        </div>
+      </div>
 
       {/* ── 2. HERO EXECUTIVE GOVERNANCE BANNER ───────────────────────── */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-amber-950/40 to-slate-900 border border-amber-500/30 p-6 lg:p-8 backdrop-blur-2xl shadow-2xl">

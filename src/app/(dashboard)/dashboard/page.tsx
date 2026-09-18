@@ -13,10 +13,9 @@ import {
   ArrowDownRight, Loader2, UploadCloud, Bot, Database,
   BarChart2, ChevronRight, RefreshCw, Sparkles, Building,
   GraduationCap, ShieldCheck, CheckCircle2, XCircle, BookOpen,
-  Calendar, Layers, ArrowRight, Eye, Download,
+  Calendar, Layers, ArrowRight, Eye, Download, User,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { PortalSwitcher } from "@/components/portal-switcher";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -242,10 +241,43 @@ export default function DashboardPage() {
   const authDocs = ac?.authorizedDocsCount ?? s?.authorizedDeptDocs ?? s?.totalDocs ?? 0;
 
   return (
-    <div className="min-h-screen bg-[#0f1117] text-white pb-12 px-1 space-y-6">
-      
-      {/* ── 0. UNIVERSAL PORTAL SWITCHER MATRIX ──────────────────────────── */}
-      <PortalSwitcher />
+    <div className="space-y-6 pb-12 font-sans">
+      {/* ── ALITS STUDENT INSTITUTIONAL BRAND HEADER ──────────────────────── */}
+      <div className="light-glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
+        <div className="flex items-center gap-3.5">
+          <div className="relative h-11 w-36 sm:w-44 flex items-center justify-start">
+            <img
+              src="/images/college-logo.png"
+              alt="ALITS University Logo"
+              className="h-10 object-contain drop-shadow-sm"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = "none";
+              }}
+            />
+          </div>
+          <div className="h-7 w-[1px] bg-slate-200 hidden sm:block" />
+          <div>
+            <span className="text-xs font-bold text-slate-900 block tracking-tight">
+              Anantha Lakshmi Institute of Technology & Sciences
+            </span>
+            <span className="text-[11px] text-slate-500 font-medium flex items-center gap-1">
+              <ShieldCheck className="h-3.5 w-3.5 text-indigo-600" />
+              Student Academic Intelligence & Learning Portal
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <Link
+            href="/student/profile"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white rounded-xl shadow-md shadow-indigo-600/20 text-xs font-bold px-4 py-2.5 transition-all hover:scale-105"
+          >
+            <User className="h-4 w-4" />
+            My Student Profile ({ac?.studentNumber || "STU-CSE-001"})
+            <ChevronRight className="h-3.5 w-3.5 opacity-80" />
+          </Link>
+        </div>
+      </div>
 
       {/* ── ACADEMIC HERO BANNER ────────────────────────────────────────────── */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-950 via-purple-950/70 to-slate-900 border border-indigo-500/20 p-6 lg:p-8 backdrop-blur-xl shadow-xl">

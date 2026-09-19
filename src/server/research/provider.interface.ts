@@ -92,10 +92,20 @@ export interface ResearchNotebookProvider {
     providerNotebookId: string
   ): Promise<{ success: boolean; errorMessage?: string }>;
 
-  /** Optional multi-document synthesis (Study guide, FAQ, Podcast dialogue, Summary) */
+  /** Optional multi-document synthesis */
   synthesizeNotebook?(params: {
     sources: Array<{ fileName: string; textContent: string }>;
-    mode?: "summary" | "faq" | "podcast" | "study_guide";
+    mode?: SynthesisMode;
     customPrompt?: string;
   }): Promise<{ markdown: string; title: string }>;
 }
+
+export type SynthesisMode =
+  | "summary"
+  | "faq"
+  | "podcast"
+  | "study_guide"
+  | "literature_matrix"
+  | "thesis_defense"
+  | "bibtex_citations"
+  | "methodology";

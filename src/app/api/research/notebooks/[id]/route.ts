@@ -23,6 +23,42 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    if (id.startsWith("ws-starter-")) {
+      const { getStarterWorkspaceById } = await import("@/server/research/starter-workspaces");
+      const { getProviderMeta } = await import("@/server/research/provider.factory");
+      const starter = getStarterWorkspaceById(id);
+      if (starter) {
+        const providerMeta = getProviderMeta();
+        return NextResponse.json({
+          notebook: {
+            id: starter.id,
+            organizationId: starter.organizationId,
+            title: starter.title,
+            description: starter.description,
+            provider: providerMeta.providerName,
+            isDevelopmentMode: providerMeta.isDevelopmentMode,
+            status: "ACTIVE",
+            providerWebUrl: null,
+            totalSources: starter.sources.length,
+            staleSources: 0,
+            createdAt: starter.createdAt,
+            updatedAt: starter.updatedAt,
+          },
+          sources: starter.sources.map((s) => ({
+            id: s.id,
+            documentId: s.documentId,
+            fileName: s.fileName,
+            status: s.status,
+            isStale: s.isStale,
+            currentDocumentVersion: "1",
+            syncedDocumentVersion: "1",
+            errorMessage: s.errorMessage,
+            updatedAt: s.updatedAt,
+          })),
+        });
+      }
+    }
+
     const ctx = await resolveContext();
     if (!ctx) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
 

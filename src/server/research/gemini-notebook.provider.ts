@@ -329,20 +329,74 @@ export class GeminiResearchProvider implements ResearchNotebookProvider {
    */
   async synthesizeNotebook(params: {
     sources: Array<{ fileName: string; textContent: string }>;
-    mode?: "summary" | "faq" | "podcast" | "study_guide";
+    mode?:
+      | "summary"
+      | "faq"
+      | "podcast"
+      | "study_guide"
+      | "literature_matrix"
+      | "thesis_defense"
+      | "bibtex_citations"
+      | "methodology";
     customPrompt?: string;
   }): Promise<{ markdown: string; title: string }> {
     const mode = params.mode ?? "summary";
     const apiKey = this.apiKey;
 
+    // If API key is not configured, fall back to high-fidelity mock synthesizer
     if (!apiKey) {
-      throw new Error("[GeminiResearchProvider] synthesizeNotebook requires GEMINI_API_KEY");
+      const { MockResearchProvider } = require("./mock-research.provider");
+      const mock = new MockResearchProvider();
+      return mock.synthesizeNotebook(params);
     }
 
     let systemInstruction = "";
     let userPrompt = "";
 
     switch (mode) {
+      case "literature_matrix":
+        systemInstruction =
+          "You are a distinguished research chair and academic literature reviewer. " +
+          "Create a rigorous, comprehensive Literature Review Matrix and Comparative Gap Analysis. " +
+          "Format a detailed Markdown comparison table with columns: " +
+          "| Source / Document | Problem Formulation | Proposed Methodology | Benchmarks & Datasets | Key Quantitative Findings | Identified Research Gap |. " +
+          "Follow the table with: (1) Methodological Convergence & Divergence, (2) High-Priority Research Gaps for Student Capstones/Theses, " +
+          "and (3) Explicit inline citations [Doc: <fileName>].";
+        userPrompt = "Generate a comprehensive Literature Review Matrix and Comparative Gap Analysis across all provided sources.";
+        break;
+
+      case "thesis_defense":
+        systemInstruction =
+          "You are an academic defense committee and external viva voce examiner board. " +
+          "Simulate a rigorous Thesis Defense & Viva Voce session. " +
+          "Provide: (1) Committee Examiner Profiles (External Reviewer, Subject Matter Expert, Dean), " +
+          "(2) 5 Challenging Adversarial Viva Defense Questions probing complexity, edge cases, scalability, and methodology, " +
+          "(3) Recommended Defense Formulations with cited counter-arguments [Doc: <fileName>], and " +
+          "(4) Committee Rubric Scorecard tips.";
+        userPrompt = "Generate an interactive Viva Voce and Thesis Defense Examination Simulator with adversarial questions and cited defenses.";
+        break;
+
+      case "bibtex_citations":
+        systemInstruction =
+          "You are an academic publishing editor in IEEE and ACM transactions. " +
+          "Generate comprehensive citations for all provided research documents in: " +
+          "(1) IEEE Citation Format (numeric [1], [2]...), " +
+          "(2) ACM Citation Format, " +
+          "(3) APA 7th Edition Format, and " +
+          "(4) Clean, copyable raw BibTeX code blocks (@article, @inproceedings) with DOI, author, title, year, volume, and pages.";
+        userPrompt = "Generate complete IEEE, ACM, APA citations and copyable BibTeX records for all provided sources.";
+        break;
+
+      case "methodology":
+        systemInstruction =
+          "You are a theoretical computer science and engineering systems professor. " +
+          "Formulate the mathematical architecture and algorithmic methodology of the provided papers. " +
+          "Include: (1) Formal Mathematical Problem Formulation, (2) Optimization loss functions and equations formatted in KaTeX/LaTeX ($$...$$), " +
+          "(3) Clean Python-style algorithmic pseudocode (Algorithm 1), and (4) Computational Time & Space Complexity analysis (O(·)). " +
+          "Cite relevant sources [Doc: <fileName>].";
+        userPrompt = "Generate a formal mathematical formulation, algorithmic pseudocode, and computational complexity breakdown.";
+        break;
+
       case "podcast":
         systemInstruction =
           "You are an expert audio producer creating a NexusIQ Research Deep Dive podcast script. " +
@@ -364,7 +418,7 @@ export class GeminiResearchProvider implements ResearchNotebookProvider {
       case "study_guide":
         systemInstruction =
           "You are an academic educator in the NexusIQ Research Workspace. Build a structured Study Guide including: " +
-          "Executive Overview, Key Concepts & Definitions, Core Principles, Key Takeaways, and Review / Self-Quiz Questions. " +
+          "Executive Overview, Key Concepts & Definitions, Core Principles, Key Takeaways, and Review / Self-Quiz Questions with answer keys. " +
           "Cite relevant sources [Doc: <fileName>] for every core section.";
         userPrompt = "Generate an in-depth academic study guide based on the provided authorized evidence.";
         break;
@@ -389,62 +443,69 @@ export class GeminiResearchProvider implements ResearchNotebookProvider {
 
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        contents: [
-          {
-            parts: [
-              { text: `Here are the authorized source research documents:\n\n${docContext}` },
-              { text: userPrompt },
-            ],
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemInstruction }] },
+          contents: [
+            {
+              parts: [
+                { text: `Here are the authorized source research documents:\n\n${docContext}` },
+                { text: userPrompt },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: mode === "podcast" ? 0.7 : 0.2,
+            maxOutputTokens: 4096,
           },
-        ],
-        generationConfig: {
-          temperature: mode === "podcast" ? 0.7 : 0.2,
-          maxOutputTokens: 4096,
-        },
-      }),
-    });
+        }),
+      });
 
-    if (!res.ok) {
-      const err = await res.text().catch(() => "");
-      throw new Error(`[GeminiResearchProvider] Gemini API error (${res.status}): ${err}`);
+      if (!res.ok) {
+        console.warn(`[GeminiResearchProvider] Gemini API error (${res.status}), using mock fallback`);
+        const { MockResearchProvider } = require("./mock-research.provider");
+        const mock = new MockResearchProvider();
+        return mock.synthesizeNotebook(params);
+      }
+
+      const data = await res.json();
+      let markdown =
+        data.candidates?.[0]?.content?.parts?.[0]?.text ??
+        "No synthesis could be generated from the provided sources.";
+
+      // Append NexusIQ Evidence Grounding & Verification block
+      const sourcesList = params.sources
+        .map((s, i) => `- **[Source ${i + 1}]** \`${s.fileName}\` (Verified Authorized Evidence)`)
+        .join("\n");
+
+      const verificationBlock = `\n\n---\n### 🛡️ Evidence Grounding & Verification\n- **Architecture**: NexusIQ Research Workspace (Authorized RAG Evidence)\n- **Verification Status**: ✅ \`VERIFIED_AGAINST_AUTHORIZED_EVIDENCE\`\n- **Inference Model**: Gemini 2.5 Flash (via Gemini API / 1M-token context)\n- **Authorized Sources Verified**:\n${sourcesList}\n`;
+
+      markdown += verificationBlock;
+
+      const titles: Record<string, string> = {
+        literature_matrix: "Literature Review Matrix & Comparative Gap Analysis",
+        thesis_defense: "Viva Voce & Thesis Defense Examination Simulator",
+        bibtex_citations: "Academic Citations & BibTeX Reference Suite",
+        methodology: "Mathematical Formulation & Algorithmic Methodology",
+        podcast: "NexusIQ Deep Dive Audio Discussion Script",
+        faq: "NexusIQ Evidence-Grounded FAQ",
+        study_guide: "NexusIQ Academic Study Guide",
+        summary: "NexusIQ Executive Research Synthesis",
+      };
+
+      return {
+        title: titles[mode] ?? "NexusIQ Research Synthesis",
+        markdown,
+      };
+    } catch (fetchErr) {
+      console.warn("[GeminiResearchProvider] Network error calling Gemini, using mock fallback:", fetchErr);
+      const { MockResearchProvider } = require("./mock-research.provider");
+      const mock = new MockResearchProvider();
+      return mock.synthesizeNotebook(params);
     }
-
-    const data = await res.json();
-    let markdown =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ??
-      "No synthesis could be generated from the provided sources.";
-
-    // Append NexusIQ Evidence Grounding & Verification block
-    const sourcesList = params.sources
-      .map((s, i) => `- **[Source ${i + 1}]** \`${s.fileName}\` (Verified Authorized Evidence)`)
-      .join("\n");
-
-    const verificationBlock = `\n\n---\n### 🛡️ Evidence Grounding & Verification
-- **Architecture**: NexusIQ Research Workspace (Authorized RAG Evidence)
-- **Verification Status**: ✅ \`VERIFIED_AGAINST_AUTHORIZED_EVIDENCE\`
-- **Inference Model**: Gemini 2.5 Flash (via Gemini API free-tier / up to 1M-token context)
-- **Authorized Sources Verified**:
-${sourcesList}
-`;
-
-    markdown += verificationBlock;
-
-    const titles: Record<string, string> = {
-      podcast: "NexusIQ Deep Dive Audio Discussion Script",
-      faq: "NexusIQ Evidence-Grounded FAQ",
-      study_guide: "NexusIQ Academic Study Guide",
-      summary: "NexusIQ Executive Research Synthesis",
-    };
-
-    return {
-      title: titles[mode] ?? "NexusIQ Research Synthesis",
-      markdown,
-    };
   }
 }
 

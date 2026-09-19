@@ -21,7 +21,25 @@ async function resolveContext() {
 export async function GET() {
   try {
     const ctx = await resolveContext();
-    if (!ctx) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
+    if (!ctx) {
+      const { getStarterWorkspaces } = await import("@/server/research/starter-workspaces");
+      const providerMeta = getProviderMeta();
+      const starters = getStarterWorkspaces().map((w) => ({
+        id: w.id,
+        organizationId: w.organizationId,
+        title: w.title,
+        description: w.description,
+        provider: providerMeta.providerName,
+        isDevelopmentMode: providerMeta.isDevelopmentMode,
+        status: "ACTIVE",
+        providerWebUrl: null,
+        totalSources: w.sources.length,
+        staleSources: 0,
+        createdAt: w.createdAt,
+        updatedAt: w.updatedAt,
+      }));
+      return NextResponse.json({ notebooks: starters, provider: providerMeta });
+    }
 
     const notebooks = await ResearchNotebookService.getAuthorizedNotebooks(ctx);
     const providerMeta = getProviderMeta();

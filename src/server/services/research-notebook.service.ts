@@ -21,6 +21,8 @@ import { db } from "@/server/db/prisma";
 import { DocumentAccessPolicy } from "@/server/services/document-access-policy";
 import { AuditService } from "@/server/services/audit";
 import { getResearchProvider, getProviderMeta } from "@/server/research/provider.factory";
+import { getStarterWorkspaceById, getStarterWorkspaces } from "@/server/research/starter-workspaces";
+import type { SynthesisMode } from "@/server/research/provider.interface";
 
 // ── Forbidden document categories — never synced externally ───────────────────
 const FORBIDDEN_CONTENT_PATTERNS = [
@@ -286,6 +288,41 @@ export class ResearchNotebookService {
     ctx: ResolvedUserContext,
     notebookId: string
   ): Promise<{ notebook: NotebookSummary; sources: SourceSummary[] }> {
+    // If starter workspace, resolve immediately without DB lookup
+    if (notebookId.startsWith("ws-starter-")) {
+      const starter = getStarterWorkspaceById(notebookId);
+      if (starter) {
+        const providerMeta = getProviderMeta();
+        return {
+          notebook: {
+            id: starter.id,
+            organizationId: starter.organizationId,
+            title: starter.title,
+            description: starter.description,
+            provider: providerMeta.providerName,
+            isDevelopmentMode: providerMeta.isDevelopmentMode,
+            status: "ACTIVE",
+            providerWebUrl: null,
+            totalSources: starter.sources.length,
+            staleSources: 0,
+            createdAt: starter.createdAt,
+            updatedAt: starter.updatedAt,
+          },
+          sources: starter.sources.map((s) => ({
+            id: s.id,
+            documentId: s.documentId,
+            fileName: s.fileName,
+            status: s.status,
+            isStale: s.isStale,
+            currentDocumentVersion: "1",
+            syncedDocumentVersion: "1",
+            errorMessage: s.errorMessage,
+            updatedAt: s.updatedAt,
+          })),
+        };
+      }
+    }
+
     const notebook = await db.researchNotebook.findFirst({
       where: { id: notebookId, organizationId: ctx.organizationId, deletedAt: null },
     });
@@ -353,14 +390,34 @@ export class ResearchNotebookService {
   }
 
   /**
-   * Synthesizes cross-document research insights (Study guide, FAQ, Podcast dialogue, Executive Summary).
+   * Synthesizes cross-document research insights (Study guide, FAQ, Podcast dialogue, Executive Summary, Matrix, Viva Defense, Citations, Methodology).
    */
   static async synthesizeNotebook(
     ctx: ResolvedUserContext,
     notebookId: string,
-    mode?: "summary" | "faq" | "podcast" | "study_guide",
+    mode?: SynthesisMode,
     customPrompt?: string
   ): Promise<{ title: string; markdown: string }> {
+    // If starter workspace, synthesize directly
+    if (notebookId.startsWith("ws-starter-")) {
+      const starter = getStarterWorkspaceById(notebookId);
+      if (starter) {
+        const provider = getResearchProvider();
+        if (!provider.synthesizeNotebook) {
+          throw new Error("Active research provider does not support multi-document synthesis.");
+        }
+        const payload = starter.sources.map((s) => ({
+          fileName: s.fileName,
+          textContent: s.textContent,
+        }));
+        return provider.synthesizeNotebook({
+          sources: payload,
+          mode,
+          customPrompt,
+        });
+      }
+    }
+
     await ResearchNotebookService.assertNotebookAccess(ctx, notebookId, "VIEWER");
 
     const sources = await db.researchNotebookSource.findMany({
@@ -426,11 +483,28 @@ export class ResearchNotebookService {
     });
 
     const providerMeta = getProviderMeta();
-    return notebooks.map((nb) => {
+    const userNotebooks = notebooks.map((nb) => {
       const totalSources = nb.sources.length;
       const staleSources = nb.sources.filter((s) => s.status === "STALE").length;
       return ResearchNotebookService.toNotebookSummary(nb, providerMeta, totalSources, staleSources);
     });
+
+    const starters: NotebookSummary[] = getStarterWorkspaces().map((w) => ({
+      id: w.id,
+      organizationId: w.organizationId,
+      title: w.title,
+      description: w.description,
+      provider: providerMeta.providerName,
+      isDevelopmentMode: providerMeta.isDevelopmentMode,
+      status: "ACTIVE",
+      providerWebUrl: null,
+      totalSources: w.sources.length,
+      staleSources: 0,
+      createdAt: w.createdAt,
+      updatedAt: w.updatedAt,
+    }));
+
+    return [...userNotebooks, ...starters];
   }
 
   /**

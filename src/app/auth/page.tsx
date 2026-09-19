@@ -15,6 +15,7 @@ import {
   Sparkles,
   Users,
   CheckCircle2,
+  Landmark,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +24,7 @@ export default function UnifiedAuthGatewayPage() {
   const portals = [
     {
       id: "student",
-      title: "Student Academic AI Portal",
+      title: "Student Login",
       role: "Undergraduate / Postgraduate Students",
       desc: "Instant syllabus retrieval, course prerequisite checking, and live PDF page-range slicing downloads.",
       icon: MessageSquare,
@@ -41,7 +42,7 @@ export default function UnifiedAuthGatewayPage() {
     },
     {
       id: "faculty",
-      title: "Faculty Operations Portal",
+      title: "Faculty Login",
       role: "Professors & Department Lecturers",
       desc: "Upload syllabi and exam documents, configure weekly timetable slots, and inspect anti-malpractice seating.",
       icon: GraduationCap,
@@ -59,7 +60,7 @@ export default function UnifiedAuthGatewayPage() {
     },
     {
       id: "hod",
-      title: "HOD & Dean Governance Portal",
+      title: "HOD Login",
       role: "Department Heads & Academic Deans",
       desc: "7-Dimension department health score, AI command center, faculty workload limits, student risk radar, and action proposals.",
       icon: Scale,
@@ -73,6 +74,24 @@ export default function UnifiedAuthGatewayPage() {
         "7-Dimension Department Health Index & Provenance",
         "What Changed? Weekly delta drift tracker",
         "Multi-tiered action proposals with policy evidence",
+      ],
+    },
+    {
+      id: "principal",
+      title: "Principal Login",
+      role: "College Principals & Higher Officials",
+      desc: "Macro-level institutional oversight, NIRF/NAAC metrics benchmarking, and financial budget allocation approvals.",
+      icon: Landmark,
+      color: "from-amber-600 to-orange-600",
+      border: "border-amber-500/40 hover:border-amber-500/70",
+      bgGlow: "bg-amber-500/15",
+      badge: "Executive Leadership",
+      loginUrl: "/principal",
+      signupUrl: "",
+      bullets: [
+        "NIRF/NAAC Institutional Benchmarking",
+        "Executive Budget Approvals & Sanctions",
+        "Multi-college macro governance cockpit",
       ],
     },
   ];
@@ -145,7 +164,7 @@ export default function UnifiedAuthGatewayPage() {
                     href={portal.loginUrl}
                     className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r ${portal.color} hover:opacity-95 text-slate-900 text-xs font-semibold shadow-lg transition-all`}
                   >
-                    <span>Sign In to {portal.id.toUpperCase()}</span>
+                    <span>{portal.title}</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
 

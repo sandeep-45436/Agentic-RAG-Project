@@ -132,7 +132,7 @@ export default function SkillDevelopmentPortalPage() {
             </div>
 
             <h1 className="text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
-              Skill Acceleration & Career Launchpad
+              Placement Center & Career Launchpad
             </h1>
 
             <p className="text-sm text-slate-700 max-w-2xl leading-relaxed">

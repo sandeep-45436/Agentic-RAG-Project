@@ -56,7 +56,7 @@ export default function LoginPage() {
           <Bot className="h-6 w-6" />
         </div>
         <div>
-          <CardTitle className="text-2xl font-bold tracking-tight text-slate-900">Student Academic Portal</CardTitle>
+          <CardTitle className="text-2xl font-bold tracking-tight text-slate-900">Student Login</CardTitle>
           <CardDescription className="text-xs text-slate-600">
             Sign in to access your department syllabus, course documents, and AI assistant
           </CardDescription>
@@ -134,19 +134,19 @@ export default function LoginPage() {
           <div className="pt-3 border-t border-indigo-100/80 w-full grid grid-cols-2 gap-2 text-xs text-slate-600">
             <Link href="/principal" className="hover:text-amber-300 transition-colors flex items-center gap-1.5 p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-semibold">
               <Landmark className="h-3.5 w-3.5 text-amber-400" />
-              <span>Principal Portal</span>
+              <span>Principal Login</span>
             </Link>
             <Link href="/skills" className="hover:text-cyan-300 transition-colors flex items-center gap-1.5 p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-semibold">
               <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
-              <span>Skills Arena</span>
+              <span>Placement Center</span>
             </Link>
             <Link href="/faculty/login" className="hover:text-purple-300 transition-colors flex items-center gap-1 p-1">
               <GraduationCap className="h-3.5 w-3.5 text-purple-400" />
-              <span>Faculty Portal</span>
+              <span>Faculty Login</span>
             </Link>
             <Link href="/hod/login" className="hover:text-blue-300 transition-colors flex items-center gap-1 p-1 justify-end">
               <Scale className="h-3.5 w-3.5 text-blue-400" />
-              <span>HOD Portal &rarr;</span>
+              <span>HOD Login &rarr;</span>
             </Link>
           </div>
         </CardFooter>

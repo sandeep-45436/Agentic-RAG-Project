@@ -243,7 +243,7 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
         >
           <span className="flex items-center gap-2">
             <Building2 className="h-3.5 w-3.5 text-slate-400" />
-            Switch to Main Portal
+            Switch to Student Portal
           </span>
           <ExternalLink className="h-3 w-3 text-slate-400" />
         </Link>

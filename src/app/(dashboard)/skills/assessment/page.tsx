@@ -112,7 +112,7 @@ export default function SkillAssessmentArenaPage() {
           href="/skills"
           className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-white transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to Skill Center
+          <ArrowLeft className="h-4 w-4" /> Back to Placement Center
         </Link>
 
         <div className="flex items-center gap-3">

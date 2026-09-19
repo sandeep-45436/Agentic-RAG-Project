@@ -98,7 +98,7 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
               href="/dashboard"
               className="hidden lg:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-600 text-xs font-medium border border-slate-200 transition-colors"
             >
-              <span>Main Portal</span>
+              <span>Student Portal</span>
               <ExternalLink className="h-3 w-3 text-slate-400" />
             </Link>
 

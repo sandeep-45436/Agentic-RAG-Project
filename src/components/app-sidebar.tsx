@@ -35,7 +35,7 @@ import {
 const studentNav = [
   { title: "Chat Assistant", url: "/chat", icon: MessageSquare },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Skill Development", url: "/skills", icon: Zap },
+  { title: "Placement Center", url: "/skills", icon: Zap },
   { title: "Research Workspace", url: "/research", icon: BookMarked },
   { title: "Browse Notes & Docs", url: "/documents", icon: BookOpen },
   { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },
@@ -48,7 +48,7 @@ const studentNav = [
 const facultyAdminNav = [
   { title: "Chat Assistant", url: "/chat", icon: MessageSquare },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Skill Development", url: "/skills", icon: Zap },
+  { title: "Placement Center", url: "/skills", icon: Zap },
   { title: "Principal Portal", url: "/principal", icon: Landmark },
   { title: "Faculty Portal", url: "/faculty/dashboard", icon: GraduationCap },
   { title: "HOD Portal", url: "/hod/dashboard", icon: Scale },

@@ -591,7 +591,7 @@ export default function StudentProfilePage() {
                     </div>
                     <Link href="/skills">
                       <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold">
-                        Open Full Skills Portal <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                        Open Placement Center <ChevronRight className="h-3.5 w-3.5 ml-1" />
                       </Button>
                     </Link>
                   </div>

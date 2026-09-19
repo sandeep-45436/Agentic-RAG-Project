@@ -440,11 +440,11 @@ export default function HODLoginPage() {
             <div className="flex items-center justify-between w-full text-xs text-slate-600">
               <Link href="/faculty/login" className="hover:text-blue-400 transition-colors flex items-center gap-1">
                 <GraduationCap className="h-3.5 w-3.5" />
-                Faculty Portal &rarr;
+                Faculty Login &rarr;
               </Link>
               <Link href="/dashboard" className="hover:text-blue-400 transition-colors flex items-center gap-1">
                 <Building2 className="h-3.5 w-3.5" />
-                Main Portal &rarr;
+                Student Portal &rarr;
               </Link>
             </div>
           </CardFooter>

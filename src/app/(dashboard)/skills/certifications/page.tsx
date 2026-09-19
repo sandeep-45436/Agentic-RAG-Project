@@ -93,7 +93,7 @@ export default function CertificationsPortfolioPage() {
             href="/skills"
             className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-white transition-colors mb-2"
           >
-            <ArrowLeft className="h-4 w-4" /> Back to Skill Center
+            <ArrowLeft className="h-4 w-4" /> Back to Placement Center
           </Link>
           <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
             <Award className="h-6 w-6 text-cyan-400" />

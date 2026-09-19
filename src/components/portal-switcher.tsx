@@ -28,8 +28,8 @@ interface Portal {
 const portals: Portal[] = [
   {
     id: "student",
-    name: "Student Academic Hub",
-    shortName: "Student Hub",
+    name: "Student Portal",
+    shortName: "Student Portal",
     href: "/dashboard",
     icon: BookOpen,
     badge: "Active Scope",
@@ -39,8 +39,8 @@ const portals: Portal[] = [
   },
   {
     id: "skills",
-    name: "Skill Development Portal",
-    shortName: "Skills & Career",
+    name: "Placement Center",
+    shortName: "Placement Center",
     href: "/skills",
     icon: Zap,
     badge: "Industry Ready",

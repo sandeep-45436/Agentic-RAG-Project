@@ -408,20 +408,38 @@
   100% { background-position: 120px 120px, -180px 180px, 150px -150px, -200px 200px, 160px 160px, -220px -220px; }
 }
 
-/* ── LIGHT STREAKS ────────────────────────────────────────────────────────── */
+/* ── LIGHT STREAKS (Soft, diffused ambient shafts, not sharp lines) ───────── */
 .light-streak {
   position: absolute;
-  width: 2px;
+  width: 40px;
   height: 300%;
-  background: linear-gradient(to bottom, transparent, rgba(99,102,241,0.08), rgba(6,182,212,0.06), transparent);
+  background: linear-gradient(to bottom, transparent, rgba(99,102,241,0.04), rgba(6,182,212,0.03), transparent);
+  filter: blur(14px);
   transform-origin: top center;
+  pointer-events: none;
 }
-.light-streak-1 { left: 15%; top: -50%; transform: rotate(25deg); animation: streakMove 12s ease-in-out infinite; }
-.light-streak-2 { left: 55%; top: -60%; transform: rotate(-20deg); animation: streakMove 15s ease-in-out infinite 4s; opacity: 0.6; }
-.light-streak-3 { left: 80%; top: -40%; transform: rotate(35deg); animation: streakMove 18s ease-in-out infinite 8s; opacity: 0.4; }
+.light-streak-1 { left: 15%; top: -50%; transform: rotate(25deg); animation: streakMove 14s ease-in-out infinite; }
+.light-streak-2 { left: 55%; top: -60%; transform: rotate(-20deg); animation: streakMove 18s ease-in-out infinite 4s; opacity: 0.6; }
+.light-streak-3 { left: 80%; top: -40%; transform: rotate(35deg); animation: streakMove 22s ease-in-out infinite 8s; opacity: 0.4; }
 @keyframes streakMove {
-  0%, 100% { opacity: 0.3; transform: rotate(25deg) translateY(0); }
-  50% { opacity: 0.7; transform: rotate(25deg) translateY(80px); }
+  0%, 100% { opacity: 0.25; transform: rotate(25deg) translateY(0); }
+  50% { opacity: 0.6; transform: rotate(25deg) translateY(80px); }
+}
+
+/* ── CAMPUS AMBIENT DRIFT (Soft, dreamy depth-of-field movement) ─────────── */
+@keyframes campusAmbientDrift {
+  0% {
+    transform: scale(1.10) translate(0px, 0px);
+  }
+  50% {
+    transform: scale(1.15) translate(-10px, -8px);
+  }
+  100% {
+    transform: scale(1.10) translate(0px, 0px);
+  }
+}
+.campus-ambient-drift {
+  animation: campusAmbientDrift 30s ease-in-out infinite alternate;
 }
 
 /* ── STAGGERED FADE-UP ENTRANCE ───────────────────────────────────────────── */

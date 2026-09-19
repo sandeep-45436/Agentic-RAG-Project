@@ -75,34 +75,11 @@ const navSections: NavSection[] = [
     ],
   },
   {
-    label: "Faculty Operations",
+    label: "Campus Subsystems",
     items: [
-      { title: "Faculty Dashboard", url: "/faculty/dashboard", icon: GraduationCap, badge: "Cockpit" },
-      { title: "Class Timetables", url: "/faculty/timetables", icon: Calendar },
-      { title: "Exam Seating", url: "/faculty/seating", icon: Users, badge: "Halls" },
-      { title: "Upload Course Docs", url: "/faculty/documents", icon: FileText },
-      { title: "Assigned Faculty", url: "/faculty/assigned-faculty", icon: Building2 },
-    ],
-  },
-  {
-    label: "HOD Governance",
-    items: [
-      { title: "Department Command", url: "/hod/dashboard", icon: Scale, badge: "HQ" },
-      { title: "Approval Docket", url: "/hod/approvals", icon: CheckCircle2, badge: "Leaves" },
-      { title: "Faculty Workload", url: "/hod/faculty", icon: Users },
-      { title: "Student Risk Radar", url: "/hod/students", icon: ShieldAlert, badge: "Risks" },
-      { title: "Master Timetable", url: "/hod/timetable", icon: Calendar },
-      { title: "Courses & Syllabi", url: "/hod/courses", icon: BookOpen },
-      { title: "Research Grants", url: "/hod/research", icon: Award },
-    ],
-  },
-  {
-    label: "Principal Leadership",
-    items: [
-      { title: "Executive Cockpit", url: "/principal", icon: Landmark, badge: "Executive" },
-      { title: "9-Department Matrix", url: "/principal/departments", icon: Building2, badge: "9 Depts" },
-      { title: "Approvals Registry", url: "/principal/approvals", icon: CheckCircle2 },
-      { title: "Budget & Finance", url: "/principal/finance", icon: DollarSign, badge: "Grants" },
+      { title: "Principal Portal", url: "/principal", icon: Landmark, badge: "Executive" },
+      { title: "Faculty Portal", url: "/faculty/dashboard", icon: GraduationCap, badge: "Academic" },
+      { title: "HOD Portal", url: "/hod/dashboard", icon: Scale, badge: "Dept HQ" },
     ],
   },
   {

@@ -14,7 +14,7 @@ import {
   ArrowDownRight, Loader2, UploadCloud, Bot, Database,
   BarChart2, ChevronRight, RefreshCw, Sparkles, Building,
   GraduationCap, ShieldCheck, CheckCircle2, XCircle, BookOpen,
-  Calendar, Layers, ArrowRight, Eye, Download, User,
+  Calendar, Layers, ArrowRight, Eye, Download, User, BookMarked,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PortalSwitcher } from "@/components/portal-switcher";
@@ -253,8 +253,125 @@ export default function DashboardPage() {
   return (
     <AnimatedBackground>
     <div className="space-y-6 pb-12 font-sans">
-      {/* ── UNIFIED SUBSYSTEM PORTAL SWITCHER ─────────────────────────────── */}
-      <PortalSwitcher />
+      {/* ── STUDENT ACADEMIC OPERATIONS SUB-FEATURES HUB ────────────────── */}
+      <div className="bg-white/95 rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-100 gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold shadow-xs">
+              <GraduationCap className="h-4.5 w-4.5" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900">Student Academic Modules & Resources Hub</h2>
+              <p className="text-[11px] text-slate-500">Access your department faculty materials, AI study assistant, notes repository, and research tools</p>
+            </div>
+          </div>
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 w-fit">
+            5 Student Sub-Features Available
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <a
+            href="#dept-feed"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/40 hover:bg-white hover:border-indigo-400 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-indigo-100 text-indigo-700 group-hover:scale-105 transition-transform">
+                <FileText className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">Live Feed</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-indigo-700 transition-colors">Faculty Uploads Feed</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Syllabi, course handouts & lecture notes</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-indigo-700">
+              <span>Jump to Feed</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </a>
+
+          <Link
+            href="/chat"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-purple-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-purple-100 text-purple-700 group-hover:scale-105 transition-transform">
+                <Bot className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">RAG AI</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-purple-700 transition-colors">AI Academic Chat</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Ask questions on textbooks, syllabus & slides</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-purple-700">
+              <span>Start Chat</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/documents"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-blue-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-blue-100 text-blue-700 group-hover:scale-105 transition-transform">
+                <BookOpen className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">Docs</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-blue-700 transition-colors">Browse Notes & Docs</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Searchable textbook chunks & question banks</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-blue-700">
+              <span>Browse Documents</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/knowledge-bases"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-emerald-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 group-hover:scale-105 transition-transform">
+                <Layers className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">Repositories</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Knowledge Bases</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Indexed department collections & curriculum</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-emerald-700">
+              <span>View Repositories</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/research"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-amber-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-amber-100 text-amber-700 group-hover:scale-105 transition-transform">
+                <BookMarked className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Research</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-amber-700 transition-colors">Research Workspace</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">AI literature analysis & project research</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-amber-700">
+              <span>Open Workspace</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+        </div>
+      </div>
 
       {/* ── ALITS STUDENT INSTITUTIONAL BRAND HEADER ──────────────────────── */}
       <div className="light-glass-card anim-fade-up-1 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">

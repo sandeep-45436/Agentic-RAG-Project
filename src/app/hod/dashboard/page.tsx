@@ -29,6 +29,8 @@ import {
   Building,
   FlaskConical,
   Flame,
+  BookOpen,
+  FileBarChart,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -141,8 +143,225 @@ export default function HODDashboardPage() {
   return (
     <AnimatedBackground>
     <div className="space-y-6 font-sans pb-12">
-      {/* ── PORTAL SWITCHER MATRIX ─────────────────────────────────── */}
-      <PortalSwitcher />
+      {/* ── HOD DEPARTMENT GOVERNANCE SUB-FEATURES HUB ────────────────── */}
+      <div className="bg-white/95 rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-100 gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold shadow-xs">
+              <Scale className="h-4.5 w-4.5" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900">Department Governance & Operations Hub</h2>
+              <p className="text-[11px] text-slate-500">Executive command tools for student risk tracking, faculty workload, approvals, and curriculum</p>
+            </div>
+          </div>
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 w-fit">
+            10 Department Sub-Features Available
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
+          <Link
+            href="/hod/approvals"
+            className="group flex flex-col justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-blue-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-blue-100 text-blue-700 group-hover:scale-105 transition-transform">
+                <ShieldCheck className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">Approvals</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-blue-700 transition-colors">Approval Docket</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Leaves, OD & requisitions</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-blue-700">
+              <span>Open Queue</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/hod/faculty"
+            className="group flex flex-col justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-purple-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-purple-100 text-purple-700 group-hover:scale-105 transition-transform">
+                <Users className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">Workload</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-purple-700 transition-colors">Faculty Workload</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">15-hr cap & course sections</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-purple-700">
+              <span>Inspect Hours</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/hod/students"
+            className="group flex flex-col justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-rose-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-rose-100 text-rose-700 group-hover:scale-105 transition-transform">
+                <GraduationCap className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-700">Risk Radar</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-rose-700 transition-colors">Student Risk Radar</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Attendance shortfall & alerts</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-rose-700">
+              <span>View At-Risk</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/hod/timetable"
+            className="group flex flex-col justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-amber-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-amber-100 text-amber-700 group-hover:scale-105 transition-transform">
+                <Calendar className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Master</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-amber-700 transition-colors">Master Timetable</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Conflict-free department grid</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-amber-700">
+              <span>Open Timetable</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/hod/courses"
+            className="group flex flex-col justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-emerald-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 group-hover:scale-105 transition-transform">
+                <BookOpen className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">Syllabus</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Courses & Syllabi</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Curriculum coverage & credits</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-emerald-700">
+              <span>Curriculum</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/hod/research"
+            className="group flex flex-col justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-cyan-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-cyan-100 text-cyan-700 group-hover:scale-105 transition-transform">
+                <FlaskConical className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-700">Grants</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">Research & Grants</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Patents & sponsored projects</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-cyan-700">
+              <span>View Grants</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/hod/examinations"
+            className="group flex flex-col justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-indigo-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-indigo-100 text-indigo-700 group-hover:scale-105 transition-transform">
+                <Layers className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">Exams</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-indigo-700 transition-colors">Exam Cell</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Seating supervision & schedules</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-indigo-700">
+              <span>Exam Cell</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/hod/facilities"
+            className="group flex flex-col justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-teal-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-teal-100 text-teal-700 group-hover:scale-105 transition-transform">
+                <Building className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-teal-100 text-teal-700">Labs</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-teal-700 transition-colors">Labs & Facilities</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Equipment & infrastructure</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-teal-700">
+              <span>Inspect Labs</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/hod/audit"
+            className="group flex flex-col justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-slate-400 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-slate-100 text-slate-700 group-hover:scale-105 transition-transform">
+                <FileText className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">Audit</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-slate-800 transition-colors">Audit Trail</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Governance event logging</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-slate-700">
+              <span>View Trail</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/hod/reports"
+            className="group flex flex-col justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-indigo-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-indigo-100 text-indigo-700 group-hover:scale-105 transition-transform">
+                <FileBarChart className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">NAAC/NBA</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-indigo-700 transition-colors">Executive Reports</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Accreditation metrics & briefs</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-indigo-700">
+              <span>View Reports</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+        </div>
+      </div>
 
       {/* ─────────────────────────────────────────────────────────────────── */}
       {/* 1. TOP HEADER & OPERATIONAL BRIEF BANNER                            */}

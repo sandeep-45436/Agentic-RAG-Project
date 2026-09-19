@@ -79,8 +79,105 @@ export default function SkillDevelopmentPortalPage() {
   return (
     <AnimatedBackground>
       <div className="space-y-6 pb-12 font-sans">
-      {/* ── UNIFIED SUBSYSTEM PORTAL SWITCHER ─────────────────────────────── */}
-      <PortalSwitcher />
+      {/* ── PLACEMENT CENTER CAREER LAUNCHPAD SUB-FEATURES HUB ───────── */}
+      <div className="bg-white/95 rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-100 gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold shadow-xs">
+              <Zap className="h-4.5 w-4.5" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900">Placement Center • Career Modules Hub</h2>
+              <p className="text-[11px] text-slate-500">Industry competency tracking, live coding tests, verified certifications, and interview preparation</p>
+            </div>
+          </div>
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200 w-fit">
+            4 Career Sub-Features Available
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <Link
+            href="/skills"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-cyan-300 bg-cyan-50/50 hover:bg-white hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-cyan-100 text-cyan-700 group-hover:scale-105 transition-transform">
+                <Zap className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-700">Radar</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">Placement Match Radar</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Role competency fitment & industry benchmarks</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-cyan-700">
+              <span>View Fitment Radar</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/skills/assessment"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-emerald-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 group-hover:scale-105 transition-transform">
+                <Award className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">Assessments</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Skill Assessment Arena</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Live technical challenges & mock interview tests</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-emerald-700">
+              <span>Enter Arena</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/skills/certifications"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-indigo-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-indigo-100 text-indigo-700 group-hover:scale-105 transition-transform">
+                <CheckCircle2 className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">Credentials</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-indigo-700 transition-colors">Industry Certifications</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">AWS, Google Cloud, Cisco & Microsoft verified badges</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-indigo-700">
+              <span>Inspect Badges</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/student/profile"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-purple-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-purple-100 text-purple-700 group-hover:scale-105 transition-transform">
+                <BrainCircuit className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">Profile</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-purple-700 transition-colors">Candidate Profile & Resume</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Verified skill dossier, GitHub projects & academic record</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-purple-700">
+              <span>View Dossier</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+        </div>
+      </div>
 
       {/* ── 1. ALITS INSTITUTIONAL SKILLS HEADER ──────────────────────── */}
       <div className="light-glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">

@@ -112,8 +112,125 @@ export default function FacultyDashboardPage() {
   return (
     <AnimatedBackground>
     <div className="space-y-6 pb-12 font-sans relative z-10">
-      {/* ── UNIFIED SUBSYSTEM PORTAL SWITCHER ─────────────────────────────── */}
-      <PortalSwitcher />
+      {/* ── FACULTY ACADEMIC OPERATIONS SUB-FEATURES HUB ────────────────── */}
+      <div className="bg-white/95 rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-100 gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold shadow-xs">
+              <GraduationCap className="h-4.5 w-4.5" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900">Faculty Academic Operations & Modules</h2>
+              <p className="text-[11px] text-slate-500">Access your teaching periods, exam invigilations, syllabus uploads, and department dossier</p>
+            </div>
+          </div>
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 w-fit">
+            5 Faculty Sub-Features Available
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <Link
+            href="/faculty/timetables"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-purple-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-purple-100 text-purple-700 group-hover:scale-105 transition-transform">
+                <Calendar className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">Schedule</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-purple-700 transition-colors">Class Timetables</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Teaching hours, periods & hall schedules</p>
+            </div>
+            <div className="mt-2 pt-2 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-purple-700 group-hover:translate-x-0.5 transition-transform">
+              <span>View Timetable</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/faculty/seating"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-blue-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-blue-100 text-blue-700 group-hover:scale-105 transition-transform">
+                <Layers className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">Invigilation</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-blue-700 transition-colors">Exam Seating Plans</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Student seat grid & exam hall duties</p>
+            </div>
+            <div className="mt-2 pt-2 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-blue-700 group-hover:translate-x-0.5 transition-transform">
+              <span>Inspect Seating Grid</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/faculty/documents"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-emerald-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 group-hover:scale-105 transition-transform">
+                <FileText className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">Uploads</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Academic Docs & Notes</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Upload syllabi, notes & question banks</p>
+            </div>
+            <div className="mt-2 pt-2 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-emerald-700 group-hover:translate-x-0.5 transition-transform">
+              <span>Manage Materials</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/faculty/assigned-faculty"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-amber-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-amber-100 text-amber-700 group-hover:scale-105 transition-transform">
+                <Users className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Faculty List</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-amber-700 transition-colors">Assigned Faculty</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Department colleagues & course sections</p>
+            </div>
+            <div className="mt-2 pt-2 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-amber-700 group-hover:translate-x-0.5 transition-transform">
+              <span>View Directory</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/faculty/profile"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-indigo-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-indigo-100 text-indigo-700 group-hover:scale-105 transition-transform">
+                <User className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">Dossier</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-indigo-700 transition-colors">Faculty Dossier</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Profile credentials & research publications</p>
+            </div>
+            <div className="mt-2 pt-2 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-indigo-700 group-hover:translate-x-0.5 transition-transform">
+              <span>Edit Profile</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+        </div>
+      </div>
 
       {/* ── ALITS FACULTY INSTITUTIONAL BRAND HEADER ──────────────────────── */}
       <div className="light-glass-card anim-fade-up-1 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">

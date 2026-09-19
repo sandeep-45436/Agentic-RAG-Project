@@ -118,8 +118,105 @@ export default function PrincipalDashboardPage() {
   return (
     <AnimatedBackground>
     <div className="space-y-6 pb-12 font-sans">
-      {/* ── UNIFIED SUBSYSTEM PORTAL SWITCHER ─────────────────────────────── */}
-      <PortalSwitcher />
+      {/* ── PRINCIPAL EXECUTIVE LEADERSHIP SUB-FEATURES HUB ─────────────── */}
+      <div className="bg-white/95 rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-100 gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold shadow-xs">
+              <Landmark className="h-4.5 w-4.5" />
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900">Office of the Principal • Executive Operations Hub</h2>
+              <p className="text-[11px] text-slate-500">Institution-wide governance across all 9 departments, statutory approvals, and research financing</p>
+            </div>
+          </div>
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-300 w-fit">
+            4 Executive Sub-Features Available
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <Link
+            href="/principal"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-amber-300 bg-amber-50/50 hover:bg-white hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-amber-100 text-amber-800 group-hover:scale-105 transition-transform">
+                <Landmark className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">Executive</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-amber-800 transition-colors">Executive Command Cockpit</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Institution overview, pass rates & NIRF radar</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-amber-800">
+              <span>Current Dashboard</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/principal/departments"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-blue-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-blue-100 text-blue-700 group-hover:scale-105 transition-transform">
+                <Building2 className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">9 Depts</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-blue-700 transition-colors">9-Department Matrix</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Comparative benchmarks across all engineering branches</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-blue-700">
+              <span>View Matrix</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/principal/approvals"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-emerald-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700 group-hover:scale-105 transition-transform">
+                <ShieldCheck className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">Approvals</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">Executive Approvals Registry</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Capital requests, faculty recruitments & university escalations</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-emerald-700">
+              <span>Manage Approvals</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/principal/finance"
+            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-purple-300 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2 rounded-lg bg-purple-100 text-purple-700 group-hover:scale-105 transition-transform">
+                <Coins className="h-4 w-4" />
+              </div>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">Finance</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-purple-700 transition-colors">Budget & Research Grants</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Department fund utilization, government grants & endowments</p>
+            </div>
+            <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-purple-700">
+              <span>View Finance</span>
+              <ChevronRight className="h-3 w-3 ml-0.5" />
+            </div>
+          </Link>
+        </div>
+      </div>
 
       {/* ── ALITS PRINCIPAL INSTITUTIONAL BRAND HEADER ────────────────────── */}
       <div className="light-glass-card anim-fade-up-1 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80 bg-white/80 backdrop-blur-sm">

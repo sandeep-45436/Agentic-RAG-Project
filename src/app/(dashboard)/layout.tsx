@@ -65,6 +65,11 @@ export default function DashboardLayout({
             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
               <SidebarTrigger className="-ml-1 sm:-ml-2 hover:bg-muted transition-colors rounded-xl p-2 shrink-0" />
               
+              <div className="flex md:hidden items-center gap-1.5 min-w-0">
+                <img src="/images/college-logo.png" alt="ALITS" className="h-6 w-auto object-contain shrink-0" />
+                <span className="font-bold text-xs text-slate-900 truncate">ALITS NexusIQ</span>
+              </div>
+
               <Button 
                 variant="outline" 
                 className="hidden sm:flex relative justify-start text-sm text-muted-foreground sm:pr-12 md:w-64 lg:w-80 rounded-xl bg-card hover:bg-muted border-border/50 shadow-soft"

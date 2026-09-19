@@ -266,30 +266,32 @@ export default function HomePage() {
       />
 
       {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* 1. STICKY LUMINOUS NAVIGATION HEADER (Solid, not clear)              */}
+      {/* 1. STICKY LUMINOUS NAVIGATION HEADER (Solid, responsive)             */}
       {/* ─────────────────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
-          <Link href="/" className="flex items-center gap-3 group shrink-0">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0 min-w-0">
             <img
               src="/images/college-logo.png"
               alt="ALITS College Logo"
-              className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-sm"
+              className="h-9 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-sm shrink-0"
             />
-            <div className="border-l border-slate-300 pl-3">
-              <span className="text-base sm:text-lg font-black tracking-tight text-slate-900 flex items-center gap-1.5">
-                ALITS <span className="bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">NexusIQ</span>
-                <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+            <div className="border-l border-slate-300 pl-2 sm:pl-3 min-w-0">
+              <div className="flex items-center gap-1 sm:gap-1.5">
+                <span className="text-sm sm:text-lg font-black tracking-tight text-slate-900 truncate">
+                  ALITS <span className="bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">NexusIQ</span>
+                </span>
+                <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0 hidden sm:inline-block">
                   Autonomous
                 </span>
-              </span>
-              <p className="text-[10px] text-slate-600 font-medium hidden sm:block">
+              </div>
+              <p className="text-[10px] text-slate-600 font-medium hidden sm:block truncate max-w-[280px] lg:max-w-none">
                 Anantha Lakshmi Institute of Technology & Sciences
               </p>
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-xs font-semibold text-slate-700">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-8 text-xs font-semibold text-slate-700">
             <a href="#portals" className="hover:text-slate-900 transition-colors flex items-center gap-1">
               <span>Campus Portals</span>
             </a>
@@ -310,10 +312,11 @@ export default function HomePage() {
             </a>
           </nav>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Desktop Only Portal Shortcuts */}
             <Link
               href="/principal"
-              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 shadow-sm transition-all"
+              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 shadow-xs transition-all"
             >
               <Landmark className="w-3.5 h-3.5 text-amber-700" />
               <span>Principal</span>
@@ -321,7 +324,7 @@ export default function HomePage() {
 
             <Link
               href="/skills"
-              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-sm transition-all"
+              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-xs transition-all"
             >
               <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
               <span>Placement Center</span>
@@ -329,7 +332,7 @@ export default function HomePage() {
 
             <Link
               href="/faculty/dashboard"
-              className="hidden sm:inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 shadow-sm transition-all"
+              className="hidden 2xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 shadow-xs transition-all"
             >
               <GraduationCap className="w-3.5 h-3.5 text-purple-700" />
               <span>Faculty</span>
@@ -337,23 +340,25 @@ export default function HomePage() {
 
             <Link
               href="/hod/dashboard"
-              className="hidden sm:inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 shadow-sm transition-all"
+              className="hidden 2xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 shadow-xs transition-all"
             >
               <Scale className="w-3.5 h-3.5 text-blue-700" />
               <span>HOD</span>
             </Link>
 
+            {/* Primary Student Portal Button */}
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 hover:scale-[1.02] transition-all"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 hover:scale-[1.02] transition-all shrink-0"
             >
               <Users className="w-3.5 h-3.5" />
               <span>Student Portal</span>
             </Link>
 
+            {/* Hamburger Toggle */}
             <button
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="md:hidden p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors border border-slate-200"
+              className="lg:hidden p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors border border-slate-200 shrink-0"
               aria-label="Toggle Navigation Menu"
             >
               {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -361,71 +366,151 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Mobile Dropdown */}
+        {/* Responsive Mobile Drawer */}
         {mobileNavOpen && (
-          <div className="md:hidden bg-white border-b border-slate-200 px-6 py-5 space-y-4 shadow-lg animate-slide-up-fade">
-            <nav className="flex flex-col space-y-3 text-sm font-semibold">
-              <a href="#portals" onClick={() => setMobileNavOpen(false)} className="text-slate-700 hover:text-slate-900">
-                Campus Portals
-              </a>
-              <a href="#playground" onClick={() => setMobileNavOpen(false)} className="text-slate-700 hover:text-slate-900">
-                Live Playground
-              </a>
-              <a href="#slicer" onClick={() => setMobileNavOpen(false)} className="text-slate-700 hover:text-slate-900">
-                PDF Slicer
-              </a>
-              <a href="#pipeline" onClick={() => setMobileNavOpen(false)} className="text-slate-700 hover:text-slate-900">
-                Neural Pipeline
-              </a>
-              <a href="#features" onClick={() => setMobileNavOpen(false)} className="text-slate-700 hover:text-slate-900">
-                Features
-              </a>
-              <a href="#faq" onClick={() => setMobileNavOpen(false)} className="text-slate-700 hover:text-slate-900">
-                FAQ
-              </a>
-            </nav>
+          <div className="lg:hidden bg-white/98 backdrop-blur-2xl border-b border-slate-200 px-4 sm:px-6 py-5 shadow-2xl animate-slide-up-fade max-h-[85vh] overflow-y-auto">
+            {/* 5 Subsystem Portals Header */}
+            <div className="mb-4">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5">
+                Campus Subsystem Portals
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 bg-indigo-600 text-white rounded-lg">
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">Student Portal</p>
+                      <p className="text-[10px] text-slate-500">Attendance, GPA & RAG Chat</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-indigo-400" />
+                </Link>
 
-            <div className="pt-3 border-t border-slate-200 flex flex-col gap-2.5">
-              <Link
-                href="/principal"
-                onClick={() => setMobileNavOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 shadow-sm"
-              >
-                <Landmark className="w-4 h-4 text-amber-700" />
-                Principal Portal
-              </Link>
-              <Link
-                href="/skills"
-                onClick={() => setMobileNavOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-sm"
-              >
-                <Sparkles className="w-4 h-4 text-emerald-700" />
-                Placement Center
-              </Link>
-              <Link
-                href="/faculty/dashboard"
-                onClick={() => setMobileNavOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 shadow-sm"
-              >
-                <GraduationCap className="w-4 h-4 text-purple-700" />
-                Faculty Portal
-              </Link>
-              <Link
-                href="/hod/dashboard"
-                onClick={() => setMobileNavOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 shadow-sm"
-              >
-                <Scale className="w-4 h-4 text-blue-700" />
-                HOD Portal
-              </Link>
-              <Link
-                href="/dashboard"
-                onClick={() => setMobileNavOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20"
-              >
-                <Users className="w-4 h-4 text-white" />
-                Student Portal
-              </Link>
+                <Link
+                  href="/skills"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 bg-emerald-600 text-white rounded-lg">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">Placement Center</p>
+                      <p className="text-[10px] text-slate-500">Skills Radar & Tests</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-emerald-400" />
+                </Link>
+
+                <Link
+                  href="/faculty/dashboard"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-purple-50 border border-purple-200 hover:bg-purple-100 transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 bg-purple-600 text-white rounded-lg">
+                      <GraduationCap className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">Faculty Portal</p>
+                      <p className="text-[10px] text-slate-500">Timetables, Seating & Uploads</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-purple-400" />
+                </Link>
+
+                <Link
+                  href="/hod/dashboard"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 bg-blue-600 text-white rounded-lg">
+                      <Scale className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">HOD Portal</p>
+                      <p className="text-[10px] text-slate-500">Governance & Workload</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-blue-400" />
+                </Link>
+
+                <Link
+                  href="/principal"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="sm:col-span-2 flex items-center justify-between p-2.5 rounded-xl bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 bg-amber-600 text-white rounded-lg">
+                      <Landmark className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">Principal Portal</p>
+                      <p className="text-[10px] text-slate-500">All Depts, NAAC & Grants</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-amber-400" />
+                </Link>
+              </div>
+            </div>
+
+            {/* In-Page Navigation Links */}
+            <div className="pt-3 border-t border-slate-200">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
+                Page Sections
+              </p>
+              <nav className="grid grid-cols-2 gap-2 text-xs font-semibold">
+                <a
+                  href="#portals"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                >
+                  Campus Portals
+                </a>
+                <a
+                  href="#playground"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                >
+                  Live Playground
+                </a>
+                <a
+                  href="#slicer"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                >
+                  PDF Slicer
+                </a>
+                <a
+                  href="#pipeline"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                >
+                  Neural Pipeline
+                </a>
+                <a
+                  href="#features"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                >
+                  Features
+                </a>
+                <a
+                  href="#faq"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                >
+                  FAQ
+                </a>
+              </nav>
             </div>
           </div>
         )}

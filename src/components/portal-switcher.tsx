@@ -169,7 +169,7 @@ export function PortalSwitcher({ className = "" }: { className?: string }) {
       </div>
 
       {/* ── 5 Primary Portals ─────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 mb-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-2.5 mb-3">
         {portals.map((p) => {
           const isActive = activePortal.id === p.id;
           const Icon = p.icon;
@@ -178,7 +178,7 @@ export function PortalSwitcher({ className = "" }: { className?: string }) {
             <Link
               key={p.id}
               href={p.href}
-              className={`relative group flex flex-col justify-between p-3 rounded-xl border transition-all duration-200 hover-lift ${
+              className={`relative group flex flex-col justify-between p-2.5 sm:p-3 rounded-xl border transition-all duration-200 hover-lift last:col-span-2 sm:last:col-span-1 lg:last:col-span-1 ${
                 isActive
                   ? p.activeColor + " shadow-md"
                   : "bg-slate-50/80 hover:bg-white border-slate-200 hover:border-indigo-300"

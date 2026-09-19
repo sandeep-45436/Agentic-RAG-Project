@@ -23,7 +23,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { PanelLeftIcon } from "lucide-react"
+import { PanelLeftIcon, X } from "lucide-react"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -184,17 +184,30 @@ function Sidebar({
     return (
       <div className="fixed inset-0 z-50 flex md:hidden">
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
           onClick={() => setOpenMobile(false)}
         />
         <div
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="relative z-10 flex h-full flex-col bg-sidebar text-sidebar-foreground p-0 shadow-2xl animate-in slide-in-from-left duration-200"
+          className="relative z-10 flex h-full flex-col bg-white text-slate-900 border-r border-slate-200 p-0 shadow-2xl animate-in slide-in-from-left duration-200"
           style={{ width: SIDEBAR_WIDTH_MOBILE }}
         >
-          <div className="flex h-full w-full flex-col">{children}</div>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 shrink-0">
+            <div className="flex items-center gap-2">
+              <img src="/images/college-logo.png" alt="ALITS" className="h-7 w-auto object-contain" />
+              <span className="font-bold text-xs text-slate-900">ALITS NexusIQ</span>
+            </div>
+            <button
+              onClick={() => setOpenMobile(false)}
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              aria-label="Close menu"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="flex h-full w-full flex-col overflow-y-auto">{children}</div>
         </div>
       </div>
     );

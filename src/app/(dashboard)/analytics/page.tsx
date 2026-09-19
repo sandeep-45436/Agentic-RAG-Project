@@ -308,8 +308,8 @@ export default function AnalyticsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/40 pb-6">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold tracking-tight gradient-text-animated bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
-              Analytics
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              Campus Learning & Usage Analytics
             </h1>
             <div className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${
               isLive
@@ -364,15 +364,15 @@ export default function AnalyticsPage() {
             </button>
             
             {isSimulating && (
-              <div className="flex items-center gap-1 px-2 border-l border-border/60 ml-1.5">
+              <div className="flex items-center gap-1 px-2 border-l border-slate-200 ml-1.5">
                 {(["slow", "medium", "fast"] as const).map((speed) => (
                   <button
                     key={speed}
                     onClick={() => setSimSpeed(speed)}
                     className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded transition-all ${
                       simSpeed === speed
-                        ? "bg-white/10 text-white"
-                        : "text-muted-foreground hover:text-white"
+                        ? "bg-slate-200 text-slate-900"
+                        : "text-slate-500 hover:text-slate-900"
                     }`}
                   >
                     {speed === "slow" ? "1x" : speed === "medium" ? "2x" : "3x"}
@@ -384,7 +384,7 @@ export default function AnalyticsPage() {
             {!isSimulating && (
               <button
                 onClick={triggerSimulationEvent}
-                className="text-[10px] font-semibold text-muted-foreground hover:text-white px-2.5 py-1.5 hover:bg-muted rounded-lg transition-colors border-l border-border/60 ml-1"
+                className="text-[10px] font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1.5 hover:bg-slate-100 rounded-lg transition-colors border-l border-slate-200 ml-1"
                 title="Inject a single mock request"
               >
                 + Inject Event
@@ -393,15 +393,15 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Dynamic Range Selector */}
-          <div className="flex items-center bg-card border border-border/60 rounded-xl p-0.5">
+          <div className="flex items-center bg-white border border-slate-200 rounded-xl p-0.5">
             {([7, 30, 90] as const).map((days) => (
               <button
                 key={days}
                 onClick={() => setDaysFilter(days)}
                 className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
                   daysFilter === days
-                    ? "bg-primary/20 text-primary-foreground font-semibold"
-                    : "text-muted-foreground hover:text-white"
+                    ? "bg-indigo-50 text-indigo-700 font-semibold"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 {days}d
@@ -412,7 +412,7 @@ export default function AnalyticsPage() {
           {/* Export button */}
           <button
             onClick={exportCsvReport}
-            className="flex items-center gap-2 bg-card hover:bg-muted border border-border/60 text-xs px-3.5 py-2 rounded-xl font-medium text-white transition-colors"
+            className="flex items-center gap-2 bg-white hover:bg-slate-100 border border-slate-200 text-xs px-3.5 py-2 rounded-xl font-medium text-slate-800 transition-colors"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export CSV</span>

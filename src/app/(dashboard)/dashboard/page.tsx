@@ -49,9 +49,13 @@ interface DashboardData {
     recentDepartmentDocs: Array<{
       id: string;
       fileName: string;
+      courseCode?: string;
       visibility: string;
       departmentCode: string;
       departmentName: string;
+      facultyAuthor?: string;
+      facultyTitle?: string;
+      fileSizeText?: string;
       processingStatus: string;
       createdAt: string;
     }>;
@@ -177,10 +181,14 @@ export default function DashboardPage() {
     });
   }, [router]);
 
-  const load = useCallback(() => {
+  const [selectedDept, setSelectedDept] = useState<string | null>(null);
+
+  const load = useCallback((deptOverride?: string) => {
     setLoading(true);
     setError(null);
-    fetch("/api/dashboard/stats")
+    const targetDept = deptOverride !== undefined ? deptOverride : selectedDept;
+    const url = targetDept ? `/api/dashboard/stats?department=${encodeURIComponent(targetDept)}` : "/api/dashboard/stats";
+    fetch(url)
       .then(async (r) => {
         const contentType = r.headers.get("content-type");
         if (contentType && contentType.includes("text/html")) {
@@ -206,7 +214,7 @@ export default function DashboardPage() {
         setError(err.message || "Failed to load dashboard data");
         setLoading(false);
       });
-  }, []);
+  }, [selectedDept]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -225,7 +233,7 @@ export default function DashboardPage() {
           <h2 className="text-lg font-semibold text-red-500 mb-2">Connection Issue</h2>
           <p className="text-sm text-slate-600 mb-6">{error}</p>
           <button
-            onClick={load}
+            onClick={() => load()}
             className="inline-flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 text-sm font-medium transition-colors shadow-lg"
           >
             Try Again
@@ -331,7 +339,7 @@ export default function DashboardPage() {
               Browse Notes
             </Link>
             <button
-              onClick={load}
+              onClick={() => load()}
               className="p-2.5 text-slate-500 hover:text-slate-800 bg-white/50 hover:bg-white/80 border border-slate-200 rounded-xl transition-colors"
               title="Refresh metrics"
             >
@@ -384,19 +392,63 @@ export default function DashboardPage() {
           
           {/* Department Course Materials Feed */}
           <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl p-5 space-y-4 shadow-md">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-indigo-600" />
-                <h3 className="text-sm font-bold text-slate-800 tracking-wide">
-                  Recent {deptCode} Course Materials & Syllabi
-                </h3>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800 tracking-wide">
+                    {deptCode} Faculty Course Uploads & Syllabi
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Official documents & lecture notes uploaded by {deptName} faculty
+                  </p>
+                </div>
               </div>
-              <Link
-                href="/documents"
-                className="text-xs text-indigo-600 hover:text-indigo-700 flex items-center gap-1 font-medium"
-              >
-                View all <ChevronRight className="w-3 h-3" />
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/faculty/documents"
+                  className="text-xs text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg font-medium transition-all"
+                >
+                  + Upload Material
+                </Link>
+                <Link
+                  href="/documents"
+                  className="text-xs text-slate-600 hover:text-slate-900 flex items-center gap-1 font-medium"
+                >
+                  All Docs <ChevronRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Department Quick Filter Tabs */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-1 pb-2 border-b border-slate-100">
+              <span className="text-[11px] font-semibold text-slate-500 mr-1">Switch Dept:</span>
+              {[
+                { code: "CSE", name: "Computer Science" },
+                { code: "ECE", name: "Electronics" },
+                { code: "MECH", name: "Mechanical" },
+                { code: "EEE", name: "Electrical" },
+                { code: "AIDS", label: "AI&DS", name: "AI & Data Sci" },
+              ].map((d) => {
+                const label = (d as any).label || d.code;
+                const isActive = (selectedDept ? selectedDept === d.code : deptCode.toUpperCase() === d.code.toUpperCase());
+                return (
+                  <button
+                    key={d.code}
+                    onClick={() => {
+                      setSelectedDept(d.code);
+                      load(d.code);
+                    }}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                      isActive
+                        ? "bg-indigo-600 text-white shadow-sm"
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="divide-y divide-slate-100">
@@ -406,34 +458,50 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 ac.recentDepartmentDocs.map((doc) => (
-                  <div key={doc.id} className="py-3.5 flex items-center justify-between gap-3 hover:bg-slate-50 px-2 rounded-xl transition-colors">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="p-2 bg-indigo-50 rounded-lg shrink-0">
+                  <div key={doc.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 px-2 rounded-xl transition-colors">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="p-2 bg-indigo-50 rounded-lg shrink-0 mt-0.5">
                         <FileText className="w-4 h-4 text-indigo-600" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-semibold text-slate-800 truncate">{doc.fileName}</p>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[10px] text-indigo-600 font-mono bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">
+                        {doc.facultyAuthor && (
+                          <p className="text-[11px] text-slate-600 mt-0.5">
+                            Uploaded by <span className="font-semibold text-slate-800">{doc.facultyAuthor}</span>
+                            {doc.facultyTitle ? ` • ${doc.facultyTitle}` : ""}
+                          </p>
+                        )}
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                          {doc.courseCode && (
+                            <span className="text-[10px] font-bold text-indigo-700 font-mono bg-indigo-100/70 px-1.5 py-0.5 rounded border border-indigo-200">
+                              {doc.courseCode}
+                            </span>
+                          )}
+                          <span className="text-[10px] text-slate-500 font-mono bg-slate-100 px-1.5 py-0.5 rounded">
                             {doc.departmentCode}
                           </span>
-                          <span className="text-[10px] text-slate-500">
+                          {doc.fileSizeText && (
+                            <span className="text-[10px] text-slate-400">
+                              {doc.fileSizeText}
+                            </span>
+                          )}
+                          <span className="text-[10px] text-slate-400">
                             {timeAgo(doc.createdAt)}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                       <button
                         onClick={() => openDocViewer(doc.id)}
-                        className="shrink-0 text-[11px] text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1 border border-slate-200"
+                        className="text-[11px] text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 px-2.5 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1 border border-slate-200 shadow-xs"
                       >
                         <Eye className="w-3 h-3 text-cyan-600" /> View
                       </button>
                       <Link
                         href={`/chat`}
-                        className="shrink-0 text-[11px] text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg font-medium transition-all"
+                        className="text-[11px] text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg font-semibold transition-all border border-indigo-200 shadow-xs"
                       >
                         Ask AI
                       </Link>

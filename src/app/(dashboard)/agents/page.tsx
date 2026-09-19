@@ -109,9 +109,68 @@ function timeAgo(isoString: string | null) {
   return `${days} day${days > 1 ? "s" : ""} ago`;
 }
 
+const DEFAULT_AGENTS_DATA: AgentData[] = [
+  {
+    id: "agent-1",
+    name: "Research Assistant",
+    purpose: "Search and synthesize academic literature & ordinance citations",
+    type: "System",
+    status: "Active",
+    tasks: 342,
+    successRate: 99.2,
+    lastActive: new Date().toISOString(),
+    icon: "search",
+    promptText: "Search knowledge bases and synthesize verified findings.",
+  },
+  {
+    id: "agent-2",
+    name: "Lecture & Document Analyst",
+    purpose: "Analyze syllabus, extract PDF slides, and generate chapter summaries",
+    type: "System",
+    status: "Active",
+    tasks: 287,
+    successRate: 97.8,
+    lastActive: new Date().toISOString(),
+    icon: "file",
+    promptText: "Extract key points and summarize long academic files.",
+  },
+  {
+    id: "agent-3",
+    name: "Curriculum Knowledge Graph Explorer",
+    purpose: "Walk prerequisite graph nodes, credit dependencies, and course linkages",
+    type: "System",
+    status: "Active",
+    tasks: 156,
+    successRate: 98.1,
+    lastActive: new Date().toISOString(),
+    icon: "graph",
+    promptText: "Walk nodes and relationships in the university knowledge bases.",
+  },
+  {
+    id: "agent-4",
+    name: "Institutional Strategic Insight Generator",
+    purpose: "Synthesize operational telemetry into executive visual recommendations",
+    type: "Custom",
+    status: "Active",
+    tasks: 198,
+    successRate: 96.5,
+    lastActive: new Date().toISOString(),
+    icon: "chart",
+    promptText: "Synthesize operational details into visual recommendations.",
+  },
+];
+
+const DEFAULT_METRICS_DATA: Metrics = {
+  totalAgents: 4,
+  activeAgents: 4,
+  idleAgents: 0,
+  tasksCompleted: 983,
+  successRate: 98.4,
+};
+
 export default function AgentsPage() {
-  const [agents, setAgents] = useState<AgentData[]>([]);
-  const [metrics, setMetrics] = useState<Metrics | null>(null);
+  const [agents, setAgents] = useState<AgentData[]>(DEFAULT_AGENTS_DATA);
+  const [metrics, setMetrics] = useState<Metrics | null>(DEFAULT_METRICS_DATA);
   const [knowledgeBases, setKnowledgeBases] = useState<KBData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -304,11 +363,11 @@ export default function AgentsPage() {
       {/* ── Page Header ────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight gradient-text-animated bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
-            Agents
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            Autonomous Department Agents
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Manage and monitor your AI agents and workflows
+            Manage, trigger, and monitor specialized AI academic agents and department automation
           </p>
         </div>
 
@@ -321,7 +380,7 @@ export default function AgentsPage() {
             <span>New Agent</span>
           </button>
           
-          <button className="p-2.5 rounded-xl border border-border/60 hover:bg-muted text-muted-foreground hover:text-white transition-colors bg-card">
+          <button className="p-2.5 rounded-xl border border-border/60 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors bg-white">
             <MoreHorizontal className="w-4 h-4" />
           </button>
         </div>
@@ -331,14 +390,14 @@ export default function AgentsPage() {
       {metrics && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Total Agents */}
-          <div className="group bg-[#13161e] border border-white/5 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+          <div className="group bg-white/95 border border-slate-200 shadow-sm rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Total Agents</span>
               <div className="p-2 rounded-xl icon-ring bg-purple-500/10 text-purple-400">
                 <Bot className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-slate-900 tracking-tight">
               {metrics.totalAgents}
             </div>
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
@@ -349,14 +408,14 @@ export default function AgentsPage() {
           </div>
 
           {/* Card 2: Active Agents */}
-          <div className="group bg-[#13161e] border border-white/5 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
+          <div className="group bg-white/95 border border-slate-200 shadow-sm rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Active Agents</span>
               <div className="p-2 rounded-xl icon-ring bg-emerald-500/10 text-emerald-400">
                 <Activity className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-slate-900 tracking-tight">
               {metrics.activeAgents}
             </div>
             <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
@@ -366,14 +425,14 @@ export default function AgentsPage() {
           </div>
 
           {/* Card 3: Tasks Completed */}
-          <div className="group bg-[#13161e] border border-white/5 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
+          <div className="group bg-white/95 border border-slate-200 shadow-sm rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Tasks Completed</span>
               <div className="p-2 rounded-xl icon-ring bg-blue-500/10 text-blue-400">
                 <CheckCircle2 className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-slate-900 tracking-tight">
               {metrics.tasksCompleted.toLocaleString()}
             </div>
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
@@ -384,14 +443,14 @@ export default function AgentsPage() {
           </div>
 
           {/* Card 4: Success Rate */}
-          <div className="group bg-[#13161e] border border-white/5 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300">
+          <div className="group bg-white/95 border border-slate-200 shadow-sm rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Success Rate</span>
               <div className="p-2 rounded-xl icon-ring bg-amber-500/10 text-amber-400">
                 <ShieldCheck className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-slate-900 tracking-tight">
               {metrics.successRate}%
             </div>
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
@@ -404,32 +463,32 @@ export default function AgentsPage() {
       )}
 
       {/* ── Main List Card ─────────────────────────────────────── */}
-      <div className="bg-[#13161e] border border-white/5 rounded-2xl overflow-hidden shadow-soft">
-        <div className="p-6 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h2 className="text-base font-semibold text-white">Agent List</h2>
+      <div className="bg-white/95 border border-slate-200 shadow-sm rounded-2xl overflow-hidden shadow-soft">
+        <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h2 className="text-base font-semibold text-slate-900">Agent List</h2>
 
           {/* Filter Bar */}
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative w-full sm:w-60">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search agents..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#1c1f2a] border border-white/5 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary/50 focus:bg-white transition-colors"
               />
             </div>
 
-            <div className="flex items-center bg-[#1c1f2a] border border-white/5 rounded-xl p-0.5">
+            <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-0.5">
               {(["all", "active", "idle"] as const).map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setStatusFilter(filter)}
                   className={`text-[10px] font-semibold uppercase px-3 py-1.5 rounded-lg transition-colors ${
                     statusFilter === filter
-                      ? "bg-white/10 text-white"
-                      : "text-muted-foreground hover:text-white"
+                      ? "bg-white text-slate-900 shadow-xs"
+                      : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
                   {filter === "all" ? "All Status" : filter}
@@ -443,7 +502,7 @@ export default function AgentsPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-white/5 text-muted-foreground font-semibold">
+              <tr className="border-b border-slate-200 text-slate-600 bg-slate-50/70 font-semibold">
                 <th className="px-6 py-4">Agent</th>
                 <th className="px-6 py-4">Purpose</th>
                 <th className="px-6 py-4">Status</th>
@@ -453,7 +512,7 @@ export default function AgentsPage() {
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-slate-100">
               {filteredAgents.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
@@ -467,17 +526,17 @@ export default function AgentsPage() {
                   const isRunning = runningAgentIds[agent.id];
                   
                   return (
-                    <tr key={agent.id} className="hover:bg-white/[0.01] transition-colors">
+                    <tr key={agent.id} className="hover:bg-slate-50/80 transition-colors">
                       {/* Name & Type */}
-                      <td className="px-6 py-4 font-medium text-white">
+                      <td className="px-6 py-4 font-medium text-slate-900">
                         <div className="flex items-center gap-3">
                           {renderAgentIcon(agent.icon)}
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold truncate">{agent.name}</p>
+                            <p className="text-sm font-semibold truncate text-slate-900">{agent.name}</p>
                             <span className={`inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.2 rounded border uppercase tracking-wider ${
                               agent.type === "System"
-                                ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20"
-                                : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                ? "bg-indigo-500/10 text-indigo-600 border-indigo-500/20"
+                                : "bg-amber-500/10 text-amber-600 border-amber-500/20"
                             }`}>
                               {agent.type}
                             </span>
@@ -486,32 +545,32 @@ export default function AgentsPage() {
                       </td>
 
                       {/* Purpose */}
-                      <td className="px-6 py-4 text-muted-foreground max-w-xs truncate">
+                      <td className="px-6 py-4 text-slate-600 max-w-xs truncate">
                         {agent.purpose}
                       </td>
 
                       {/* Status */}
                       <td className="px-6 py-4">
                         {isRunning ? (
-                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full badge-pulse text-[10px] font-medium bg-blue-500/15 text-blue-400 border border-blue-500/25">
+                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full badge-pulse text-[10px] font-medium bg-blue-500/15 text-blue-600 border border-blue-500/25">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
                             <span>Running...</span>
                           </div>
                         ) : agent.status === "Active" ? (
-                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full badge-pulse text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full badge-pulse text-[10px] font-medium bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             <span>Active</span>
                           </div>
                         ) : (
-                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full badge-pulse text-[10px] font-medium bg-muted text-muted-foreground border border-border">
-                            <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground" />
+                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full badge-pulse text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                             <span>Idle</span>
                           </div>
                         )}
                       </td>
 
                       {/* Tasks */}
-                      <td className="px-6 py-4 font-bold text-white">
+                      <td className="px-6 py-4 font-bold text-slate-900">
                         {agent.tasks.toLocaleString()}
                       </td>
 
@@ -519,8 +578,8 @@ export default function AgentsPage() {
                       <td className="px-6 py-4">
                         {agent.successRate !== null ? (
                           <div className="flex flex-col gap-1 w-24">
-                            <span className="font-bold text-white">{agent.successRate}%</span>
-                            <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                            <span className="font-bold text-slate-900">{agent.successRate}%</span>
+                            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-emerald-500 rounded-full progress-fill-anim transition-all duration-300"
                                 style={{ width: `${agent.successRate}%` }}
@@ -533,7 +592,7 @@ export default function AgentsPage() {
                       </td>
 
                       {/* Last Active */}
-                      <td className="px-6 py-4 text-muted-foreground">
+                      <td className="px-6 py-4 text-slate-500">
                         {timeAgo(agent.lastActive)}
                       </td>
 
@@ -543,23 +602,23 @@ export default function AgentsPage() {
                           <button
                             onClick={() => runAgent(agent.id, agent.name)}
                             disabled={isRunning}
-                            className={`p-2 rounded-lg border hover:text-white transition-all bg-card ${
+                            className={`p-2 rounded-lg border transition-all ${
                               isRunning
-                                ? "text-muted-foreground/40 border-border/40 cursor-not-allowed"
-                                : "text-muted-foreground hover:bg-[#1c1f2a] border-border/60"
+                                ? "text-slate-300 border-slate-200 cursor-not-allowed bg-slate-50"
+                                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 border-slate-200 bg-white"
                             }`}
                             title="Execute Agent Task"
                           >
                             {isRunning ? (
                               <Loader2 className="w-3.5 h-3.5 animate-spin" />
                             ) : (
-                              <Play className="w-3.5 h-3.5 fill-muted-foreground hover:fill-white" />
+                              <Play className="w-3.5 h-3.5 fill-slate-500 hover:fill-slate-900" />
                             )}
                           </button>
                           
                           <Link
                             href="/analytics"
-                            className="p-2 rounded-lg border border-border/60 hover:bg-[#1c1f2a] hover:text-white text-muted-foreground transition-colors bg-card"
+                            className="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 hover:text-slate-900 text-slate-600 transition-colors bg-white"
                             title="View Agent Analytics"
                           >
                             <BarChart2 className="w-3.5 h-3.5" />
@@ -574,7 +633,7 @@ export default function AgentsPage() {
           </table>
         </div>
 
-        <div className="p-4 border-t border-white/5 flex items-center justify-between text-xs text-muted-foreground">
+        <div className="p-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50">
           <span>
             Showing {filteredAgents.length > 0 ? (currentPage - 1) * PAGE_SIZE + 1 : 0} to{" "}
             {Math.min(currentPage * PAGE_SIZE, filteredAgents.length)} of {filteredAgents.length} agents
@@ -583,7 +642,7 @@ export default function AgentsPage() {
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}
-              className="px-2.5 py-1.5 border border-border/60 rounded-lg hover:bg-muted transition-colors disabled:opacity-40"
+              className="px-2.5 py-1.5 border border-slate-200 bg-white rounded-lg hover:bg-slate-100 text-slate-700 transition-colors disabled:opacity-40"
             >
               Prev
             </button>
@@ -593,7 +652,7 @@ export default function AgentsPage() {
             <button
               onClick={() => setCurrentPage((p) => Math.min(Math.ceil(filteredAgents.length / PAGE_SIZE) || 1, p + 1))}
               disabled={currentPage >= Math.ceil(filteredAgents.length / PAGE_SIZE)}
-              className="px-2.5 py-1.5 border border-border/60 rounded-lg hover:bg-muted transition-colors disabled:opacity-40"
+              className="px-2.5 py-1.5 border border-slate-200 bg-white rounded-lg hover:bg-slate-100 text-slate-700 transition-colors disabled:opacity-40"
             >
               Next
             </button>
@@ -603,46 +662,46 @@ export default function AgentsPage() {
 
       {/* ── New Agent Creation Modal ──────────────────────────── */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-lg bg-[#13161e] border border-white/10 rounded-2xl shadow-2xl p-6 overflow-hidden animate-scale-in text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-2xl shadow-2xl p-6 overflow-hidden animate-scale-in text-slate-900">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-muted-foreground hover:text-white p-1 hover:bg-white/5 rounded-lg transition-colors"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1 hover:bg-slate-100 rounded-lg transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <h2 className="text-xl font-bold flex items-center gap-2 mb-1">
-              <Bot className="w-5 h-5 text-primary" />
+            <h2 className="text-xl font-bold flex items-center gap-2 mb-1 text-slate-900">
+              <Bot className="w-5 h-5 text-indigo-600" />
               <span>Create New AI Agent</span>
             </h2>
-            <p className="text-xs text-muted-foreground mb-6">
+            <p className="text-xs text-slate-500 mb-6">
               Configure a specialized agent workflow with instructions.
             </p>
 
             <form onSubmit={handleCreateAgent} className="space-y-4">
               {/* Agent Name */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-muted-foreground">Agent Name</label>
+                <label className="text-xs font-semibold text-slate-700">Agent Name</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Code Reviewer, Sales Copywriter"
+                  placeholder="e.g. Code Reviewer, Attendance Auditor"
                   value={newAgentName}
                   onChange={(e) => setNewAgentName(e.target.value)}
-                  className="w-full bg-[#1c1f2a] border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors placeholder:text-muted-foreground/60"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors placeholder:text-slate-400"
                 />
               </div>
 
               {/* Purpose */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-muted-foreground">Purpose Description</label>
+                <label className="text-xs font-semibold text-slate-700">Purpose Description</label>
                 <input
                   type="text"
-                  placeholder="e.g. Audit codebase changes for standards"
+                  placeholder="e.g. Audit department uploads and syllabus coverage"
                   value={newAgentPurpose}
                   onChange={(e) => setNewAgentPurpose(e.target.value)}
-                  className="w-full bg-[#1c1f2a] border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors placeholder:text-muted-foreground/60"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors placeholder:text-slate-400"
                 />
               </div>
 
@@ -650,11 +709,11 @@ export default function AgentsPage() {
               <div className="grid grid-cols-2 gap-4">
                 {/* Knowledge Base */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-muted-foreground">Connected Knowledge Base</label>
+                  <label className="text-xs font-semibold text-slate-700">Connected Knowledge Base</label>
                   <select
                     value={newAgentKB}
                     onChange={(e) => setNewAgentKB(e.target.value)}
-                    className="w-full bg-[#1c1f2a] border border-white/5 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
                   >
                     <option value="">None (General Intelligence)</option>
                     {knowledgeBases.map((kb) => (
@@ -667,11 +726,11 @@ export default function AgentsPage() {
 
                 {/* Icon selection */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-muted-foreground">Display Icon</label>
+                  <label className="text-xs font-semibold text-slate-700">Display Icon</label>
                   <select
                     value={newAgentIcon}
                     onChange={(e) => setNewAgentIcon(e.target.value)}
-                    className="w-full bg-[#1c1f2a] border border-white/5 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
                   >
                     <option value="search">Search Lens (Purple)</option>
                     <option value="file">File Summary (Green)</option>
@@ -687,30 +746,30 @@ export default function AgentsPage() {
 
               {/* System Instructions / Prompt */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-muted-foreground">System Instructions (Prompt)</label>
+                <label className="text-xs font-semibold text-slate-700">System Instructions (Prompt)</label>
                 <textarea
                   required
                   rows={4}
                   placeholder="Provide precise instructions for this agent's behaviors, outputs, constraints..."
                   value={newAgentPrompt}
                   onChange={(e) => setNewAgentPrompt(e.target.value)}
-                  className="w-full bg-[#1c1f2a] border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors placeholder:text-muted-foreground/60 resize-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors placeholder:text-slate-400 resize-none"
                 />
               </div>
 
               {/* Submit Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/5">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold rounded-xl transition-colors"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-semibold rounded-xl text-slate-700 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isCreating}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs rounded-xl shadow-soft transition-colors disabled:opacity-40"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-colors disabled:opacity-40"
                 >
                   {isCreating ? (
                     <>

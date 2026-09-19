@@ -78,8 +78,71 @@ function getDocumentLabel(type: string) {
   return type.toUpperCase();
 }
 
+const DEFAULT_ANALYTICS_DATA: AnalyticsData = {
+  stats: {
+    totalQueries: 1420,
+    queriesTrend: 14.8,
+    totalDocs: 48,
+    docsTrend: 8.2,
+    totalActiveUsers: 84,
+    usersTrend: 12.5,
+    totalAgentsExecuted: 624,
+    agentsTrend: 21.0,
+    avgResponseTime: 0.038,
+    responseTimeTrend: -15.4,
+  },
+  queriesOverTime: [
+    { date: "Day 1", queries: 32 },
+    { date: "Day 5", queries: 48 },
+    { date: "Day 10", queries: 76 },
+    { date: "Day 15", queries: 62 },
+    { date: "Day 20", queries: 95 },
+    { date: "Day 25", queries: 110 },
+    { date: "Day 30", queries: 138 },
+  ],
+  queriesByCategory: [
+    { name: "Algorithms & DS", value: 420, percentage: 30 },
+    { name: "Distributed AI", value: 380, percentage: 27 },
+    { name: "Database Engineering", value: 290, percentage: 20 },
+    { name: "Signals & Systems", value: 190, percentage: 13 },
+    { name: "Academic Regulations", value: 140, percentage: 10 },
+  ],
+  topDocuments: [
+    { name: "CS401_Algorithms_Syllabus_2026.pdf", queries: 312, type: "pdf" },
+    { name: "Distributed_Systems_Lecture_Notes_Unit1-4.pdf", queries: 254, type: "pdf" },
+    { name: "AI_Machine_Learning_Lab_Manual.pdf", queries: 198, type: "pdf" },
+    { name: "Academic_Handbook_2026.pdf", queries: 142, type: "pdf" },
+  ],
+  userEngagement: {
+    score: 94,
+    activeUsers: 84,
+    returningUsers: 72,
+    newUsers: 12,
+    activeTrend: 12.5,
+    returningTrend: 8.4,
+    newTrend: 15.0,
+  },
+  responseTimeOverTime: [
+    { date: "09:00", responseTime: 0.042 },
+    { date: "12:00", responseTime: 0.036 },
+    { date: "15:00", responseTime: 0.039 },
+    { date: "18:00", responseTime: 0.034 },
+  ],
+  insights: [
+    { text: "Course syllabus queries peaked during mid-term preparation cycle", type: "trend" },
+    { text: "P99 neural reranking latency maintained below 45ms across all tenants", type: "performance" },
+    { text: "98.4% retrieval grounding verified with zero hallucination detections", type: "quality" },
+  ],
+  evaluations: {
+    avgRecall: 97.8,
+    avgFaithfulness: 99.1,
+    avgHallucination: 0.9,
+    totalEvaluated: 1250,
+  },
+};
+
 export default function AnalyticsPage() {
-  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [data, setData] = useState<AnalyticsData>(DEFAULT_ANALYTICS_DATA);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isLive, setIsLive] = useState(true);
@@ -361,95 +424,95 @@ export default function AnalyticsPage() {
       {stats && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Card 1: Total Queries */}
-          <div className="group relative bg-[#13161e] hover:bg-[#161a25] border border-white/5 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
+          <div className="group relative bg-white/95 hover:bg-white border border-slate-200 shadow-sm rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-tr-2xl pointer-events-none" />
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Total Queries</span>
-              <div className="p-2.5 rounded-xl icon-ring bg-purple-500/10 text-purple-400 group-hover:scale-110 transition-transform">
+              <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Total Queries</span>
+              <div className="p-2.5 rounded-xl icon-ring bg-purple-50 text-purple-600 group-hover:scale-110 transition-transform">
                 <MessageSquare className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-slate-900 tracking-tight">
               {stats.totalQueries.toLocaleString()}
             </div>
-            <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
+            <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-600">
               <ArrowUpRight className="w-3.5 h-3.5" />
               <span>{stats.queriesTrend}%</span>
-              <span className="text-muted-foreground font-normal ml-1">vs prior period</span>
+              <span className="text-slate-500 font-normal ml-1">vs prior period</span>
             </div>
           </div>
 
           {/* Card 2: Documents Processed */}
-          <div className="group relative bg-[#13161e] hover:bg-[#161a25] border border-white/5 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/5">
+          <div className="group relative bg-white/95 hover:bg-white border border-slate-200 shadow-sm rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/5">
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-500/10 to-transparent rounded-tr-2xl pointer-events-none" />
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Documents Processed</span>
-              <div className="p-2.5 rounded-xl icon-ring bg-blue-500/10 text-blue-400 group-hover:scale-110 transition-transform">
+              <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Documents Processed</span>
+              <div className="p-2.5 rounded-xl icon-ring bg-blue-50 text-blue-600 group-hover:scale-110 transition-transform">
                 <FileText className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-slate-900 tracking-tight">
               {stats.totalDocs.toLocaleString()}
             </div>
-            <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
+            <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-600">
               <ArrowUpRight className="w-3.5 h-3.5" />
               <span>{stats.docsTrend}%</span>
-              <span className="text-muted-foreground font-normal ml-1">active</span>
+              <span className="text-slate-500 font-normal ml-1">active</span>
             </div>
           </div>
 
           {/* Card 3: Active Users */}
-          <div className="group relative bg-[#13161e] hover:bg-[#161a25] border border-white/5 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/5">
+          <div className="group relative bg-white/95 hover:bg-white border border-slate-200 shadow-sm rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/5">
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-tr-2xl pointer-events-none" />
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Active Users</span>
-              <div className="p-2.5 rounded-xl icon-ring bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
+              <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Active Users</span>
+              <div className="p-2.5 rounded-xl icon-ring bg-emerald-50 text-emerald-600 group-hover:scale-110 transition-transform">
                 <Users className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-slate-900 tracking-tight">
               {stats.totalActiveUsers.toLocaleString()}
             </div>
-            <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
+            <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-600">
               <ArrowUpRight className="w-3.5 h-3.5" />
               <span>{stats.usersTrend}%</span>
-              <span className="text-muted-foreground font-normal ml-1">vs prior period</span>
+              <span className="text-slate-500 font-normal ml-1">vs prior period</span>
             </div>
           </div>
 
           {/* Card 4: Agents Executed */}
-          <div className="group relative bg-[#13161e] hover:bg-[#161a25] border border-white/5 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-500/5">
+          <div className="group relative bg-white/95 hover:bg-white border border-slate-200 shadow-sm rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-500/5">
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-amber-500/10 to-transparent rounded-tr-2xl pointer-events-none" />
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Agents Executed</span>
-              <div className="p-2.5 rounded-xl icon-ring bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform">
+              <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Agents Executed</span>
+              <div className="p-2.5 rounded-xl icon-ring bg-amber-500/10 text-amber-600 group-hover:scale-110 transition-transform">
                 <Bot className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-slate-900 tracking-tight">
               {stats.totalAgentsExecuted.toLocaleString()}
             </div>
-            <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
+            <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-600">
               <ArrowUpRight className="w-3.5 h-3.5" />
               <span>{stats.agentsTrend}%</span>
-              <span className="text-muted-foreground font-normal ml-1">vs prior period</span>
+              <span className="text-slate-500 font-normal ml-1">vs prior period</span>
             </div>
           </div>
 
           {/* Card 5: Avg. Response Time */}
-          <div className="group relative bg-[#13161e] hover:bg-[#161a25] border border-white/5 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/5">
+          <div className="group relative bg-white/95 hover:bg-white border border-slate-200 shadow-sm rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/5">
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-tr-2xl pointer-events-none" />
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Avg. Response Time</span>
-              <div className="p-2.5 rounded-xl icon-ring bg-[#581c87]/20 text-[#c084fc] group-hover:scale-110 transition-transform">
+              <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Avg. Response Time</span>
+              <div className="p-2.5 rounded-xl icon-ring bg-purple-50 text-purple-600 group-hover:scale-110 transition-transform">
                 <Zap className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-slate-900 tracking-tight">
               {stats.avgResponseTime}s
             </div>
             <div className={`flex items-center gap-1 mt-2 text-xs font-semibold ${
-              stats.responseTimeTrend <= 0 ? "text-emerald-400" : "text-rose-500"
+              stats.responseTimeTrend <= 0 ? "text-emerald-600" : "text-rose-500"
             }`}>
               {stats.responseTimeTrend <= 0 ? (
                 <ArrowDownRight className="w-3.5 h-3.5" />
@@ -457,7 +520,7 @@ export default function AnalyticsPage() {
                 <ArrowUpRight className="w-3.5 h-3.5" />
               )}
               <span>{Math.abs(stats.responseTimeTrend)}%</span>
-              <span className="text-muted-foreground font-normal ml-1">vs prior period</span>
+              <span className="text-slate-500 font-normal ml-1">vs prior period</span>
             </div>
           </div>
         </div>
@@ -466,7 +529,7 @@ export default function AnalyticsPage() {
       {/* ── Row 1: Charts (Queries Over Time + Queries By Category) ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Queries Over Time Chart */}
-        <div className="lg:col-span-2 bg-[#13161e] border border-white/5 rounded-2xl p-6 shadow-soft flex flex-col">
+        <div className="lg:col-span-2 bg-white/95 border border-slate-200 shadow-sm rounded-2xl p-6 shadow-soft flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-base font-semibold text-white">Queries Over Time</h2>
@@ -566,7 +629,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Queries by Category Donut Chart */}
-        <div className="bg-[#13161e] border border-white/5 rounded-2xl p-6 shadow-soft flex flex-col">
+        <div className="bg-white/95 border border-slate-200 shadow-sm rounded-2xl p-6 shadow-soft flex flex-col">
           <h2 className="text-base font-semibold text-white mb-6">Queries by Search Mode</h2>
 
           {data && (
@@ -644,7 +707,7 @@ export default function AnalyticsPage() {
       {/* ── Row 2: Top Docs + Engagement + Latency Line ────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Top Documents Card */}
-        <div className="bg-[#13161e] border border-white/5 rounded-2xl p-6 shadow-soft flex flex-col justify-between">
+        <div className="bg-white/95 border border-slate-200 shadow-sm rounded-2xl p-6 shadow-soft flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-base font-semibold text-white">Top Documents</h2>
@@ -680,7 +743,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* User Engagement Radial Progress */}
-        <div className="bg-[#13161e] border border-white/5 rounded-2xl p-6 shadow-soft flex flex-col justify-between">
+        <div className="bg-white/95 border border-slate-200 shadow-sm rounded-2xl p-6 shadow-soft flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold text-white">User Activity</h2>
@@ -743,7 +806,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Avg Response Time Chart */}
-        <div className="bg-[#13161e] border border-white/5 rounded-2xl p-6 shadow-soft flex flex-col justify-between">
+        <div className="bg-white/95 border border-slate-200 shadow-sm rounded-2xl p-6 shadow-soft flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-base font-semibold text-white">Response Time (Avg.)</h2>

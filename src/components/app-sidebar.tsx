@@ -16,10 +16,18 @@ import {
   BookMarked,
   Zap,
   Landmark,
+  Calendar,
+  Users,
+  FileText,
+  CheckCircle2,
+  ShieldAlert,
+  Award,
+  Building2,
+  DollarSign,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { signOutAction, getCurrentUserRoleAction } from "@/server/actions/auth";
+import { signOutAction } from "@/server/actions/auth";
 
 import {
   Sidebar,
@@ -49,34 +57,59 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   {
-    label: "Academic Essentials",
+    label: "Student Portal",
     items: [
       { title: "Student Dashboard", url: "/dashboard", icon: LayoutDashboard },
-      { title: "Chat Assistant", url: "/chat", icon: MessageSquare },
+      { title: "AI Academic Chat", url: "/chat", icon: MessageSquare },
       { title: "Browse Notes & Docs", url: "/documents", icon: BookOpen },
-      { title: "Knowledge Bases", url: "/knowledge-bases", icon: BookOpen },
+      { title: "Knowledge Bases", url: "/knowledge-bases", icon: FileText },
       { title: "Research Workspace", url: "/research", icon: BookMarked },
     ],
   },
   {
     label: "Placement Center",
     items: [
-      { title: "Placement Center", url: "/skills", icon: Zap, badge: "Career" },
+      { title: "Placement Center", url: "/skills", icon: Zap, badge: "Radar" },
+      { title: "Assessment Arena", url: "/skills/assessment", icon: Award, badge: "Tests" },
+      { title: "Certifications", url: "/skills/certifications", icon: CheckCircle2, badge: "Badges" },
     ],
   },
   {
-    label: "Campus Leadership Portals",
+    label: "Faculty Operations",
     items: [
-      { title: "Principal Portal", url: "/principal", icon: Landmark, badge: "Executive" },
-      { title: "Faculty Portal", url: "/faculty/dashboard", icon: GraduationCap, badge: "Academic" },
-      { title: "HOD Portal", url: "/hod/dashboard", icon: Scale, badge: "Dept" },
+      { title: "Faculty Dashboard", url: "/faculty/dashboard", icon: GraduationCap, badge: "Cockpit" },
+      { title: "Class Timetables", url: "/faculty/timetables", icon: Calendar },
+      { title: "Exam Seating", url: "/faculty/seating", icon: Users, badge: "Halls" },
+      { title: "Upload Course Docs", url: "/faculty/documents", icon: FileText },
+      { title: "Assigned Faculty", url: "/faculty/assigned-faculty", icon: Building2 },
+    ],
+  },
+  {
+    label: "HOD Governance",
+    items: [
+      { title: "Department Command", url: "/hod/dashboard", icon: Scale, badge: "HQ" },
+      { title: "Approval Docket", url: "/hod/approvals", icon: CheckCircle2, badge: "Leaves" },
+      { title: "Faculty Workload", url: "/hod/faculty", icon: Users },
+      { title: "Student Risk Radar", url: "/hod/students", icon: ShieldAlert, badge: "Risks" },
+      { title: "Master Timetable", url: "/hod/timetable", icon: Calendar },
+      { title: "Courses & Syllabi", url: "/hod/courses", icon: BookOpen },
+      { title: "Research Grants", url: "/hod/research", icon: Award },
+    ],
+  },
+  {
+    label: "Principal Leadership",
+    items: [
+      { title: "Executive Cockpit", url: "/principal", icon: Landmark, badge: "Executive" },
+      { title: "9-Department Matrix", url: "/principal/departments", icon: Building2, badge: "9 Depts" },
+      { title: "Approvals Registry", url: "/principal/approvals", icon: CheckCircle2 },
+      { title: "Budget & Finance", url: "/principal/finance", icon: DollarSign, badge: "Grants" },
     ],
   },
   {
     label: "Platform Intelligence",
     items: [
-      { title: "Agents", url: "/agents", icon: Bot },
-      { title: "Analytics", url: "/analytics", icon: BarChart2 },
+      { title: "Autonomous Agents", url: "/agents", icon: Bot, badge: "AI" },
+      { title: "Analytics & Usage", url: "/analytics", icon: BarChart2 },
       { title: "RAG Evaluation", url: "/evaluation", icon: FlaskConical },
       { title: "Settings", url: "/settings", icon: Settings2 },
     ],
@@ -121,7 +154,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarGroupContent>
               <SidebarMenu className="space-y-0.5">
                 {section.items.map((item) => {
-                  const isActive = pathname === item.url || (item.url !== "/dashboard" && pathname.startsWith(item.url));
+                  const isActive = pathname === item.url;
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
@@ -133,7 +166,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <item.icon className={isActive ? "text-indigo-600" : "text-slate-700"} />
                         <span className="flex-1 truncate">{item.title}</span>
                         {item.badge && (
-                          <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">
+                          <span className={`ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                            isActive ? "bg-indigo-200 text-indigo-800" : "bg-slate-100 text-slate-600"
+                          }`}>
                             {item.badge}
                           </span>
                         )}

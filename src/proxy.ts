@@ -66,7 +66,13 @@ export async function proxy(request: NextRequest) {
     path.startsWith("/chat") ||
     path.startsWith("/research") ||
     path.startsWith("/student") ||
-    path.startsWith("/dashboard");
+    path.startsWith("/dashboard") ||
+    path.startsWith("/analytics") ||
+    path.startsWith("/agents") ||
+    path.startsWith("/documents") ||
+    path.startsWith("/knowledge-bases") ||
+    path.startsWith("/evaluation") ||
+    path.startsWith("/settings");
 
   // Dedicated HOD Portal - Seamless Access
   if (path.startsWith("/hod")) {

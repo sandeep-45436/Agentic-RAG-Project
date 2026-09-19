@@ -10,7 +10,28 @@ import {
   Scale,
   Landmark,
   Sparkles,
+  Calendar,
+  Users,
+  FileText,
+  CheckCircle2,
+  ShieldAlert,
+  Award,
+  Building2,
+  DollarSign,
+  Compass,
+  MessageSquare,
+  BookMarked,
+  Layers,
+  ChevronRight,
 } from "lucide-react";
+
+interface SubFeature {
+  title: string;
+  href: string;
+  icon: React.ElementType;
+  badge?: string;
+  description: string;
+}
 
 interface Portal {
   id: string;
@@ -22,6 +43,7 @@ interface Portal {
   badgeColor: string;
   activeColor: string;
   role: string;
+  subFeatures: SubFeature[];
 }
 
 const portals: Portal[] = [
@@ -34,7 +56,14 @@ const portals: Portal[] = [
     badge: "Student Hub",
     badgeColor: "bg-indigo-100 text-indigo-700 border-indigo-200",
     activeColor: "bg-indigo-50 border-indigo-300 ring-2 ring-indigo-200",
-    role: "Attendance, GPA & RAG Chat",
+    role: "Department Feed, GPA & RAG Chat",
+    subFeatures: [
+      { title: "Student Dashboard", href: "/dashboard", icon: BookOpen, description: "Dept faculty uploads & attendance" },
+      { title: "AI Academic Chat", href: "/chat", icon: MessageSquare, description: "Instant RAG textbook & notes Q&A" },
+      { title: "Browse Notes & Syllabi", href: "/documents", icon: FileText, description: "Department course docs & materials" },
+      { title: "Knowledge Bases", href: "/knowledge-bases", icon: Layers, description: "Indexed institutional knowledge" },
+      { title: "Research Workspace", href: "/research", icon: BookMarked, description: "AI literature & thesis assistance" },
+    ],
   },
   {
     id: "skills",
@@ -46,6 +75,11 @@ const portals: Portal[] = [
     badgeColor: "bg-cyan-100 text-cyan-700 border-cyan-200",
     activeColor: "bg-cyan-50 border-cyan-300 ring-2 ring-cyan-200",
     role: "Skills Radar & Certifications",
+    subFeatures: [
+      { title: "Placement Hub", href: "/skills", icon: Zap, badge: "Match Radar", description: "Placement readiness & company match" },
+      { title: "Assessment Arena", href: "/skills/assessment", icon: Award, badge: "Tests", description: "Live coding & technical skill tests" },
+      { title: "Industry Certifications", href: "/skills/certifications", icon: CheckCircle2, badge: "Badges", description: "Verified industry credentials & badges" },
+    ],
   },
   {
     id: "faculty",
@@ -57,6 +91,13 @@ const portals: Portal[] = [
     badgeColor: "bg-purple-100 text-purple-700 border-purple-200",
     activeColor: "bg-purple-50 border-purple-300 ring-2 ring-purple-200",
     role: "Timetables, Seating & Syllabi",
+    subFeatures: [
+      { title: "Faculty Cockpit", href: "/faculty/dashboard", icon: GraduationCap, description: "Course load, classes & quick actions" },
+      { title: "Class Timetables", href: "/faculty/timetables", icon: Calendar, badge: "Schedule", description: "Weekly teaching schedule & periods" },
+      { title: "Exam Seating", href: "/faculty/seating", icon: Users, badge: "Invigilation", description: "Exam hall allocation & seating plan" },
+      { title: "Upload Course Docs", href: "/faculty/documents", icon: FileText, badge: "Uploads", description: "Upload syllabi, notes & question banks" },
+      { title: "Department Faculty", href: "/faculty/assigned-faculty", icon: Building2, description: "Department colleagues & subject allocations" },
+    ],
   },
   {
     id: "hod",
@@ -68,6 +109,15 @@ const portals: Portal[] = [
     badgeColor: "bg-blue-100 text-blue-700 border-blue-200",
     activeColor: "bg-blue-50 border-blue-300 ring-2 ring-blue-200",
     role: "Health Score, Workload & Risks",
+    subFeatures: [
+      { title: "Command Center", href: "/hod/dashboard", icon: Scale, description: "Department health score & metrics" },
+      { title: "Approval Docket", href: "/hod/approvals", icon: CheckCircle2, badge: "Approvals", description: "Student leaves, OD & faculty requisitions" },
+      { title: "Faculty Workload", href: "/hod/faculty", icon: Users, description: "Teaching hours & workload distribution" },
+      { title: "Student Risk Radar", href: "/hod/students", icon: ShieldAlert, badge: "Alerts", description: "Attendance shortfall & academic alerts" },
+      { title: "Master Timetable", href: "/hod/timetable", icon: Calendar, description: "Department-wide master class schedule" },
+      { title: "Syllabi & Curriculum", href: "/hod/courses", icon: BookOpen, description: "Department course coverage & syllabus" },
+      { title: "Research & Grants", href: "/hod/research", icon: Award, description: "Patents, publications & funded research" },
+    ],
   },
   {
     id: "principal",
@@ -79,14 +129,29 @@ const portals: Portal[] = [
     badgeColor: "bg-amber-100 text-amber-800 border-amber-200",
     activeColor: "bg-amber-50 border-amber-300 ring-2 ring-amber-200",
     role: "All Depts, NAAC & Finance",
+    subFeatures: [
+      { title: "Executive Cockpit", href: "/principal", icon: Landmark, description: "Institution overview & academic KPIs" },
+      { title: "9-Dept Matrix", href: "/principal/departments", icon: Building2, badge: "9 Depts", description: "Comparative department benchmarks" },
+      { title: "Approvals Registry", href: "/principal/approvals", icon: CheckCircle2, description: "Institution-level approvals & escalations" },
+      { title: "Budget & Finance", href: "/principal/finance", icon: DollarSign, badge: "Grants", description: "Departmental budget & research grants" },
+    ],
   },
 ];
 
 export function PortalSwitcher({ className = "" }: { className?: string }) {
   const pathname = usePathname();
 
+  // Determine active portal based on current pathname
+  const activePortal =
+    portals.find((p) =>
+      p.id === "student"
+        ? pathname === "/dashboard" || pathname.startsWith("/chat") || pathname.startsWith("/documents") || pathname.startsWith("/knowledge-bases") || pathname.startsWith("/research")
+        : pathname.startsWith(p.href)
+    ) || portals[0];
+
   return (
     <div className={`w-full overflow-hidden rounded-2xl bg-white/95 border border-slate-200 p-3.5 shadow-md backdrop-blur-xl ${className}`}>
+      {/* ── Top Header Row ────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-2 pb-2.5 mb-2.5 border-b border-slate-200/80">
         <div className="flex items-center gap-2">
           <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-indigo-600 to-cyan-500 flex items-center justify-center text-white shadow-sm">
@@ -96,18 +161,17 @@ export function PortalSwitcher({ className = "" }: { className?: string }) {
             ALITS Smart University Subsystem Portals
           </span>
         </div>
-        <span className="text-[11px] text-slate-500 hidden sm:inline font-medium">
-          Instant 1-Click Subsystem Switcher
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-slate-500 hidden sm:inline font-medium">
+            Active: <span className="font-bold text-slate-800">{activePortal.name}</span>
+          </span>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+      {/* ── 5 Primary Portals ─────────────────────────────────────── */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 mb-3">
         {portals.map((p) => {
-          const isActive =
-            p.href === "/dashboard"
-              ? pathname === "/dashboard"
-              : pathname.startsWith(p.href);
-
+          const isActive = activePortal.id === p.id;
           const Icon = p.icon;
 
           return (
@@ -147,6 +211,51 @@ export function PortalSwitcher({ className = "" }: { className?: string }) {
             </Link>
           );
         })}
+      </div>
+
+      {/* ── Active Portal Subsystem Feature Ribbon ───────────────── */}
+      <div className="bg-slate-50/90 rounded-xl p-2.5 border border-slate-200/90">
+        <div className="flex items-center justify-between px-1 mb-2">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+            <Compass className="w-3.5 h-3.5 text-indigo-600" />
+            <span>{activePortal.name} Features & Operations:</span>
+          </div>
+          <span className="text-[10px] text-slate-500 font-medium hidden sm:inline">
+            Direct Jump to Subsystem Modules
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {activePortal.subFeatures.map((sub) => {
+            const isSubActive = pathname === sub.href;
+            const SubIcon = sub.icon;
+
+            return (
+              <Link
+                key={sub.href}
+                href={sub.href}
+                title={sub.description}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-150 ${
+                  isSubActive
+                    ? "bg-indigo-600 text-white border-indigo-700 shadow-sm"
+                    : "bg-white text-slate-700 hover:text-indigo-600 border-slate-200 hover:border-indigo-300 hover:bg-slate-50"
+                }`}
+              >
+                <SubIcon className={`w-3.5 h-3.5 ${isSubActive ? "text-white" : "text-slate-500"}`} />
+                <span>{sub.title}</span>
+                {sub.badge && (
+                  <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full ${
+                    isSubActive
+                      ? "bg-indigo-500 text-white"
+                      : "bg-slate-100 text-slate-600 border border-slate-200"
+                  }`}>
+                    {sub.badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

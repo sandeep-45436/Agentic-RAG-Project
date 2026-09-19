@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedBackground } from "@/components/animated-background";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -108,9 +109,10 @@ export default function FacultyDashboardPage() {
   };
 
   return (
-    <div className="space-y-6 pb-12 font-sans">
+    <AnimatedBackground>
+    <div className="space-y-6 pb-12 font-sans relative z-10">
       {/* ── ALITS FACULTY INSTITUTIONAL BRAND HEADER ──────────────────────── */}
-      <div className="light-glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
+      <div className="light-glass-card anim-fade-up-1 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
         <div className="flex items-center gap-3.5">
           <div className="relative h-11 w-36 sm:w-44 flex items-center justify-start">
             <img
@@ -146,22 +148,22 @@ export default function FacultyDashboardPage() {
       </div>
 
       {/* ── HERO BANNER ────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900/60 via-purple-900/40 to-slate-900 border border-indigo-500/20 p-6 lg:p-8 backdrop-blur-xl">
-        <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 border border-white/60 shadow-lg p-6 lg:p-8 backdrop-blur-xl anim-fade-up-1">
+        <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-white/20 blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/40 text-xs">
+              <Badge className="bg-white/20 text-white border-white/40 text-xs">
                 Academic Year 2026-2027 • Fall Term
               </Badge>
-              <span className="text-xs text-slate-400 font-mono">
+              <span className="text-xs text-white/90 font-mono">
                 {profile?.facultyCode || "FAC-MEMBER"}
               </span>
             </div>
             <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
               Welcome, {profile?.title} {profile?.user?.name || "Professor"}
             </h1>
-            <p className="text-sm text-slate-300 max-w-xl">
+            <p className="text-sm text-white/90 max-w-xl">
               {profile?.designation || profile?.title} • {profile?.department?.name || "Department"}
             </p>
           </div>
@@ -169,14 +171,14 @@ export default function FacultyDashboardPage() {
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/faculty/documents"
-              className="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-600/20 text-xs font-semibold px-4 py-2.5 transition-all"
+              className="inline-flex items-center justify-center bg-white/20 hover:bg-white/30 text-white border border-white/40 rounded-xl shadow-lg text-xs font-semibold px-4 py-2.5 transition-all"
             >
               <UploadCloud className="mr-2 h-4 w-4" />
               Upload Document
             </Link>
             <Link
               href="/faculty/seating"
-              className="inline-flex items-center justify-center border border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-slate-200 rounded-xl text-xs font-semibold px-4 py-2.5 transition-all"
+              className="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-xl text-xs font-semibold px-4 py-2.5 transition-all"
             >
               <Layers className="mr-2 h-4 w-4" />
               Exam Seating
@@ -187,53 +189,53 @@ export default function FacultyDashboardPage() {
 
       {/* ── TOP STATS ──────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl hover-lift hover:border-indigo-500/40 transition-all shadow-md">
+        <Card className="light-glass-card card-3d-inner anim-fade-up-2 shimmer-effect hover-lift hover:border-indigo-300 transition-all shadow-md">
           <CardContent className="p-5 flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-xs font-medium text-slate-400">Department Documents</p>
-              <p className="text-2xl font-bold text-white">{docsCount}</p>
-              <p className="text-[11px] text-indigo-400">Indexed & Searchable</p>
+              <p className="text-xs font-medium text-slate-600">Department Documents</p>
+              <p className="text-2xl font-bold text-slate-900 number-pop">{docsCount}</p>
+              <p className="text-[11px] text-indigo-600 font-medium">Indexed & Searchable</p>
             </div>
-            <div className="h-12 w-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+            <div className="h-12 w-12 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 icon-ring">
               <FileText className="h-6 w-6" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl hover-lift hover:border-indigo-500/40 transition-all shadow-md">
+        <Card className="light-glass-card card-3d-inner anim-fade-up-2 shimmer-effect hover-lift hover:border-emerald-300 transition-all shadow-md" style={{ animationDelay: '100ms' }}>
           <CardContent className="p-5 flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-xs font-medium text-slate-400">Assigned Courses</p>
-              <p className="text-2xl font-bold text-white">{sectionsCount || 3}</p>
-              <p className="text-[11px] text-emerald-400">Active Fall Term</p>
+              <p className="text-xs font-medium text-slate-600">Assigned Courses</p>
+              <p className="text-2xl font-bold text-slate-900 number-pop">{sectionsCount || 3}</p>
+              <p className="text-[11px] text-emerald-600 font-medium">Active Fall Term</p>
             </div>
-            <div className="h-12 w-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="h-12 w-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 icon-ring">
               <BookOpen className="h-6 w-6" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl hover-lift hover:border-indigo-500/40 transition-all shadow-md">
+        <Card className="light-glass-card card-3d-inner anim-fade-up-2 shimmer-effect hover-lift hover:border-purple-300 transition-all shadow-md" style={{ animationDelay: '200ms' }}>
           <CardContent className="p-5 flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-xs font-medium text-slate-400">Weekly Classes</p>
-              <p className="text-2xl font-bold text-white">{timetablesCount || 6}</p>
-              <p className="text-[11px] text-purple-400">Scheduled Slots</p>
+              <p className="text-xs font-medium text-slate-600">Weekly Classes</p>
+              <p className="text-2xl font-bold text-slate-900 number-pop">{timetablesCount || 6}</p>
+              <p className="text-[11px] text-purple-600 font-medium">Scheduled Slots</p>
             </div>
-            <div className="h-12 w-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+            <div className="h-12 w-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 icon-ring">
               <Clock className="h-6 w-6" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl hover-lift hover:border-indigo-500/40 transition-all shadow-md">
+        <Card className="light-glass-card card-3d-inner anim-fade-up-2 shimmer-effect hover-lift hover:border-amber-300 transition-all shadow-md" style={{ animationDelay: '300ms' }}>
           <CardContent className="p-5 flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-xs font-medium text-slate-400">Invigilation Duties</p>
-              <p className="text-2xl font-bold text-white">{invigilationsCount || 1}</p>
-              <p className="text-[11px] text-amber-400">Midterm Fall 2026</p>
+              <p className="text-xs font-medium text-slate-600">Invigilation Duties</p>
+              <p className="text-2xl font-bold text-slate-900 number-pop">{invigilationsCount || 1}</p>
+              <p className="text-[11px] text-amber-600 font-medium">Midterm Fall 2026</p>
             </div>
-            <div className="h-12 w-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <div className="h-12 w-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 icon-ring">
               <Layers className="h-6 w-6" />
             </div>
           </CardContent>
@@ -241,15 +243,15 @@ export default function FacultyDashboardPage() {
       </div>
 
       {/* ── SCHEDULE & RECENT DOCUMENTS SPLIT ─────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 anim-fade-up-3">
         {/* Weekly Class Slots for this faculty */}
-        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl">
+        <Card className="light-glass-card">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div>
-              <CardTitle className="text-base font-semibold text-white">Your Assigned Weekly Classes</CardTitle>
-              <CardDescription className="text-xs text-slate-400">Class schedule for {profile?.name}</CardDescription>
+              <CardTitle className="text-base font-semibold text-slate-900 text-reveal">Your Assigned Weekly Classes</CardTitle>
+              <CardDescription className="text-xs text-slate-500">Class schedule for {profile?.name}</CardDescription>
             </div>
-            <Link href="/faculty/timetables" className="text-xs text-indigo-400 hover:underline flex items-center">
+            <Link href="/faculty/timetables" className="text-xs text-indigo-600 hover:underline flex items-center">
               View All <ChevronRight className="h-3 w-3 ml-0.5" />
             </Link>
           </CardHeader>
@@ -258,22 +260,22 @@ export default function FacultyDashboardPage() {
               profile.timetableEntries.slice(0, 4).map((slot: any) => (
                 <div
                   key={slot.id}
-                  className="flex items-center justify-between p-3 rounded-xl bg-slate-950/60 border border-slate-800"
+                  className="flex items-center justify-between p-3 rounded-xl bg-white/50 border border-slate-200 hover:bg-slate-50/50 transition-colors"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-white text-sm">{slot.courseCode}</span>
-                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-slate-700 text-slate-300">
+                      <span className="font-semibold text-slate-900 text-sm">{slot.courseCode}</span>
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-slate-200 text-slate-600 bg-white">
                         {slot.room}
                       </Badge>
                     </div>
-                    <p className="text-xs text-slate-400 truncate max-w-[220px]">{slot.courseTitle}</p>
+                    <p className="text-xs text-slate-500 truncate max-w-[220px]">{slot.courseTitle}</p>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-semibold text-indigo-300 bg-indigo-500/10 px-2 py-1 rounded-md">
+                    <span className="text-xs font-semibold text-indigo-700 bg-indigo-50 px-2 py-1 rounded-md">
                       {slot.dayOfWeek}
                     </span>
-                    <p className="text-[11px] text-slate-400 mt-1">
+                    <p className="text-[11px] text-slate-500 mt-1">
                       {slot.startTime} - {slot.endTime}
                     </p>
                   </div>
@@ -288,13 +290,13 @@ export default function FacultyDashboardPage() {
         </Card>
 
         {/* Recent Document Uploads with Click-to-View */}
-        <Card className="bg-slate-900/70 border-slate-800/80 backdrop-blur-xl">
+        <Card className="light-glass-card">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div>
-              <CardTitle className="text-base font-semibold text-white">Recent Academic Documents</CardTitle>
-              <CardDescription className="text-xs text-slate-400">Click any document to preview indexed chunks</CardDescription>
+              <CardTitle className="text-base font-semibold text-slate-900 text-reveal">Recent Academic Documents</CardTitle>
+              <CardDescription className="text-xs text-slate-500">Click any document to preview indexed chunks</CardDescription>
             </div>
-            <Link href="/faculty/documents" className="text-xs text-indigo-400 hover:underline flex items-center">
+            <Link href="/faculty/documents" className="text-xs text-indigo-600 hover:underline flex items-center">
               Manage <ChevronRight className="h-3 w-3 ml-0.5" />
             </Link>
           </CardHeader>
@@ -304,17 +306,17 @@ export default function FacultyDashboardPage() {
                 <div
                   key={doc.id}
                   onClick={() => handleViewDoc(doc.id)}
-                  className="flex items-center justify-between p-3 rounded-xl bg-slate-950/60 border border-slate-800 hover:bg-slate-800/40 cursor-pointer transition-colors"
+                  className="flex items-center justify-between p-3 rounded-xl bg-white/50 border border-slate-200 hover:bg-indigo-50/50 cursor-pointer transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0">
+                    <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600 shrink-0 icon-ring">
                       <FileText className="h-4 w-4" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-white truncate max-w-[200px]">
+                      <p className="text-xs font-semibold text-slate-900 truncate max-w-[200px]">
                         {doc.fileName}
                       </p>
-                      <p className="text-[11px] text-slate-400">
+                      <p className="text-[11px] text-slate-500">
                         {(doc.fileSize / 1024 / 1024).toFixed(2)} MB • {doc._count?.chunks || 0} Chunks
                       </p>
                     </div>
@@ -322,10 +324,10 @@ export default function FacultyDashboardPage() {
                   <div className="flex items-center gap-2 shrink-0">
                     <Badge
                       variant="outline"
-                      className={`text-[10px] ${
+                      className={`text-[10px] badge-pulse ${
                         doc.processingStatus === "COMPLETED"
-                          ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
-                          : "bg-amber-500/10 text-amber-300 border-amber-500/30"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-amber-50 text-amber-700 border-amber-200"
                       }`}
                     >
                       {doc.processingStatus}
@@ -337,7 +339,7 @@ export default function FacultyDashboardPage() {
                         e.stopPropagation();
                         handleViewDoc(doc.id);
                       }}
-                      className="h-7 w-7 p-0 text-slate-400 hover:text-white"
+                      className="h-7 w-7 p-0 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50"
                     >
                       <Eye className="h-3.5 w-3.5" />
                     </Button>
@@ -380,35 +382,35 @@ export default function FacultyDashboardPage() {
               </div>
               <button
                 onClick={() => setSelectedDoc(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors shrink-0"
+                className="text-slate-400 hover:text-slate-800 p-1 rounded-lg hover:bg-slate-100 transition-colors shrink-0"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-4 text-xs text-slate-300">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+            <div className="p-5 overflow-y-auto space-y-4 text-xs text-slate-700">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                 <div>
                   <span className="text-slate-500 block text-[10px]">File Size</span>
-                  <span className="font-semibold text-white">{(selectedDoc.fileSize / 1024 / 1024).toFixed(2)} MB</span>
+                  <span className="font-semibold text-slate-900">{(selectedDoc.fileSize / 1024 / 1024).toFixed(2)} MB</span>
                 </div>
                 <div>
                   <span className="text-slate-500 block text-[10px]">Indexed Chunks</span>
-                  <span className="font-semibold text-indigo-400 font-mono">{selectedDoc._count?.chunks || selectedDoc.chunks?.length || 0} Chunks</span>
+                  <span className="font-semibold text-indigo-600 font-mono">{selectedDoc._count?.chunks || selectedDoc.chunks?.length || 0} Chunks</span>
                 </div>
                 <div>
                   <span className="text-slate-500 block text-[10px]">Uploaded On</span>
-                  <span className="font-semibold text-white">{new Date(selectedDoc.createdAt).toLocaleDateString()}</span>
+                  <span className="font-semibold text-slate-900">{new Date(selectedDoc.createdAt).toLocaleDateString()}</span>
                 </div>
                 <div>
                   <span className="text-slate-500 block text-[10px]">Vector Search Status</span>
-                  <span className="font-semibold text-emerald-400">Online & Ready</span>
+                  <span className="font-semibold text-emerald-600">Online & Ready</span>
                 </div>
               </div>
 
               <div>
-                <h4 className="font-semibold text-white text-xs mb-2 flex items-center justify-between">
+                <h4 className="font-semibold text-slate-900 text-xs mb-2 flex items-center justify-between">
                   <span>Indexed Content Chunks Preview</span>
                   <span className="text-[10px] text-slate-500 font-normal">
                     Showing top {selectedDoc.chunks?.length || 0} chunks
@@ -416,18 +418,18 @@ export default function FacultyDashboardPage() {
                 </h4>
 
                 {(!selectedDoc.chunks || selectedDoc.chunks.length === 0) ? (
-                  <div className="p-6 text-center text-slate-500 bg-slate-950 rounded-xl border border-slate-800">
+                  <div className="p-6 text-center text-slate-500 bg-slate-50 rounded-xl border border-slate-200">
                     No indexed chunks preview available.
                   </div>
                 ) : (
                   <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
                     {selectedDoc.chunks.map((chunk: any, i: number) => (
-                      <div key={chunk.id || i} className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
-                        <div className="flex items-center justify-between text-[10px] text-indigo-400 font-mono">
+                      <div key={chunk.id || i} className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                        <div className="flex items-center justify-between text-[10px] text-indigo-600 font-mono">
                           <span>Chunk #{chunk.chunkIndex ?? i + 1} {chunk.pageNumber ? `(Page ${chunk.pageNumber})` : ""}</span>
                           <span className="text-slate-500">{chunk.tokenCount ? `${chunk.tokenCount} tokens` : ""}</span>
                         </div>
-                        <p className="text-slate-300 leading-relaxed line-clamp-4 font-mono text-[11px]">
+                        <p className="text-slate-700 leading-relaxed line-clamp-4 font-mono text-[11px]">
                           {chunk.content}
                         </p>
                       </div>
@@ -438,7 +440,7 @@ export default function FacultyDashboardPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between gap-3">
+            <div className="p-4 border-t border-slate-200 bg-slate-50/80 flex items-center justify-between gap-3">
               {selectedDoc.signedUrl ? (
                 <a
                   href={selectedDoc.signedUrl}
@@ -465,5 +467,6 @@ export default function FacultyDashboardPage() {
         </div>
       )}
     </div>
+    </AnimatedBackground>
   );
 }

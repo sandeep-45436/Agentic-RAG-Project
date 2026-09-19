@@ -1,9 +1,11 @@
+import { AnimatedBackground } from "@/components/animated-background";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function PricingPage() {
   return (
-    <div className="flex flex-col min-h-[100dvh]">
+    <AnimatedBackground>
+      <div className="flex flex-col min-h-[100dvh]">
       <header className="px-4 lg:px-6 h-14 flex items-center border-b">
         <Link href="/" className="flex items-center justify-center">
           <span className="font-bold text-xl tracking-tighter">AI SaaS</span>
@@ -69,5 +71,7 @@ export default function PricingPage() {
         </div>
       </main>
     </div>
+  
+    </AnimatedBackground>
   );
 }

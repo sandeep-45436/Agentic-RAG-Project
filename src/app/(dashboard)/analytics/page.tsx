@@ -121,7 +121,8 @@ export default function AnalyticsPage() {
     const interval = setInterval(() => {
       fetchAnalytics(true);
     }, 5000);
-    return () => clearInterval(interval);
+    return (
+    <AnimatedBackground>) => clearInterval(interval);
   }, [isLive, fetchAnalytics]);
 
   // Handle single manual event trigger
@@ -243,7 +244,7 @@ export default function AnalyticsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/40 pb-6">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold tracking-tight gradient-text-animated bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
               Analytics
             </h1>
             <div className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${
@@ -363,11 +364,11 @@ export default function AnalyticsPage() {
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-tr-2xl pointer-events-none" />
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Total Queries</span>
-              <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 group-hover:scale-110 transition-transform">
+              <div className="p-2.5 rounded-xl icon-ring bg-purple-500/10 text-purple-400 group-hover:scale-110 transition-transform">
                 <MessageSquare className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
               {stats.totalQueries.toLocaleString()}
             </div>
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
@@ -382,11 +383,11 @@ export default function AnalyticsPage() {
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-500/10 to-transparent rounded-tr-2xl pointer-events-none" />
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Documents Processed</span>
-              <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 group-hover:scale-110 transition-transform">
+              <div className="p-2.5 rounded-xl icon-ring bg-blue-500/10 text-blue-400 group-hover:scale-110 transition-transform">
                 <FileText className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
               {stats.totalDocs.toLocaleString()}
             </div>
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
@@ -401,11 +402,11 @@ export default function AnalyticsPage() {
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-tr-2xl pointer-events-none" />
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Active Users</span>
-              <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
+              <div className="p-2.5 rounded-xl icon-ring bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
                 <Users className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
               {stats.totalActiveUsers.toLocaleString()}
             </div>
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
@@ -420,11 +421,11 @@ export default function AnalyticsPage() {
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-amber-500/10 to-transparent rounded-tr-2xl pointer-events-none" />
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Agents Executed</span>
-              <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform">
+              <div className="p-2.5 rounded-xl icon-ring bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform">
                 <Bot className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
               {stats.totalAgentsExecuted.toLocaleString()}
             </div>
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
@@ -439,11 +440,11 @@ export default function AnalyticsPage() {
             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-tr-2xl pointer-events-none" />
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Avg. Response Time</span>
-              <div className="p-2.5 rounded-xl bg-[#581c87]/20 text-[#c084fc] group-hover:scale-110 transition-transform">
+              <div className="p-2.5 rounded-xl icon-ring bg-[#581c87]/20 text-[#c084fc] group-hover:scale-110 transition-transform">
                 <Zap className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
               {stats.avgResponseTime}s
             </div>
             <div className={`flex items-center gap-1 mt-2 text-xs font-semibold ${
@@ -808,5 +809,7 @@ export default function AnalyticsPage() {
         </div>
       </div>
     </div>
+  
+    </AnimatedBackground>
   );
 }

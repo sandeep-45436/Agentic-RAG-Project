@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -21,7 +22,8 @@ function UsageBar({ used, limit }: { used: number; limit: number }) {
   const pct = limit > 0 ? Math.min((used / limit) * 100, 100) : 0;
   const color = pct > 90 ? "bg-destructive" : pct > 70 ? "bg-amber-500" : "bg-primary";
   return (
-    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+    <AnimatedBackground>
+      <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
       <div className={`h-full ${color} transition-all`} style={{ width: `${pct}%` }} />
     </div>
   );
@@ -101,5 +103,6 @@ export default function UsagePage() {
         </div>
       ) : null}
     </div>
+    </AnimatedBackground>
   );
 }

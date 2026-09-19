@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import {
@@ -307,7 +308,8 @@ export default function ResearchWorkspacePage() {
   const hasSyncingSources = activeSources.some((s) => s.status === "SYNCING");
 
   return (
-    <div className="container mx-auto p-4 md:p-6 max-w-7xl space-y-6">
+    <AnimatedBackground>
+      <div className="container mx-auto p-4 md:p-6 max-w-7xl space-y-6">
       {/* ── Page Header ──────────────────────────────────────────────────────── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-5">
         <div>
@@ -811,5 +813,6 @@ export default function ResearchWorkspacePage() {
         </div>
       )}
     </div>
+    </AnimatedBackground>
   );
 }

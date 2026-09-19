@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -151,15 +152,16 @@ export default function HODResearchPage() {
   const totalFunding = projects.reduce((sum, p) => sum + (p.grantRaw || 50000), 0);
 
   return (
-    <div className="space-y-6 font-sans">
+    <AnimatedBackground>
+<div className="space-y-6 font-sans">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
             <FlaskConical className="h-6 w-6 text-blue-400" />
             Department Research & Sponsored Grants
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-xs sm:text-sm text-slate-500">
             Sponsored research projects, external funding, and academic publication tracking for {activeDepartment}
           </p>
         </div>
@@ -170,7 +172,7 @@ export default function HODResearchPage() {
             size="sm"
             onClick={fetchResearchData}
             disabled={loading}
-            className="border-slate-700 bg-slate-900 text-slate-300 text-xs rounded-xl"
+            className="border-slate-200 text-slate-700 text-xs rounded-xl"
           >
             <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
             Refresh
@@ -179,7 +181,7 @@ export default function HODResearchPage() {
           <Button
             size="sm"
             onClick={() => setAddModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl"
+            className="bg-blue-600 hover:bg-blue-500 text-slate-800 text-xs font-semibold rounded-xl"
           >
             <Plus className="mr-1.5 h-4 w-4" />
             Add Research Grant
@@ -189,10 +191,10 @@ export default function HODResearchPage() {
 
       {/* Top Grant KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-slate-900/80 border-slate-800 backdrop-blur">
+        <Card className="border-slate-200 backdrop-blur light-glass-card card-3d-inner anim-fade-up-1">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs text-slate-400">Total Sponsored Funding</p>
+              <p className="text-xs text-slate-500">Total Sponsored Funding</p>
               <p className="text-2xl font-bold text-emerald-400 mt-0.5">
                 ${totalFunding.toLocaleString()}
               </p>
@@ -204,11 +206,11 @@ export default function HODResearchPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/80 border-slate-800 backdrop-blur">
+        <Card className="border-slate-200 backdrop-blur light-glass-card card-3d-inner anim-fade-up-1">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs text-slate-400">Published Papers (2026)</p>
-              <p className="text-2xl font-bold text-white mt-0.5">9 Papers</p>
+              <p className="text-xs text-slate-500">Published Papers (2026)</p>
+              <p className="text-2xl font-bold text-slate-800 mt-0.5">9 Papers</p>
               <p className="text-[10px] text-blue-400 font-medium">IEEE / ACM / Springer</p>
             </div>
             <div className="p-3 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
@@ -217,10 +219,10 @@ export default function HODResearchPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900/80 border-slate-800 backdrop-blur">
+        <Card className="border-slate-200 backdrop-blur light-glass-card card-3d-inner anim-fade-up-1">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs text-slate-400">Faculty PIs Engaged</p>
+              <p className="text-xs text-slate-500">Faculty PIs Engaged</p>
               <p className="text-2xl font-bold text-purple-400 mt-0.5">
                 {new Set(projects.map((p) => p.pi)).size} Investigators
               </p>
@@ -236,12 +238,12 @@ export default function HODResearchPage() {
       {/* Projects List */}
       <div className="space-y-4">
         {projects.map((proj) => (
-          <Card key={proj.id} className="bg-slate-900/80 border-slate-800 backdrop-blur space-y-3">
+          <Card key={proj.id} className="border-slate-200 backdrop-blur space-y-3 light-glass-card card-3d-inner anim-fade-up-1">
             <CardHeader className="pb-2">
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <CardTitle className="text-sm font-bold text-white">{proj.title}</CardTitle>
+                    <CardTitle className="text-sm font-bold text-slate-800">{proj.title}</CardTitle>
                     <Badge
                       variant="outline"
                       className={`text-[9px] px-1.5 py-0 ${
@@ -253,7 +255,7 @@ export default function HODResearchPage() {
                       {proj.status}
                     </Badge>
                   </div>
-                  <CardDescription className="text-xs text-slate-400">
+                  <CardDescription className="text-xs text-slate-500">
                     Principal Investigator: <strong className="text-blue-300">{proj.pi}</strong> • Sponsoring Agency: {proj.agency}
                   </CardDescription>
                 </div>
@@ -272,7 +274,7 @@ export default function HODResearchPage() {
                         abstract: proj.abstract || "",
                       });
                     }}
-                    className="h-7 w-7 p-0 text-slate-500 hover:text-white"
+                    className="h-7 w-7 p-0 text-slate-500 hover:text-slate-800"
                   >
                     <Edit className="h-3.5 w-3.5" />
                   </Button>
@@ -289,9 +291,9 @@ export default function HODResearchPage() {
             </CardHeader>
 
             <CardContent className="space-y-2 text-xs">
-              <p className="text-slate-300 text-xs">{proj.abstract}</p>
+              <p className="text-slate-700 text-xs">{proj.abstract}</p>
 
-              <div className="flex items-center gap-4 text-[11px] text-slate-400 font-mono pt-1">
+              <div className="flex items-center gap-4 text-[11px] text-slate-500 font-mono pt-1">
                 <span>Timeline: {proj.progress}</span>
                 <span>•</span>
                 <span>Publications: {proj.papers} Verified Papers</span>
@@ -306,9 +308,9 @@ export default function HODResearchPage() {
       {/* ─────────────────────────────────────────────────────────────────── */}
       {addModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+          <div className="border border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
                 <FlaskConical className="h-4 w-4 text-blue-400" />
                 Register Sponsored Research Project / Grant
               </h3>
@@ -316,7 +318,7 @@ export default function HODResearchPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setAddModalOpen(false)}
-                className="text-slate-400 hover:text-white h-7 w-7 p-0 rounded-full"
+                className="text-slate-500 hover:text-slate-800 h-7 w-7 p-0 rounded-full"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -324,24 +326,24 @@ export default function HODResearchPage() {
 
             <form onSubmit={handleAddProject} className="space-y-3 text-xs">
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Project Title *</label>
+                <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Project Title *</label>
                 <Input
                   required
                   placeholder="e.g. Distributed Consensus in Edge AI Networks"
                   value={projectForm.title}
                   onChange={(e) => setProjectForm({ ...projectForm, title: e.target.value })}
-                  className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                  className="border-slate-200 text-slate-800 text-xs rounded-xl"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Principal Investigator (Faculty) *</label>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Principal Investigator (Faculty) *</label>
                   <select
                     required
                     value={projectForm.leadFacultyId}
                     onChange={(e) => setProjectForm({ ...projectForm, leadFacultyId: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 text-white text-xs rounded-xl p-2"
+                    className="w-full border border-slate-200 text-slate-800 text-xs rounded-xl p-2"
                   >
                     <option value="">Select Faculty PI...</option>
                     {facultyList.map((f) => (
@@ -352,39 +354,39 @@ export default function HODResearchPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Grant Funding ($ USD)</label>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Grant Funding ($ USD)</label>
                   <Input
                     type="number"
                     value={projectForm.grantAmount}
                     onChange={(e) => setProjectForm({ ...projectForm, grantAmount: e.target.value })}
-                    className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                    className="border-slate-200 text-slate-800 text-xs rounded-xl"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Abstract & Scope</label>
+                <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Abstract & Scope</label>
                 <Input
                   placeholder="e.g. Investigation into hybrid vector RAG and deterministic governance"
                   value={projectForm.abstract}
                   onChange={(e) => setProjectForm({ ...projectForm, abstract: e.target.value })}
-                  className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                  className="border-slate-200 text-slate-800 text-xs rounded-xl"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setAddModalOpen(false)}
-                  className="border-slate-800 text-slate-400 text-xs rounded-xl"
+                  className="border-slate-200 text-slate-500 text-xs rounded-xl"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={addLoading || !projectForm.leadFacultyId}
-                  className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl"
+                  className="bg-blue-600 hover:bg-blue-500 text-slate-800 font-semibold text-xs rounded-xl"
                 >
                   {addLoading ? "Registering..." : "Register Project"}
                 </Button>
@@ -399,9 +401,9 @@ export default function HODResearchPage() {
       {/* ─────────────────────────────────────────────────────────────────── */}
       {editingProject && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+          <div className="border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
                 <Edit className="h-4 w-4 text-blue-400" />
                 Edit Research Grant: {editingProject.title}
               </h3>
@@ -409,7 +411,7 @@ export default function HODResearchPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setEditingProject(null)}
-                className="text-slate-400 hover:text-white h-7 w-7 p-0 rounded-full"
+                className="text-slate-500 hover:text-slate-800 h-7 w-7 p-0 rounded-full"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -417,21 +419,21 @@ export default function HODResearchPage() {
 
             <form onSubmit={handleUpdateProject} className="space-y-3 text-xs">
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Grant Amount ($ USD)</label>
+                <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Grant Amount ($ USD)</label>
                 <Input
                   type="number"
                   value={editForm.grantAmount}
                   onChange={(e) => setEditForm({ ...editForm, grantAmount: e.target.value })}
-                  className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                  className="border-slate-200 text-slate-800 text-xs rounded-xl"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Status</label>
+                <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Status</label>
                 <select
                   value={editForm.status}
                   onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 text-white text-xs rounded-xl p-2"
+                  className="w-full border border-slate-200 text-slate-800 text-xs rounded-xl p-2"
                 >
                   <option value="Active">Active</option>
                   <option value="Completed">Completed</option>
@@ -440,27 +442,27 @@ export default function HODResearchPage() {
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Abstract</label>
+                <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Abstract</label>
                 <Input
                   value={editForm.abstract}
                   onChange={(e) => setEditForm({ ...editForm, abstract: e.target.value })}
-                  className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                  className="border-slate-200 text-slate-800 text-xs rounded-xl"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setEditingProject(null)}
-                  className="border-slate-800 text-slate-400 text-xs rounded-xl"
+                  className="border-slate-200 text-slate-500 text-xs rounded-xl"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={updating}
-                  className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl"
+                  className="bg-blue-600 hover:bg-blue-500 text-slate-800 font-semibold text-xs rounded-xl"
                 >
                   {updating ? "Saving..." : "Save Project"}
                 </Button>
@@ -470,5 +472,6 @@ export default function HODResearchPage() {
         </div>
       )}
     </div>
+</AnimatedBackground>
   );
 }

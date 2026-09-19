@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import React, { useState, useEffect, useCallback } from "react";
 import {
@@ -156,7 +157,8 @@ function ConfidenceBar({
     pct >= 70 ? "high" : pct >= 40 ? "medium" : "low";
 
   return (
-    <div className="space-y-1">
+    <AnimatedBackground>
+      <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">{label}</span>
         <span className={`font-medium ${confidenceColor(level)}`}>{pct}%</span>
@@ -618,5 +620,6 @@ export default function RetrievalDebugPage() {
         </CardContent>
       </Card>
     </div>
+    </AnimatedBackground>
   );
 }

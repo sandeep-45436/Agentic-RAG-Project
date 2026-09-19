@@ -63,7 +63,7 @@ function fileIcon(name: string, type: string) {
   if (["ppt","pptx"].includes(ext))
     return { bg: "bg-orange-500/15", text: "text-orange-400", label: "PP" };
   if (["md","txt"].includes(ext))
-    return { bg: "bg-gray-500/15", text: "text-gray-400", label: "MD" };
+    return { bg: "bg-gray-500/15", text: "text-slate-500", label: "MD" };
   return { bg: "bg-indigo-500/15", text: "text-indigo-400", label: ext.toUpperCase() || "FILE" };
 }
 
@@ -102,7 +102,7 @@ function StatusBadge({ status }: { status: string }) {
       );
     default:
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-500/15 text-gray-400">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-500/15 text-slate-500">
           {status}
         </span>
       );
@@ -153,10 +153,10 @@ function UploadModal({ onClose, onDone }: { onClose: () => void; onDone: () => v
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#141720] border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+      <div className=" border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-2xl">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-white">Upload Document</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white"><X className="w-4 h-4" /></button>
+          <button onClick={onClose} className="text-slate-500 hover:text-white"><X className="w-4 h-4" /></button>
         </div>
         {!file ? (
           <div
@@ -164,7 +164,7 @@ function UploadModal({ onClose, onDone }: { onClose: () => void; onDone: () => v
             onDragLeave={() => setDragging(false)}
             onDrop={(e) => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files?.[0]; if (f) pick(f); }}
             onClick={() => ref.current?.click()}
-            className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center gap-3 cursor-pointer transition-colors ${dragging ? "border-indigo-500 bg-indigo-500/5" : "border-white/10 hover:border-white/20"}`}
+            className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center gap-3 cursor-pointer transition-colors ${dragging ? "border-indigo-500 bg-indigo-500/5" : "border-slate-200 hover:border-white/20"}`}
           >
             <div className="p-4 bg-indigo-500/10 rounded-full"><Upload className="w-7 h-7 text-indigo-400" /></div>
             <p className="text-sm font-medium text-white">Click or drag PDF here</p>
@@ -176,13 +176,13 @@ function UploadModal({ onClose, onDone }: { onClose: () => void; onDone: () => v
           <div className="space-y-4">
             <div className="flex items-center gap-3 bg-white/5 rounded-xl p-3">
               <FileIcon name={file.name} type={file.type} />
-              <div className="flex-1 min-w-0"><p className="text-sm text-white truncate">{file.name}</p><p className="text-xs text-gray-400">{fmtBytes(file.size)}</p></div>
+              <div className="flex-1 min-w-0"><p className="text-sm text-white truncate">{file.name}</p><p className="text-xs text-slate-500">{fmtBytes(file.size)}</p></div>
               {!uploading && !done && <button onClick={() => setFile(null)} className="text-gray-500 hover:text-white"><X className="w-4 h-4" /></button>}
             </div>
             {uploading && (
               <div className="space-y-2">
-                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden"><div className="h-full bg-indigo-500 rounded-full transition-all" style={{ width: `${progress}%` }} /></div>
-                <p className="text-xs text-gray-400 text-center animate-pulse">Uploading...</p>
+                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden"><div className="h-full bg-indigo-500 rounded-full progress-fill-anim transition-all" style={{ width: `${progress}%` }} /></div>
+                <p className="text-xs text-slate-500 text-center animate-pulse">Uploading...</p>
               </div>
             )}
             {done && <p className="text-xs text-emerald-400 text-center flex items-center justify-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Uploaded successfully!</p>}
@@ -217,9 +217,9 @@ function DetailPanel({ docId, onClose }: { docId: string; onClose: () => void })
       {/* Mobile backdrop */}
       <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-30 lg:hidden" onClick={onClose} />
 
-      <aside className="fixed inset-y-0 right-0 z-40 w-full sm:w-80 lg:relative lg:w-80 shrink-0 bg-[#141720] border-l border-white/10 flex flex-col overflow-hidden shadow-2xl lg:shadow-none animate-slide-up-fade">
+      <aside className="fixed inset-y-0 right-0 z-40 w-full sm:w-80 lg:relative lg:w-80 shrink-0  border-l border-slate-200 flex flex-col overflow-hidden shadow-2xl lg:shadow-none animate-slide-up-fade">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/5">
+        <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-200/80">
           <div className="flex items-center gap-2 min-w-0">
             {detail && <FileIcon name={detail.fileName} type={detail.fileType} />}
             <p className="text-xs font-semibold text-white truncate">{detail?.fileName ?? "Loading..."}</p>
@@ -230,10 +230,10 @@ function DetailPanel({ docId, onClose }: { docId: string; onClose: () => void })
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-white/5 px-4">
+        <div className="flex border-b border-slate-200/80 px-4">
           {(["Details", "Chunks"] as const).map((t) => (
             <button key={t} onClick={() => setTab(t)}
-              className={`py-2.5 px-3 text-xs font-medium border-b-2 transition-colors ${tab === t ? "border-indigo-500 text-white" : "border-transparent text-gray-500 hover:text-gray-300"}`}>
+              className={`py-2.5 px-3 text-xs font-medium border-b-2 transition-colors ${tab === t ? "border-indigo-500 text-white" : "border-transparent text-gray-500 hover:text-slate-700"}`}>
               {t}
             </button>
           ))}
@@ -258,7 +258,7 @@ function DetailPanel({ docId, onClose }: { docId: string; onClose: () => void })
                   ...(detail.knowledgeBase ? [{ label: "Knowledge Base", value: detail.knowledgeBase.name }] : []),
                 ].map(({ label, value }) => (
                   <div key={label} className="flex items-start justify-between gap-2">
-                    <span className="text-xs text-gray-400 shrink-0">{label}</span>
+                    <span className="text-xs text-slate-500 shrink-0">{label}</span>
                     {label === "Status" ? (
                       <StatusBadge status={value as string} />
                     ) : (
@@ -271,11 +271,11 @@ function DetailPanel({ docId, onClose }: { docId: string; onClose: () => void })
 
             {tab === "Chunks" && (
               <div className="p-4 space-y-2">
-                <p className="text-xs text-gray-400">{detail._count.chunks} total chunks — showing first 5</p>
+                <p className="text-xs text-slate-500">{detail._count.chunks} total chunks — showing first 5</p>
                 {detail.chunks.map((c) => (
-                  <div key={c.id} className="bg-[#1a1f2e] rounded-xl p-3 border border-white/5">
+                  <div key={c.id} className="bg-[#1a1f2e] rounded-xl p-3 border border-slate-200/80">
                     <p className="text-[10px] text-indigo-400 font-medium mb-1">Chunk {c.chunkIndex + 1} · {c.tokenCount} tokens</p>
-                    <p className="text-[11px] text-gray-300 leading-relaxed line-clamp-4">{c.content}</p>
+                    <p className="text-[11px] text-slate-700 leading-relaxed line-clamp-4">{c.content}</p>
                   </div>
                 ))}
               </div>
@@ -285,7 +285,7 @@ function DetailPanel({ docId, onClose }: { docId: string; onClose: () => void })
 
         {/* Footer CTA */}
         {detail?.signedUrl && (
-          <div className="p-4 border-t border-white/5">
+          <div className="p-4 border-t border-slate-200/80">
             <a href={detail.signedUrl} target="_blank" rel="noreferrer"
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors">
               <Eye className="w-4 h-4" /> View Full Document <ExternalLink className="w-3.5 h-3.5" />
@@ -350,7 +350,8 @@ export default function DocumentsPage() {
     const iv = setInterval(() => {
       load(pagination.page, search, tab, selectedDeptId);
     }, 5000);
-    return () => clearInterval(iv);
+    return (
+    <AnimatedBackground>) => clearInterval(iv);
   }, [load, pagination.page, search, tab, selectedDeptId]);
 
   const handleDelete = async (id: string) => {
@@ -364,11 +365,11 @@ export default function DocumentsPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] bg-[#0f1117] text-white overflow-hidden -m-6 md:-m-10">
+    <div className="flex h-[calc(100vh-3.5rem)]  text-white overflow-hidden -m-6 md:-m-10">
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
 
         {/* ── Top bar ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5 shrink-0 gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200/80 shrink-0 gap-3">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-lg sm:text-xl font-bold text-white">University Documents & Notes</h1>
@@ -376,13 +377,13 @@ export default function DocumentsPage() {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live Synced
               </span>
             </div>
-            <p className="text-xs text-gray-400 mt-0.5">Explore institutional and departmental course materials. Academic documents uploaded by faculty appear here in real time.</p>
+            <p className="text-xs text-slate-500 mt-0.5">Explore institutional and departmental course materials. Academic documents uploaded by faculty appear here in real time.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2 shrink-0">
             {/* Department Scope Selector */}
             <div className="flex items-center gap-1.5 bg-indigo-950/60 border border-indigo-500/30 rounded-xl px-2.5 py-1.5 shadow-sm">
               <Building className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-              <span className="text-[11px] text-gray-400 font-medium hidden sm:inline">Scope:</span>
+              <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">Scope:</span>
               <select
                 value={selectedDeptId}
                 onChange={(e) => {
@@ -390,11 +391,11 @@ export default function DocumentsPage() {
                 }}
                 className="bg-transparent text-xs font-semibold text-indigo-200 border-none outline-none focus:ring-0 cursor-pointer pr-1"
               >
-                <option value="ALL" className="bg-[#141720] text-white">
+                <option value="ALL" className=" text-white">
                   All Departments & University
                 </option>
                 {departments.map((dept) => (
-                  <option key={dept.id} value={dept.id} className="bg-[#141720] text-white">
+                  <option key={dept.id} value={dept.id} className=" text-white">
                     {dept.code} - {dept.name}
                   </option>
                 ))}
@@ -408,7 +409,7 @@ export default function DocumentsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search documents..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50"
+                className="w-full bg-white/5 border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50"
               />
             </div>
 
@@ -422,10 +423,10 @@ export default function DocumentsPage() {
         </div>
 
         {/* ── Tabs ── */}
-        <div className="flex items-center gap-1 px-4 sm:px-6 border-b border-white/5 shrink-0 overflow-x-auto scrollbar-none">
+        <div className="flex items-center gap-1 px-4 sm:px-6 border-b border-slate-200/80 shrink-0 overflow-x-auto scrollbar-none">
           {TABS.map((t) => (
             <button key={t} onClick={() => setTab(t)}
-              className={`py-2.5 sm:py-3 px-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${tab === t ? "border-indigo-500 text-white" : "border-transparent text-gray-500 hover:text-gray-300"}`}>
+              className={`py-2.5 sm:py-3 px-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${tab === t ? "border-indigo-500 text-white" : "border-transparent text-gray-500 hover:text-slate-700"}`}>
               {t}
             </button>
           ))}
@@ -437,7 +438,7 @@ export default function DocumentsPage() {
         {/* ── Table ── */}
         <div className="flex-1 overflow-auto">
           <table className="w-full text-xs">
-            <thead className="sticky top-0 bg-[#0f1117] border-b border-white/5 z-10">
+            <thead className="sticky top-0  border-b border-slate-200/80 z-10">
               <tr>
                 <th className="text-left px-6 py-3 text-gray-500 font-medium">Name</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Scope</th>
@@ -453,7 +454,7 @@ export default function DocumentsPage() {
                 <tr><td colSpan={7} className="text-center py-16"><Loader2 className="w-5 h-5 animate-spin text-gray-500 mx-auto" /></td></tr>
               ) : docs.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-16 text-gray-400">
+                  <td colSpan={7} className="text-center py-16 text-slate-500">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <FileText className="w-8 h-8 text-gray-600 mb-1" />
                       <p className="font-semibold text-white">No documents found in selected scope</p>
@@ -475,7 +476,7 @@ export default function DocumentsPage() {
                 <tr
                   key={doc.id}
                   onClick={() => setSelectedId(selectedId === doc.id ? null : doc.id)}
-                  className={`border-b border-white/5 cursor-pointer transition-colors ${selectedId === doc.id ? "bg-indigo-600/10" : "hover:bg-white/5"}`}
+                  className={`border-b border-slate-200/80 cursor-pointer transition-colors ${selectedId === doc.id ? "bg-indigo-600/10" : "hover:bg-white/5"}`}
                 >
                   <td className="px-6 py-3">
                     <div className="flex items-center gap-3">
@@ -493,11 +494,11 @@ export default function DocumentsPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3"><StatusBadge status={doc.processingStatus} /></td>
-                  <td className="px-4 py-3 text-gray-400 hidden md:table-cell">
+                  <td className="px-4 py-3 text-slate-500 hidden md:table-cell">
                     {doc.processingStatus === "COMPLETED" ? doc._count.chunks.toLocaleString() : "—"}
                   </td>
-                  <td className="px-4 py-3 text-gray-400 hidden md:table-cell">{fmtBytes(doc.fileSize)}</td>
-                  <td className="px-4 py-3 text-gray-400 hidden lg:table-cell">{timeAgo(doc.createdAt)}</td>
+                  <td className="px-4 py-3 text-slate-500 hidden md:table-cell">{fmtBytes(doc.fileSize)}</td>
+                  <td className="px-4 py-3 text-slate-500 hidden lg:table-cell">{timeAgo(doc.createdAt)}</td>
                   <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                     <div className="relative">
                       <button onClick={() => setMenuOpenId(menuOpenId === doc.id ? null : doc.id)}
@@ -505,9 +506,9 @@ export default function DocumentsPage() {
                         <MoreHorizontal className="w-4 h-4" />
                       </button>
                       {menuOpenId === doc.id && (
-                        <div className="absolute right-0 top-8 bg-[#1a1f2e] border border-white/10 rounded-xl shadow-2xl z-20 w-36 overflow-hidden">
+                        <div className="absolute right-0 top-8 bg-[#1a1f2e] border border-slate-200 rounded-xl shadow-2xl z-20 w-36 overflow-hidden">
                           <button onClick={() => { setSelectedId(doc.id); setMenuOpenId(null); }}
-                            className="flex items-center gap-2 w-full px-3 py-2.5 text-xs text-gray-300 hover:bg-white/10 transition-colors">
+                            className="flex items-center gap-2 w-full px-3 py-2.5 text-xs text-slate-700 hover:bg-white/10 transition-colors">
                             <Eye className="w-3.5 h-3.5" /> View details
                           </button>
                           <button onClick={() => handleDelete(doc.id)} disabled={deletingId === doc.id}
@@ -525,7 +526,7 @@ export default function DocumentsPage() {
         </div>
 
         {/* ── Pagination ── */}
-        <div className="flex items-center justify-between px-6 py-3 border-t border-white/5 shrink-0">
+        <div className="flex items-center justify-between px-6 py-3 border-t border-slate-200/80 shrink-0">
           <span className="text-xs text-gray-500">
             Showing {((pagination.page - 1) * pagination.pageSize) + 1}–{Math.min(pagination.page * pagination.pageSize, pagination.total)} of {pagination.total.toLocaleString()} results
           </span>
@@ -538,7 +539,7 @@ export default function DocumentsPage() {
               const p = i + 1;
               return (
                 <button key={p} onClick={() => load(p)}
-                  className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${pagination.page === p ? "bg-indigo-600 text-white" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}>
+                  className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${pagination.page === p ? "bg-indigo-600 text-white" : "text-slate-500 hover:bg-white/10 hover:text-white"}`}>
                   {p}
                 </button>
               );
@@ -546,7 +547,7 @@ export default function DocumentsPage() {
             {pagination.pages > 5 && <span className="text-gray-500 px-1">...</span>}
             {pagination.pages > 5 && (
               <button onClick={() => load(pagination.pages)}
-                className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${pagination.page === pagination.pages ? "bg-indigo-600 text-white" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}>
+                className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${pagination.page === pagination.pages ? "bg-indigo-600 text-white" : "text-slate-500 hover:bg-white/10 hover:text-white"}`}>
                 {pagination.pages}
               </button>
             )}
@@ -569,5 +570,7 @@ export default function DocumentsPage() {
         <div className="fixed inset-0 z-10" onClick={() => setMenuOpenId(null)} />
       )}
     </div>
+  
+    </AnimatedBackground>
   );
 }

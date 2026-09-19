@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -102,14 +103,15 @@ export default function HODDocumentsPage() {
   ];
 
   return (
-    <div className="space-y-6 font-sans">
+    <AnimatedBackground>
+<div className="space-y-6 font-sans">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
             <FileText className="h-6 w-6 text-blue-400" />
             Department Knowledge Repository & Syllabus Intelligence
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-xs sm:text-sm text-slate-500">
             Multi-scope document governance, vector RAG indexing, and comparative syllabus diffs for {activeDepartment}
           </p>
         </div>
@@ -117,7 +119,7 @@ export default function HODDocumentsPage() {
         <div className="flex items-center gap-2">
           <Button
             onClick={handleCompareSyllabus}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs rounded-xl font-semibold shadow-lg shadow-indigo-600/20"
+            className="bg-indigo-600 hover:bg-indigo-500 text-slate-800 text-xs rounded-xl font-semibold shadow-lg shadow-indigo-600/20"
           >
             <GitCompare className="mr-1.5 h-4 w-4" />
             Compare Syllabi Diffs
@@ -127,7 +129,7 @@ export default function HODDocumentsPage() {
             size="sm"
             onClick={fetchDocs}
             disabled={loading}
-            className="border-slate-700 bg-slate-900 text-slate-300 text-xs rounded-xl"
+            className="border-slate-200 text-slate-700 text-xs rounded-xl"
           >
             <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
             Refresh
@@ -137,21 +139,21 @@ export default function HODDocumentsPage() {
 
       {/* ── SYLLABUS COMPARISON ENGINE PREVIEW ─────────────────────── */}
       {comparing && (
-        <Card className="bg-gradient-to-b from-slate-900 to-slate-950 border-indigo-500/40 backdrop-blur-xl shadow-2xl animate-in fade-in duration-300">
-          <CardHeader className="pb-3 border-b border-slate-800">
+        <Card className="bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 to-slate-950 border-indigo-500/40 backdrop-blur-xl shadow-2xl animate-in fade-in duration-300 light-glass-card card-3d-inner anim-fade-up-1">
+          <CardHeader className="pb-3 border-b border-slate-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
                   <GitCompare className="h-5 w-5" />
                 </div>
                 <div>
-                  <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+                  <CardTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
                     <span>Syllabus Comparative Diff & Provenance</span>
                     <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/40 text-[10px]">
                       CS401 Algorithm Curriculum
                     </Badge>
                   </CardTitle>
-                  <CardDescription className="text-xs text-slate-400">
+                  <CardDescription className="text-xs text-slate-500">
                     Comparing 2025 Syllabus vs 2026 Modernized Curriculum with page-level citations
                   </CardDescription>
                 </div>
@@ -160,7 +162,7 @@ export default function HODDocumentsPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setComparing(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-slate-500 hover:text-slate-800"
               >
                 Close Diff
               </Button>
@@ -168,15 +170,15 @@ export default function HODDocumentsPage() {
           </CardHeader>
 
           {diffLoading ? (
-            <CardContent className="p-8 text-center text-slate-400 space-y-2">
+            <CardContent className="p-8 text-center text-slate-500 space-y-2">
               <RefreshCw className="h-6 w-6 animate-spin mx-auto text-indigo-400" />
               <p className="text-xs">Computing RAG semantic vector and structural diffs...</p>
             </CardContent>
           ) : compareDiff ? (
             <CardContent className="p-5 space-y-5 text-xs">
-              <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
+              <div className="p-3.5 rounded-xl border border-slate-200">
                 <span className="font-semibold text-indigo-300 block text-[11px] uppercase">Summary of Changes</span>
-                <p className="text-slate-200 mt-1 leading-relaxed">{compareDiff.summary}</p>
+                <p className="text-slate-700 mt-1 leading-relaxed">{compareDiff.summary}</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -188,10 +190,10 @@ export default function HODDocumentsPage() {
                   {compareDiff.addedModules?.map((mod: any, idx: number) => (
                     <div key={idx} className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-1">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-white text-xs">{mod.title}</span>
+                        <span className="font-bold text-slate-800 text-xs">{mod.title}</span>
                         <span className="text-[10px] text-emerald-400 font-mono">Page {mod.pageNumber}</span>
                       </div>
-                      <p className="text-[11px] text-slate-300">{mod.description}</p>
+                      <p className="text-[11px] text-slate-700">{mod.description}</p>
                     </div>
                   ))}
                 </div>
@@ -204,25 +206,25 @@ export default function HODDocumentsPage() {
                   {compareDiff.removedModules?.map((mod: any, idx: number) => (
                     <div key={idx} className="p-3 rounded-xl bg-rose-950/20 border border-rose-500/30 space-y-1">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-white text-xs">{mod.title}</span>
+                        <span className="font-bold text-slate-800 text-xs">{mod.title}</span>
                         <span className="text-[10px] text-rose-400 font-mono">Page {mod.pageNumber}</span>
                       </div>
-                      <p className="text-[11px] text-slate-300">{mod.description}</p>
+                      <p className="text-[11px] text-slate-700">{mod.description}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Modified Credits & Requirements */}
-              <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
-                <span className="font-bold text-slate-300 block text-xs">Credit & Prerequisite Adjustments</span>
+              <div className="p-3.5 rounded-xl border border-slate-200 space-y-2">
+                <span className="font-bold text-slate-700 block text-xs">Credit & Prerequisite Adjustments</span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {compareDiff.modifiedCredits?.map((cr: any, i: number) => (
-                    <div key={i} className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-[11px] space-y-1">
-                      <span className="font-bold text-white block">{cr.item}</span>
+                    <div key={i} className="p-2.5 rounded-lg border border-slate-200 text-[11px] space-y-1">
+                      <span className="font-bold text-slate-800 block">{cr.item}</span>
                       <div className="flex items-center gap-2 font-mono">
                         <span className="text-rose-400 line-through">{cr.previous}</span>
-                        <span className="text-slate-400">&rarr;</span>
+                        <span className="text-slate-500">&rarr;</span>
                         <span className="text-emerald-400 font-bold">{cr.current}</span>
                       </div>
                       <p className="text-slate-500 text-[10px] italic">{cr.citation}</p>
@@ -237,13 +239,13 @@ export default function HODDocumentsPage() {
 
       {/* Scope Filter Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
+        <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl border border-slate-200">
           {scopes.map((s) => (
             <button
               key={s.id}
               onClick={() => setActiveScope(s.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeScope === s.id ? "bg-blue-600 text-white shadow" : "text-slate-400 hover:text-slate-200"
+                activeScope === s.id ? "bg-blue-600 text-slate-800 shadow" : "text-slate-500 hover:text-slate-700"
               }`}
             >
               {s.label}
@@ -257,7 +259,7 @@ export default function HODDocumentsPage() {
             placeholder="Search documents by title..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 py-1.5 bg-slate-900 border-slate-800 text-white text-xs rounded-xl"
+            className="pl-10 py-1.5 border-slate-200 text-slate-800 text-xs rounded-xl"
           />
         </div>
       </div>
@@ -265,14 +267,14 @@ export default function HODDocumentsPage() {
       {/* Documents Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((doc) => (
-          <Card key={doc.id} className="bg-slate-900/80 border-slate-800 backdrop-blur space-y-3">
+          <Card key={doc.id} className="border-slate-200 backdrop-blur space-y-3 light-glass-card card-3d-inner anim-fade-up-1">
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 shrink-0">
                     <FileText className="h-4 w-4" />
                   </div>
-                  <CardTitle className="text-xs font-bold text-white truncate max-w-[180px]">
+                  <CardTitle className="text-xs font-bold text-slate-800 truncate max-w-[180px]">
                     {doc.fileName}
                   </CardTitle>
                 </div>
@@ -292,21 +294,21 @@ export default function HODDocumentsPage() {
             </CardHeader>
 
             <CardContent className="space-y-2 text-xs">
-              <div className="flex items-center justify-between text-slate-400 bg-slate-950/60 p-2 rounded-lg border border-slate-800 text-[11px]">
+              <div className="flex items-center justify-between text-slate-500 p-2 rounded-lg border border-slate-200 text-[11px]">
                 <span>Indexed RAG Chunks:</span>
                 <span className="font-mono font-bold text-blue-400">{doc.chunksCount || 12} Chunks</span>
               </div>
-              <div className="flex items-center justify-between text-slate-400 bg-slate-950/60 p-2 rounded-lg border border-slate-800 text-[11px]">
+              <div className="flex items-center justify-between text-slate-500 p-2 rounded-lg border border-slate-200 text-[11px]">
                 <span>Knowledge Base:</span>
-                <span className="text-slate-300 font-semibold truncate max-w-[120px]">{doc.knowledgeBaseName}</span>
+                <span className="text-slate-700 font-semibold truncate max-w-[120px]">{doc.knowledgeBaseName}</span>
               </div>
             </CardContent>
 
-            <CardFooter className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+            <CardFooter className="pt-2 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
               <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
               <button
                 onClick={() => handleViewDoc(doc.id)}
-                className="text-[11px] text-blue-400 hover:text-white flex items-center gap-1 font-semibold"
+                className="text-[11px] text-blue-400 hover:text-slate-800 flex items-center gap-1 font-semibold"
               >
                 <Eye className="h-3 w-3" /> Inspect Document
               </button>
@@ -318,32 +320,32 @@ export default function HODDocumentsPage() {
       {/* Document Inspector Modal */}
       {selectedDoc && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="border border-slate-200 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="p-2 bg-blue-500/10 rounded-xl text-blue-400">
                   <FileText className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-sm font-bold text-white truncate">{selectedDoc.fileName}</h3>
-                  <p className="text-[11px] text-slate-400">
+                  <h3 className="text-sm font-bold text-slate-800 truncate">{selectedDoc.fileName}</h3>
+                  <p className="text-[11px] text-slate-500">
                     {selectedDoc.department?.name || activeDepartment} • {selectedDoc.visibility} Scope
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedDoc(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+                className="text-slate-500 hover:text-slate-800 p-1 rounded-lg hover:"
               >
                 ✕
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-4 text-xs pr-1">
-              <div className="grid grid-cols-3 gap-2 bg-slate-950/70 p-3 rounded-xl border border-slate-800 font-mono text-[11px]">
+              <div className="grid grid-cols-3 gap-2 p-3 rounded-xl border border-slate-200 font-mono text-[11px]">
                 <div>
                   <span className="text-slate-500 block text-[10px]">Total Size</span>
-                  <span className="font-bold text-white">{(selectedDoc.fileSize / 1024).toFixed(1)} KB</span>
+                  <span className="font-bold text-slate-800">{(selectedDoc.fileSize / 1024).toFixed(1)} KB</span>
                 </div>
                 <div>
                   <span className="text-slate-500 block text-[10px]">Indexed Chunks</span>
@@ -357,17 +359,17 @@ export default function HODDocumentsPage() {
 
               {/* Chunks */}
               <div className="space-y-2">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                <span className="text-[10px] uppercase font-bold text-slate-500 block">
                   Extracted Text Chunks Preview
                 </span>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {selectedDoc.chunks && selectedDoc.chunks.length > 0 ? (
                     selectedDoc.chunks.map((c: any, i: number) => (
-                      <div key={i} className="p-3 rounded-xl bg-slate-950 border border-slate-800/80 space-y-1">
+                      <div key={i} className="p-3 rounded-xl border border-slate-200/80 space-y-1">
                         <span className="text-[10px] font-mono text-indigo-400 block font-semibold">
                           Chunk {c.chunkIndex + 1} {c.pageNumber ? `(Page ${c.pageNumber})` : ""} · {c.tokenCount} Tokens
                         </span>
-                        <p className="text-[11px] text-slate-300 leading-relaxed line-clamp-3">{c.content}</p>
+                        <p className="text-[11px] text-slate-700 leading-relaxed line-clamp-3">{c.content}</p>
                       </div>
                     ))
                   ) : (
@@ -377,12 +379,12 @@ export default function HODDocumentsPage() {
               </div>
 
               {selectedDoc.signedUrl && (
-                <div className="pt-3 border-t border-slate-800 flex justify-end">
+                <div className="pt-3 border-t border-slate-200 flex justify-end">
                   <a
                     href={selectedDoc.signedUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-slate-800 font-semibold text-xs transition-colors"
                   >
                     Open Document File ↗
                   </a>
@@ -393,5 +395,6 @@ export default function HODDocumentsPage() {
         </div>
       )}
     </div>
+</AnimatedBackground>
   );
 }

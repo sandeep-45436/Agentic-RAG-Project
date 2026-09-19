@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -95,9 +96,10 @@ export default function SkillAssessmentArenaPage() {
 
   if (loading) {
     return (
+    <AnimatedBackground>
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <RefreshCw className="h-8 w-8 animate-spin text-cyan-400" />
-        <p className="text-xs text-slate-400">Loading Assessment Arena Engine...</p>
+        <p className="text-xs text-slate-500">Loading Assessment Arena Engine...</p>
       </div>
     );
   }
@@ -108,13 +110,13 @@ export default function SkillAssessmentArenaPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <Link
           href="/skills"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-white transition-colors"
         >
           <ArrowLeft className="h-4 w-4" /> Back to Skill Center
         </Link>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-xs text-slate-300">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/80 backdrop-blur-sm border border-slate-200 text-xs text-slate-700">
             <Clock className={`h-4 w-4 ${timeLeft < 20 ? "text-rose-400 animate-pulse" : "text-cyan-400"}`} />
             <span className="font-mono font-bold">{timeLeft}s remaining</span>
           </div>
@@ -128,17 +130,17 @@ export default function SkillAssessmentArenaPage() {
 
       {/* Main Assessment Card */}
       {currentQ ? (
-        <div className="rounded-3xl bg-slate-900/90 border border-white/10 p-6 lg:p-8 backdrop-blur-xl shadow-2xl space-y-6">
+        <div className="rounded-3xl bg-white/80 backdrop-blur-sm border border-slate-200 p-6 lg:p-8 backdrop-blur-xl shadow-2xl space-y-6">
           {/* Question Header */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 pb-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
             <div className="flex items-center gap-2">
               <Badge className="bg-cyan-500/15 text-cyan-300 border-cyan-500/30 text-xs">
                 Question {currentIndex + 1} of {questions.length}
               </Badge>
-              <Badge variant="outline" className="text-xs border-slate-700 text-slate-300">
+              <Badge variant="outline" className="text-xs border-slate-200 text-slate-700">
                 {currentQ.difficulty} Difficulty
               </Badge>
-              <span className="text-xs text-slate-400 font-mono">
+              <span className="text-xs text-slate-500 font-mono">
                 Worth {currentQ.points} Points
               </span>
             </div>
@@ -153,7 +155,7 @@ export default function SkillAssessmentArenaPage() {
             <h2 className="text-xl font-bold text-white tracking-tight">
               {currentQ.title}
             </h2>
-            <p className="text-sm text-slate-300 leading-relaxed font-sans">
+            <p className="text-sm text-slate-700 leading-relaxed font-sans">
               {currentQ.prompt}
             </p>
           </div>
@@ -168,14 +170,14 @@ export default function SkillAssessmentArenaPage() {
                   className={`w-full text-left p-4 rounded-2xl border transition-all text-xs flex items-start gap-3.5 ${
                     selectedOption === idx
                       ? "bg-cyan-500/10 border-cyan-500/50 text-white shadow-lg ring-1 ring-cyan-500/30"
-                      : "bg-slate-950/60 border-white/5 text-slate-300 hover:bg-slate-950 hover:border-white/20"
+                      : "bg-slate-50 border-slate-200/80 text-slate-700 hover:bg-slate-50 hover:border-white/20"
                   }`}
                 >
                   <span
                     className={`h-6 w-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
                       selectedOption === idx
                         ? "bg-cyan-500 text-slate-950"
-                        : "bg-slate-800 text-slate-400"
+                        : "bg-slate-800 text-slate-500"
                     }`}
                   >
                     {String.fromCharCode(65 + idx)}
@@ -189,7 +191,7 @@ export default function SkillAssessmentArenaPage() {
           {/* Code Editor (if code type) */}
           {currentQ.type === "code" && (
             <div className="space-y-2 pt-2">
-              <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+              <div className="flex items-center justify-between text-xs text-slate-500 px-1">
                 <span className="flex items-center gap-1.5 font-mono">
                   <Code2 className="h-4 w-4 text-cyan-400" /> TypeScript Solution Buffer
                 </span>
@@ -200,7 +202,7 @@ export default function SkillAssessmentArenaPage() {
                 onChange={(e) => setCodeAnswer(e.target.value)}
                 disabled={Boolean(result)}
                 rows={8}
-                className="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-500/50 leading-relaxed shadow-inner"
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-500/50 leading-relaxed shadow-inner"
               />
             </div>
           )}
@@ -234,7 +236,7 @@ export default function SkillAssessmentArenaPage() {
           )}
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-4 border-t border-white/5">
+          <div className="flex items-center justify-between pt-4 border-t border-slate-200/80">
             <span className="text-xs text-slate-500">
               Instant evaluation with deterministic verification engine
             </span>
@@ -272,5 +274,6 @@ export default function SkillAssessmentArenaPage() {
         <div className="text-center py-12 text-slate-500">No questions available in this track.</div>
       )}
     </div>
+    </AnimatedBackground>
   );
 }

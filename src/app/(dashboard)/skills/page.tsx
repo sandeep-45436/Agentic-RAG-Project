@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -75,7 +76,8 @@ export default function SkillDevelopmentPortalPage() {
       : tracks.filter((t: any) => t.category.toLowerCase().includes(activeCategory.toLowerCase()));
 
   return (
-    <div className="space-y-6 pb-12 font-sans">
+    <AnimatedBackground>
+      <div className="space-y-6 pb-12 font-sans">
       {/* ── 1. ALITS INSTITUTIONAL SKILLS HEADER ──────────────────────── */}
       <div className="light-glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
         <div className="flex items-center gap-3.5">
@@ -111,7 +113,7 @@ export default function SkillDevelopmentPortalPage() {
       </div>
 
       {/* ── 2. HERO BANNER WITH ADVANCED NEON GLOW ───────────────────── */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-cyan-950/40 to-slate-900 border border-cyan-500/30 p-6 lg:p-8 backdrop-blur-2xl shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 border border-cyan-500/30 p-6 lg:p-8 backdrop-blur-2xl shadow-2xl">
         <div className="absolute top-0 right-0 -mt-12 -mr-12 h-80 w-80 rounded-full bg-cyan-500/15 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 -mb-16 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
 
@@ -124,7 +126,7 @@ export default function SkillDevelopmentPortalPage() {
               <Badge className="bg-emerald-500/10 text-emerald-300 border-emerald-500/30 text-xs">
                 Top {100 - profile.rankingPercentile}% University Cohort
               </Badge>
-              <span className="text-xs text-slate-400 font-mono">
+              <span className="text-xs text-slate-500 font-mono">
                 Candidate: <strong className="text-white">{profile.studentName}</strong> ({profile.studentCode})
               </span>
             </div>
@@ -133,7 +135,7 @@ export default function SkillDevelopmentPortalPage() {
               Skill Acceleration & Career Launchpad
             </h1>
 
-            <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
+            <p className="text-sm text-slate-700 max-w-2xl leading-relaxed">
               Synthesize industry micro-credentials, take adaptive algorithmic challenges, track multi-dimensional skill radars, and unlock elite tech placement tiers.
             </p>
           </div>
@@ -158,7 +160,7 @@ export default function SkillDevelopmentPortalPage() {
             <button
               onClick={loadData}
               disabled={loading}
-              className="p-3 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors"
+              className="p-3 text-slate-500 hover:text-white bg-white/5 hover:bg-white/10 border border-slate-200 rounded-xl transition-colors"
               title="Refresh skills state"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
@@ -169,7 +171,7 @@ export default function SkillDevelopmentPortalPage() {
 
       {/* ── 3. FOUR ANIMATED METRIC CARDS ────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="glass-glow-cyan rounded-2xl p-5 flex flex-col justify-between hover-lift">
+        <div className="light-glass-card card-3d-inner shimmer-effect rounded-2xl p-5 flex flex-col justify-between hover-lift">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-cyan-300 uppercase tracking-wider">Overall Skill Score</span>
             <div className="p-2.5 rounded-xl bg-cyan-500/15 text-cyan-400">
@@ -179,7 +181,7 @@ export default function SkillDevelopmentPortalPage() {
           <div className="mt-3">
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-black text-white font-mono">{profile.overallSkillScore}</span>
-              <span className="text-xs text-slate-400">/ 100</span>
+              <span className="text-xs text-slate-500">/ 100</span>
             </div>
             <p className="text-[11px] text-cyan-300 mt-1 flex items-center gap-1">
               <TrendingUp className="h-3 w-3" /> +12% improvement this semester
@@ -187,7 +189,7 @@ export default function SkillDevelopmentPortalPage() {
           </div>
         </div>
 
-        <div className="glass-glow-indigo rounded-2xl p-5 flex flex-col justify-between hover-lift">
+        <div className="light-glass-card card-3d-inner shimmer-effect rounded-2xl p-5 flex flex-col justify-between hover-lift">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-indigo-300 uppercase tracking-wider">Verified Credentials</span>
             <div className="p-2.5 rounded-xl bg-indigo-500/15 text-indigo-400">
@@ -197,7 +199,7 @@ export default function SkillDevelopmentPortalPage() {
           <div className="mt-3">
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-black text-white font-mono">{profile.completedCertificationsCount}</span>
-              <span className="text-xs text-slate-400">Badges</span>
+              <span className="text-xs text-slate-500">Badges</span>
             </div>
             <p className="text-[11px] text-indigo-300 mt-1">
               AWS, GCP, NVIDIA & Cisco Validated
@@ -205,7 +207,7 @@ export default function SkillDevelopmentPortalPage() {
           </div>
         </div>
 
-        <div className="glass-glow-emerald rounded-2xl p-5 flex flex-col justify-between hover-lift">
+        <div className="light-glass-card card-3d-inner shimmer-effect rounded-2xl p-5 flex flex-col justify-between hover-lift">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-emerald-300 uppercase tracking-wider">Focused Learning Time</span>
             <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400">
@@ -215,7 +217,7 @@ export default function SkillDevelopmentPortalPage() {
           <div className="mt-3">
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-black text-white font-mono">{profile.hoursLearned}</span>
-              <span className="text-xs text-slate-400">Hours</span>
+              <span className="text-xs text-slate-500">Hours</span>
             </div>
             <p className="text-[11px] text-emerald-300 mt-1">
               42 Lab exercises completed
@@ -223,7 +225,7 @@ export default function SkillDevelopmentPortalPage() {
           </div>
         </div>
 
-        <div className="glass-glow-gold rounded-2xl p-5 flex flex-col justify-between hover-lift">
+        <div className="light-glass-card card-3d-inner shimmer-effect rounded-2xl p-5 flex flex-col justify-between hover-lift">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-amber-300 uppercase tracking-wider">Placement Readiness</span>
             <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-400">
@@ -233,7 +235,7 @@ export default function SkillDevelopmentPortalPage() {
           <div className="mt-3">
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-black text-white font-mono">{roadmap?.overallReadiness || 86}%</span>
-              <span className="text-xs text-slate-400">Index</span>
+              <span className="text-xs text-slate-500">Index</span>
             </div>
             <p className="text-[11px] text-amber-300 mt-1 truncate">
               {roadmap?.projectedPlacementTier || "Super Dream Tier"}
@@ -245,7 +247,7 @@ export default function SkillDevelopmentPortalPage() {
       {/* ── 4. TWO-COLUMN: SKILL RADAR & AI CAREER ROADMAP ────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left 5 Cols: Multi-Dimensional Skill Radar */}
-        <div className="lg:col-span-5 rounded-3xl bg-slate-900/80 border border-white/10 p-6 backdrop-blur space-y-4 shadow-xl flex flex-col justify-between">
+        <div className="lg:col-span-5 rounded-3xl bg-white/80 backdrop-blur-sm border border-slate-200 p-6 backdrop-blur space-y-4 shadow-xl flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -258,7 +260,7 @@ export default function SkillDevelopmentPortalPage() {
                 Adaptive Assessment
               </Badge>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               Real-time vector score compared with Top 10% university benchmark
             </p>
           </div>
@@ -301,13 +303,13 @@ export default function SkillDevelopmentPortalPage() {
           </div>
 
           {/* Badges Gallery */}
-          <div className="border-t border-white/5 pt-3">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">
+          <div className="border-t border-slate-200/80 pt-3">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-2">
               Earned Distinction Badges
             </span>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {profile.recentBadges?.map((b: any, i: number) => (
-                <div key={i} className="p-2.5 rounded-xl bg-slate-950/70 border border-white/5 text-center hover:border-cyan-500/40 transition-colors">
+                <div key={i} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-center hover:border-cyan-500/40 transition-colors">
                   <div className="mx-auto w-7 h-7 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center mb-1">
                     <Star className="h-3.5 w-3.5" />
                   </div>
@@ -320,8 +322,8 @@ export default function SkillDevelopmentPortalPage() {
         </div>
 
         {/* Right 7 Cols: AI Career Roadmap & Milestone Milestones */}
-        <div className="lg:col-span-7 rounded-3xl bg-slate-900/80 border border-white/10 p-6 backdrop-blur space-y-4 shadow-xl">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
+        <div className="lg:col-span-7 rounded-3xl bg-white/80 backdrop-blur-sm border border-slate-200 p-6 backdrop-blur space-y-4 shadow-xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/80 pb-3">
             <div>
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-indigo-400" />
@@ -329,7 +331,7 @@ export default function SkillDevelopmentPortalPage() {
                   Target Career Trajectory & Readiness
                 </h3>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 Target Role: <strong className="text-indigo-300">{roadmap?.targetRole}</strong>
               </p>
             </div>
@@ -350,7 +352,7 @@ export default function SkillDevelopmentPortalPage() {
                     ? "bg-emerald-950/10 border-emerald-500/30"
                     : st.status === "IN_PROGRESS"
                     ? "bg-indigo-950/20 border-indigo-500/40 ring-1 ring-indigo-500/20"
-                    : "bg-slate-950/40 border-white/5 opacity-70"
+                    : "bg-slate-50 border-slate-200/80 opacity-70"
                 }`}
               >
                 <div className="flex items-center justify-between mb-1.5">
@@ -361,7 +363,7 @@ export default function SkillDevelopmentPortalPage() {
                           ? "bg-emerald-500 text-slate-950"
                           : st.status === "IN_PROGRESS"
                           ? "bg-indigo-500 text-white animate-pulse"
-                          : "bg-slate-800 text-slate-400"
+                          : "bg-slate-800 text-slate-500"
                       }`}
                     >
                       {st.stepNumber}
@@ -375,7 +377,7 @@ export default function SkillDevelopmentPortalPage() {
                         ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
                         : st.status === "IN_PROGRESS"
                         ? "bg-indigo-500/10 text-indigo-300 border-indigo-500/30"
-                        : "bg-slate-800 text-slate-400 border-slate-700"
+                        : "bg-slate-800 text-slate-500 border-slate-200"
                     }`}
                   >
                     {st.status === "IN_PROGRESS" ? `In Progress (${st.estimatedWeeks}w remaining)` : st.status}
@@ -383,8 +385,8 @@ export default function SkillDevelopmentPortalPage() {
                 </div>
 
                 <div className="space-y-1 pl-7">
-                  <p className="text-[11px] text-slate-400">Target Level: <span className="text-slate-200">{st.roleTarget}</span></p>
-                  <ul className="text-[11px] text-slate-300 space-y-0.5">
+                  <p className="text-[11px] text-slate-500">Target Level: <span className="text-slate-200">{st.roleTarget}</span></p>
+                  <ul className="text-[11px] text-slate-700 space-y-0.5">
                     {st.recommendations?.map((r: string, idx: number) => (
                       <li key={idx} className="flex items-center gap-1.5">
                         <CheckCircle2 className="h-3 w-3 text-cyan-400 shrink-0" />
@@ -423,7 +425,7 @@ export default function SkillDevelopmentPortalPage() {
               <BookOpen className="h-5 w-5 text-cyan-400" />
               Accredited Engineering Specialization Tracks
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               Interactive curriculums aligned with Tier-1 industry hiring expectations
             </p>
           </div>
@@ -438,7 +440,7 @@ export default function SkillDevelopmentPortalPage() {
                   className={`text-xs px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
                     activeCategory === cat
                       ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20"
-                      : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                      : "bg-white/5 text-slate-500 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   {cat === "ALL" ? "All Tracks" : cat}
@@ -452,7 +454,7 @@ export default function SkillDevelopmentPortalPage() {
           {filteredTracks.map((tr: any) => (
             <div
               key={tr.id}
-              className="group rounded-3xl bg-slate-900/80 border border-white/10 p-5 backdrop-blur flex flex-col justify-between hover:border-cyan-500/40 hover-lift shadow-xl space-y-4"
+              className="group rounded-3xl bg-white/80 backdrop-blur-sm border border-slate-200 p-5 backdrop-blur flex flex-col justify-between hover:border-cyan-500/40 hover-lift shadow-xl space-y-4"
             >
               <div>
                 <div className="flex items-start justify-between gap-3 mb-3">
@@ -463,21 +465,21 @@ export default function SkillDevelopmentPortalPage() {
                     <Badge variant="outline" className="text-[10px] border-cyan-500/30 text-cyan-300 bg-cyan-500/10">
                       Demand: {tr.marketDemandIndex}%
                     </Badge>
-                    <span className="text-[10px] text-slate-400 mt-0.5">{tr.level} Level</span>
+                    <span className="text-[10px] text-slate-500 mt-0.5">{tr.level} Level</span>
                   </div>
                 </div>
 
                 <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
                   {tr.title}
                 </h3>
-                <p className="text-xs text-slate-400 mt-1.5 leading-relaxed line-clamp-2">
+                <p className="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">
                   {tr.description}
                 </p>
 
                 {/* Progress Bar */}
                 <div className="mt-4 space-y-1.5">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-slate-400 font-medium">Track Completion</span>
+                    <span className="text-slate-500 font-medium">Track Completion</span>
                     <span className="text-cyan-400 font-bold font-mono">{tr.progressPercentage}%</span>
                   </div>
                   <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
@@ -489,9 +491,9 @@ export default function SkillDevelopmentPortalPage() {
                 </div>
 
                 {/* Current Active Module */}
-                <div className="mt-3.5 p-2.5 rounded-xl bg-slate-950/70 border border-white/5">
+                <div className="mt-3.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
                   <span className="text-[9px] uppercase font-bold text-slate-500 block">Current Milestone:</span>
-                  <p className="text-[11px] text-slate-300 font-medium truncate mt-0.5">
+                  <p className="text-[11px] text-slate-700 font-medium truncate mt-0.5">
                     {tr.currentModule}
                   </p>
                 </div>
@@ -499,7 +501,7 @@ export default function SkillDevelopmentPortalPage() {
                 {/* Skills tags */}
                 <div className="flex flex-wrap gap-1 mt-3">
                   {tr.skillsAcquired?.slice(0, 3).map((sk: string, i: number) => (
-                    <span key={i} className="text-[10px] bg-white/5 text-slate-300 px-2 py-0.5 rounded-md border border-white/5">
+                    <span key={i} className="text-[10px] bg-white/5 text-slate-700 px-2 py-0.5 rounded-md border border-slate-200/80">
                       {sk}
                     </span>
                   ))}
@@ -509,8 +511,8 @@ export default function SkillDevelopmentPortalPage() {
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-white/5 flex items-center justify-between">
-                <span className="text-[11px] text-slate-400">
+              <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between">
+                <span className="text-[11px] text-slate-500">
                   {tr.completedModules}/{tr.totalModules} Modules • {tr.estimatedHours}h
                 </span>
 
@@ -526,5 +528,6 @@ export default function SkillDevelopmentPortalPage() {
         </div>
       </div>
     </div>
+    </AnimatedBackground>
   );
 }

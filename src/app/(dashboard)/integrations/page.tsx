@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import { useEffect, useState } from "react";
 import { Loader2, Plus, Trash2, Copy, Check, KeyRound } from "lucide-react";
@@ -65,7 +66,8 @@ export default function IntegrationsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <AnimatedBackground>
+      <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Integrations</h1>
@@ -175,5 +177,6 @@ export default function IntegrationsPage() {
         </div>
       )}
     </div>
+    </AnimatedBackground>
   );
 }

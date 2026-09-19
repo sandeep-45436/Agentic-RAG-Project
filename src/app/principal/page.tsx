@@ -22,6 +22,7 @@ import {
   Clock,
   Compass,
 } from "lucide-react";
+import { AnimatedBackground } from "@/components/animated-background";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -114,9 +115,10 @@ export default function PrincipalDashboardPage() {
   };
 
   return (
+    <AnimatedBackground>
     <div className="space-y-6 pb-12 font-sans">
       {/* ── ALITS PRINCIPAL INSTITUTIONAL BRAND HEADER ────────────────────── */}
-      <div className="light-glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
+      <div className="light-glass-card anim-fade-up-1 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80 bg-white/80 backdrop-blur-sm">
         <div className="flex items-center gap-3.5">
           <div className="relative h-11 w-36 sm:w-44 flex items-center justify-start">
             <img
@@ -130,10 +132,10 @@ export default function PrincipalDashboardPage() {
           </div>
           <div className="h-7 w-[1px] bg-slate-200 hidden sm:block" />
           <div>
-            <span className="text-xs font-bold text-slate-900 block tracking-tight">
+            <span className="text-xs font-bold text-slate-900 block tracking-tight text-reveal">
               Anantha Lakshmi Institute of Technology & Sciences
             </span>
-            <span className="text-[11px] text-slate-500 font-medium">
+            <span className="text-[11px] text-slate-600 font-medium">
               Office of the Principal • Executive Operations Cockpit
             </span>
           </div>
@@ -142,7 +144,7 @@ export default function PrincipalDashboardPage() {
         <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
           <Link
             href="/principal/profile"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 rounded-xl shadow-md shadow-amber-500/20 text-xs font-bold px-4 py-2.5 transition-all hover:scale-105"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-900 rounded-xl shadow-md shadow-amber-500/20 text-xs font-bold px-4 py-2.5 transition-all hover:scale-105"
           >
             <ShieldCheck className="h-4 w-4" />
             Principal Executive Dossier
@@ -152,52 +154,52 @@ export default function PrincipalDashboardPage() {
       </div>
 
       {/* ── 2. HERO EXECUTIVE GOVERNANCE BANNER ───────────────────────── */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-amber-950/40 to-slate-900 border border-amber-500/30 p-6 lg:p-8 backdrop-blur-2xl shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 border border-indigo-100 p-6 lg:p-8 shadow-2xl anim-fade-up-1">
         <div className="absolute top-0 right-0 -mt-10 -mr-10 h-72 w-72 rounded-full bg-amber-500/15 blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2.5">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40 text-xs font-semibold px-2.5 py-0.5">
+              <Badge className="bg-white/20 text-white border-white/40 text-xs font-semibold px-2.5 py-0.5 backdrop-blur-sm">
                 🏛️ Institutional Governance Council
               </Badge>
-              <Badge className="bg-emerald-500/10 text-emerald-300 border-emerald-500/30 text-xs">
+              <Badge className="bg-white/20 text-white border-white/40 text-xs backdrop-blur-sm">
                 NAAC Grade A++ ({ov.naacAccreditationScore} / 4.00)
               </Badge>
-              <Badge className="bg-blue-500/10 text-blue-300 border-blue-500/30 text-xs font-mono">
+              <Badge className="bg-white/20 text-white border-white/40 text-xs font-mono backdrop-blur-sm">
                 NIRF Rank #{ov.nirfNationalRank} National
               </Badge>
             </div>
 
-            <h1 className="text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
+            <h1 className="text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight gradient-text-animated">
               University Executive Operations Cockpit
             </h1>
 
-            <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Plenary institutional oversight across {ov.totalColleges} constituent college, {ov.totalDepartments} academic departments, {ov.totalStudents.toLocaleString()} verified scholars, and autonomous policy enforcement engines.
+            <p className="text-sm text-white max-w-2xl leading-relaxed">
+              Plenary institutional oversight across {ov.totalColleges} constituent college, {ov.totalDepartments} academic departments, <span className="number-pop inline-block">{ov.totalStudents.toLocaleString()}</span> verified scholars, and autonomous policy enforcement engines.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             <Link
               href="/principal/approvals"
-              className="inline-flex items-center justify-center bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-amber-500/25 text-xs px-4 py-3 transition-all hover:scale-105 gap-2"
+              className="inline-flex items-center justify-center bg-white text-slate-900 hover:bg-slate-50 font-bold rounded-xl shadow-lg shadow-white/25 text-xs px-4 py-3 transition-all hover:scale-105 gap-2"
             >
-              <ShieldCheck className="h-4 w-4" />
+              <ShieldCheck className="h-4 w-4 icon-ring" />
               Executive Approvals ({approvals.length})
             </Link>
 
             <Link
               href="/principal/departments"
-              className="inline-flex items-center justify-center border border-white/20 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-semibold px-4 py-3 transition-all gap-2"
+              className="inline-flex items-center justify-center border border-white/20 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold px-4 py-3 transition-all gap-2 backdrop-blur-sm"
             >
-              <Building2 className="h-4 w-4 text-amber-400" />
+              <Building2 className="h-4 w-4 text-white" />
               Benchmarking Matrix
             </Link>
 
             <button
               onClick={loadData}
               disabled={loading}
-              className="p-3 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors"
+              className="p-3 text-white hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-colors backdrop-blur-sm"
               title="Refresh institutional state"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
@@ -207,89 +209,89 @@ export default function PrincipalDashboardPage() {
       </div>
 
       {/* ── 3. SIX EXECUTIVE MACRO KPI METRICS ────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-        <div className="glass-glow-gold rounded-2xl p-4 flex flex-col justify-between hover-lift">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-300">Total Scholars</span>
-            <GraduationCap className="h-4 w-4 text-amber-400" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 anim-fade-up-2">
+        <div className="light-glass-card card-3d-inner shimmer-effect rounded-2xl p-4 flex flex-col justify-between hover:bg-indigo-50 transition-colors bg-white/80 backdrop-blur-sm border-slate-200">
+          <div className="flex items-center justify-between text-slate-600">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-700">Total Scholars</span>
+            <GraduationCap className="h-4 w-4 text-indigo-500 icon-ring" />
           </div>
           <div className="mt-2">
-            <p className="text-2xl font-black text-white font-mono">{ov.totalStudents.toLocaleString()}</p>
-            <p className="text-[10px] text-emerald-400 mt-0.5">94.6% Placement Rate</p>
+            <p className="text-2xl font-black text-slate-900 font-mono number-pop">{ov.totalStudents.toLocaleString()}</p>
+            <p className="text-[10px] text-slate-600 mt-0.5">94.6% Placement Rate</p>
           </div>
         </div>
 
-        <div className="glass-glow-indigo rounded-2xl p-4 flex flex-col justify-between hover-lift">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-indigo-300">Faculty Roster</span>
-            <Users className="h-4 w-4 text-indigo-400" />
+        <div className="light-glass-card card-3d-inner shimmer-effect rounded-2xl p-4 flex flex-col justify-between hover:bg-indigo-50 transition-colors bg-white/80 backdrop-blur-sm border-slate-200">
+          <div className="flex items-center justify-between text-slate-600">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-700">Faculty Roster</span>
+            <Users className="h-4 w-4 text-purple-500 icon-ring" />
           </div>
           <div className="mt-2">
-            <p className="text-2xl font-black text-white font-mono">{ov.totalFaculty}</p>
-            <p className="text-[10px] text-indigo-300 mt-0.5">Ratio {ov.studentFacultyRatio}</p>
+            <p className="text-2xl font-black text-slate-900 font-mono number-pop">{ov.totalFaculty}</p>
+            <p className="text-[10px] text-slate-600 mt-0.5">Ratio {ov.studentFacultyRatio}</p>
           </div>
         </div>
 
-        <div className="glass-glow-cyan rounded-2xl p-4 flex flex-col justify-between hover-lift">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-cyan-300">Colleges & Depts</span>
-            <Building2 className="h-4 w-4 text-cyan-400" />
+        <div className="light-glass-card card-3d-inner shimmer-effect rounded-2xl p-4 flex flex-col justify-between hover:bg-indigo-50 transition-colors bg-white/80 backdrop-blur-sm border-slate-200">
+          <div className="flex items-center justify-between text-slate-600">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-700">Colleges & Depts</span>
+            <Building2 className="h-4 w-4 text-cyan-600 icon-ring" />
           </div>
           <div className="mt-2">
-            <p className="text-2xl font-black text-white font-mono">{ov.totalColleges} / {ov.totalDepartments}</p>
-            <p className="text-[10px] text-cyan-300 mt-0.5">{ov.totalDepartments} Scoped Branches</p>
+            <p className="text-2xl font-black text-slate-900 font-mono number-pop">{ov.totalColleges} / {ov.totalDepartments}</p>
+            <p className="text-[10px] text-slate-600 mt-0.5">{ov.totalDepartments} Scoped Branches</p>
           </div>
         </div>
 
-        <div className="glass-glow-emerald rounded-2xl p-4 flex flex-col justify-between hover-lift">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-300">Research Grants</span>
-            <Coins className="h-4 w-4 text-emerald-400" />
+        <div className="light-glass-card card-3d-inner shimmer-effect rounded-2xl p-4 flex flex-col justify-between hover:bg-indigo-50 transition-colors bg-white/80 backdrop-blur-sm border-slate-200">
+          <div className="flex items-center justify-between text-slate-600">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-700">Research Grants</span>
+            <Coins className="h-4 w-4 text-emerald-600 icon-ring" />
           </div>
           <div className="mt-2">
-            <p className="text-2xl font-black text-white font-mono">${(ov.totalResearchFundingUsd / 1_000_000).toFixed(1)}M</p>
-            <p className="text-[10px] text-emerald-300 mt-0.5">+18% YoY Growth</p>
+            <p className="text-2xl font-black text-slate-900 font-mono number-pop">${(ov.totalResearchFundingUsd / 1_000_000).toFixed(1)}M</p>
+            <p className="text-[10px] text-slate-600 mt-0.5">+18% YoY Growth</p>
           </div>
         </div>
 
-        <div className="glass-glow-cyan rounded-2xl p-4 flex flex-col justify-between hover-lift">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-cyan-300">Exam Integrity</span>
-            <ShieldCheck className="h-4 w-4 text-cyan-400" />
+        <div className="light-glass-card card-3d-inner shimmer-effect rounded-2xl p-4 flex flex-col justify-between hover:bg-indigo-50 transition-colors bg-white/80 backdrop-blur-sm border-slate-200">
+          <div className="flex items-center justify-between text-slate-600">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-700">Exam Integrity</span>
+            <ShieldCheck className="h-4 w-4 text-pink-500 icon-ring" />
           </div>
           <div className="mt-2">
-            <p className="text-2xl font-black text-white font-mono">{ov.examIntegrityScore}%</p>
-            <p className="text-[10px] text-cyan-300 mt-0.5">Zero Leakage / Collisions</p>
+            <p className="text-2xl font-black text-slate-900 font-mono number-pop">{ov.examIntegrityScore}%</p>
+            <p className="text-[10px] text-slate-600 mt-0.5">Zero Leakage / Collisions</p>
           </div>
         </div>
 
-        <div className="glass-glow-gold rounded-2xl p-4 flex flex-col justify-between hover-lift">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-300">Fiscal Spend</span>
-            <TrendingUp className="h-4 w-4 text-amber-400" />
+        <div className="light-glass-card card-3d-inner shimmer-effect rounded-2xl p-4 flex flex-col justify-between hover:bg-indigo-50 transition-colors bg-white/80 backdrop-blur-sm border-slate-200">
+          <div className="flex items-center justify-between text-slate-600">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-700">Fiscal Spend</span>
+            <TrendingUp className="h-4 w-4 text-amber-500 icon-ring" />
           </div>
           <div className="mt-2">
-            <p className="text-2xl font-black text-white font-mono">${(ov.annualBudgetSpentUsd / 1_000_000).toFixed(1)}M</p>
-            <p className="text-[10px] text-slate-400 mt-0.5">of ${(ov.annualBudgetTotalUsd / 1_000_000).toFixed(1)}M Budget</p>
+            <p className="text-2xl font-black text-slate-900 font-mono number-pop">${(ov.annualBudgetSpentUsd / 1_000_000).toFixed(1)}M</p>
+            <p className="text-[10px] text-slate-600 mt-0.5">of ${(ov.annualBudgetTotalUsd / 1_000_000).toFixed(1)}M Budget</p>
           </div>
         </div>
       </div>
 
       {/* ── 4. AUTONOMOUS PRINCIPAL STRATEGIC AI ADVISOR ─────────────── */}
-      <div className="rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/40 border border-amber-500/25 p-6 backdrop-blur shadow-2xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+      <div className="rounded-3xl bg-white/80 border border-slate-200 p-6 backdrop-blur-sm shadow-xl space-y-4 anim-fade-up-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-amber-500/15 text-amber-400 border border-amber-500/30">
+            <div className="p-2.5 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100">
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 Autonomous University Strategic Intelligence Engine
-                <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 text-[10px]">
+                <Badge className="bg-indigo-50 text-indigo-700 border-indigo-200 text-[10px] badge-pulse">
                   Institutional Synthesis
                 </Badge>
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-600">
                 Cross-correlates multi-college SIS records, research grant milestones, faculty workload caps, and statutory policies
               </p>
             </div>
@@ -298,19 +300,19 @@ export default function PrincipalDashboardPage() {
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => handleRunAi("What is the comprehensive university operations state?")}
-              className="text-[11px] px-2.5 py-1 rounded-lg border border-amber-500/30 bg-amber-950/30 text-amber-300 hover:bg-amber-900/40 transition-colors"
+              className="text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
             >
               Operations Brief
             </button>
             <button
               onClick={() => handleRunAi("Provide NAAC accreditation Criterion breakdown & gap analysis")}
-              className="text-[11px] px-2.5 py-1 rounded-lg border border-white/10 bg-slate-950 text-slate-300 hover:bg-slate-800 transition-colors"
+              className="text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
             >
               NAAC / NIRF Readiness
             </button>
             <button
               onClick={() => handleRunAi("Evaluate fiscal spend rate and research CapEx allocation")}
-              className="text-[11px] px-2.5 py-1 rounded-lg border border-white/10 bg-slate-950 text-slate-300 hover:bg-slate-800 transition-colors"
+              className="text-[11px] px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
             >
               Budget & Grants ROI
             </button>
@@ -329,12 +331,12 @@ export default function PrincipalDashboardPage() {
             placeholder="e.g. 'Assess inter-departmental research yield' or 'Identify faculties with teaching overloads'..."
             value={aiQuery}
             onChange={(e) => setAiQuery(e.target.value)}
-            className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+            className="bg-white border-slate-200 text-slate-900 text-xs rounded-xl"
           />
           <Button
             type="submit"
             disabled={aiLoading}
-            className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl px-5 shrink-0 shadow-md shadow-amber-500/20"
+            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl px-5 shrink-0 shadow-md shadow-indigo-500/20"
           >
             {aiLoading ? <RefreshCw className="h-4 w-4 animate-spin mr-1.5" /> : <Send className="h-4 w-4 mr-1.5" />}
             Synthesize
@@ -343,27 +345,27 @@ export default function PrincipalDashboardPage() {
 
         {/* AI Report Output */}
         {aiReport && (
-          <div className="p-4 rounded-2xl bg-slate-950/90 border border-amber-500/25 space-y-3.5 text-xs animate-in fade-in duration-300">
-            <div className="flex items-center justify-between border-b border-white/5 pb-2">
-              <span className="font-bold text-amber-300">Executive Strategic Dossier</span>
+          <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-3.5 text-xs animate-in fade-in duration-300 shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <span className="font-bold text-slate-900">Executive Strategic Dossier</span>
               <span className="text-[10px] text-slate-500 font-mono">
                 {new Date(aiReport.generatedAt).toLocaleTimeString()}
               </span>
             </div>
 
-            <p className="text-slate-200 leading-relaxed text-xs font-sans">
+            <p className="text-slate-700 leading-relaxed text-xs font-sans">
               {aiReport.executiveSummary}
             </p>
 
             {/* Institutional Findings */}
-            <div className="space-y-1 bg-slate-900/60 p-3 rounded-xl border border-white/5">
-              <span className="text-[10px] uppercase font-bold text-amber-400 block mb-1">
+            <div className="space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <span className="text-[10px] uppercase font-bold text-slate-800 block mb-1">
                 Institutional Audit Observations:
               </span>
               <ul className="space-y-1">
                 {aiReport.institutionalFindings?.map((f: string, i: number) => (
-                  <li key={i} className="flex items-start gap-2 text-[11px] text-slate-300">
-                    <span className="text-amber-400 font-bold">•</span>
+                  <li key={i} className="flex items-start gap-2 text-[11px] text-slate-700">
+                    <span className="text-indigo-500 font-bold">•</span>
                     <span>{f}</span>
                   </li>
                 ))}
@@ -373,10 +375,10 @@ export default function PrincipalDashboardPage() {
             {/* Recommendations */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {aiReport.strategicRecommendations?.map((r: any, idx: number) => (
-                <div key={idx} className="p-3 rounded-xl bg-slate-900/80 border border-white/5 space-y-1">
-                  <strong className="text-white block text-[11px]">{r.action}</strong>
-                  <p className="text-[10px] text-slate-400">{r.impact}</p>
-                  <div className="flex items-center justify-between text-[9px] text-amber-300/80 font-mono pt-1">
+                <div key={idx} className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                  <strong className="text-slate-900 block text-[11px]">{r.action}</strong>
+                  <p className="text-[10px] text-slate-600">{r.impact}</p>
+                  <div className="flex items-center justify-between text-[9px] text-slate-500 font-mono pt-1">
                     <span>Assigned: {r.responsibleDean}</span>
                     <span>Timeline: {r.timeframe}</span>
                   </div>
@@ -385,13 +387,13 @@ export default function PrincipalDashboardPage() {
             </div>
 
             {/* Statutory Grounding Citations */}
-            <div className="space-y-1 pt-1 text-[10px] text-slate-400">
-              <span className="font-bold uppercase tracking-wider text-slate-500 block">
+            <div className="space-y-1 pt-1 text-[10px] text-slate-600">
+              <span className="font-bold uppercase tracking-wider text-slate-800 block">
                 Statutory Charter Citations:
               </span>
               {aiReport.policyGrounding?.map((p: any, i: number) => (
-                <p key={i} className="text-slate-400">
-                  <strong className="text-amber-400">{p.rule}:</strong> {p.citation}
+                <p key={i} className="text-slate-600">
+                  <strong className="text-indigo-600">{p.rule}:</strong> {p.citation}
                 </p>
               ))}
             </div>
@@ -400,22 +402,22 @@ export default function PrincipalDashboardPage() {
       </div>
 
       {/* ── 5. TWO-COLUMN: EXECUTIVE APPROVALS DESK & BENCHMARKING PREVIEW */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 anim-fade-up-3">
         {/* Left 7 Cols: Executive Approvals Desk */}
-        <div className="lg:col-span-7 rounded-3xl bg-slate-900/80 border border-white/10 p-6 backdrop-blur space-y-4 shadow-xl">
-          <div className="flex items-center justify-between border-b border-white/5 pb-3">
+        <div className="lg:col-span-7 rounded-3xl bg-white/80 border border-slate-200 p-6 backdrop-blur-sm space-y-4 shadow-xl">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-3">
             <div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-amber-400" />
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-indigo-500 icon-ring" />
                 Executive Approvals Council
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-600">
                 Matters requiring Principal / Vice-Chancellor statutory sign-off
               </p>
             </div>
             <Link
               href="/principal/approvals"
-              className="text-xs text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1"
+              className="text-xs text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1"
             >
               View all ({approvals.length}) <ChevronRight className="h-3.5 w-3.5" />
             </Link>
@@ -428,25 +430,25 @@ export default function PrincipalDashboardPage() {
               approvals.slice(0, 3).map((app) => (
                 <div
                   key={app.id}
-                  className="p-4 rounded-2xl bg-slate-950/70 border border-white/5 space-y-3 hover:border-amber-500/30 transition-colors"
+                  className="p-4 rounded-2xl bg-white border border-slate-200 space-y-3 hover:border-indigo-300 hover:bg-indigo-50/50 transition-colors shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-300 bg-amber-500/10">
+                        <Badge variant="outline" className="text-[10px] border-slate-200 text-slate-700 bg-slate-50 badge-pulse">
                           {app.category.replace("_", " ")}
                         </Badge>
-                        <span className="text-[10px] text-slate-400 font-mono">{app.departmentCode}</span>
+                        <span className="text-[10px] text-slate-500 font-mono">{app.departmentCode}</span>
                         {app.financialImpactUsd && (
-                          <span className="text-[10px] font-bold text-emerald-400 font-mono">
+                          <span className="text-[10px] font-bold text-emerald-600 font-mono">
                             ${app.financialImpactUsd.toLocaleString()}
                           </span>
                         )}
                       </div>
-                      <h3 className="text-xs font-bold text-white mt-1.5 leading-snug">
+                      <h3 className="text-xs font-bold text-slate-900 mt-1.5 leading-snug">
                         {app.title}
                       </h3>
-                      <p className="text-[11px] text-slate-400 mt-1">{app.justification}</p>
+                      <p className="text-[11px] text-slate-600 mt-1">{app.justification}</p>
                     </div>
 
                     <span className="text-[10px] text-slate-500 shrink-0 font-mono">
@@ -454,25 +456,25 @@ export default function PrincipalDashboardPage() {
                     </span>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-slate-900 border border-white/5 text-[10px] text-amber-300 flex items-center gap-1.5">
-                    <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-[10px] text-slate-700 flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 shrink-0 text-indigo-500" />
                     <span>AI Risk Scan: {app.aiRiskAssessment}</span>
                   </div>
 
                   <div className="flex items-center justify-between pt-1">
-                    <span className="text-[10px] text-slate-400">By: {app.submittedBy}</span>
+                    <span className="text-[10px] text-slate-600">By: {app.submittedBy}</span>
                     <div className="flex items-center gap-2">
                       <Button
                         size="sm"
                         onClick={() => handleResolveApproval(app.id, "REJECT")}
-                        className="h-7 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg"
+                        className="h-7 text-[10px] bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg"
                       >
                         Reject
                       </Button>
                       <Button
                         size="sm"
                         onClick={() => handleResolveApproval(app.id, "APPROVE")}
-                        className="h-7 text-[10px] bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg shadow-sm"
+                        className="h-7 text-[10px] bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg shadow-sm"
                       >
                         Seal & Ratify
                       </Button>
@@ -485,21 +487,21 @@ export default function PrincipalDashboardPage() {
         </div>
 
         {/* Right 5 Cols: Top Performing Departments Summary */}
-        <div className="lg:col-span-5 rounded-3xl bg-slate-900/80 border border-white/10 p-6 backdrop-blur space-y-4 shadow-xl flex flex-col justify-between">
+        <div className="lg:col-span-5 rounded-3xl bg-white/80 border border-slate-200 p-6 backdrop-blur-sm space-y-4 shadow-xl flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between border-b border-white/5 pb-3">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div>
-                <h2 className="text-base font-bold text-white flex items-center gap-2">
-                  <Compass className="h-5 w-5 text-cyan-400" />
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Compass className="h-5 w-5 text-indigo-500 icon-ring" />
                   Department Health Ranking
                 </h2>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-600">
                   Multivariate operational composite index
                 </p>
               </div>
               <Link
                 href="/principal/departments"
-                className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1"
+                className="text-xs text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1"
               >
                 Matrix <ChevronRight className="h-3.5 w-3.5" />
               </Link>
@@ -509,13 +511,13 @@ export default function PrincipalDashboardPage() {
               {departments.slice(0, 5).map((d, i) => (
                 <div
                   key={d.code}
-                  className="p-3 rounded-2xl bg-slate-950/60 border border-white/5 flex items-center justify-between gap-3 text-xs"
+                  className="p-3 rounded-2xl bg-white border border-slate-200 flex items-center justify-between gap-3 text-xs shadow-sm hover:border-indigo-200 transition-colors"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="font-mono font-bold text-slate-500 text-xs w-4">#{i + 1}</span>
+                    <span className="font-mono font-bold text-slate-400 text-xs w-4">#{i + 1}</span>
                     <div className="min-w-0">
-                      <p className="font-bold text-white truncate">{d.code} - {d.name}</p>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="font-bold text-slate-900 truncate">{d.code} - {d.name}</p>
+                      <p className="text-[10px] text-slate-500">
                         {d.studentCount} Students • Avg GPA: {d.avgGpa}
                       </p>
                     </div>
@@ -526,10 +528,10 @@ export default function PrincipalDashboardPage() {
                       variant="outline"
                       className={`text-[9px] ${
                         d.status === "EXEMPLARY"
-                          ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                           : d.status === "STABLE"
-                          ? "bg-blue-500/10 text-blue-300 border-blue-500/30"
-                          : "bg-amber-500/10 text-amber-300 border-amber-500/30"
+                          ? "bg-blue-50 text-blue-700 border-blue-200"
+                          : "bg-amber-50 text-amber-700 border-amber-200"
                       }`}
                     >
                       {d.healthIndex}/100
@@ -540,9 +542,9 @@ export default function PrincipalDashboardPage() {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-white/5">
+          <div className="pt-4 border-t border-slate-200">
             <Link href="/principal/departments" className="block">
-              <Button variant="outline" className="w-full text-xs border-white/10 bg-slate-950 text-slate-300 hover:text-white rounded-xl">
+              <Button variant="outline" className="w-full text-xs border-slate-200 bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl">
                 Open Full Institutional Benchmarking Matrix <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
               </Button>
             </Link>
@@ -550,5 +552,6 @@ export default function PrincipalDashboardPage() {
         </div>
       </div>
     </div>
+    </AnimatedBackground>
   );
 }

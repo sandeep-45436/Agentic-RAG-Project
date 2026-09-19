@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -214,15 +215,16 @@ export default function HODStudentsPage() {
   );
 
   return (
-    <div className="space-y-6 font-sans">
+    <AnimatedBackground>
+<div className="space-y-6 font-sans">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
             <GraduationCap className="h-6 w-6 text-blue-400" />
             Student Academic Risk & Governance Radar
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-xs sm:text-sm text-slate-500">
             Attendance monitoring, probation interventions, and policy-grounded exam eligibility condonation for {activeDepartment}
           </p>
         </div>
@@ -233,7 +235,7 @@ export default function HODStudentsPage() {
             size="sm"
             onClick={fetchStudents}
             disabled={loading}
-            className="border-slate-700 bg-slate-900 text-slate-300 text-xs rounded-xl"
+            className="border-slate-200 text-slate-700 text-xs rounded-xl"
           >
             <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
             Refresh Cohort
@@ -242,7 +244,7 @@ export default function HODStudentsPage() {
           <Button
             size="sm"
             onClick={() => setAdmitModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl"
+            className="bg-blue-600 hover:bg-blue-500 text-slate-800 text-xs font-semibold rounded-xl"
           >
             <UserPlus className="mr-1.5 h-4 w-4" />
             Admit Student
@@ -256,7 +258,7 @@ export default function HODStudentsPage() {
           <button
             onClick={() => setFilter("ALL")}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-              filter === "ALL" ? "bg-blue-600 text-white shadow" : "bg-slate-900 border border-slate-800 text-slate-400"
+              filter === "ALL" ? "bg-blue-600 text-slate-800 shadow" : " border border-slate-200 text-slate-500"
             }`}
           >
             All Students ({students.length})
@@ -264,7 +266,7 @@ export default function HODStudentsPage() {
           <button
             onClick={() => setFilter("AT_RISK")}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-              filter === "AT_RISK" ? "bg-rose-600 text-white shadow" : "bg-slate-900 border border-slate-800 text-slate-400"
+              filter === "AT_RISK" ? "bg-rose-600 text-slate-800 shadow" : " border border-slate-200 text-slate-500"
             }`}
           >
             At-Risk Radar
@@ -272,7 +274,7 @@ export default function HODStudentsPage() {
           <button
             onClick={() => setFilter("PROBATION")}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-              filter === "PROBATION" ? "bg-amber-600 text-white shadow" : "bg-slate-900 border border-slate-800 text-slate-400"
+              filter === "PROBATION" ? "bg-amber-600 text-slate-800 shadow" : " border border-slate-200 text-slate-500"
             }`}
           >
             Academic Probation
@@ -280,7 +282,7 @@ export default function HODStudentsPage() {
           <button
             onClick={() => setFilter("ATTENDANCE_SHORTFALL")}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-              filter === "ATTENDANCE_SHORTFALL" ? "bg-cyan-600 text-white shadow" : "bg-slate-900 border border-slate-800 text-slate-400"
+              filter === "ATTENDANCE_SHORTFALL" ? "bg-cyan-600 text-slate-800 shadow" : " border border-slate-200 text-slate-500"
             }`}
           >
             Attendance &lt; 75%
@@ -293,7 +295,7 @@ export default function HODStudentsPage() {
             placeholder="Search by student name or ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-slate-900 border-slate-800 text-white placeholder:text-slate-600 text-xs rounded-xl h-9"
+            className="pl-9 border-slate-200 text-slate-800 placeholder:text-slate-600 text-xs rounded-xl h-9"
           />
         </div>
       </div>
@@ -307,19 +309,19 @@ export default function HODStudentsPage() {
           return (
             <Card
               key={s.id}
-              className={`border backdrop-blur space-y-3 transition-all ${
+              className={`light-glass-card card-3d-inner anim-fade-up-1 border backdrop-blur space-y-3 transition-all ${
                 isWithdrawn
-                  ? "bg-slate-950/40 border-slate-800/40 opacity-70"
+                  ? " border-slate-200/40 opacity-70"
                   : isAtRisk
-                  ? "bg-slate-900/90 border-rose-900/40 hover:border-rose-700/60"
-                  : "bg-slate-900/80 border-slate-800 hover:border-slate-700"
+                  ? " border-rose-900/40 hover:border-rose-700/60"
+                  : " border-slate-200 hover:border-slate-200"
               }`}
             >
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2">
-                      <CardTitle className="text-base font-bold text-white">{s.name}</CardTitle>
+                      <CardTitle className="text-base font-bold text-slate-800">{s.name}</CardTitle>
                       <Badge
                         variant="outline"
                         className={`text-[9px] px-1.5 py-0 ${
@@ -333,7 +335,7 @@ export default function HODStudentsPage() {
                         {s.academicStatus}
                       </Badge>
                     </div>
-                    <CardDescription className="text-xs text-slate-400 mt-0.5">
+                    <CardDescription className="text-xs text-slate-500 mt-0.5">
                       {s.studentNumber} • {s.major}
                     </CardDescription>
                   </div>
@@ -355,7 +357,7 @@ export default function HODStudentsPage() {
 
               <CardContent className="space-y-3 text-xs">
                 {/* Academic Metrics Snapshot */}
-                <div className="grid grid-cols-2 gap-2 bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/80 font-mono text-[11px]">
+                <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl border border-slate-200/80 font-mono text-[11px]">
                   <div>
                     <span className="text-slate-500 block text-[10px]">Attendance</span>
                     <span
@@ -368,7 +370,7 @@ export default function HODStudentsPage() {
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px]">Internal Marks</span>
-                    <span className="font-bold text-white">
+                    <span className="font-bold text-slate-800">
                       {s.internalMarks} / {s.maxInternalMarks}
                     </span>
                   </div>
@@ -380,13 +382,13 @@ export default function HODStudentsPage() {
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px]">Faculty Advisor</span>
-                    <span className="text-slate-300 truncate block">{s.advisorName || "Assigned"}</span>
+                    <span className="text-slate-700 truncate block">{s.advisorName || "Assigned"}</span>
                   </div>
                 </div>
 
                 {/* Exam Hall Ticket Status */}
-                <div className="p-2 rounded-lg bg-slate-950/40 border border-slate-800 flex items-center justify-between text-[11px]">
-                  <span className="text-slate-400">Exam Hall Ticket:</span>
+                <div className="p-2 rounded-lg border border-slate-200 flex items-center justify-between text-[11px]">
+                  <span className="text-slate-500">Exam Hall Ticket:</span>
                   {s.attendancePercentage >= 75 && s.feeStatus === "Paid" ? (
                     <Badge className="bg-emerald-500/20 text-emerald-300 text-[10px] border-emerald-500/30">
                       <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -401,7 +403,7 @@ export default function HODStudentsPage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center gap-2 pt-2 border-t border-slate-800/80">
+                <div className="flex items-center gap-2 pt-2 border-t border-slate-200/80">
                   {s.attendancePercentage < 75 && (
                     <Button
                       size="sm"
@@ -409,7 +411,7 @@ export default function HODStudentsPage() {
                         setCondonationStudent(s);
                         setCondonationReason(`Documented medical leave submitted by student. Attendance at ${s.attendancePercentage.toFixed(1)}%.`);
                       }}
-                      className="bg-amber-600 hover:bg-amber-500 text-white text-xs rounded-xl flex-1 font-semibold"
+                      className="bg-amber-600 hover:bg-amber-500 text-slate-800 text-xs rounded-xl flex-1 font-semibold"
                     >
                       <ShieldCheck className="mr-1 h-3.5 w-3.5" />
                       Grant Condonation
@@ -424,7 +426,7 @@ export default function HODStudentsPage() {
                       setEditStatus(s.academicStatus);
                       setEditMajor(s.major);
                     }}
-                    className="border-slate-700 bg-slate-950 text-slate-300 hover:text-white text-xs rounded-xl flex-1"
+                    className="border-slate-200 text-slate-700 hover:text-slate-800 text-xs rounded-xl flex-1"
                   >
                     <Edit className="mr-1 h-3.5 w-3.5" />
                     Edit Standing
@@ -452,9 +454,9 @@ export default function HODStudentsPage() {
       {/* ─────────────────────────────────────────────────────────────────── */}
       {admitModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+          <div className="border border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
                 <UserPlus className="h-4 w-4 text-blue-400" />
                 Admit New Student to Department
               </h3>
@@ -462,7 +464,7 @@ export default function HODStudentsPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setAdmitModalOpen(false)}
-                className="text-slate-400 hover:text-white h-7 w-7 p-0 rounded-full"
+                className="text-slate-500 hover:text-slate-800 h-7 w-7 p-0 rounded-full"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -471,66 +473,66 @@ export default function HODStudentsPage() {
             <form onSubmit={handleAdmitStudent} className="space-y-3 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Student Full Name *</label>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Student Full Name *</label>
                   <Input
                     required
                     placeholder="e.g. Grace Hopper"
                     value={admitForm.name}
                     onChange={(e) => setAdmitForm({ ...admitForm, name: e.target.value })}
-                    className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                    className="border-slate-200 text-slate-800 text-xs rounded-xl"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Student ID / Roll No *</label>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Student ID / Roll No *</label>
                   <Input
                     required
                     placeholder="e.g. CS-2026-042"
                     value={admitForm.studentNumber}
                     onChange={(e) => setAdmitForm({ ...admitForm, studentNumber: e.target.value })}
-                    className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                    className="border-slate-200 text-slate-800 text-xs rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Email Address *</label>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Email Address *</label>
                   <Input
                     required
                     type="email"
                     placeholder="e.g. grace@students.smartuniversity.edu"
                     value={admitForm.email}
                     onChange={(e) => setAdmitForm({ ...admitForm, email: e.target.value })}
-                    className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                    className="border-slate-200 text-slate-800 text-xs rounded-xl"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Degree Major</label>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Degree Major</label>
                   <Input
                     value={admitForm.major}
                     onChange={(e) => setAdmitForm({ ...admitForm, major: e.target.value })}
-                    className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                    className="border-slate-200 text-slate-800 text-xs rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Initial Matriculation GPA</label>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Initial Matriculation GPA</label>
                   <Input
                     type="number"
                     step="0.01"
                     value={admitForm.gpa}
                     onChange={(e) => setAdmitForm({ ...admitForm, gpa: e.target.value })}
-                    className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                    className="border-slate-200 text-slate-800 text-xs rounded-xl"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Academic Standing</label>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Academic Standing</label>
                   <select
                     value={admitForm.academicStatus}
                     onChange={(e) => setAdmitForm({ ...admitForm, academicStatus: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 text-white text-xs rounded-xl p-2"
+                    className="w-full border border-slate-200 text-slate-800 text-xs rounded-xl p-2"
                   >
                     <option value="Good Standing">Good Standing</option>
                     <option value="Academic Probation">Academic Probation</option>
@@ -538,19 +540,19 @@ export default function HODStudentsPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setAdmitModalOpen(false)}
-                  className="border-slate-800 text-slate-400 text-xs rounded-xl"
+                  className="border-slate-200 text-slate-500 text-xs rounded-xl"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={admitLoading}
-                  className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl"
+                  className="bg-blue-600 hover:bg-blue-500 text-slate-800 font-semibold text-xs rounded-xl"
                 >
                   {admitLoading ? "Admitting..." : "Admit Student"}
                 </Button>
@@ -565,9 +567,9 @@ export default function HODStudentsPage() {
       {/* ─────────────────────────────────────────────────────────────────── */}
       {condonationStudent && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white flex items-center gap-2 text-amber-400">
+          <div className="border border-slate-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2 text-amber-400">
                 <ShieldCheck className="h-4 w-4" />
                 Formal Attendance Condonation & Exam Clearance
               </h3>
@@ -575,63 +577,63 @@ export default function HODStudentsPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setCondonationStudent(null)}
-                className="text-slate-400 hover:text-white h-7 w-7 p-0 rounded-full"
+                className="text-slate-500 hover:text-slate-800 h-7 w-7 p-0 rounded-full"
               >
                 <X className="h-4 w-4" />
               </Button>
             </div>
 
             <form onSubmit={handleExecuteCondonation} className="space-y-3 text-xs">
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+              <div className="p-3 rounded-xl border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-white">{condonationStudent.name}</span>
+                  <span className="font-bold text-slate-800">{condonationStudent.name}</span>
                   <span className="text-blue-300 font-mono">{condonationStudent.studentNumber}</span>
                 </div>
-                <p className="text-slate-400 text-[11px]">
+                <p className="text-slate-500 text-[11px]">
                   Current Attendance: <strong className="text-rose-400">{condonationStudent.attendancePercentage.toFixed(1)}%</strong> ({condonationStudent.attendedClasses}/{condonationStudent.totalClasses} classes attended)
                 </p>
-                <p className="text-slate-400 text-[10px]">
-                  Required Threshold: <strong className="text-slate-200">75.0%</strong>
+                <p className="text-slate-500 text-[10px]">
+                  Required Threshold: <strong className="text-slate-700">75.0%</strong>
                 </p>
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Reason & Academic Justification *</label>
+                <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Reason & Academic Justification *</label>
                 <Input
                   required
                   value={condonationReason}
                   onChange={(e) => setCondonationReason(e.target.value)}
-                  className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                  className="border-slate-200 text-slate-800 text-xs rounded-xl"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Verified Evidence Document</label>
+                <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Verified Evidence Document</label>
                 <Input
                   value={condonationEvidence}
                   onChange={(e) => setCondonationEvidence(e.target.value)}
-                  className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                  className="border-slate-200 text-slate-800 text-xs rounded-xl"
                 />
               </div>
 
-              <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 text-[11px] text-slate-400">
+              <div className="p-2.5 rounded-xl border border-slate-200 text-[11px] text-slate-500">
                 <span className="text-emerald-400 font-bold block mb-0.5">Policy Grounding:</span>
                 Examination Ordinance 12.3 permits HOD to condone attendance shortfalls up to 10% on verified medical or institutional representation grounds. This mutation produces an immutable audit record.
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setCondonationStudent(null)}
-                  className="border-slate-800 text-slate-400 text-xs rounded-xl"
+                  className="border-slate-200 text-slate-500 text-xs rounded-xl"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={condonationLoading || !condonationReason.trim()}
-                  className="bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs rounded-xl"
+                  className="bg-amber-600 hover:bg-amber-500 text-slate-800 font-semibold text-xs rounded-xl"
                 >
                   {condonationLoading ? "Executing Condonation..." : "Grant Condonation & Clear Hall Ticket"}
                 </Button>
@@ -646,9 +648,9 @@ export default function HODStudentsPage() {
       {/* ─────────────────────────────────────────────────────────────────── */}
       {editingStudent && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+          <div className="border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
                 <Edit className="h-4 w-4 text-blue-400" />
                 Update Academic Standing: {editingStudent.name}
               </h3>
@@ -656,7 +658,7 @@ export default function HODStudentsPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setEditingStudent(null)}
-                className="text-slate-400 hover:text-white h-7 w-7 p-0 rounded-full"
+                className="text-slate-500 hover:text-slate-800 h-7 w-7 p-0 rounded-full"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -664,11 +666,11 @@ export default function HODStudentsPage() {
 
             <form onSubmit={handleUpdateStanding} className="space-y-3 text-xs">
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Academic Status Lifecycle</label>
+                <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Academic Status Lifecycle</label>
                 <select
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 text-white text-xs rounded-xl p-2"
+                  className="w-full border border-slate-200 text-slate-800 text-xs rounded-xl p-2"
                 >
                   <option value="Good Standing">Good Standing</option>
                   <option value="Academic Probation">Academic Probation</option>
@@ -678,36 +680,36 @@ export default function HODStudentsPage() {
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Degree Major</label>
+                <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Degree Major</label>
                 <Input
                   value={editMajor}
                   onChange={(e) => setEditMajor(e.target.value)}
-                  className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                  className="border-slate-200 text-slate-800 text-xs rounded-xl"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Governance Reason for Audit Log</label>
+                <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Governance Reason for Audit Log</label>
                 <Input
                   value={editReason}
                   onChange={(e) => setEditReason(e.target.value)}
-                  className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                  className="border-slate-200 text-slate-800 text-xs rounded-xl"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setEditingStudent(null)}
-                  className="border-slate-800 text-slate-400 text-xs rounded-xl"
+                  className="border-slate-200 text-slate-500 text-xs rounded-xl"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={updating}
-                  className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl"
+                  className="bg-blue-600 hover:bg-blue-500 text-slate-800 font-semibold text-xs rounded-xl"
                 >
                   {updating ? "Saving..." : "Save Standing"}
                 </Button>
@@ -722,9 +724,9 @@ export default function HODStudentsPage() {
       {/* ─────────────────────────────────────────────────────────────────── */}
       {withdrawingStudent && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white flex items-center gap-2 text-rose-400">
+          <div className="border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2 text-rose-400">
                 <UserX className="h-4 w-4" />
                 Deregister / Withdraw Student
               </h3>
@@ -732,44 +734,44 @@ export default function HODStudentsPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setWithdrawingStudent(null)}
-                className="text-slate-400 hover:text-white h-7 w-7 p-0 rounded-full"
+                className="text-slate-500 hover:text-slate-800 h-7 w-7 p-0 rounded-full"
               >
                 <X className="h-4 w-4" />
               </Button>
             </div>
 
             <div className="space-y-3 text-xs">
-              <p className="text-slate-300">
+              <p className="text-slate-700">
                 Are you sure you want to transition <strong>{withdrawingStudent.name} ({withdrawingStudent.studentNumber})</strong> to <span className="text-rose-400 font-bold">Withdrawn</span> status?
               </p>
-              <p className="text-slate-400 text-[11px]">
+              <p className="text-slate-500 text-[11px]">
                 In accordance with academic regulations, historical semester marks and transcripts are preserved in the permanent institutional ledger.
               </p>
 
               <div>
-                <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Reason for Withdrawal</label>
+                <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Reason for Withdrawal</label>
                 <Input
                   required
                   placeholder="e.g. Student transfer to external institution / personal withdrawal"
                   value={withdrawReason}
                   onChange={(e) => setWithdrawReason(e.target.value)}
-                  className="bg-slate-950 border-slate-800 text-white text-xs rounded-xl"
+                  className="border-slate-200 text-slate-800 text-xs rounded-xl"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setWithdrawingStudent(null)}
-                  className="border-slate-800 text-slate-400 text-xs rounded-xl"
+                  className="border-slate-200 text-slate-500 text-xs rounded-xl"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={handleWithdrawStudent}
                   disabled={withdrawLoading || !withdrawReason.trim()}
-                  className="bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs rounded-xl"
+                  className="bg-rose-600 hover:bg-rose-500 text-slate-800 font-semibold text-xs rounded-xl"
                 >
                   {withdrawLoading ? "Processing..." : "Confirm Withdrawal"}
                 </Button>
@@ -779,5 +781,6 @@ export default function HODStudentsPage() {
         </div>
       )}
     </div>
+</AnimatedBackground>
   );
 }

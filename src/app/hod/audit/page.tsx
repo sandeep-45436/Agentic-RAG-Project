@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -71,15 +72,16 @@ export default function HODAuditTrailPage() {
   });
 
   return (
-    <div className="space-y-6 font-sans">
+    <AnimatedBackground>
+<div className="space-y-6 font-sans">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
             <Scale className="h-6 w-6 text-blue-400" />
             Departmental Governance & Audit Trail
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-xs sm:text-sm text-slate-500">
             Immutable, cryptographically verifiable ledger of all departmental decisions, condonations, appointments, and curriculum mutations for {activeDepartment}
           </p>
         </div>
@@ -89,7 +91,7 @@ export default function HODAuditTrailPage() {
           size="sm"
           onClick={fetchLogs}
           disabled={loading}
-          className="border-slate-700 bg-slate-900 text-slate-300 text-xs rounded-xl"
+          className="border-slate-200 text-slate-700 text-xs rounded-xl"
         >
           <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
           Refresh Ledger
@@ -107,8 +109,8 @@ export default function HODAuditTrailPage() {
                 onClick={() => setSelectedType(t.id)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                   selectedType === t.id
-                    ? "bg-blue-600 text-white shadow"
-                    : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200"
+                    ? "bg-blue-600 text-slate-800 shadow"
+                    : " border border-slate-200 text-slate-500 hover:text-slate-700"
                 }`}
               >
                 {t.label} ({count})
@@ -123,7 +125,7 @@ export default function HODAuditTrailPage() {
             placeholder="Search action, actor, reason..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-slate-900 border-slate-800 text-white placeholder:text-slate-600 text-xs rounded-xl h-9"
+            className="pl-9 border-slate-200 text-slate-800 placeholder:text-slate-600 text-xs rounded-xl h-9"
           />
         </div>
       </div>
@@ -131,18 +133,16 @@ export default function HODAuditTrailPage() {
       {/* Audit Log Entries List */}
       <div className="space-y-3">
         {filtered.length === 0 ? (
-          <Card className="bg-slate-900/60 border-slate-800 p-8 text-center">
+          <Card className="border-slate-200 p-8 text-center light-glass-card card-3d-inner anim-fade-up-1">
             <CheckCircle2 className="h-10 w-10 text-slate-500 mx-auto mb-2 opacity-60" />
-            <h3 className="text-sm font-bold text-white">No Audit Events Found</h3>
-            <p className="text-xs text-slate-400 mt-1">No matching mutation or governance records logged in this filter scope.</p>
+            <h3 className="text-sm font-bold text-slate-800">No Audit Events Found</h3>
+            <p className="text-xs text-slate-500 mt-1">No matching mutation or governance records logged in this filter scope.</p>
           </Card>
         ) : (
           filtered.map((log) => {
             const isExpanded = expandedLogId === log.id;
             return (
-              <Card
-                key={log.id}
-                className="bg-slate-900/80 border-slate-800 backdrop-blur hover:border-slate-700 transition-all text-xs"
+              <Card key={log.id} className="border-slate-200 backdrop-blur hover:border-slate-200 transition-all text-xs light-glass-card card-3d-inner anim-fade-up-1"
               >
                 <CardHeader
                   className="p-4 cursor-pointer select-none"
@@ -157,16 +157,16 @@ export default function HODAuditTrailPage() {
                         >
                           {log.entityType}
                         </Badge>
-                        <span className="font-bold text-white text-sm">{log.action.replace(/_/g, " ")}</span>
+                        <span className="font-bold text-slate-800 text-sm">{log.action.replace(/_/g, " ")}</span>
                       </div>
-                      <p className="text-slate-400 text-xs">
-                        Target: <strong className="text-slate-200">{log.entityName}</strong> • Actor:{" "}
+                      <p className="text-slate-500 text-xs">
+                        Target: <strong className="text-slate-700">{log.entityName}</strong> • Actor:{" "}
                         <span className="text-blue-300 font-semibold">{log.actorName}</span>
                       </p>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <span className="text-[11px] text-slate-400 font-mono block">
+                      <span className="text-[11px] text-slate-500 font-mono block">
                         {new Date(log.createdAt).toLocaleString()}
                       </span>
                       <span className="text-[10px] text-blue-400 flex items-center gap-0.5 justify-end mt-1">
@@ -178,10 +178,10 @@ export default function HODAuditTrailPage() {
                 </CardHeader>
 
                 {isExpanded && (
-                  <CardContent className="p-4 pt-0 border-t border-slate-800/60 mt-1 space-y-3">
+                  <CardContent className="p-4 pt-0 border-t border-slate-200/60 mt-1 space-y-3">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
                       {/* Previous State */}
-                      <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-1">
+                      <div className="p-2.5 rounded-xl border border-slate-200/80 space-y-1">
                         <span className="text-[10px] uppercase font-bold text-slate-500 block">Previous State Snapshot</span>
                         <pre className="text-[11px] text-amber-300/90 font-mono overflow-x-auto whitespace-pre-wrap">
                           {log.previousState ? JSON.stringify(log.previousState, null, 2) : "None (Initial Creation)"}
@@ -189,7 +189,7 @@ export default function HODAuditTrailPage() {
                       </div>
 
                       {/* New State */}
-                      <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-1">
+                      <div className="p-2.5 rounded-xl border border-slate-200/80 space-y-1">
                         <span className="text-[10px] uppercase font-bold text-slate-500 block">New Mutated State Snapshot</span>
                         <pre className="text-[11px] text-emerald-300/90 font-mono overflow-x-auto whitespace-pre-wrap">
                           {log.newState ? JSON.stringify(log.newState, null, 2) : "State Preserved"}
@@ -197,13 +197,13 @@ export default function HODAuditTrailPage() {
                       </div>
                     </div>
 
-                    <div className="p-2.5 rounded-xl bg-slate-950/40 border border-slate-800/50 space-y-1 text-[11px]">
-                      <p className="text-slate-300">
-                        <strong className="text-slate-400">Documented Reason:</strong> {log.reason}
+                    <div className="p-2.5 rounded-xl border border-slate-200/50 space-y-1 text-[11px]">
+                      <p className="text-slate-700">
+                        <strong className="text-slate-500">Documented Reason:</strong> {log.reason}
                       </p>
                       {log.policyCitation && (
-                        <p className="text-slate-300 font-mono text-[10px]">
-                          <strong className="text-slate-400">Policy Reference:</strong> {log.policyCitation}
+                        <p className="text-slate-700 font-mono text-[10px]">
+                          <strong className="text-slate-500">Policy Reference:</strong> {log.policyCitation}
                         </p>
                       )}
                     </div>
@@ -215,5 +215,6 @@ export default function HODAuditTrailPage() {
         )}
       </div>
     </div>
+</AnimatedBackground>
   );
 }

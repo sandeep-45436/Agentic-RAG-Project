@@ -1,5 +1,7 @@
 "use client";
 
+import { AnimatedBackground } from "@/components/animated-background";
+
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -139,14 +141,15 @@ export default function SignupPage() {
 
   if (step === "verify") {
     return (
-      <Card className="w-full max-w-md shadow-2xl border-indigo-500/20 bg-slate-950/90 backdrop-blur-xl">
+    <AnimatedBackground variant="subtle">
+      <Card className="w-full max-w-md shadow-2xl border-indigo-500/20  backdrop-blur-xl light-glass-card anim-fade-up-1">
         <CardHeader className="space-y-3 items-center text-center">
           <div className="bg-blue-500/10 p-3 rounded-full">
             <Mail className="h-6 w-6 text-blue-500" />
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold tracking-tight text-white">Check your email</CardTitle>
-            <CardDescription className="text-xs text-slate-400">
+            <CardTitle className="text-2xl font-bold tracking-tight text-slate-900">Check your email</CardTitle>
+            <CardDescription className="text-xs text-slate-600">
               We sent a 6-digit code to <span className="text-cyan-400 font-medium">{email}</span>
             </CardDescription>
           </div>
@@ -165,7 +168,7 @@ export default function SignupPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label className="text-center block text-slate-300">Enter verification code</Label>
+              <Label className="text-center block text-slate-700">Enter verification code</Label>
               <div className="flex justify-center gap-2">
                 {otp.map((digit, i) => (
                   <input
@@ -178,21 +181,21 @@ export default function SignupPage() {
                     onChange={(e) => handleOtpChange(i, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(i, e)}
                     disabled={loading}
-                    className="w-11 h-12 text-center text-lg font-bold border border-slate-800 bg-slate-900 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-white outline-none"
+                    className="w-11 h-12 text-center text-lg font-bold border border-indigo-100  rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-900 outline-none"
                   />
                 ))}
               </div>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl" disabled={loading}>
+            <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-slate-900 font-bold text-xs rounded-xl" disabled={loading}>
               {loading ? "Verifying..." : "Verify and Continue"}
             </Button>
-            <div className="flex items-center justify-between w-full text-xs text-slate-400">
+            <div className="flex items-center justify-between w-full text-xs text-slate-600">
               <button
                 type="button"
                 onClick={() => setStep("signup")}
-                className="flex items-center gap-1 hover:text-white"
+                className="flex items-center gap-1 hover:text-slate-900"
               >
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
               </button>
@@ -212,14 +215,15 @@ export default function SignupPage() {
   }
 
   return (
-    <Card className="w-full max-w-md shadow-2xl border-indigo-500/20 bg-slate-950/90 backdrop-blur-xl">
+    <AnimatedBackground variant="subtle">
+      <Card className="w-full max-w-md shadow-2xl border-indigo-500/20  backdrop-blur-xl light-glass-card anim-fade-up-1">
       <CardHeader className="space-y-3 items-center text-center">
-        <div className="bg-gradient-to-tr from-indigo-600 to-cyan-500 p-3 rounded-2xl text-white shadow-lg shadow-indigo-500/30">
+        <div className="bg-gradient-to-tr from-indigo-600 to-cyan-500 p-3 rounded-2xl text-slate-900 shadow-lg shadow-indigo-500/30">
           <Bot className="h-6 w-6" />
         </div>
         <div>
-          <CardTitle className="text-2xl font-bold tracking-tight text-white">Create Student Account</CardTitle>
-          <CardDescription className="text-xs text-slate-400">
+          <CardTitle className="text-2xl font-bold tracking-tight text-slate-900">Create Student Account</CardTitle>
+          <CardDescription className="text-xs text-slate-600">
             Sign up and select your academic department to access scoped syllabus and course documents
           </CardDescription>
         </div>
@@ -234,7 +238,7 @@ export default function SignupPage() {
 
           {/* Department Selection */}
           <div className="space-y-1.5">
-            <Label htmlFor="dept" className="text-slate-300 font-semibold flex items-center justify-between">
+            <Label htmlFor="dept" className="text-slate-700 font-semibold flex items-center justify-between">
               <span>Your Department *</span>
               <span className="text-[10px] text-cyan-400 font-mono">Scoped Documents</span>
             </Label>
@@ -242,7 +246,7 @@ export default function SignupPage() {
               id="dept"
               value={departmentCode}
               onChange={(e) => setDepartmentCode(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 text-white rounded-xl p-2.5 text-xs focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              className="w-full  border border-indigo-100 text-slate-900 rounded-xl p-2.5 text-xs focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
               disabled={loading}
             >
               {DEPARTMENTS.map((d) => (
@@ -254,7 +258,7 @@ export default function SignupPage() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="name" className="text-slate-300 font-semibold">Full Name</Label>
+            <Label htmlFor="name" className="text-slate-700 font-semibold">Full Name</Label>
             <Input
               id="name"
               placeholder="e.g. John Doe"
@@ -262,12 +266,12 @@ export default function SignupPage() {
               onChange={(e) => setFullName(e.target.value)}
               required
               disabled={loading}
-              className="bg-slate-900 border-slate-800 text-white text-xs rounded-xl"
+              className=" border-indigo-100 text-slate-900 text-xs rounded-xl"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-slate-300 font-semibold">University Email</Label>
+            <Label htmlFor="email" className="text-slate-700 font-semibold">University Email</Label>
             <Input
               id="email"
               type="email"
@@ -276,12 +280,12 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
-              className="bg-slate-900 border-slate-800 text-white text-xs rounded-xl"
+              className=" border-indigo-100 text-slate-900 text-xs rounded-xl"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-slate-300 font-semibold">Password</Label>
+            <Label htmlFor="password" className="text-slate-700 font-semibold">Password</Label>
             <Input
               id="password"
               type="password"
@@ -290,15 +294,15 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
-              className="bg-slate-900 border-slate-800 text-white text-xs rounded-xl"
+              className=" border-indigo-100 text-slate-900 text-xs rounded-xl"
             />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30" disabled={loading}>
+          <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-slate-900 font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30" disabled={loading}>
             {loading ? "Creating Account..." : "Create Account & Enter Portal"}
           </Button>
-          <div className="text-xs text-center text-slate-400">
+          <div className="text-xs text-center text-slate-600">
             Already have an account?{" "}
             <Link href="/login" className="text-cyan-400 hover:underline font-semibold">
               Sign in
@@ -307,5 +311,9 @@ export default function SignupPage() {
         </CardFooter>
       </form>
     </Card>
+  
+    </AnimatedBackground>
+  
+    </AnimatedBackground>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -97,7 +98,8 @@ export default function FacultyLoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-slate-950 text-slate-100 flex flex-col justify-center items-center p-4 lg:p-8 relative overflow-hidden">
+    <AnimatedBackground variant="subtle">
+      <div className="min-h-screen w-full  text-slate-100 flex flex-col justify-center items-center p-4 lg:p-8 relative overflow-hidden">
       {/* Ambient background glows */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-72 h-72 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -106,24 +108,24 @@ export default function FacultyLoginPage() {
         {/* Brand Top Header */}
         <div className="text-center space-y-2">
           <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 shadow-xl shadow-indigo-500/25 mb-1">
-            <GraduationCap className="h-8 w-8 text-white" />
+            <GraduationCap className="h-8 w-8 text-slate-900" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">Smart University Faculty Portal</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Smart University Faculty Portal</h1>
+          <p className="text-sm text-slate-600">
             Dedicated Academic Operations, Document Uploads & Examination Management
           </p>
         </div>
 
         {/* Login Card */}
-        <Card className="bg-slate-900/90 border-slate-800 backdrop-blur-xl shadow-2xl">
+        <Card className=" border-indigo-100 backdrop-blur-xl shadow-2xl light-glass-card anim-fade-up-1">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-xl text-white font-semibold flex items-center justify-between">
+            <CardTitle className="text-xl text-slate-900 font-semibold flex items-center justify-between">
               <span>Faculty Sign In</span>
               <Badge variant="outline" className="bg-indigo-500/10 text-indigo-400 border-indigo-500/30 text-xs">
                 Unique Password Access
               </Badge>
             </CardTitle>
-            <CardDescription className="text-slate-400 text-xs">
+            <CardDescription className="text-slate-600 text-xs">
               Enter your assigned Faculty ID or university email with your unique password.
             </CardDescription>
           </CardHeader>
@@ -145,7 +147,7 @@ export default function FacultyLoginPage() {
               )}
 
               <div className="space-y-1.5">
-                <Label htmlFor="identifier" className="text-xs font-medium text-slate-300">
+                <Label htmlFor="identifier" className="text-xs font-medium text-slate-700">
                   Faculty ID or University Email
                 </Label>
                 <div className="relative">
@@ -158,14 +160,14 @@ export default function FacultyLoginPage() {
                     onChange={(e) => setIdentifier(e.target.value)}
                     required
                     disabled={loading}
-                    className="pl-10 bg-slate-950/60 border-slate-800 text-white placeholder:text-slate-600 focus:border-indigo-500 rounded-xl"
+                    className="pl-10  border-indigo-100 text-slate-900 placeholder:text-slate-600 focus:border-indigo-500 rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-xs font-medium text-slate-300">
+                  <Label htmlFor="password" className="text-xs font-medium text-slate-700">
                     Unique Faculty Password
                   </Label>
                   <span className="text-[11px] text-indigo-400">Assigned by Department</span>
@@ -180,7 +182,7 @@ export default function FacultyLoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={loading}
-                    className="pl-10 bg-slate-950/60 border-slate-800 text-white placeholder:text-slate-600 focus:border-indigo-500 rounded-xl"
+                    className="pl-10  border-indigo-100 text-slate-900 placeholder:text-slate-600 focus:border-indigo-500 rounded-xl"
                   />
                 </div>
               </div>
@@ -188,7 +190,7 @@ export default function FacultyLoginPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium py-2.5 rounded-xl shadow-lg shadow-indigo-600/25 transition-all mt-2"
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-slate-900 font-medium py-2.5 rounded-xl shadow-lg shadow-indigo-600/25 transition-all mt-2"
               >
                 {loading ? "Authenticating Faculty..." : "Sign In to Faculty Portal"}
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -197,8 +199,8 @@ export default function FacultyLoginPage() {
           </form>
 
           {/* Quick Demo Login Chips */}
-          <div className="p-4 mx-6 mb-4 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-2.5">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-300">
+          <div className="p-4 mx-6 mb-4 rounded-xl  border border-indigo-100/80 space-y-2.5">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700">
               <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
               <span>1-Click Test Faculty Accounts</span>
             </div>
@@ -209,11 +211,11 @@ export default function FacultyLoginPage() {
                   type="button"
                   onClick={() => handleDemoFill(acc)}
                   disabled={loading}
-                  className="p-2 text-left rounded-lg bg-slate-900 hover:bg-indigo-950/50 border border-slate-800 hover:border-indigo-500/40 transition-all text-xs group"
+                  className="p-2 text-left rounded-lg  hover:bg-indigo-950/50 border border-indigo-100 hover:border-indigo-500/40 transition-all text-xs group"
                 >
-                  <p className="font-semibold text-slate-200 group-hover:text-indigo-300 truncate">{acc.name}</p>
+                  <p className="font-semibold text-slate-800 group-hover:text-indigo-300 truncate">{acc.name}</p>
                   <p className="text-[10px] text-slate-500 font-mono">{acc.code}</p>
-                  <Badge variant="outline" className="mt-1 text-[9px] px-1 py-0 border-slate-700 text-slate-400">
+                  <Badge variant="outline" className="mt-1 text-[9px] px-1 py-0 border-indigo-100 text-slate-600">
                     {acc.dept}
                   </Badge>
                 </button>
@@ -221,8 +223,8 @@ export default function FacultyLoginPage() {
             </div>
           </div>
 
-          <CardFooter className="flex flex-col space-y-3 pt-0 text-center border-t border-slate-800/60 p-4">
-            <div className="flex items-center justify-between w-full text-xs text-slate-400">
+          <CardFooter className="flex flex-col space-y-3 pt-0 text-center border-t border-indigo-100/60 p-4">
+            <div className="flex items-center justify-between w-full text-xs text-slate-600">
               <Link href="/dashboard" className="hover:text-indigo-400 transition-colors flex items-center gap-1">
                 <Building2 className="h-3 w-3" />
                 Main University Portal
@@ -235,5 +237,7 @@ export default function FacultyLoginPage() {
         </Card>
       </div>
     </div>
+  
+    </AnimatedBackground>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
@@ -73,9 +74,10 @@ function ScoreBadge({
 }) {
   if (value === null || value === undefined) {
     return (
-      <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] border border-white/5">
+    <AnimatedBackground>
+      <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/[0.03] border border-slate-200/80">
         <span className="text-gray-500 text-lg font-bold">—</span>
-        <span className="text-[11px] text-gray-400 uppercase tracking-wide mt-1">{label}</span>
+        <span className="text-[11px] text-slate-500 uppercase tracking-wide mt-1">{label}</span>
       </div>
     );
   }
@@ -96,7 +98,7 @@ function ScoreBadge({
         {isPct && <span className="text-xs font-semibold opacity-75">%</span>}
       </div>
       <span className="text-[11px] font-medium uppercase tracking-wide opacity-90 mt-0.5">{label}</span>
-      {target && <span className="text-[10px] text-gray-400 mt-1 font-mono">{target}</span>}
+      {target && <span className="text-[10px] text-slate-500 mt-1 font-mono">{target}</span>}
     </div>
   );
 }
@@ -123,7 +125,7 @@ function StatusPill({ status }: { status: string }) {
       );
     default:
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500/15 text-gray-400 border border-gray-500/20">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500/15 text-slate-500 border border-gray-500/20">
           <Clock className="w-3.5 h-3.5" /> Pending
         </span>
       );
@@ -427,7 +429,7 @@ export default function EvaluationPage() {
   return (
     <div className="space-y-8 p-6 max-w-7xl mx-auto">
       {/* Header with Presets & Action Buttons */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
@@ -435,7 +437,7 @@ export default function EvaluationPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white tracking-tight">RAG Evaluation Studio</h1>
-              <p className="text-sm text-gray-400 mt-0.5">
+              <p className="text-sm text-slate-500 mt-0.5">
                 Benchmark retrieval quality across Recall@5, MRR, NDCG@5, and Multi-Document synthesis.
               </p>
             </div>
@@ -445,14 +447,14 @@ export default function EvaluationPage() {
         {/* Action Bar */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Preset Selector */}
-          <div className="flex items-center bg-white/5 border border-white/10 rounded-xl p-1 text-xs">
+          <div className="flex items-center bg-white/5 border border-slate-200 rounded-xl p-1 text-xs">
             <button
               onClick={() => setPreset("quick")}
               disabled={isRunning}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
                 preset === "quick"
                   ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-gray-400 hover:text-white"
+                  : "text-slate-500 hover:text-white"
               }`}
             >
               <Zap className="w-3.5 h-3.5" />
@@ -464,7 +466,7 @@ export default function EvaluationPage() {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
                 preset === "standard"
                   ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-gray-400 hover:text-white"
+                  : "text-slate-500 hover:text-white"
               }`}
             >
               <Target className="w-3.5 h-3.5" />
@@ -476,7 +478,7 @@ export default function EvaluationPage() {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
                 preset === "full"
                   ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-gray-400 hover:text-white"
+                  : "text-slate-500 hover:text-white"
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -487,7 +489,7 @@ export default function EvaluationPage() {
           <button
             onClick={fetchRuns}
             disabled={isRunning}
-            className="p-2.5 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:border-indigo-500/40 transition-colors disabled:opacity-40"
+            className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-white hover:border-indigo-500/40 transition-colors disabled:opacity-40"
             title="Refresh runs"
           >
             <RefreshCw className="w-4 h-4" />
@@ -524,7 +526,7 @@ export default function EvaluationPage() {
 
       {/* Live Interactive Runner Hero Console */}
       {isRunning && (
-        <div className="rounded-2xl border border-indigo-500/40 bg-gradient-to-r from-indigo-950/40 via-purple-950/30 to-indigo-950/40 p-6 shadow-2xl relative overflow-hidden backdrop-blur-sm">
+        <div className="rounded-2xl border border-indigo-500/40 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-950/40 p-6 shadow-2xl relative overflow-hidden backdrop-blur-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -542,12 +544,12 @@ export default function EvaluationPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-xs font-mono text-gray-300">
-              <span className="flex items-center gap-1.5 bg-black/30 px-3 py-1.5 rounded-lg border border-white/5">
+            <div className="flex items-center gap-4 text-xs font-mono text-slate-700">
+              <span className="flex items-center gap-1.5 bg-black/30 px-3 py-1.5 rounded-lg border border-slate-200/80">
                 <Clock className="w-3.5 h-3.5 text-indigo-400" />
                 Elapsed: {Math.floor(elapsedSeconds / 60)}:{(elapsedSeconds % 60).toString().padStart(2, "0")}
               </span>
-              <span className="flex items-center gap-1.5 bg-black/30 px-3 py-1.5 rounded-lg border border-white/5">
+              <span className="flex items-center gap-1.5 bg-black/30 px-3 py-1.5 rounded-lg border border-slate-200/80">
                 <Gauge className="w-3.5 h-3.5 text-emerald-400" />
                 Completed: {progressCount} / {progressTotal}
               </span>
@@ -566,26 +568,26 @@ export default function EvaluationPage() {
 
           {/* Running Live Metrics Ticker */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-3 rounded-xl bg-black/30 border border-white/5">
-              <div className="text-xs text-gray-400">Live Recall@5</div>
+            <div className="p-3 rounded-xl bg-black/30 border border-slate-200/80">
+              <div className="text-xs text-slate-500">Live Recall@5</div>
               <div className="text-xl font-bold text-emerald-400 tabular-nums mt-0.5">
                 {(runningMetrics.recall5 * 100).toFixed(1)}%
               </div>
             </div>
-            <div className="p-3 rounded-xl bg-black/30 border border-white/5">
-              <div className="text-xs text-gray-400">Live MRR</div>
+            <div className="p-3 rounded-xl bg-black/30 border border-slate-200/80">
+              <div className="text-xs text-slate-500">Live MRR</div>
               <div className="text-xl font-bold text-yellow-400 tabular-nums mt-0.5">
                 {runningMetrics.mrr.toFixed(3)}
               </div>
             </div>
-            <div className="p-3 rounded-xl bg-black/30 border border-white/5">
-              <div className="text-xs text-gray-400">Live Precision@5</div>
+            <div className="p-3 rounded-xl bg-black/30 border border-slate-200/80">
+              <div className="text-xs text-slate-500">Live Precision@5</div>
               <div className="text-xl font-bold text-indigo-400 tabular-nums mt-0.5">
                 {(runningMetrics.precision5 * 100).toFixed(1)}%
               </div>
             </div>
-            <div className="p-3 rounded-xl bg-black/30 border border-white/5">
-              <div className="text-xs text-gray-400">Avg Latency</div>
+            <div className="p-3 rounded-xl bg-black/30 border border-slate-200/80">
+              <div className="text-xs text-slate-500">Avg Latency</div>
               <div className="text-xl font-bold text-gray-200 tabular-nums mt-0.5">
                 {Math.round(runningMetrics.avgLatencyMs)} ms
               </div>
@@ -596,16 +598,16 @@ export default function EvaluationPage() {
 
       {/* Metrics Dashboard for Selected/Latest Run */}
       {displayRun && (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white/[0.03] p-6 backdrop-blur-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-semibold text-white">Evaluation Scorecard</h2>
                 <StatusPill status={displayRun.status} />
               </div>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 Started {new Date(displayRun.startedAt).toLocaleString()} ·{" "}
-                <span className="text-gray-300 font-medium">{displayRun.totalQuestions} questions benchmarked</span>
+                <span className="text-slate-700 font-medium">{displayRun.totalQuestions} questions benchmarked</span>
                 {displayRun.avgLatencyMs ? ` · ${Math.round(displayRun.avgLatencyMs)}ms average latency` : ""}
               </p>
             </div>
@@ -615,7 +617,7 @@ export default function EvaluationPage() {
               <button
                 onClick={() => exportReport("csv")}
                 disabled={results.length === 0}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 text-xs font-medium text-gray-300 hover:text-white hover:bg-white/5 disabled:opacity-40 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:text-white hover:bg-white/5 disabled:opacity-40 transition-colors"
                 title="Download CSV report"
               >
                 <Download className="w-3.5 h-3.5" /> CSV
@@ -623,7 +625,7 @@ export default function EvaluationPage() {
               <button
                 onClick={() => exportReport("json")}
                 disabled={results.length === 0}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 text-xs font-medium text-gray-300 hover:text-white hover:bg-white/5 disabled:opacity-40 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:text-white hover:bg-white/5 disabled:opacity-40 transition-colors"
                 title="Download JSON report"
               >
                 <Download className="w-3.5 h-3.5" /> JSON
@@ -647,26 +649,26 @@ export default function EvaluationPage() {
       )}
 
       {/* Interactive Per-Question Breakdown & Filtering */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/5 pb-4">
+      <div className="rounded-2xl border border-slate-200 bg-white/[0.03] p-6 space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
           <div>
             <h2 className="text-base font-semibold text-white flex items-center gap-2">
               Question Breakdown
-              <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-gray-300 font-normal">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-slate-700 font-normal">
                 {filteredResults.length} / {results.length} questions
               </span>
             </h2>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Inspect individual questions, relevance rankings, category alignments, and latencies.
             </p>
           </div>
 
           {/* Hit / Miss Tabs */}
-          <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1 text-xs">
+          <div className="flex items-center gap-1 bg-white/5 border border-slate-200 rounded-xl p-1 text-xs">
             <button
               onClick={() => setFilterHit("all")}
               className={`px-3 py-1 rounded-lg font-medium transition-colors ${
-                filterHit === "all" ? "bg-white/15 text-white" : "text-gray-400 hover:text-white"
+                filterHit === "all" ? "bg-white/15 text-white" : "text-slate-500 hover:text-white"
               }`}
             >
               All ({results.length})
@@ -674,7 +676,7 @@ export default function EvaluationPage() {
             <button
               onClick={() => setFilterHit("hits")}
               className={`flex items-center gap-1 px-3 py-1 rounded-lg font-medium transition-colors ${
-                filterHit === "hits" ? "bg-emerald-500/20 text-emerald-400" : "text-gray-400 hover:text-emerald-400"
+                filterHit === "hits" ? "bg-emerald-500/20 text-emerald-400" : "text-slate-500 hover:text-emerald-400"
               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5" /> Hits ({hitCount})
@@ -682,7 +684,7 @@ export default function EvaluationPage() {
             <button
               onClick={() => setFilterHit("misses")}
               className={`flex items-center gap-1 px-3 py-1 rounded-lg font-medium transition-colors ${
-                filterHit === "misses" ? "bg-red-500/20 text-red-400" : "text-gray-400 hover:text-red-400"
+                filterHit === "misses" ? "bg-red-500/20 text-red-400" : "text-slate-500 hover:text-red-400"
               }`}
             >
               <XCircle className="w-3.5 h-3.5" /> Misses ({missCount})
@@ -699,7 +701,7 @@ export default function EvaluationPage() {
               placeholder="Search by question text or expected answer..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-white/5 border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
             />
           </div>
 
@@ -707,25 +709,25 @@ export default function EvaluationPage() {
           <select
             value={filterDifficulty}
             onChange={(e) => setFilterDifficulty(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-gray-300 focus:outline-none focus:border-indigo-500"
+            className="bg-white/5 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
           >
-            <option value="all" className="bg-gray-900">All Difficulties</option>
-            <option value="EASY" className="bg-gray-900">Easy</option>
-            <option value="MEDIUM" className="bg-gray-900">Medium</option>
-            <option value="HARD" className="bg-gray-900">Hard</option>
+            <option value="all" className="bg-white/80 backdrop-blur-sm">All Difficulties</option>
+            <option value="EASY" className="bg-white/80 backdrop-blur-sm">Easy</option>
+            <option value="MEDIUM" className="bg-white/80 backdrop-blur-sm">Medium</option>
+            <option value="HARD" className="bg-white/80 backdrop-blur-sm">Hard</option>
           </select>
 
           {/* Category filter */}
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-gray-300 focus:outline-none focus:border-indigo-500"
+            className="bg-white/5 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
           >
-            <option value="all" className="bg-gray-900">All Categories</option>
-            <option value="policy" className="bg-gray-900">Policy</option>
-            <option value="academic" className="bg-gray-900">Academic</option>
-            <option value="financial" className="bg-gray-900">Financial</option>
-            <option value="faculty" className="bg-gray-900">Faculty</option>
+            <option value="all" className="bg-white/80 backdrop-blur-sm">All Categories</option>
+            <option value="policy" className="bg-white/80 backdrop-blur-sm">Policy</option>
+            <option value="academic" className="bg-white/80 backdrop-blur-sm">Academic</option>
+            <option value="financial" className="bg-white/80 backdrop-blur-sm">Financial</option>
+            <option value="faculty" className="bg-white/80 backdrop-blur-sm">Faculty</option>
           </select>
         </div>
 
@@ -733,13 +735,13 @@ export default function EvaluationPage() {
         {results.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Sparkles className="w-8 h-8 text-indigo-400 mb-2 opacity-60" />
-            <p className="text-sm font-medium text-gray-300">No evaluation questions loaded for this run</p>
+            <p className="text-sm font-medium text-slate-700">No evaluation questions loaded for this run</p>
             <p className="text-xs text-gray-500 mt-1 max-w-sm">
               Click &ldquo;Run Evaluation&rdquo; above to execute a live test run against your knowledge base.
             </p>
           </div>
         ) : filteredResults.length === 0 ? (
-          <div className="py-8 text-center text-xs text-gray-400">
+          <div className="py-8 text-center text-xs text-slate-500">
             No questions match your current search and filters.
           </div>
         ) : (
@@ -758,7 +760,7 @@ export default function EvaluationPage() {
                   key={r.id}
                   className={`rounded-xl border transition-all ${
                     r.recall5Hit
-                      ? "border-white/5 bg-white/[0.02] hover:bg-white/[0.04]"
+                      ? "border-slate-200/80 bg-white/[0.02] hover:bg-white/[0.04]"
                       : "border-red-500/20 bg-red-500/[0.02] hover:bg-red-500/[0.04]"
                   }`}
                 >
@@ -792,7 +794,7 @@ export default function EvaluationPage() {
                           <span>{r.evalQuestion.question}</span>
                         </div>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/5 text-gray-400 font-mono">
+                          <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/5 text-slate-500 font-mono">
                             {r.evalQuestion.difficulty}
                           </span>
                           {r.evalQuestion.relevantCategories.map((c) => (
@@ -812,7 +814,7 @@ export default function EvaluationPage() {
                         {r.reciprocalRank > 0 ? `Rank #${Math.round(1 / r.reciprocalRank)}` : "Miss"}
                       </span>
 
-                      <span className="font-mono text-gray-400 text-xs hidden sm:inline">
+                      <span className="font-mono text-slate-500 text-xs hidden sm:inline">
                         NDCG: {r.dcg5.toFixed(2)}
                       </span>
 
@@ -829,25 +831,25 @@ export default function EvaluationPage() {
                       </span>
 
                       {expanded ? (
-                        <ChevronUp className="w-4 h-4 text-gray-400" />
+                        <ChevronUp className="w-4 h-4 text-slate-500" />
                       ) : (
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                        <ChevronDown className="w-4 h-4 text-slate-500" />
                       )}
                     </div>
                   </button>
 
                   {expanded && (
-                    <div className="px-5 pb-4 pt-2 border-t border-white/5 space-y-3 bg-black/20 text-xs">
+                    <div className="px-5 pb-4 pt-2 border-t border-slate-200/80 space-y-3 bg-black/20 text-xs">
                       {r.evalQuestion.expectedAnswer && (
                         <div>
-                          <span className="text-gray-400 font-medium">Expected Ground Truth:</span>
-                          <p className="text-gray-200 mt-0.5 bg-white/[0.02] p-2.5 rounded-lg border border-white/5">
+                          <span className="text-slate-500 font-medium">Expected Ground Truth:</span>
+                          <p className="text-gray-200 mt-0.5 bg-white/[0.02] p-2.5 rounded-lg border border-slate-200/80">
                             {r.evalQuestion.expectedAnswer}
                           </p>
                         </div>
                       )}
 
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1 text-gray-400">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1 text-slate-500">
                         <div className="bg-white/5 p-2 rounded-lg">
                           <span className="text-gray-500 block text-[10px] uppercase">Reciprocal Rank</span>
                           <span className="text-sm font-semibold text-white font-mono">
@@ -881,18 +883,18 @@ export default function EvaluationPage() {
       </div>
 
       {/* Historical Evaluation Runs */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 space-y-3">
+      <div className="rounded-2xl border border-slate-200 bg-white/[0.03] p-6 space-y-3">
         <div className="flex items-center justify-between mb-2">
           <div>
             <h2 className="text-base font-semibold text-white">Evaluation History</h2>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Compare historical retrieval benchmarks and track regression over time.
             </p>
           </div>
 
           <button
             onClick={cleanStaleRuns}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 text-xs text-gray-400 hover:text-white hover:border-red-500/30 hover:bg-red-500/10 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-500 hover:text-white hover:border-red-500/30 hover:bg-red-500/10 transition-colors"
             title="Clean up stale runs"
           >
             <Trash2 className="w-3.5 h-3.5" /> Clean Stale Runs
@@ -904,14 +906,14 @@ export default function EvaluationPage() {
             <Loader2 className="w-5 h-5 animate-spin text-gray-500" />
           </div>
         ) : runs.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-6">
+          <p className="text-sm text-slate-500 text-center py-6">
             No evaluation runs recorded yet.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-[11px] text-gray-400 uppercase tracking-wide border-b border-white/5">
+                <tr className="text-[11px] text-slate-500 uppercase tracking-wide border-b border-slate-200/80">
                   <th className="text-left pb-2.5 pr-4">Started</th>
                   <th className="text-right pb-2.5 pr-4">Questions</th>
                   <th className="text-right pb-2.5 pr-4">Recall@5</th>
@@ -930,10 +932,10 @@ export default function EvaluationPage() {
                       selectedRun?.id === run.id ? "bg-indigo-500/10" : ""
                     }`}
                   >
-                    <td className="py-3 pr-4 text-gray-300 font-sans">
+                    <td className="py-3 pr-4 text-slate-700 font-sans">
                       {new Date(run.startedAt).toLocaleString()}
                     </td>
-                    <td className="py-3 pr-4 text-right text-gray-300">
+                    <td className="py-3 pr-4 text-right text-slate-700">
                       {run.completedQuestions ?? run.totalQuestions} / {run.totalQuestions}
                     </td>
                     <td className="py-3 pr-4 text-right">
@@ -953,13 +955,13 @@ export default function EvaluationPage() {
                         <span className="text-gray-500">—</span>
                       )}
                     </td>
-                    <td className="py-3 pr-4 text-right text-gray-300">
+                    <td className="py-3 pr-4 text-right text-slate-700">
                       {run.mrr !== null ? run.mrr.toFixed(3) : "—"}
                     </td>
-                    <td className="py-3 pr-4 text-right text-gray-300">
+                    <td className="py-3 pr-4 text-right text-slate-700">
                       {run.ndcg5 !== null ? run.ndcg5.toFixed(3) : "—"}
                     </td>
-                    <td className="py-3 pr-4 text-right text-gray-300">
+                    <td className="py-3 pr-4 text-right text-slate-700">
                       {run.precision5 !== null ? `${(run.precision5 * 100).toFixed(1)}%` : "—"}
                     </td>
                     <td className="py-3 text-right">
@@ -973,5 +975,6 @@ export default function EvaluationPage() {
         )}
       </div>
     </div>
+    </AnimatedBackground>
   );
 }

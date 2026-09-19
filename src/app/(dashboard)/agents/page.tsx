@@ -41,55 +41,55 @@ function renderAgentIcon(iconName: string, size = 16) {
   switch (iconName.toLowerCase()) {
     case "search":
       return (
-        <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-sm shrink-0">
+        <div className="p-2 rounded-xl icon-ring bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-sm shrink-0">
           <Search style={{ width: size, height: size }} />
         </div>
       );
     case "file":
       return (
-        <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm shrink-0">
+        <div className="p-2 rounded-xl icon-ring bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm shrink-0">
           <FileText style={{ width: size, height: size }} />
         </div>
       );
     case "graph":
       return (
-        <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-sm shrink-0">
+        <div className="p-2 rounded-xl icon-ring bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-sm shrink-0">
           <Network style={{ width: size, height: size }} />
         </div>
       );
     case "chart":
       return (
-        <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-sm shrink-0">
+        <div className="p-2 rounded-xl icon-ring bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-sm shrink-0">
           <BarChart2 style={{ width: size, height: size }} />
         </div>
       );
     case "chat":
       return (
-        <div className="p-2 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20 shadow-sm shrink-0">
+        <div className="p-2 rounded-xl icon-ring bg-pink-500/10 text-pink-400 border border-pink-500/20 shadow-sm shrink-0">
           <MessageSquare style={{ width: size, height: size }} />
         </div>
       );
     case "shield":
       return (
-        <div className="p-2 rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20 shadow-sm shrink-0">
+        <div className="p-2 rounded-xl icon-ring bg-teal-500/10 text-teal-400 border border-teal-500/20 shadow-sm shrink-0">
           <ShieldCheck style={{ width: size, height: size }} />
         </div>
       );
     case "envelope":
       return (
-        <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-sm shrink-0">
+        <div className="p-2 rounded-xl icon-ring bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-sm shrink-0">
           <Mail style={{ width: size, height: size }} />
         </div>
       );
     case "database":
       return (
-        <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shadow-sm shrink-0">
+        <div className="p-2 rounded-xl icon-ring bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shadow-sm shrink-0">
           <Database style={{ width: size, height: size }} />
         </div>
       );
     default:
       return (
-        <div className="p-2 rounded-xl bg-gray-500/10 text-gray-400 border border-gray-500/20 shadow-sm shrink-0">
+        <div className="p-2 rounded-xl icon-ring bg-gray-500/10 text-gray-400 border border-gray-500/20 shadow-sm shrink-0">
           <Bot style={{ width: size, height: size }} />
         </div>
       );
@@ -173,7 +173,8 @@ export default function AgentsPage() {
     const interval = setInterval(() => {
       loadData(true);
     }, 4000);
-    return () => clearInterval(interval);
+    return (
+    <AnimatedBackground>) => clearInterval(interval);
   }, [loadData]);
 
   // Triggers simulated agent run
@@ -302,7 +303,7 @@ export default function AgentsPage() {
       {/* ── Page Header ────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold tracking-tight gradient-text-animated bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
             Agents
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
@@ -332,11 +333,11 @@ export default function AgentsPage() {
           <div className="group bg-[#13161e] border border-white/5 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Total Agents</span>
-              <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
+              <div className="p-2 rounded-xl icon-ring bg-purple-500/10 text-purple-400">
                 <Bot className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
               {metrics.totalAgents}
             </div>
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
@@ -350,11 +351,11 @@ export default function AgentsPage() {
           <div className="group bg-[#13161e] border border-white/5 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Active Agents</span>
-              <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+              <div className="p-2 rounded-xl icon-ring bg-emerald-500/10 text-emerald-400">
                 <Activity className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
               {metrics.activeAgents}
             </div>
             <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
@@ -367,11 +368,11 @@ export default function AgentsPage() {
           <div className="group bg-[#13161e] border border-white/5 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Tasks Completed</span>
-              <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
+              <div className="p-2 rounded-xl icon-ring bg-blue-500/10 text-blue-400">
                 <CheckCircle2 className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
               {metrics.tasksCompleted.toLocaleString()}
             </div>
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
@@ -385,11 +386,11 @@ export default function AgentsPage() {
           <div className="group bg-[#13161e] border border-white/5 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Success Rate</span>
-              <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
+              <div className="p-2 rounded-xl icon-ring bg-amber-500/10 text-amber-400">
                 <ShieldCheck className="w-4 h-4" />
               </div>
             </div>
-            <div className="text-3xl font-extrabold text-white tracking-tight">
+            <div className="text-3xl font-extrabold number-pop text-white tracking-tight">
               {metrics.successRate}%
             </div>
             <div className="flex items-center gap-1 mt-2 text-xs font-semibold text-emerald-400">
@@ -491,17 +492,17 @@ export default function AgentsPage() {
                       {/* Status */}
                       <td className="px-6 py-4">
                         {isRunning ? (
-                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-500/15 text-blue-400 border border-blue-500/25">
+                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full badge-pulse text-[10px] font-medium bg-blue-500/15 text-blue-400 border border-blue-500/25">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
                             <span>Running...</span>
                           </div>
                         ) : agent.status === "Active" ? (
-                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full badge-pulse text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             <span>Active</span>
                           </div>
                         ) : (
-                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground border border-border">
+                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full badge-pulse text-[10px] font-medium bg-muted text-muted-foreground border border-border">
                             <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground" />
                             <span>Idle</span>
                           </div>
@@ -520,7 +521,7 @@ export default function AgentsPage() {
                             <span className="font-bold text-white">{agent.successRate}%</span>
                             <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                                className="h-full bg-emerald-500 rounded-full progress-fill-anim transition-all duration-300"
                                 style={{ width: `${agent.successRate}%` }}
                               />
                             </div>
@@ -728,5 +729,7 @@ export default function AgentsPage() {
         </div>
       )}
     </div>
+  
+    </AnimatedBackground>
   );
 }

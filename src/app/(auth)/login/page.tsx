@@ -1,5 +1,7 @@
 "use client";
 
+import { AnimatedBackground } from "@/components/animated-background";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -47,14 +49,15 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-2xl border-indigo-500/20 bg-slate-950/90 backdrop-blur-xl">
+    <AnimatedBackground variant="subtle">
+      <Card className="w-full max-w-md shadow-2xl border-indigo-500/20 light-glass-card anim-fade-up-1 backdrop-blur-xl">
       <CardHeader className="space-y-3 items-center text-center">
-        <div className="bg-gradient-to-tr from-indigo-600 to-cyan-500 p-3 rounded-2xl text-white shadow-lg shadow-indigo-500/30">
+        <div className="bg-gradient-to-tr from-indigo-600 to-cyan-500 p-3 rounded-2xl text-slate-900 shadow-lg shadow-indigo-500/30">
           <Bot className="h-6 w-6" />
         </div>
         <div>
-          <CardTitle className="text-2xl font-bold tracking-tight text-white">Student Academic Portal</CardTitle>
-          <CardDescription className="text-xs text-slate-400">
+          <CardTitle className="text-2xl font-bold tracking-tight text-slate-900">Student Academic Portal</CardTitle>
+          <CardDescription className="text-xs text-slate-600">
             Sign in to access your department syllabus, course documents, and AI assistant
           </CardDescription>
         </div>
@@ -69,7 +72,7 @@ export default function LoginPage() {
 
           {/* Department Selection */}
           <div className="space-y-1.5">
-            <Label htmlFor="dept" className="text-slate-300 font-semibold flex items-center justify-between">
+            <Label htmlFor="dept" className="text-slate-700 font-semibold flex items-center justify-between">
               <span>Select Your Department *</span>
               <span className="text-[10px] text-cyan-400 font-mono">Scoped Documents</span>
             </Label>
@@ -78,7 +81,7 @@ export default function LoginPage() {
                 id="dept"
                 value={departmentCode}
                 onChange={(e) => setDepartmentCode(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 text-white rounded-xl p-2.5 text-xs focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                className="w-full  border border-indigo-100 text-slate-900 rounded-xl p-2.5 text-xs focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
                 disabled={loading}
               >
                 {DEPARTMENTS.map((d) => (
@@ -91,7 +94,7 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-slate-300 font-semibold">Email Address</Label>
+            <Label htmlFor="email" className="text-slate-700 font-semibold">Email Address</Label>
             <Input
               id="email"
               type="email"
@@ -100,12 +103,12 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
-              className="bg-slate-900 border-slate-800 text-white text-xs rounded-xl"
+              className=" border-indigo-100 text-slate-900 text-xs rounded-xl"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-slate-300 font-semibold">Password</Label>
+            <Label htmlFor="password" className="text-slate-700 font-semibold">Password</Label>
             <Input
               id="password"
               type="password"
@@ -113,22 +116,22 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
-              className="bg-slate-900 border-slate-800 text-white text-xs rounded-xl"
+              className=" border-indigo-100 text-slate-900 text-xs rounded-xl"
             />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30" disabled={loading}>
+          <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-slate-900 font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30" disabled={loading}>
             {loading ? "Signing in..." : "Sign in to Dashboard"}
           </Button>
-          <div className="text-xs text-center text-slate-400">
+          <div className="text-xs text-center text-slate-600">
             Don't have an account?{" "}
             <Link href="/signup" className="text-cyan-400 hover:underline font-semibold">
               Sign up with Department
             </Link>
           </div>
 
-          <div className="pt-3 border-t border-slate-800/80 w-full grid grid-cols-2 gap-2 text-xs text-slate-400">
+          <div className="pt-3 border-t border-indigo-100/80 w-full grid grid-cols-2 gap-2 text-xs text-slate-600">
             <Link href="/principal" className="hover:text-amber-300 transition-colors flex items-center gap-1.5 p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-semibold">
               <Landmark className="h-3.5 w-3.5 text-amber-400" />
               <span>Principal Portal</span>
@@ -149,5 +152,7 @@ export default function LoginPage() {
         </CardFooter>
       </form>
     </Card>
+  
+    </AnimatedBackground>
   );
 }

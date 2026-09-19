@@ -240,7 +240,7 @@ function ContextPanelContent({
     <div className="flex flex-col h-full overflow-y-auto">
       {/* Relevant chunks */}
       <div className="p-4 space-y-3 flex-1">
-        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Relevant Chunks</p>
+        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Relevant Chunks</p>
 
         {chunks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -252,7 +252,7 @@ function ContextPanelContent({
         ) : (
           <>
             {visible.map((c, i) => (
-              <div key={i} className="bg-[#1a1f2e] rounded-xl p-3 border border-white/5 space-y-1.5">
+              <div key={i} className="bg-[#1a1f2e] rounded-xl p-3 border border-slate-200/80 space-y-1.5">
                 <div className="flex items-start gap-2">
                   <div className="p-1.5 bg-red-500/15 rounded-lg shrink-0 mt-0.5">
                     <FileText className="w-3 h-3 text-red-400" />
@@ -261,7 +261,7 @@ function ContextPanelContent({
                     <p className="text-xs font-semibold text-white truncate">
                       {c.documentName}
                     </p>
-                    <p className="text-[10px] text-gray-400">
+                    <p className="text-[10px] text-slate-500">
                       Chunk {c.chunkIndex + 1}
                       {c.score !== null && (
                         <span className="ml-1 text-primary">
@@ -271,7 +271,7 @@ function ContextPanelContent({
                     </p>
                   </div>
                 </div>
-                <p className="text-[11px] text-gray-400 leading-relaxed line-clamp-3">
+                <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-3">
                   {c.chunkText}
                 </p>
               </div>
@@ -280,7 +280,7 @@ function ContextPanelContent({
             {chunks.length > 2 && (
               <button
                 onClick={() => setShowAll((v) => !v)}
-                className="w-full text-xs text-primary hover:text-primary/80 py-2 rounded-xl border border-white/5 hover:bg-white/5 transition-colors"
+                className="w-full text-xs text-primary hover:text-primary/80 py-2 rounded-xl border border-slate-200/80 hover:bg-white/5 transition-colors"
               >
                 {showAll ? "Show less" : `View all ${chunks.length} sources`}
               </button>
@@ -290,10 +290,10 @@ function ContextPanelContent({
       </div>
 
       {/* Model info */}
-      <div className="p-4 border-t border-white/5 space-y-4">
+      <div className="p-4 border-t border-slate-200/80 space-y-4">
         <div>
-          <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Model</p>
-          <div className="flex items-center gap-2 bg-[#1a1f2e] rounded-xl px-3 py-2 border border-white/5">
+          <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Model</p>
+          <div className="flex items-center gap-2 bg-[#1a1f2e] rounded-xl px-3 py-2 border border-slate-200/80">
             <span className="text-sm">🚀</span>
             <span className="text-xs text-white font-medium">{model}</span>
           </div>
@@ -301,7 +301,7 @@ function ContextPanelContent({
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Temperature</p>
+            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Temperature</p>
             <span className="text-xs text-white font-medium">{temperature}</span>
           </div>
           <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
@@ -324,8 +324,8 @@ function ContextPanel({ chunks, model, temperature }: {
   temperature: number;
 }) {
   return (
-    <aside className="w-72 shrink-0 bg-[#141720] border-l border-white/5 hidden xl:flex flex-col overflow-hidden">
-      <div className="p-4 border-b border-white/5">
+    <aside className="w-72 shrink-0  border-l border-slate-200/80 hidden xl:flex flex-col overflow-hidden">
+      <div className="p-4 border-b border-slate-200/80">
         <h3 className="text-sm font-semibold text-white">Context & Citations</h3>
       </div>
       <ContextPanelContent chunks={chunks} model={model} temperature={temperature} />
@@ -349,7 +349,7 @@ function EmptyState({ onSuggest, deptCode = "CSE" }: { onSuggest: (q: string) =>
       </div>
       <div>
         <h2 className="text-xl font-bold text-white">Ask University AI Knowledge Base</h2>
-        <p className="text-sm text-gray-400 mt-1.5 max-w-md">
+        <p className="text-sm text-slate-500 mt-1.5 max-w-md">
           Ask questions scoped to your department (<span className="text-indigo-400 font-semibold">{deptCode}</span>) and university-wide official documents with ground-truth citations.
         </p>
       </div>
@@ -358,7 +358,7 @@ function EmptyState({ onSuggest, deptCode = "CSE" }: { onSuggest: (q: string) =>
           <button
             key={s}
             onClick={() => onSuggest(s)}
-            className="text-left text-xs text-gray-300 bg-[#1a1f2e] hover:bg-[#1e2435] border border-white/5 hover:border-primary/40 hover:text-white rounded-xl px-4 py-3 transition-all flex items-start gap-2 group"
+            className="text-left text-xs text-slate-700 bg-[#1a1f2e] hover:bg-[#1e2435] border border-slate-200/80 hover:border-primary/40 hover:text-white rounded-xl px-4 py-3 transition-all flex items-start gap-2 group"
           >
             <span className="text-primary/60 group-hover:text-primary font-mono text-[11px] mt-0.5">0{idx + 1}.</span>
             <span className="leading-relaxed">{s}</span>
@@ -384,7 +384,7 @@ function UserBubble({ content, time, name, initials }: {
           <span className="text-sm font-semibold text-white">{name}</span>
           {time && <span className="text-[11px] text-gray-500">{time}</span>}
         </div>
-        <div className="bg-[#1a1f2e] border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3">
+        <div className="bg-[#1a1f2e] border border-slate-200/80 rounded-2xl rounded-tl-sm px-4 py-3">
           <p className="text-sm text-gray-200 whitespace-pre-wrap">{content}</p>
         </div>
       </div>
@@ -425,7 +425,7 @@ function AssistantBubble({ id, content, time, onCopy, onRetry, chunks, initialFe
           <span className="text-sm font-semibold text-white">AI Assistant</span>
           {time && <span className="text-[11px] text-gray-500">{time}</span>}
         </div>
-        <div className="bg-[#1a1f2e] border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3">
+        <div className="bg-[#1a1f2e] border border-slate-200/80 rounded-2xl rounded-tl-sm px-4 py-3">
           <div className="prose prose-invert prose-sm max-w-none text-gray-200
             prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-strong:text-white
             prose-headings:text-white prose-code:text-primary">
@@ -440,7 +440,7 @@ function AssistantBubble({ id, content, time, onCopy, onRetry, chunks, initialFe
             className={`p-1.5 rounded-lg transition-colors ${
               feedback === "thumbs_up"
                 ? "text-emerald-400 bg-emerald-500/10"
-                : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+                : "text-gray-500 hover:text-slate-700 hover:bg-white/5"
             }`}
           >
             <ThumbsUp className="w-3.5 h-3.5" />
@@ -451,7 +451,7 @@ function AssistantBubble({ id, content, time, onCopy, onRetry, chunks, initialFe
             className={`p-1.5 rounded-lg transition-colors ${
               feedback === "thumbs_down"
                 ? "text-rose-400 bg-rose-500/10"
-                : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+                : "text-gray-500 hover:text-slate-700 hover:bg-white/5"
             }`}
           >
             <ThumbsDown className="w-3.5 h-3.5" />
@@ -459,14 +459,14 @@ function AssistantBubble({ id, content, time, onCopy, onRetry, chunks, initialFe
           <button
             onClick={onCopy}
             title="Copy"
-            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors"
+            className="p-1.5 rounded-lg text-gray-500 hover:text-slate-700 hover:bg-white/5 transition-colors"
           >
             <Copy className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onRetry}
             title="Retry"
-            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors"
+            className="p-1.5 rounded-lg text-gray-500 hover:text-slate-700 hover:bg-white/5 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
@@ -813,7 +813,7 @@ export default function ChatPage() {
   );
 
   const historyListContent = (
-    <div className="flex flex-col h-full bg-[#0f1117]">
+    <div className="flex flex-col h-full ">
       <div className="p-3">
         <button
           onClick={() => {
@@ -850,7 +850,7 @@ export default function ChatPage() {
               className={`group flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
                 conversationId === conv.id
                   ? "bg-white/10 text-white"
-                  : "text-gray-400 hover:bg-white/5 hover:text-white"
+                  : "text-slate-500 hover:bg-white/5 hover:text-white"
               }`}
             >
               <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-60" />
@@ -870,10 +870,11 @@ export default function ChatPage() {
   );
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] bg-[#0f1117] text-white overflow-hidden -m-6 md:-m-10">
+    <AnimatedBackground>
+    <div className="flex h-[calc(100vh-3.5rem)]  text-white overflow-hidden -m-6 md:-m-10">
 
       {/* ── Left sidebar: conversation history (Desktop) ─────────── */}
-      <aside className="w-60 shrink-0 bg-[#0f1117] border-r border-white/5 flex-col hidden md:flex">
+      <aside className="w-60 shrink-0  border-r border-slate-200/80 flex-col hidden md:flex">
         {historyListContent}
       </aside>
 
@@ -881,21 +882,21 @@ export default function ChatPage() {
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 border-b border-white/5 shrink-0 gap-2">
+        <div className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 border-b border-slate-200/80 shrink-0 gap-2">
           <div className="flex items-center gap-2 min-w-0">
             {/* Mobile Conversation History Drawer */}
             <Sheet open={mobileHistoryOpen} onOpenChange={setMobileHistoryOpen}>
               <SheetTrigger
-                className="md:hidden flex items-center gap-1.5 text-xs text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-2.5 py-1.5 transition-colors shrink-0"
+                className="md:hidden flex items-center gap-1.5 text-xs text-slate-700 hover:text-white bg-white/5 hover:bg-white/10 border border-slate-200 rounded-lg px-2.5 py-1.5 transition-colors shrink-0"
                 aria-label="Open chats history"
               >
                 <MessageSquare className="w-3.5 h-3.5 text-primary" />
                 <span className="hidden xs:inline">Chats</span>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[85vw] sm:max-w-xs bg-[#0f1117] border-r border-white/10 p-0 text-white">
-                <SheetHeader className="p-3 border-b border-white/5">
+              <SheetContent side="left" className="w-[85vw] sm:max-w-xs  border-r border-slate-200 p-0 text-white">
+                <SheetHeader className="p-3 border-b border-slate-200/80">
                   <SheetTitle className="text-white text-sm">Conversations</SheetTitle>
-                  <SheetDescription className="text-xs text-gray-400">
+                  <SheetDescription className="text-xs text-slate-500">
                     Switch or start new chats
                   </SheetDescription>
                 </SheetHeader>
@@ -912,7 +913,7 @@ export default function ChatPage() {
             {/* Mobile Context / Citations Sheet */}
             <Sheet open={mobileContextOpen} onOpenChange={setMobileContextOpen}>
               <SheetTrigger
-                className="xl:hidden flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-2.5 py-1.5 transition-colors"
+                className="xl:hidden flex items-center gap-1 text-xs text-slate-500 hover:text-white bg-white/5 hover:bg-white/10 border border-slate-200 rounded-lg px-2.5 py-1.5 transition-colors"
                 title="View source citations"
               >
                 <FileText className="w-3.5 h-3.5 text-indigo-400" />
@@ -923,10 +924,10 @@ export default function ChatPage() {
                   </span>
                 )}
               </SheetTrigger>
-              <SheetContent side="right" className="w-[85vw] sm:max-w-sm bg-[#141720] border-l border-white/10 p-0 text-white">
-                <SheetHeader className="p-4 border-b border-white/5">
+              <SheetContent side="right" className="w-[85vw] sm:max-w-sm  border-l border-slate-200 p-0 text-white">
+                <SheetHeader className="p-4 border-b border-slate-200/80">
                   <SheetTitle className="text-white text-sm">Context & Citations</SheetTitle>
-                  <SheetDescription className="text-xs text-gray-400">
+                  <SheetDescription className="text-xs text-slate-500">
                     Retrieved ground-truth university chunks
                   </SheetDescription>
                 </SheetHeader>
@@ -940,7 +941,7 @@ export default function ChatPage() {
               <span className="text-xs font-bold text-white">
                 {selectedDepartment?.code || "CS"}
               </span>
-              <span className="text-[11px] text-slate-400 truncate max-w-[160px]">
+              <span className="text-[11px] text-slate-500 truncate max-w-[160px]">
                 {selectedDepartment?.name || "Department Knowledge Scope"}
               </span>
             </div>
@@ -951,7 +952,7 @@ export default function ChatPage() {
               className={`hidden md:flex items-center gap-1.5 text-xs border rounded-lg px-3 py-1.5 transition-all duration-200 ${
                 debugOpen
                   ? "text-primary bg-primary/10 border-primary/30"
-                  : "text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10"
+                  : "text-slate-500 hover:text-white bg-white/5 hover:bg-white/10 border-slate-200"
               }`}
               title="Toggle retrieval debug panel"
             >
@@ -962,7 +963,7 @@ export default function ChatPage() {
             {/* Debug panel toggle — mobile (sheet) */}
             <Sheet>
               <SheetTrigger
-                className="md:hidden flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-2.5 py-1.5 transition-colors"
+                className="md:hidden flex items-center gap-1 text-xs text-slate-500 hover:text-white bg-white/5 hover:bg-white/10 border border-slate-200 rounded-lg px-2.5 py-1.5 transition-colors"
               >
                 <Bug className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Debug</span>
@@ -987,7 +988,7 @@ export default function ChatPage() {
                   alert("Chat link copied to clipboard!");
                 }
               }}
-              className="flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg px-2.5 py-1.5 transition-colors"
+              className="flex items-center gap-1 text-xs text-slate-500 hover:text-white bg-white/5 hover:bg-white/10 border border-slate-200 rounded-lg px-2.5 py-1.5 transition-colors"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Share</span>
@@ -1037,7 +1038,7 @@ export default function ChatPage() {
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center shrink-0">
                 <Bot className="w-4 h-4 text-white" />
               </div>
-              <div className="bg-[#1a1f2e] border border-white/5 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2">
+              <div className="bg-[#1a1f2e] border border-slate-200/80 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2">
                 <div className="flex gap-1">
                   {[0, 0.15, 0.3].map((d) => (
                     <span
@@ -1047,7 +1048,7 @@ export default function ChatPage() {
                     />
                   ))}
                 </div>
-                <span className="text-xs text-gray-400">Synthesizing context...</span>
+                <span className="text-xs text-slate-500">Synthesizing context...</span>
               </div>
             </div>
           )}
@@ -1065,9 +1066,9 @@ export default function ChatPage() {
         </div>
 
         {/* Input area */}
-        <div className="shrink-0 px-3 sm:px-6 pb-3 sm:pb-5 pt-2 sm:pt-3 border-t border-white/5">
+        <div className="shrink-0 px-3 sm:px-6 pb-3 sm:pb-5 pt-2 sm:pt-3 border-t border-slate-200/80">
           <form onSubmit={handleFormSubmit}>
-            <div className="bg-[#1a1f2e] border border-white/10 focus-within:border-primary/50 rounded-2xl transition-colors overflow-hidden">
+            <div className="bg-[#1a1f2e] border border-slate-200 focus-within:border-primary/50 rounded-2xl transition-colors overflow-hidden">
               <textarea
                 value={input}
                 onChange={(e) => {
@@ -1098,7 +1099,7 @@ export default function ChatPage() {
                       key={label}
                       type="button"
                       title={label}
-                      className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors"
+                      className="p-1.5 rounded-lg text-gray-500 hover:text-slate-700 hover:bg-white/5 transition-colors"
                     >
                       <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
@@ -1155,5 +1156,7 @@ export default function ChatPage() {
         />
       )}
     </div>
+  
+    </AnimatedBackground>
   );
 }

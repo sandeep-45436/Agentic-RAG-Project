@@ -33,33 +33,33 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-white flex flex-col font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30 text-slate-900 flex flex-col font-sans">
       {/* ── TOP EXECUTIVE BANNER & NAVIGATION ─────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-slate-950/80 border-b border-amber-500/20 backdrop-blur-xl shadow-lg">
+      <header className="sticky top-0 z-40 bg-white/80 border-b border-amber-200/60 backdrop-blur-xl shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           {/* Brand and University Crest */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
+              className="md:hidden p-2 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-amber-50"
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
 
             <Link href="/principal" className="flex items-center gap-3 group">
-              <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-amber-500 via-yellow-600 to-amber-700 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform">
+              <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-amber-500 via-yellow-600 to-amber-700 flex items-center justify-center text-white font-black shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform">
                 <Landmark className="h-5 w-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-extrabold tracking-tight text-white text-base">
+                  <span className="font-extrabold tracking-tight text-slate-900 text-base">
                     Office of the Principal
                   </span>
-                  <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40 text-[10px] hidden sm:inline-flex">
+                  <Badge className="bg-amber-100 text-amber-800 border-amber-300/60 text-[10px] hidden sm:inline-flex">
                     Vice-Chancellor Council
                   </Badge>
                 </div>
-                <p className="text-[11px] text-amber-400/90 font-medium">
+                <p className="text-[11px] text-amber-700 font-medium">
                   Smart University Institutional Governance
                 </p>
               </div>
@@ -81,8 +81,8 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
                   href={tab.href}
                   className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
                     isActive
-                      ? "bg-amber-500/15 text-amber-300 border border-amber-500/40 shadow-sm"
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                      ? "bg-amber-100 text-amber-800 border border-amber-300/60 shadow-sm"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-amber-50/60"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -96,23 +96,23 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
           <div className="flex items-center gap-2">
             <Link
               href="/dashboard"
-              className="hidden lg:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-medium border border-white/10 transition-colors"
+              className="hidden lg:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-600 text-xs font-medium border border-slate-200 transition-colors"
             >
               <span>Main Portal</span>
               <ExternalLink className="h-3 w-3 text-slate-400" />
             </Link>
 
-            <div className="h-9 px-3 rounded-full bg-amber-950/40 border border-amber-500/30 flex items-center gap-2 text-xs">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-bold text-amber-200">Dr. Arthur Pendelton</span>
-              <span className="text-[10px] text-amber-400/80 font-mono hidden sm:inline">| VC-01</span>
+            <div className="h-9 px-3 rounded-full bg-amber-50 border border-amber-200/60 flex items-center gap-2 text-xs">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-bold text-amber-900">Dr. Arthur Pendelton</span>
+              <span className="text-[10px] text-amber-700 font-mono hidden sm:inline">| VC-01</span>
             </div>
           </div>
         </div>
 
         {/* Mobile Navigation Drawer */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-slate-800 bg-slate-950/95 p-4 space-y-2">
+          <div className="md:hidden border-t border-slate-200 bg-white/95 p-4 space-y-2">
             {navLinks.map((tab) => {
               const isActive =
                 tab.href === "/principal"
@@ -127,8 +127,8 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
                   onClick={() => setMobileOpen(false)}
                   className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                     isActive
-                      ? "bg-amber-500/15 text-amber-300 border border-amber-500/40"
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                      ? "bg-amber-100 text-amber-800 border border-amber-300/60"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-amber-50/60"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -136,18 +136,18 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
                 </Link>
               );
             })}
-            <div className="pt-2 border-t border-slate-800 flex gap-2">
+            <div className="pt-2 border-t border-slate-200 flex gap-2">
               <Link
                 href="/dashboard"
                 onClick={() => setMobileOpen(false)}
-                className="flex-1 text-center py-2 rounded-lg bg-white/5 text-xs text-slate-300"
+                className="flex-1 text-center py-2 rounded-lg bg-slate-100 text-xs text-slate-600"
               >
                 Student Hub
               </Link>
               <Link
                 href="/hod/dashboard"
                 onClick={() => setMobileOpen(false)}
-                className="flex-1 text-center py-2 rounded-lg bg-white/5 text-xs text-slate-300"
+                className="flex-1 text-center py-2 rounded-lg bg-slate-100 text-xs text-slate-600"
               >
                 HOD Hub
               </Link>

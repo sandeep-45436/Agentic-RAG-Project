@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -91,15 +92,16 @@ export default function HODApprovalCenterPage() {
   const pendingCount = proposals.filter((p) => p.status === "PENDING_HOD_CONFIRMATION").length;
 
   return (
-    <div className="space-y-6 font-sans">
+    <AnimatedBackground>
+<div className="space-y-6 font-sans">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
             <ShieldCheck className="h-6 w-6 text-blue-400" />
             Executive Department Approval Center
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-xs sm:text-sm text-slate-500">
             Policy-grounded Human-in-the-Loop decision governance, attendance condonations, and workload exceptions for {activeDepartment}
           </p>
         </div>
@@ -115,7 +117,7 @@ export default function HODApprovalCenterPage() {
             size="sm"
             onClick={fetchProposals}
             disabled={loading}
-            className="border-slate-700 bg-slate-900 text-slate-300 text-xs rounded-xl"
+            className="border-slate-200 text-slate-700 text-xs rounded-xl"
           >
             <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
             Refresh Queue
@@ -144,7 +146,7 @@ export default function HODApprovalCenterPage() {
             )}
             <span>{feedbackMsg.text}</span>
           </div>
-          <span className="text-[10px] text-slate-400">Audit record updated</span>
+          <span className="text-[10px] text-slate-500">Audit record updated</span>
         </div>
       )}
 
@@ -158,8 +160,8 @@ export default function HODApprovalCenterPage() {
               onClick={() => setSelectedCategory(cat.id)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                 selectedCategory === cat.id
-                  ? "bg-blue-600 text-white shadow"
-                  : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200"
+                  ? "bg-blue-600 text-slate-800 shadow"
+                  : " border border-slate-200 text-slate-500 hover:text-slate-700"
               }`}
             >
               {cat.label} ({count})
@@ -171,10 +173,10 @@ export default function HODApprovalCenterPage() {
       {/* Proposals List */}
       <div className="space-y-4">
         {filtered.length === 0 ? (
-          <Card className="bg-slate-900/60 border-slate-800 p-8 text-center">
+          <Card className="border-slate-200 p-8 text-center light-glass-card card-3d-inner anim-fade-up-1">
             <CheckCircle2 className="h-10 w-10 text-emerald-400 mx-auto mb-2 opacity-80" />
-            <h3 className="text-sm font-bold text-white">All Governance Actions Resolved</h3>
-            <p className="text-xs text-slate-400 mt-1">No pending action proposals requiring HOD sign-off in this category.</p>
+            <h3 className="text-sm font-bold text-slate-800">All Governance Actions Resolved</h3>
+            <p className="text-xs text-slate-500 mt-1">No pending action proposals requiring HOD sign-off in this category.</p>
           </Card>
         ) : (
           filtered.map((prop) => {
@@ -186,9 +188,9 @@ export default function HODApprovalCenterPage() {
             return (
               <Card
                 key={prop.id}
-                className={`border backdrop-blur transition-all ${
+                className={`light-glass-card card-3d-inner anim-fade-up-1 border backdrop-blur transition-all ${
                   isPending
-                    ? "bg-slate-900/90 border-slate-800 hover:border-slate-700"
+                    ? " border-slate-200 hover:border-slate-200"
                     : isApproved
                     ? "bg-emerald-950/20 border-emerald-800/40"
                     : isRejected
@@ -230,29 +232,29 @@ export default function HODApprovalCenterPage() {
                         <span className="text-[11px] text-slate-500 font-mono">ID: {prop.id}</span>
                       </div>
 
-                      <CardTitle className="text-base font-bold text-white">{prop.title}</CardTitle>
-                      <CardDescription className="text-xs text-slate-300">{prop.summary}</CardDescription>
+                      <CardTitle className="text-base font-bold text-slate-800">{prop.title}</CardTitle>
+                      <CardDescription className="text-xs text-slate-700">{prop.summary}</CardDescription>
                     </div>
 
-                    <div className="flex items-center gap-1.5 shrink-0 bg-slate-950/70 px-2.5 py-1 rounded-lg border border-slate-800">
+                    <div className="flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-lg border border-slate-200">
                       <Sparkles className="h-3.5 w-3.5 text-blue-400" />
-                      <span className="text-[11px] font-medium text-slate-300">
-                        AI Confidence: <strong className="text-white font-mono">{Math.round((prop.confidenceScore || 0.95) * 100)}%</strong>
+                      <span className="text-[11px] font-medium text-slate-700">
+                        AI Confidence: <strong className="text-slate-800 font-mono">{Math.round((prop.confidenceScore || 0.95) * 100)}%</strong>
                       </span>
                     </div>
                   </div>
                 </CardHeader>
 
-                <CardContent className="space-y-3 text-xs border-t border-slate-800/80 pt-3">
+                <CardContent className="space-y-3 text-xs border-t border-slate-200/80 pt-3">
                   {/* Evidence List */}
                   <div className="space-y-1.5">
-                    <p className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
+                    <p className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
                       <FileText className="h-3 w-3 text-blue-400" />
                       Audited Evidence & Operational Facts:
                     </p>
                     <ul className="space-y-1 pl-1">
                       {prop.evidence?.map((ev: string, i: number) => (
-                        <li key={i} className="text-slate-300 flex items-start gap-1.5 text-[11px]">
+                        <li key={i} className="text-slate-700 flex items-start gap-1.5 text-[11px]">
                           <span className="text-blue-400">•</span>
                           <span>{ev}</span>
                         </li>
@@ -261,22 +263,22 @@ export default function HODApprovalCenterPage() {
                   </div>
 
                   {/* Policy References */}
-                  <div className="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 space-y-1">
-                    <p className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
+                  <div className="p-2.5 rounded-xl border border-slate-200 space-y-1">
+                    <p className="text-[10px] uppercase font-bold text-slate-500 flex items-center gap-1">
                       <ShieldCheck className="h-3 w-3 text-emerald-400" />
                       Policy Grounding & Regulation Citations:
                     </p>
                     {prop.policyReferences?.map((pol: string, i: number) => (
-                      <p key={i} className="text-[11px] text-slate-300 font-mono">
+                      <p key={i} className="text-[11px] text-slate-700 font-mono">
                         {pol}
                       </p>
                     ))}
                   </div>
                 </CardContent>
 
-                <CardFooter className="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950/40">
-                  <div className="text-[11px] text-slate-400">
-                    Required Authority: <strong className="text-slate-200">{prop.requiredAuthority}</strong> • Proposed by{" "}
+                <CardFooter className="pt-3 border-t border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="text-[11px] text-slate-500">
+                    Required Authority: <strong className="text-slate-700">{prop.requiredAuthority}</strong> • Proposed by{" "}
                     <span className="text-blue-300 font-medium">{prop.proposedBy}</span>
                   </div>
 
@@ -286,7 +288,7 @@ export default function HODApprovalCenterPage() {
                         size="sm"
                         onClick={() => handleAction(prop.id, "APPROVE")}
                         disabled={processingId === prop.id}
-                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl flex-1 sm:flex-none"
+                        className="bg-emerald-600 hover:bg-emerald-500 text-slate-800 font-semibold text-xs rounded-xl flex-1 sm:flex-none"
                       >
                         <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
                         Approve & Execute
@@ -315,7 +317,7 @@ export default function HODApprovalCenterPage() {
                       </Button>
                     </div>
                   ) : (
-                    <div className="text-xs text-slate-400 italic">
+                    <div className="text-xs text-slate-500 italic">
                       Decision confirmed by {prop.confirmedBy || "HOD"} on {new Date(prop.confirmedAt || Date.now()).toLocaleString()}
                     </div>
                   )}
@@ -326,5 +328,6 @@ export default function HODApprovalCenterPage() {
         )}
       </div>
     </div>
+</AnimatedBackground>
   );
 }

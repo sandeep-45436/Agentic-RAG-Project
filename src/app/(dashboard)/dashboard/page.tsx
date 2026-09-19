@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { AnimatedBackground } from "@/components/animated-background";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/insforge/client";
@@ -117,21 +118,21 @@ function StatCard({
   badge?: string;
 }) {
   return (
-    <div className="rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover-lift bg-gradient-to-b from-[#161a26] to-[#121520] border border-white/10 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/10 shadow-md">
+    <div className="rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover-lift light-glass-card card-3d-inner anim-fade-up-2 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/10 shadow-md">
       <div className="flex items-start justify-between gap-3">
         <div className={`${iconBg} p-3 rounded-xl shrink-0 shadow-md`}>
           <Icon className="w-5 h-5 text-white" />
         </div>
         {badge && (
-          <Badge className="bg-emerald-500/15 text-emerald-300 border-emerald-500/30 text-[10px] font-semibold">
+          <Badge className="badge-pulse bg-emerald-400/20 text-emerald-700 border-emerald-300/40 text-[10px] font-semibold">
             {badge}
           </Badge>
         )}
       </div>
       <div className="mt-4">
-        <p className="text-xs text-slate-400 font-medium">{label}</p>
-        <p className="text-2xl font-black text-white mt-1 tracking-tight font-mono">{value}</p>
-        {subtext && <p className="text-[11px] text-slate-400 mt-1 leading-tight">{subtext}</p>}
+        <p className="text-xs text-slate-500 font-medium">{label}</p>
+        <p className="number-pop text-2xl font-black text-slate-800 mt-1 tracking-tight font-mono">{value}</p>
+        {subtext && <p className="text-[11px] text-slate-500 mt-1 leading-tight">{subtext}</p>}
       </div>
     </div>
   );
@@ -219,9 +220,9 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
-        <div className="bg-[#141720] border border-red-500/20 rounded-2xl p-8 max-w-md text-center shadow-xl">
-          <h2 className="text-lg font-semibold text-red-400 mb-2">Connection Issue</h2>
-          <p className="text-sm text-gray-300 mb-6">{error}</p>
+        <div className="bg-white/80 backdrop-blur-sm border border-red-500/20 rounded-2xl p-8 max-w-md text-center shadow-xl">
+          <h2 className="text-lg font-semibold text-red-500 mb-2">Connection Issue</h2>
+          <p className="text-sm text-slate-600 mb-6">{error}</p>
           <button
             onClick={load}
             className="inline-flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 text-sm font-medium transition-colors shadow-lg"
@@ -241,9 +242,10 @@ export default function DashboardPage() {
   const authDocs = ac?.authorizedDocsCount ?? s?.authorizedDeptDocs ?? s?.totalDocs ?? 0;
 
   return (
+    <AnimatedBackground>
     <div className="space-y-6 pb-12 font-sans">
       {/* ── ALITS STUDENT INSTITUTIONAL BRAND HEADER ──────────────────────── */}
-      <div className="light-glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
+      <div className="light-glass-card anim-fade-up-1 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
         <div className="flex items-center gap-3.5">
           <div className="relative h-11 w-36 sm:w-44 flex items-center justify-start">
             <img
@@ -257,7 +259,7 @@ export default function DashboardPage() {
           </div>
           <div className="h-7 w-[1px] bg-slate-200 hidden sm:block" />
           <div>
-            <span className="text-xs font-bold text-slate-900 block tracking-tight">
+            <span className="text-xs font-bold text-slate-900 block tracking-tight text-reveal">
               Anantha Lakshmi Institute of Technology & Sciences
             </span>
             <span className="text-[11px] text-slate-500 font-medium flex items-center gap-1">
@@ -280,18 +282,18 @@ export default function DashboardPage() {
       </div>
 
       {/* ── ACADEMIC HERO BANNER ────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-950 via-purple-950/70 to-slate-900 border border-indigo-500/20 p-6 lg:p-8 backdrop-blur-xl shadow-xl">
-        <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 border border-indigo-200 p-6 lg:p-8 backdrop-blur-xl shadow-xl anim-fade-up-1">
+        <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-white/20 blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2.5">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/40 text-xs font-semibold px-2.5 py-0.5">
+              <Badge className="bg-white/20 text-white border-white/30 text-xs font-semibold px-2.5 py-0.5">
                 Academic Year 2026-2027 • Fall Term
               </Badge>
-              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs">
+              <Badge className="bg-emerald-400/20 text-white border-emerald-300/40 text-xs">
                 {ac?.academicStatus || "Good Standing"}
               </Badge>
-              <span className="text-xs text-slate-400 font-mono">
+              <span className="text-xs text-white/70 font-mono">
                 {ac?.studentNumber || "STU-CS-101"}
               </span>
             </div>
@@ -300,12 +302,12 @@ export default function DashboardPage() {
               {greeting()}, {studentName}
             </h1>
             
-            <p className="text-sm text-slate-300 max-w-xl leading-relaxed">
-              <span className="font-semibold text-indigo-300">{deptName} ({deptCode})</span>
+            <p className="text-sm text-white/80 max-w-xl leading-relaxed">
+              <span className="font-semibold text-indigo-100">{deptName} ({deptCode})</span>
               {" • "}
               <span>{ac?.enrolledCoursesCount || 5} Active Enrolled Courses</span>
               {" • "}
-              <span className="text-emerald-400 font-medium">Department Retrieval Scope Active</span>
+              <span className="text-emerald-100 font-medium">Department Retrieval Scope Active</span>
             </p>
           </div>
 
@@ -319,14 +321,14 @@ export default function DashboardPage() {
             </Link>
             <Link
               href="/documents"
-              className="inline-flex items-center justify-center border border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-slate-200 rounded-xl text-xs font-semibold px-4 py-2.5 transition-all gap-2"
+              className="inline-flex items-center justify-center border border-slate-200 bg-white/80 hover:bg-slate-100 text-slate-800 rounded-xl text-xs font-semibold px-4 py-2.5 transition-all gap-2"
             >
-              <BookOpen className="h-4 w-4 text-indigo-400" />
+              <BookOpen className="h-4 w-4 text-indigo-600" />
               Browse Notes
             </Link>
             <button
               onClick={load}
-              className="p-2.5 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors"
+              className="p-2.5 text-slate-500 hover:text-slate-800 bg-white/50 hover:bg-white/80 border border-slate-200 rounded-xl transition-colors"
               title="Refresh metrics"
             >
               <RefreshCw className="w-4 h-4" />
@@ -371,47 +373,47 @@ export default function DashboardPage() {
       </div>
 
       {/* ── TWO-COLUMN DETAILED VIEW ────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 anim-fade-up-3">
 
         {/* ── Left 2 Cols: Recent Department Materials & Activity ──────── */}
         <div className="lg:col-span-2 space-y-6">
           
           {/* Department Course Materials Feed */}
-          <div className="bg-[#141720] border border-white/5 rounded-2xl p-5 space-y-4 shadow-md">
+          <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl p-5 space-y-4 shadow-md">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-indigo-400" />
-                <h3 className="text-sm font-bold text-white tracking-wide">
+                <BookOpen className="w-4 h-4 text-indigo-600" />
+                <h3 className="text-sm font-bold text-slate-800 tracking-wide">
                   Recent {deptCode} Course Materials & Syllabi
                 </h3>
               </div>
               <Link
                 href="/documents"
-                className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium"
+                className="text-xs text-indigo-600 hover:text-indigo-700 flex items-center gap-1 font-medium"
               >
                 View all <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
 
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-slate-100">
               {(!ac?.recentDepartmentDocs || ac.recentDepartmentDocs.length === 0) ? (
-                <div className="py-8 text-center text-xs text-gray-500">
+                <div className="py-8 text-center text-xs text-slate-500">
                   No materials uploaded yet for this department.
                 </div>
               ) : (
                 ac.recentDepartmentDocs.map((doc) => (
-                  <div key={doc.id} className="py-3.5 flex items-center justify-between gap-3 hover:bg-white/[0.02] px-2 rounded-xl transition-colors">
+                  <div key={doc.id} className="py-3.5 flex items-center justify-between gap-3 hover:bg-slate-50 px-2 rounded-xl transition-colors">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="p-2 bg-indigo-500/15 rounded-lg shrink-0">
-                        <FileText className="w-4 h-4 text-indigo-400" />
+                      <div className="p-2 bg-indigo-50 rounded-lg shrink-0">
+                        <FileText className="w-4 h-4 text-indigo-600" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold text-white truncate">{doc.fileName}</p>
+                        <p className="text-xs font-semibold text-slate-800 truncate">{doc.fileName}</p>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[10px] text-indigo-300 font-mono bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">
+                          <span className="text-[10px] text-indigo-600 font-mono bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">
                             {doc.departmentCode}
                           </span>
-                          <span className="text-[10px] text-gray-400">
+                          <span className="text-[10px] text-slate-500">
                             {timeAgo(doc.createdAt)}
                           </span>
                         </div>
@@ -421,13 +423,13 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => openDocViewer(doc.id)}
-                        className="shrink-0 text-[11px] text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1 border border-white/10"
+                        className="shrink-0 text-[11px] text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1 border border-slate-200"
                       >
-                        <Eye className="w-3 h-3 text-cyan-400" /> View
+                        <Eye className="w-3 h-3 text-cyan-600" /> View
                       </button>
                       <Link
                         href={`/chat`}
-                        className="shrink-0 text-[11px] text-indigo-400 hover:text-white bg-indigo-500/10 hover:bg-indigo-600 px-3 py-1.5 rounded-lg font-medium transition-all"
+                        className="shrink-0 text-[11px] text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg font-medium transition-all"
                       >
                         Ask AI
                       </Link>
@@ -439,30 +441,30 @@ export default function DashboardPage() {
           </div>
 
           {/* Activity Timeline */}
-          <div className="bg-[#141720] border border-white/5 rounded-2xl p-5 space-y-4 shadow-md">
+          <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl p-5 space-y-4 shadow-md">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-              <h3 className="text-sm font-bold text-white tracking-wide">
+              <Sparkles className="w-4 h-4 text-emerald-500" />
+              <h3 className="text-sm font-bold text-slate-800 tracking-wide">
                 Live Knowledge Platform Activity
               </h3>
             </div>
 
             <div className="space-y-2.5">
               {(!data?.activity || data.activity.length === 0) ? (
-                <p className="text-xs text-gray-500 py-4 text-center">No recent activity.</p>
+                <p className="text-xs text-slate-500 py-4 text-center">No recent activity.</p>
               ) : (
                 data.activity.map((act) => (
-                  <div key={act.id} className="flex items-center justify-between gap-3 py-2 border-b border-white/5 last:border-0">
+                  <div key={act.id} className="flex items-center justify-between gap-3 py-2 border-b border-slate-100 last:border-0">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={`p-1.5 rounded-lg shrink-0 ${act.type === "document" ? "bg-purple-500/15 text-purple-400" : "bg-blue-500/15 text-blue-400"}`}>
+                      <div className={`p-1.5 rounded-lg shrink-0 ${act.type === "document" ? "bg-purple-50 text-purple-600" : "bg-blue-50 text-blue-600"}`}>
                         {act.type === "document" ? <FileText className="w-3.5 h-3.5" /> : <MessageSquare className="w-3.5 h-3.5" />}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-white truncate">{act.label}</p>
-                        <p className="text-[11px] text-gray-400 truncate">{act.sublabel}</p>
+                        <p className="text-xs font-medium text-slate-800 truncate">{act.label}</p>
+                        <p className="text-[11px] text-slate-500 truncate">{act.sublabel}</p>
                       </div>
                     </div>
-                    <span className="text-[10px] text-gray-500 shrink-0">{timeAgo(act.time)}</span>
+                    <span className="text-[10px] text-slate-500 shrink-0">{timeAgo(act.time)}</span>
                   </div>
                 ))
               )}
@@ -474,29 +476,29 @@ export default function DashboardPage() {
         <div className="space-y-6">
 
           {/* Active Knowledge Scope Card */}
-          <div className="bg-gradient-to-b from-[#161a29] to-[#121522] border border-indigo-500/30 rounded-2xl p-5 space-y-4 shadow-lg">
+          <div className="bg-white/80 backdrop-blur-sm border border-indigo-200 rounded-2xl p-5 space-y-4 shadow-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-indigo-400" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+                <ShieldCheck className="w-4 h-4 text-indigo-600" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
                   Access Authorization Policy
                 </h3>
               </div>
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             </div>
 
-            <div className="bg-black/30 rounded-xl p-3 border border-white/5 space-y-2">
-              <p className="text-xs text-gray-300 font-medium">Your Scoped Retrieval Boundary:</p>
+            <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 space-y-2">
+              <p className="text-xs text-slate-700 font-medium">Your Scoped Retrieval Boundary:</p>
               <div className="space-y-1.5 text-xs">
-                <div className="flex items-center gap-2 text-emerald-400">
+                <div className="flex items-center gap-2 text-emerald-600">
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                   <span>{deptCode} Department Documents</span>
                 </div>
-                <div className="flex items-center gap-2 text-emerald-400">
+                <div className="flex items-center gap-2 text-emerald-600">
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                   <span>University-Wide Regulations</span>
                 </div>
-                <div className="flex items-center gap-2 text-gray-500">
+                <div className="flex items-center gap-2 text-slate-500">
                   <XCircle className="w-3.5 h-3.5 shrink-0" />
                   <span>Other Academic Departments (Blocked)</span>
                 </div>
@@ -505,81 +507,81 @@ export default function DashboardPage() {
 
             <Link
               href="/chat"
-              className="w-full flex items-center justify-center gap-2 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-200 text-xs font-semibold py-2.5 rounded-xl transition-all"
+              className="w-full flex items-center justify-center gap-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 text-xs font-semibold py-2.5 rounded-xl transition-all"
             >
               Open Scoped Chat Portal <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
           {/* Quick Academic Shortcuts */}
-          <div className="bg-[#141720] border border-white/5 rounded-2xl p-5 space-y-3 shadow-md">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400">
+          <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl p-5 space-y-3 shadow-md">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
               University Subsystems
             </h3>
 
             <div className="space-y-2">
               <Link
                 href="/chat"
-                className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 transition-colors group"
+                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-500/15 rounded-lg text-blue-400">
+                  <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
                     <MessageSquare className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-white group-hover:text-indigo-300">Department AI Chat</p>
-                    <p className="text-[10px] text-gray-400">Grounded Q&A with page citations</p>
+                    <p className="text-xs font-semibold text-slate-800 group-hover:text-indigo-600">Department AI Chat</p>
+                    <p className="text-[10px] text-slate-500">Grounded Q&A with page citations</p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
+                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-800 transition-colors" />
               </Link>
 
               <Link
                 href="/documents"
-                className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 transition-colors group"
+                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-500/15 rounded-lg text-purple-400">
+                  <div className="p-2 bg-purple-50 rounded-lg text-purple-600">
                     <FileText className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-white group-hover:text-indigo-300">Academic Repository</p>
-                    <p className="text-[10px] text-gray-400">Course notes & regulations</p>
+                    <p className="text-xs font-semibold text-slate-800 group-hover:text-indigo-600">Academic Repository</p>
+                    <p className="text-[10px] text-slate-500">Course notes & regulations</p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
+                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-800 transition-colors" />
               </Link>
 
               <Link
                 href="/faculty/timetables"
-                className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 transition-colors group"
+                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-amber-500/15 rounded-lg text-amber-400">
+                  <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
                     <Calendar className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-white group-hover:text-indigo-300">Class & Lab Schedules</p>
-                    <p className="text-[10px] text-gray-400">Weekly timetable matrix</p>
+                    <p className="text-xs font-semibold text-slate-800 group-hover:text-indigo-600">Class & Lab Schedules</p>
+                    <p className="text-[10px] text-slate-500">Weekly timetable matrix</p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
+                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-800 transition-colors" />
               </Link>
 
               <Link
                 href="/faculty/login"
-                className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 transition-colors group"
+                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-emerald-500/15 rounded-lg text-emerald-400">
+                  <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
                     <GraduationCap className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-white group-hover:text-indigo-300">Faculty Portal Gateway</p>
-                    <p className="text-[10px] text-gray-400">Instructor auth & document uploads</p>
+                    <p className="text-xs font-semibold text-slate-800 group-hover:text-indigo-600">Faculty Portal Gateway</p>
+                    <p className="text-[10px] text-slate-500">Instructor auth & document uploads</p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
+                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-800 transition-colors" />
               </Link>
             </div>
           </div>
@@ -589,66 +591,66 @@ export default function DashboardPage() {
 
       {/* Document Viewer Modal */}
       {viewerDocId && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col anim-fade-up-1">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="p-2 bg-indigo-500/10 rounded-xl text-indigo-400">
+                <div className="p-2 bg-indigo-50 rounded-xl text-indigo-600">
                   <FileText className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-sm font-bold text-white truncate">
+                  <h3 className="text-sm font-bold text-slate-800 truncate">
                     {viewerDoc?.fileName || "Loading Document..."}
                   </h3>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-slate-500">
                     {viewerDoc?.department?.name || deptName} • {viewerDoc?.visibility || "DEPARTMENT"} Scope
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => { setViewerDocId(null); setViewerDoc(null); }}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+                className="text-slate-500 hover:text-slate-800 p-1 rounded-lg hover:bg-slate-100"
               >
                 <XCircle className="w-5 h-5" />
               </button>
             </div>
 
             {loadingDoc ? (
-              <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-400 text-xs">
-                <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
+              <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-500 text-xs">
+                <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
                 <span>Loading document metadata and extracted chunks...</span>
               </div>
             ) : viewerDoc ? (
               <div className="flex-1 overflow-y-auto space-y-4 text-xs pr-1">
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-2 bg-slate-950/70 p-3 rounded-xl border border-slate-800 font-mono text-[11px]">
+                <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200 font-mono text-[11px]">
                   <div>
                     <span className="text-slate-500 block text-[10px]">Total Size</span>
-                    <span className="font-bold text-white">{(viewerDoc.fileSize / 1024).toFixed(1)} KB</span>
+                    <span className="font-bold text-slate-800">{(viewerDoc.fileSize / 1024).toFixed(1)} KB</span>
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px]">RAG Chunks</span>
-                    <span className="font-bold text-cyan-400">{viewerDoc._count?.chunks || viewerDoc.chunks?.length || 0} Chunks</span>
+                    <span className="font-bold text-indigo-600">{viewerDoc._count?.chunks || viewerDoc.chunks?.length || 0} Chunks</span>
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px]">Status</span>
-                    <span className="font-bold text-emerald-400">{viewerDoc.processingStatus}</span>
+                    <span className="font-bold text-emerald-600">{viewerDoc.processingStatus}</span>
                   </div>
                 </div>
 
                 {/* Chunks Preview */}
                 <div className="space-y-2">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  <span className="text-[10px] uppercase font-bold text-slate-500 block">
                     Extracted Text Chunks ({viewerDoc.chunks?.length || 0} displayed)
                   </span>
                   <div className="space-y-2 max-h-60 overflow-y-auto">
                     {viewerDoc.chunks && viewerDoc.chunks.length > 0 ? (
                       viewerDoc.chunks.map((c: any, i: number) => (
-                        <div key={i} className="p-3 rounded-xl bg-slate-950 border border-slate-800/80 space-y-1">
-                          <span className="text-[10px] font-mono text-indigo-400 block font-semibold">
+                        <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                          <span className="text-[10px] font-mono text-indigo-600 block font-semibold">
                             Chunk {c.chunkIndex + 1} {c.pageNumber ? `(Page ${c.pageNumber})` : ""} · {c.tokenCount} Tokens
                           </span>
-                          <p className="text-[11px] text-slate-300 leading-relaxed line-clamp-3">
+                          <p className="text-[11px] text-slate-700 leading-relaxed line-clamp-3">
                             {c.content}
                           </p>
                         </div>
@@ -660,10 +662,10 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+                <div className="flex items-center justify-between pt-3 border-t border-slate-200">
                   <Link
                     href={`/chat`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-colors shadow-md"
                   >
                     <Bot className="w-4 h-4" /> Ask Questions in Chat
                   </Link>
@@ -673,7 +675,7 @@ export default function DashboardPage() {
                       href={viewerDoc.signedUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 text-xs font-semibold transition-colors"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold transition-colors shadow-sm"
                     >
                       <Download className="w-3.5 h-3.5" /> Download Full Document
                     </a>

@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import React, { useState } from "react";
 import {
@@ -55,21 +56,22 @@ export default function HODReportsPage() {
   };
 
   return (
-    <div className="space-y-6 font-sans">
+    <AnimatedBackground>
+<div className="space-y-6 font-sans">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
             <FileBarChart className="h-6 w-6 text-blue-400" />
             Executive Department Intelligence & Accreditation Reports
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <p className="text-xs sm:text-sm text-slate-500">
             Automated cognitive operations dossiers, ABET accreditation artifacts, and printable governance summaries for {activeDepartment}
           </p>
         </div>
 
         <Button
           onClick={handlePrint}
-          className="bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-xl font-semibold shadow-lg shadow-blue-600/20"
+          className="bg-blue-600 hover:bg-blue-500 text-slate-800 text-xs rounded-xl font-semibold shadow-lg shadow-blue-600/20"
         >
           <Printer className="mr-1.5 h-4 w-4" />
           Print Operations Dossier
@@ -78,7 +80,7 @@ export default function HODReportsPage() {
 
       <div className="space-y-4">
         {reports.map((rep) => (
-          <Card key={rep.id} className="bg-slate-900/80 border-slate-800 backdrop-blur space-y-3">
+          <Card key={rep.id} className="border-slate-200 backdrop-blur space-y-3 light-glass-card card-3d-inner anim-fade-up-1">
             <CardHeader className="pb-2">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5">
@@ -86,8 +88,8 @@ export default function HODReportsPage() {
                     <FileText className="h-5 w-5" />
                   </div>
                   <div>
-                    <CardTitle className="text-sm font-bold text-white">{rep.title}</CardTitle>
-                    <CardDescription className="text-xs text-slate-400">
+                    <CardTitle className="text-sm font-bold text-slate-800">{rep.title}</CardTitle>
+                    <CardDescription className="text-xs text-slate-500">
                       Generated {rep.generatedDate} • Size: {rep.size}
                     </CardDescription>
                   </div>
@@ -98,11 +100,11 @@ export default function HODReportsPage() {
               </div>
             </CardHeader>
 
-            <CardContent className="text-xs text-slate-300">
+            <CardContent className="text-xs text-slate-700">
               <p className="leading-relaxed">{rep.summary}</p>
             </CardContent>
 
-            <CardFooter className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
+            <CardFooter className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs">
               <span className="flex items-center gap-1 text-[11px] text-emerald-400">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Verified Cognitive Audit
@@ -110,7 +112,7 @@ export default function HODReportsPage() {
               <Button
                 size="sm"
                 onClick={handlePrint}
-                className="bg-slate-800 hover:bg-slate-700 text-white text-xs h-8 rounded-lg"
+                className="hover:bg-slate-700 text-slate-800 text-xs h-8 rounded-lg"
               >
                 <Download className="h-3 w-3 mr-1" />
                 Download PDF
@@ -120,5 +122,6 @@ export default function HODReportsPage() {
         ))}
       </div>
     </div>
+</AnimatedBackground>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import React, { use } from "react";
 import FacultyProfilePage from "../page";

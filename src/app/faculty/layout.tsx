@@ -139,24 +139,24 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
   }
 
   const sidebarNavContent = (
-    <div className="flex flex-col h-full bg-slate-900 border-r border-slate-800">
+    <div className="flex flex-col h-full bg-white/95 backdrop-blur-xl border-r border-slate-200">
       {/* Brand Header */}
-      <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
+      <div className="p-5 border-b border-slate-200/80 flex items-center justify-between">
         <Link href="/faculty/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 group">
           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
             <GraduationCap className="h-5 w-5 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold tracking-tight text-white text-base">Faculty Portal</span>
+              <span className="font-bold tracking-tight text-slate-900 text-base">Faculty Portal</span>
             </div>
-            <p className="text-xs text-indigo-400 font-medium">Smart University Academic</p>
+            <p className="text-xs text-indigo-600 font-medium">Smart University Academic</p>
           </div>
         </Link>
         {mobileOpen && (
           <button
             onClick={() => setMobileOpen(false)}
-            className="md:hidden p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
+            className="md:hidden p-1.5 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-indigo-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -165,9 +165,9 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
 
       {/* Active Faculty Card */}
       {faculty && (
-        <div className="p-4 mx-3 mt-4 rounded-xl bg-slate-800/60 border border-slate-700/60 backdrop-blur">
+        <div className="p-4 mx-3 mt-4 rounded-xl bg-indigo-50/60 border border-indigo-200/60 backdrop-blur">
           <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 border border-indigo-500/30 ring-2 ring-indigo-500/20">
+            <Avatar className="h-10 w-10 border border-indigo-300/50 ring-2 ring-indigo-200/40">
               <AvatarFallback className="bg-indigo-600 text-white font-bold text-xs">
                 {faculty.name
                   ?.split(" ")
@@ -177,28 +177,28 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white truncate">{faculty.name}</p>
+              <p className="text-sm font-semibold text-slate-900 truncate">{faculty.name}</p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-indigo-500/40 text-indigo-300 bg-indigo-500/10">
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-indigo-400/40 text-indigo-700 bg-indigo-100/60">
                   {faculty.facultyCode}
                 </Badge>
-                <span className="text-[11px] text-slate-400 truncate">{faculty.departmentCode}</span>
+                <span className="text-[11px] text-slate-500 truncate">{faculty.departmentCode}</span>
               </div>
             </div>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-slate-700/50 flex items-center justify-between text-[11px] text-slate-400">
+          <div className="mt-2.5 pt-2 border-t border-indigo-200/50 flex items-center justify-between text-[11px] text-slate-500">
             <span className="flex items-center gap-1">
-              <ShieldCheck className="h-3 w-3 text-emerald-400" />
+              <ShieldCheck className="h-3 w-3 text-emerald-500" />
               Verified Faculty
             </span>
-            <span className="text-slate-300 truncate max-w-[90px]">{faculty.departmentName}</span>
+            <span className="text-slate-700 truncate max-w-[90px]">{faculty.departmentName}</span>
           </div>
         </div>
       )}
 
       {/* Navigation Menu */}
       <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
-        <p className="px-3 pb-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+        <p className="px-3 pb-1 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
           Academic Operations
         </p>
         {navItems.map((item) => {
@@ -210,20 +210,20 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
               onClick={() => setMobileOpen(false)}
               className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 shadow-sm"
-                  : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60"
+                  ? "bg-indigo-100 text-indigo-700 border border-indigo-300/50 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-indigo-50/60"
               }`}
             >
               <div className="flex items-center gap-3">
-                <item.icon className={`h-4 w-4 ${isActive ? "text-indigo-400" : "text-slate-400"}`} />
+                <item.icon className={`h-4 w-4 ${isActive ? "text-indigo-600" : "text-slate-400"}`} />
                 <span>{item.title}</span>
               </div>
               {item.badge && (
                 <span
                   className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${
                     isActive
-                      ? "bg-indigo-500/30 text-indigo-200"
-                      : "bg-slate-800 text-slate-400"
+                      ? "bg-indigo-200/60 text-indigo-700"
+                      : "bg-slate-100 text-slate-500"
                   }`}
                 >
                   {item.badge}
@@ -235,22 +235,22 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
       </nav>
 
       {/* Footer Actions */}
-      <div className="p-3 border-t border-slate-800/80 space-y-2 mt-auto">
+      <div className="p-3 border-t border-slate-200/80 space-y-2 mt-auto">
         <Link
           href="/dashboard"
           onClick={() => setMobileOpen(false)}
-          className="flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-lg transition-colors"
+          className="flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-indigo-50/60 rounded-lg transition-colors"
         >
           <span className="flex items-center gap-2">
             <Building2 className="h-3.5 w-3.5 text-slate-400" />
             Switch to Main Portal
           </span>
-          <ExternalLink className="h-3 w-3 text-slate-500" />
+          <ExternalLink className="h-3 w-3 text-slate-400" />
         </Link>
         <Button
           variant="ghost"
           onClick={handleLogout}
-          className="w-full justify-start text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-2 h-auto rounded-lg"
+          className="w-full justify-start text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-50 px-3 py-2 h-auto rounded-lg"
         >
           <LogOut className="h-3.5 w-3.5 mr-2" />
           Faculty Sign Out
@@ -260,9 +260,9 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
   );
 
   return (
-    <div className="flex h-screen w-full bg-slate-950 text-slate-100 overflow-hidden font-sans">
+    <div className="flex h-screen w-full bg-gradient-to-br from-slate-50 via-white to-blue-50/40 text-slate-900 overflow-hidden font-sans">
       {/* ── DESKTOP FACULTY SIDEBAR ────────────────────────────────────────── */}
-      <aside className="w-64 shrink-0 hidden md:flex flex-col bg-slate-900/90 border-r border-slate-800/80 backdrop-blur-xl">
+      <aside className="w-64 shrink-0 hidden md:flex flex-col bg-white/90 border-r border-slate-200/80 backdrop-blur-xl shadow-sm">
         {sidebarNavContent}
       </aside>
 
@@ -270,10 +270,10 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden flex">
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="relative z-10 w-72 h-full shadow-2xl flex flex-col bg-slate-900 animate-in slide-in-from-left duration-200">
+          <div className="relative z-10 w-72 h-full shadow-2xl flex flex-col bg-white animate-in slide-in-from-left duration-200">
             {sidebarNavContent}
           </div>
         </div>
@@ -282,41 +282,41 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
       {/* ── MAIN CONTENT AREA ──────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Bar */}
-        <header className="h-16 shrink-0 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between gap-3">
+        <header className="h-16 shrink-0 border-b border-slate-200/80 bg-white/70 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between gap-3 shadow-sm">
           <div className="flex items-center gap-3 min-w-0">
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileOpen(true)}
-              className="md:hidden p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
+              className="md:hidden p-2 text-slate-600 hover:text-slate-900 hover:bg-indigo-50 rounded-xl transition-colors"
               aria-label="Open Faculty Menu"
             >
               <Menu className="h-5 w-5" />
             </button>
 
-            <span className="text-xs sm:text-sm font-semibold text-slate-300 truncate">
+            <span className="text-xs sm:text-sm font-semibold text-slate-700 truncate">
               Faculty Subsystem
             </span>
-            <Badge variant="outline" className="hidden lg:inline-flex bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs shrink-0">
+            <Badge variant="outline" className="hidden lg:inline-flex bg-emerald-50 text-emerald-700 border-emerald-200 text-xs shrink-0">
               Live ETR & RAG Synchronized
             </Badge>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {faculty && (
-              <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs bg-slate-800/80 border border-slate-700/60 px-2.5 sm:px-3 py-1.5 rounded-full text-slate-300">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                <span className="font-semibold text-slate-200 truncate max-w-[100px] sm:max-w-none">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs bg-indigo-50/80 border border-indigo-200/60 px-2.5 sm:px-3 py-1.5 rounded-full text-slate-700">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="font-semibold text-slate-800 truncate max-w-[100px] sm:max-w-none">
                   {faculty.title} {faculty.name}
                 </span>
-                <span className="text-slate-500 hidden sm:inline">|</span>
-                <span className="text-indigo-400 font-mono hidden sm:inline">{faculty.facultyCode}</span>
+                <span className="text-slate-400 hidden sm:inline">|</span>
+                <span className="text-indigo-600 font-mono hidden sm:inline">{faculty.facultyCode}</span>
               </div>
             )}
           </div>
         </header>
 
         {/* Content Body */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto space-y-6">{children}</div>
         </main>
       </div>

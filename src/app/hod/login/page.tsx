@@ -1,5 +1,7 @@
 "use client";
 
+import { AnimatedBackground } from "@/components/animated-background";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -166,7 +168,8 @@ export default function HODLoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-slate-950 text-slate-100 flex flex-col justify-center items-center p-4 lg:p-8 relative overflow-hidden font-sans">
+    <AnimatedBackground variant="subtle">
+      <div className="min-h-screen w-full  text-slate-100 flex flex-col justify-center items-center p-4 lg:p-8 relative overflow-hidden font-sans">
       {/* Ambient background glows */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[32rem] h-[32rem] bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -175,21 +178,21 @@ export default function HODLoginPage() {
         {/* Brand Top Header */}
         <div className="text-center space-y-2">
           <div className="inline-flex p-3.5 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 shadow-xl shadow-indigo-500/25 mb-1">
-            <Scale className="h-8 w-8 text-white" />
+            <Scale className="h-8 w-8 text-slate-900" />
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white">Smart University HOD Portal</h1>
-          <p className="text-sm text-slate-400 max-w-md mx-auto">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Smart University HOD Portal</h1>
+          <p className="text-sm text-slate-600 max-w-md mx-auto">
             Executive Department Governance, Cognitive Operations, Risk Orchestration & Decision Intelligence
           </p>
         </div>
 
         {/* Tab Selection */}
-        <div className="flex rounded-xl bg-slate-900/90 p-1 border border-slate-800 backdrop-blur max-w-sm mx-auto">
+        <div className="flex rounded-xl  p-1 border border-indigo-100 backdrop-blur max-w-sm mx-auto">
           <button
             type="button"
             onClick={() => { setActiveTab("SIGNIN"); setError(null); setSuccessMsg(null); }}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-lg transition-all ${
-              activeTab === "SIGNIN" ? "bg-blue-600 text-white shadow" : "text-slate-400 hover:text-slate-200"
+              activeTab === "SIGNIN" ? "bg-blue-600 text-slate-900 shadow" : "text-slate-600 hover:text-slate-800"
             }`}
           >
             <LogIn className="h-3.5 w-3.5" />
@@ -199,7 +202,7 @@ export default function HODLoginPage() {
             type="button"
             onClick={() => { setActiveTab("SIGNUP"); setError(null); setSuccessMsg(null); }}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-lg transition-all ${
-              activeTab === "SIGNUP" ? "bg-blue-600 text-white shadow" : "text-slate-400 hover:text-slate-200"
+              activeTab === "SIGNUP" ? "bg-blue-600 text-slate-900 shadow" : "text-slate-600 hover:text-slate-800"
             }`}
           >
             <UserPlus className="h-3.5 w-3.5" />
@@ -208,15 +211,15 @@ export default function HODLoginPage() {
         </div>
 
         {/* Login / Register Card */}
-        <Card className="bg-slate-900/90 border-slate-800 backdrop-blur-xl shadow-2xl">
+        <Card className=" border-indigo-100 backdrop-blur-xl shadow-2xl light-glass-card anim-fade-up-1">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-xl text-white font-semibold flex items-center justify-between">
+            <CardTitle className="text-xl text-slate-900 font-semibold flex items-center justify-between">
               <span>{activeTab === "SIGNIN" ? "HOD & Governance Sign In" : "Onboard New Department HOD"}</span>
               <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/30 text-xs">
                 {activeTab === "SIGNIN" ? "Department Isolated" : "Department Provisioning"}
               </Badge>
             </CardTitle>
-            <CardDescription className="text-slate-400 text-xs">
+            <CardDescription className="text-slate-600 text-xs">
               {activeTab === "SIGNIN"
                 ? "Enter your assigned HOD Identifier or department credentials to access governance."
                 : "Create an executive HOD account and provision a new department scope in the University Platform."}
@@ -242,7 +245,7 @@ export default function HODLoginPage() {
                 )}
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="identifier" className="text-xs font-medium text-slate-300">
+                  <Label htmlFor="identifier" className="text-xs font-medium text-slate-700">
                     HOD ID / University Email
                   </Label>
                   <div className="relative">
@@ -255,14 +258,14 @@ export default function HODLoginPage() {
                       onChange={(e) => setIdentifier(e.target.value)}
                       required
                       disabled={loading}
-                      className="pl-10 bg-slate-950/60 border-slate-800 text-white placeholder:text-slate-600 focus:border-blue-500 rounded-xl"
+                      className="pl-10  border-indigo-100 text-slate-900 placeholder:text-slate-600 focus:border-blue-500 rounded-xl"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password" className="text-xs font-medium text-slate-300">
+                    <Label htmlFor="password" className="text-xs font-medium text-slate-700">
                       Unique Governance Password
                     </Label>
                     <span className="text-[11px] text-blue-400">Policy Authorized</span>
@@ -277,7 +280,7 @@ export default function HODLoginPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       disabled={loading}
-                      className="pl-10 bg-slate-950/60 border-slate-800 text-white placeholder:text-slate-600 focus:border-blue-500 rounded-xl"
+                      className="pl-10  border-indigo-100 text-slate-900 placeholder:text-slate-600 focus:border-blue-500 rounded-xl"
                     />
                   </div>
                 </div>
@@ -285,7 +288,7 @@ export default function HODLoginPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium py-2.5 rounded-xl shadow-lg shadow-indigo-600/25 transition-all mt-2"
+                  className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-slate-900 font-medium py-2.5 rounded-xl shadow-lg shadow-indigo-600/25 transition-all mt-2"
                 >
                   {loading ? "Authorizing HOD Access..." : "Sign In to HOD Portal"}
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -312,18 +315,18 @@ export default function HODLoginPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <Label className="text-xs text-slate-300">HOD Full Name</Label>
+                    <Label className="text-xs text-slate-700">HOD Full Name</Label>
                     <Input
                       placeholder="e.g. Dr. Rajesh Kumar"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       required
                       disabled={loading}
-                      className="bg-slate-950/60 border-slate-800 text-white text-xs rounded-xl"
+                      className=" border-indigo-100 text-slate-900 text-xs rounded-xl"
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs text-slate-300">University Email</Label>
+                    <Label className="text-xs text-slate-700">University Email</Label>
                     <Input
                       type="email"
                       placeholder="e.g. rajesh.kumar@smartuniversity.edu"
@@ -331,49 +334,49 @@ export default function HODLoginPage() {
                       onChange={(e) => setSignupEmail(e.target.value)}
                       required
                       disabled={loading}
-                      className="bg-slate-950/60 border-slate-800 text-white text-xs rounded-xl"
+                      className=" border-indigo-100 text-slate-900 text-xs rounded-xl"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <Label className="text-xs text-slate-300">Department Code</Label>
+                    <Label className="text-xs text-slate-700">Department Code</Label>
                     <Input
                       placeholder="e.g. MECH, CIVIL, AI, BIOTECH"
                       value={deptCode}
                       onChange={(e) => setDeptCode(e.target.value.toUpperCase())}
                       required
                       disabled={loading}
-                      className="bg-slate-950/60 border-slate-800 text-white text-xs font-mono rounded-xl"
+                      className=" border-indigo-100 text-slate-900 text-xs font-mono rounded-xl"
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs text-slate-300">Department Full Name</Label>
+                    <Label className="text-xs text-slate-700">Department Full Name</Label>
                     <Input
                       placeholder="e.g. Mechanical Engineering"
                       value={deptName}
                       onChange={(e) => setDeptName(e.target.value)}
                       required
                       disabled={loading}
-                      className="bg-slate-950/60 border-slate-800 text-white text-xs rounded-xl"
+                      className=" border-indigo-100 text-slate-900 text-xs rounded-xl"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs text-slate-300">Academic Designation</Label>
+                  <Label className="text-xs text-slate-700">Academic Designation</Label>
                   <Input
                     placeholder="e.g. Professor & Head of Department"
                     value={designation}
                     onChange={(e) => setDesignation(e.target.value)}
                     disabled={loading}
-                    className="bg-slate-950/60 border-slate-800 text-white text-xs rounded-xl"
+                    className=" border-indigo-100 text-slate-900 text-xs rounded-xl"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs text-slate-300">Governance Password</Label>
+                  <Label className="text-xs text-slate-700">Governance Password</Label>
                   <Input
                     type="password"
                     placeholder="Create a strong password (e.g. HOD@MECH2026!)"
@@ -382,14 +385,14 @@ export default function HODLoginPage() {
                     required
                     minLength={6}
                     disabled={loading}
-                    className="bg-slate-950/60 border-slate-800 text-white text-xs rounded-xl"
+                    className=" border-indigo-100 text-slate-900 text-xs rounded-xl"
                   />
                 </div>
 
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium py-2.5 rounded-xl shadow-lg shadow-indigo-600/25 transition-all mt-2"
+                  className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-slate-900 font-medium py-2.5 rounded-xl shadow-lg shadow-indigo-600/25 transition-all mt-2"
                 >
                   {loading ? "Provisioning Department Scope..." : "Complete HOD Registration & Onboard"}
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -400,8 +403,8 @@ export default function HODLoginPage() {
 
           {/* Quick Demo Login Chips (Visible in Sign-In tab) */}
           {activeTab === "SIGNIN" && (
-            <div className="p-4 mx-6 mb-4 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-2.5">
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
+            <div className="p-4 mx-6 mb-4 rounded-xl  border border-indigo-100/80 space-y-2.5">
+              <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
                 <div className="flex items-center gap-1.5">
                   <Sparkles className="h-3.5 w-3.5 text-blue-400" />
                   <span>1-Click Test HOD Accounts</span>
@@ -415,15 +418,15 @@ export default function HODLoginPage() {
                     type="button"
                     onClick={() => handleDemoFill(acc)}
                     disabled={loading}
-                    className="p-2.5 text-left rounded-lg bg-slate-900 hover:bg-blue-950/40 border border-slate-800 hover:border-blue-500/40 transition-all text-xs group"
+                    className="p-2.5 text-left rounded-lg  hover:bg-blue-950/40 border border-indigo-100 hover:border-blue-500/40 transition-all text-xs group"
                   >
                     <div className="flex items-center justify-between">
-                      <p className="font-semibold text-slate-200 group-hover:text-blue-300 truncate">{acc.name}</p>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">
+                      <p className="font-semibold text-slate-800 group-hover:text-blue-300 truncate">{acc.name}</p>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded light-glass-card card-3d-inner anim-fade-up-1 text-slate-600 font-mono">
                         {acc.code}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-0.5">{acc.role} • {acc.dept}</p>
+                    <p className="text-[11px] text-slate-600 mt-0.5">{acc.role} • {acc.dept}</p>
                     <Badge variant="outline" className="mt-1.5 text-[9px] px-1.5 py-0 border-blue-500/30 text-blue-300 bg-blue-500/10">
                       {acc.badge}
                     </Badge>
@@ -433,8 +436,8 @@ export default function HODLoginPage() {
             </div>
           )}
 
-          <CardFooter className="flex flex-col space-y-3 pt-0 text-center border-t border-slate-800/60 p-4">
-            <div className="flex items-center justify-between w-full text-xs text-slate-400">
+          <CardFooter className="flex flex-col space-y-3 pt-0 text-center border-t border-indigo-100/60 p-4">
+            <div className="flex items-center justify-between w-full text-xs text-slate-600">
               <Link href="/faculty/login" className="hover:text-blue-400 transition-colors flex items-center gap-1">
                 <GraduationCap className="h-3.5 w-3.5" />
                 Faculty Portal &rarr;
@@ -448,5 +451,7 @@ export default function HODLoginPage() {
         </Card>
       </div>
     </div>
+  
+    </AnimatedBackground>
   );
 }

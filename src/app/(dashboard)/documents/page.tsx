@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedBackground } from "@/components/animated-background";
 import { useEffect, useState, useCallback, useRef } from "react";
 import {
   Search, Upload, Filter, MoreHorizontal, ChevronLeft, ChevronRight,
@@ -350,8 +351,7 @@ export default function DocumentsPage() {
     const iv = setInterval(() => {
       load(pagination.page, search, tab, selectedDeptId);
     }, 5000);
-    return (
-    <AnimatedBackground>) => clearInterval(iv);
+    return () => clearInterval(iv);
   }, [load, pagination.page, search, tab, selectedDeptId]);
 
   const handleDelete = async (id: string) => {
@@ -365,14 +365,15 @@ export default function DocumentsPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)]  text-white overflow-hidden -m-6 md:-m-10">
+    <AnimatedBackground>
+      <div className="flex h-[calc(100vh-3.5rem)] text-slate-900 overflow-hidden -m-6 md:-m-10">
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
 
         {/* ── Top bar ── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200/80 shrink-0 gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-xl font-bold text-white">University Documents & Notes</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-slate-900">University Documents & Notes</h1>
               <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live Synced
               </span>

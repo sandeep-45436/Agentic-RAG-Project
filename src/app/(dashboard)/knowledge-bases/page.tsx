@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedBackground } from "@/components/animated-background";
 import { useEffect, useState, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import {

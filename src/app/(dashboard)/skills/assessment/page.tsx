@@ -96,7 +96,6 @@ export default function SkillAssessmentArenaPage() {
 
   if (loading) {
     return (
-    <AnimatedBackground>
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <RefreshCw className="h-8 w-8 animate-spin text-cyan-400" />
         <p className="text-xs text-slate-500">Loading Assessment Arena Engine...</p>
@@ -105,7 +104,8 @@ export default function SkillAssessmentArenaPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-12 font-sans">
+    <AnimatedBackground>
+      <div className="space-y-6 max-w-4xl mx-auto pb-12 font-sans">
       {/* Top Breadcrumb & Live Stats */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <Link

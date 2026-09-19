@@ -157,8 +157,7 @@ function ConfidenceBar({
     pct >= 70 ? "high" : pct >= 40 ? "medium" : "low";
 
   return (
-    <AnimatedBackground>
-      <div className="space-y-1">
+    <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">{label}</span>
         <span className={`font-medium ${confidenceColor(level)}`}>{pct}%</span>
@@ -399,7 +398,8 @@ export default function RetrievalDebugPage() {
   }
 
   return (
-    <div className="space-y-8 animate-slide-up-fade">
+    <AnimatedBackground>
+      <div className="space-y-8 animate-slide-up-fade">
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>

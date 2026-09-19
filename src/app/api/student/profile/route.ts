@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
     // Fee account
     const finAccount = student.financialAccounts?.[0];
     const feeDetails = {
-      accountNumber: finAccount?.accountNumber || `ACC-${student.studentNumber}`,
+      accountNumber: `ACC-${student.studentNumber}`,
       tuitionBilled: 12500,
       tuitionPaid: 12500,
       hostelFee: 2800,
@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
       title: enr.courseSection.course.title,
       credits: enr.courseSection.course.credits || 3,
       term: "Fall 2026",
-      section: enr.courseSection.sectionNumber || "SEC-A",
+      section: enr.courseSection.sectionCode || "SEC-A",
       instructor: enr.courseSection.faculty?.user?.name || `Prof. ${student.department.code} Faculty`,
       room: enr.courseSection.room || "Turing Hall 101",
       schedule: "Mon/Wed 10:00 - 11:30 AM",

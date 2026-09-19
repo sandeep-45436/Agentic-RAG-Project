@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedBackground } from "@/components/animated-background";
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
@@ -121,8 +122,7 @@ export default function AnalyticsPage() {
     const interval = setInterval(() => {
       fetchAnalytics(true);
     }, 5000);
-    return (
-    <AnimatedBackground>) => clearInterval(interval);
+    return () => clearInterval(interval);
   }, [isLive, fetchAnalytics]);
 
   // Handle single manual event trigger
@@ -219,7 +219,8 @@ export default function AnalyticsPage() {
   const stats = data?.stats;
 
   return (
-    <div className="space-y-8 pb-16 relative">
+    <AnimatedBackground>
+      <div className="space-y-8 pb-16 relative">
       {/* ── Simulated Toast Container ──────────────────────────── */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
         {toasts.map((toast) => (

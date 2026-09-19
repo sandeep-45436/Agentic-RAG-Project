@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
       id: sec.id,
       courseCode: sec.course.code,
       courseTitle: sec.course.title,
-      sectionNumber: sec.sectionNumber,
+      sectionNumber: sec.sectionCode,
       term: sec.term,
       room: sec.room || "Turing Hall 101",
       credits: sec.course.credits,

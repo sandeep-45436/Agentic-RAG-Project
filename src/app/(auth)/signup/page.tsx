@@ -211,6 +211,7 @@ export default function SignupPage() {
           </CardFooter>
         </form>
       </Card>
+    </AnimatedBackground>
     );
   }
 
@@ -311,9 +312,6 @@ export default function SignupPage() {
         </CardFooter>
       </form>
     </Card>
-  
-    </AnimatedBackground>
-  
     </AnimatedBackground>
   );
 }

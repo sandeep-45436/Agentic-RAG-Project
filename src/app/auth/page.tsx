@@ -104,8 +104,7 @@ export default function UnifiedAuthGatewayPage() {
           {portals.map((portal) => {
             const Icon = portal.icon;
             return (
-    <AnimatedBackground variant="subtle">
-      <Card
+              <Card
                 key={portal.id}
                 className={` border ${portal.border} backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 shadow-2xl flex flex-col justify-between`}
               >
@@ -170,9 +169,6 @@ export default function UnifiedAuthGatewayPage() {
         </div>
       </div>
     </div>
-  
-    </AnimatedBackground>
-  
     </AnimatedBackground>
   );
 }

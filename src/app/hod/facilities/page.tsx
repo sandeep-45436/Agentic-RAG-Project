@@ -20,7 +20,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useHOD } from "../layout";
+import { useHOD } from "../context";
 
 export default function HODFacilitiesPage() {
   const { activeDepartment, session } = useHOD();

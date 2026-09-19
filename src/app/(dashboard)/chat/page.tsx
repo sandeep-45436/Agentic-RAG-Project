@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedBackground } from "@/components/animated-background";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";

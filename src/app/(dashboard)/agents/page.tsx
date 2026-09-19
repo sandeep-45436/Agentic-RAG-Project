@@ -1,4 +1,5 @@
 "use client";
+import { AnimatedBackground } from "@/components/animated-background";
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
@@ -173,8 +174,7 @@ export default function AgentsPage() {
     const interval = setInterval(() => {
       loadData(true);
     }, 4000);
-    return (
-    <AnimatedBackground>) => clearInterval(interval);
+    return () => clearInterval(interval);
   }, [loadData]);
 
   // Triggers simulated agent run
@@ -280,7 +280,8 @@ export default function AgentsPage() {
   }
 
   return (
-    <div className="space-y-8 pb-16 relative">
+    <AnimatedBackground>
+      <div className="space-y-8 pb-16 relative">
       {/* ── Toast Container ────────────────────────────────────── */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
         {toastLog.map((toast) => (

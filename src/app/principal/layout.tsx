@@ -47,20 +47,22 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
             </button>
 
             <Link href="/principal" className="flex items-center gap-3 group">
-              <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-amber-500 via-yellow-600 to-amber-700 flex items-center justify-center text-white font-black shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform">
-                <Landmark className="h-5 w-5" />
-              </div>
+              <img
+                src="/images/college-logo.png"
+                alt="ALITS"
+                className="h-11 w-auto object-contain group-hover:scale-105 transition-transform"
+              />
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-extrabold tracking-tight text-slate-900 text-base">
                     Office of the Principal
                   </span>
                   <Badge className="bg-amber-100 text-amber-800 border-amber-300/60 text-[10px] hidden sm:inline-flex">
-                    Vice-Chancellor Council
+                    ALITS Executive
                   </Badge>
                 </div>
                 <p className="text-[11px] text-amber-700 font-medium">
-                  Smart University Institutional Governance
+                  Anantha Lakshmi Institute of Technology & Sciences
                 </p>
               </div>
             </Link>

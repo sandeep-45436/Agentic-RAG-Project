@@ -106,8 +106,18 @@ export default function UnifiedAuthGatewayPage() {
       <div className="w-full max-w-6xl space-y-8 z-10 py-8">
         {/* Header */}
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold backdrop-blur">
-            <ShieldCheck className="h-4 w-4 text-emerald-400" />
+          <div className="flex flex-col items-center gap-2 mb-2">
+            <img
+              src="/images/college-logo.png"
+              alt="ALITS College Logo"
+              className="h-20 w-auto object-contain drop-shadow-md"
+            />
+            <span className="text-xs font-bold text-indigo-700 tracking-wider uppercase">
+              Anantha Lakshmi Institute of Technology & Sciences (ALITS)
+            </span>
+          </div>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-600 text-xs font-semibold backdrop-blur">
+            <ShieldCheck className="h-4 w-4 text-emerald-500" />
             <span>Smart University Institutional Authentication Gateway</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900">

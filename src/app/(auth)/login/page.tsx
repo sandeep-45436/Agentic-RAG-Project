@@ -52,8 +52,15 @@ export default function LoginPage() {
     <AnimatedBackground variant="subtle">
       <Card className="w-full max-w-md shadow-2xl border-indigo-500/20 light-glass-card anim-fade-up-1 backdrop-blur-xl">
       <CardHeader className="space-y-3 items-center text-center">
-        <div className="bg-gradient-to-tr from-indigo-600 to-cyan-500 p-3 rounded-2xl text-slate-900 shadow-lg shadow-indigo-500/30">
-          <Bot className="h-6 w-6" />
+        <div className="flex flex-col items-center gap-2">
+          <img
+            src="/images/college-logo.png"
+            alt="ALITS College Logo"
+            className="h-16 w-auto object-contain drop-shadow-md"
+          />
+          <span className="text-xs font-bold text-indigo-700 tracking-wide uppercase">
+            Anantha Lakshmi Institute of Technology & Sciences
+          </span>
         </div>
         <div>
           <CardTitle className="text-2xl font-bold tracking-tight text-slate-900">Student Login</CardTitle>

@@ -87,12 +87,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" render={<Link href="/" />} className="hover:bg-muted transition-colors rounded-md">
-              <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-gradient-to-br from-primary to-cyan-500 text-white shadow-soft">
-                <Sparkles className="size-4" />
+              <div className="flex size-9 items-center justify-center shrink-0">
+                <img src="/images/college-logo.png" alt="ALITS" className="h-8 w-auto object-contain" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight ml-2">
-                <span className="truncate font-bold">NexusIQ</span>
-                <span className="truncate text-xs text-muted-foreground font-medium">University AI Assistant</span>
+                <span className="truncate font-bold text-slate-900">ALITS NexusIQ</span>
+                <span className="truncate text-[10px] text-slate-500 font-medium">Anantha Lakshmi Inst. of Tech</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

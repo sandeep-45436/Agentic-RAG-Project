@@ -223,9 +223,11 @@ export default function HODLayout({ children }: { children: React.ReactNode }) {
       {/* Brand Header */}
       <div className="p-5 border-b border-slate-200/80 flex items-center justify-between">
         <Link href="/hod/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 group">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
-            <Scale className="h-5 w-5 text-white" />
-          </div>
+          <img
+            src="/images/college-logo.png"
+            alt="ALITS"
+            className="h-10 w-auto object-contain group-hover:scale-105 transition-transform"
+          />
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-bold tracking-tight text-slate-900 text-base">HOD Portal</span>
@@ -233,7 +235,7 @@ export default function HODLayout({ children }: { children: React.ReactNode }) {
                 Operations
               </Badge>
             </div>
-            <p className="text-xs text-blue-600 font-medium">Department Governance & AI</p>
+            <p className="text-[11px] text-blue-600 font-medium">ALITS Anantapuramu</p>
           </div>
         </Link>
         {mobileOpen && (

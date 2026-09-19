@@ -177,10 +177,17 @@ export default function HODLoginPage() {
       <div className="w-full max-w-xl space-y-6 z-10">
         {/* Brand Top Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex p-3.5 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 shadow-xl shadow-indigo-500/25 mb-1">
-            <Scale className="h-8 w-8 text-slate-900" />
+          <div className="flex flex-col items-center gap-2 mb-1">
+            <img
+              src="/images/college-logo.png"
+              alt="ALITS College Logo"
+              className="h-16 w-auto object-contain drop-shadow-md"
+            />
+            <span className="text-xs font-bold text-indigo-700 tracking-wide uppercase">
+              Anantha Lakshmi Institute of Technology & Sciences
+            </span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Smart University HOD Portal</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">HOD Login</h1>
           <p className="text-sm text-slate-600 max-w-md mx-auto">
             Executive Department Governance, Cognitive Operations, Risk Orchestration & Decision Intelligence
           </p>

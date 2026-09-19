@@ -143,14 +143,16 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
       {/* Brand Header */}
       <div className="p-5 border-b border-slate-200/80 flex items-center justify-between">
         <Link href="/faculty/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 group">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-            <GraduationCap className="h-5 w-5 text-white" />
-          </div>
+          <img
+            src="/images/college-logo.png"
+            alt="ALITS"
+            className="h-10 w-auto object-contain group-hover:scale-105 transition-transform"
+          />
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-bold tracking-tight text-slate-900 text-base">Faculty Portal</span>
             </div>
-            <p className="text-xs text-indigo-600 font-medium">Smart University Academic</p>
+            <p className="text-[11px] text-indigo-600 font-medium">ALITS Anantapuramu</p>
           </div>
         </Link>
         {mobileOpen && (

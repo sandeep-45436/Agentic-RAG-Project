@@ -266,24 +266,25 @@ export default function HomePage() {
       />
 
       {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* 1. STICKY LUMINOUS NAVIGATION HEADER                                */}
+      {/* 1. STICKY LUMINOUS NAVIGATION HEADER (Solid, not clear)              */}
       {/* ─────────────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 backdrop-blur-2xl  border-b border-slate-200 transition-all duration-300">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-cyan-500 to-purple-600 flex items-center justify-center text-slate-900 shadow-lg shadow-indigo-500/30 group-hover:scale-105 group-hover:shadow-indigo-500/50 transition-all duration-300 relative">
-              <Sparkles className="w-5 h-5 animate-pulse" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#05070d] animate-ping" />
-            </div>
-            <div>
-              <span className="text-base sm:text-lg font-black tracking-tight text-slate-900 flex items-center gap-2">
-                NexusIQ{" "}
-                <span className="text-[9px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-gradient-to-r from-indigo-500/20 to-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-inner">
-                  Cognitive RAG
+            <img
+              src="/images/college-logo.png"
+              alt="ALITS College Logo"
+              className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-sm"
+            />
+            <div className="border-l border-slate-300 pl-3">
+              <span className="text-base sm:text-lg font-black tracking-tight text-slate-900 flex items-center gap-1.5">
+                ALITS <span className="bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">NexusIQ</span>
+                <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  Autonomous
                 </span>
               </span>
-              <p className="text-[10px] text-slate-600 font-medium hidden xs:block">
-                Smart University Operations & Multi-Modal Intelligence
+              <p className="text-[10px] text-slate-600 font-medium hidden sm:block">
+                Anantha Lakshmi Institute of Technology & Sciences
               </p>
             </div>
           </Link>
@@ -465,6 +466,50 @@ export default function HomePage() {
           <p className="text-slate-700 text-base sm:text-xl max-w-3xl leading-relaxed font-normal">
             Ground-truth academic intelligence for university students, faculty, and department heads. Retrieve syllabi, slice PDF slides on demand, balance faculty workloads, and govern academic policies with verifiable provenance.
           </p>
+
+          {/* ── OFFICIAL ALITS CAMPUS SHOWCASE BANNER ────────────────────── */}
+          <div className="w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200/90 shadow-2xl relative group my-3 bg-white/90 backdrop-blur-xl">
+            <div className="relative h-64 sm:h-80 md:h-96 w-full overflow-hidden">
+              <img
+                src="/images/college-campus.jpg"
+                alt="Anantha Lakshmi Institute of Technology & Sciences Campus"
+                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-transparent" />
+              
+              {/* Institutional Badges Top */}
+              <div className="absolute top-4 left-4 right-4 flex items-center justify-between flex-wrap gap-2 z-10">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 text-xs font-bold text-slate-900 shadow-md">
+                  <img src="/images/college-logo.png" alt="" className="h-5 w-auto object-contain" />
+                  <span>ALITS Anantapuramu</span>
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 backdrop-blur-md text-slate-950 text-xs font-extrabold shadow-md">
+                  <span>★ NAAC 'A' Grade Autonomous Institution</span>
+                </div>
+              </div>
+
+              {/* Campus Details Bottom */}
+              <div className="absolute bottom-4 left-4 right-4 text-left space-y-1.5 text-white z-10">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-600 text-white shadow-sm">
+                    Official College Campus
+                  </span>
+                  <span className="text-xs text-slate-200">
+                    Near IT Park, Sanjeevapuram, Anantapuramu - 515721 (A.P.)
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-3xl font-black tracking-tight text-white drop-shadow-md">
+                  Anantha Lakshmi Institute of Technology & Sciences
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-xs text-slate-200 border-t border-white/20 font-medium">
+                  <div>🎓 3,500+ Students Enrolled</div>
+                  <div>👨‍🏫 180+ Distinguished Faculty</div>
+                  <div>🏛️ 9 Engineering Departments</div>
+                  <div>⚡ AICTE Approved • JNTUA Affiliated</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* 5 Core University Operational Portals Quick-Launch Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 w-full max-w-5xl" id="portals">

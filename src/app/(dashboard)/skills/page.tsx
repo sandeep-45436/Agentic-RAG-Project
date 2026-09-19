@@ -34,6 +34,7 @@ import {
   Tooltip,
 } from "recharts";
 import { Badge } from "@/components/ui/badge";
+import { PortalSwitcher } from "@/components/portal-switcher";
 
 export default function SkillDevelopmentPortalPage() {
   const [data, setData] = useState<any>(null);
@@ -78,6 +79,9 @@ export default function SkillDevelopmentPortalPage() {
   return (
     <AnimatedBackground>
       <div className="space-y-6 pb-12 font-sans">
+      {/* ── UNIFIED SUBSYSTEM PORTAL SWITCHER ─────────────────────────────── */}
+      <PortalSwitcher />
+
       {/* ── 1. ALITS INSTITUTIONAL SKILLS HEADER ──────────────────────── */}
       <div className="light-glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
         <div className="flex items-center gap-3.5">

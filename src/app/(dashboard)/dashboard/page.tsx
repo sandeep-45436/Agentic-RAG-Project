@@ -17,6 +17,7 @@ import {
   Calendar, Layers, ArrowRight, Eye, Download, User,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { PortalSwitcher } from "@/components/portal-switcher";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -244,6 +245,9 @@ export default function DashboardPage() {
   return (
     <AnimatedBackground>
     <div className="space-y-6 pb-12 font-sans">
+      {/* ── UNIFIED SUBSYSTEM PORTAL SWITCHER ─────────────────────────────── */}
+      <PortalSwitcher />
+
       {/* ── ALITS STUDENT INSTITUTIONAL BRAND HEADER ──────────────────────── */}
       <div className="light-glass-card anim-fade-up-1 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
         <div className="flex items-center gap-3.5">

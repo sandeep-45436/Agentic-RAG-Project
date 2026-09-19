@@ -313,47 +313,47 @@ export default function HomePage() {
           <div className="flex items-center gap-1.5 sm:gap-2">
             <Link
               href="/principal"
-              className="inline-flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 hover:border-amber-400/80 shadow-md shadow-amber-500/10 hover-lift transition-all"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 shadow-sm transition-all"
             >
-              <Landmark className="w-3.5 h-3.5 text-amber-400" />
-              <span>Principal Login</span>
+              <Landmark className="w-3.5 h-3.5 text-amber-700" />
+              <span>Principal</span>
             </Link>
 
             <Link
               href="/skills"
-              className="inline-flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 hover:border-cyan-400/80 shadow-md shadow-cyan-500/10 hover-lift transition-all"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-sm transition-all"
             >
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+              <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
               <span>Placement Center</span>
             </Link>
 
             <Link
-              href="/faculty/login"
-              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-600/10 hover:bg-purple-600/20 text-purple-300 border border-purple-500/30 hover:border-purple-500/60 transition-all duration-200"
+              href="/faculty/dashboard"
+              className="hidden sm:inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 shadow-sm transition-all"
             >
-              <GraduationCap className="w-3.5 h-3.5 text-purple-400" />
-              <span>Faculty Login</span>
+              <GraduationCap className="w-3.5 h-3.5 text-purple-700" />
+              <span>Faculty</span>
             </Link>
 
             <Link
-              href="/hod/login"
-              className="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-600/10 hover:bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:border-blue-500/60 transition-all duration-200"
+              href="/hod/dashboard"
+              className="hidden sm:inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 shadow-sm transition-all"
             >
-              <Scale className="w-3.5 h-3.5 text-blue-400" />
-              <span>HOD Login</span>
+              <Scale className="w-3.5 h-3.5 text-blue-700" />
+              <span>HOD</span>
             </Link>
 
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-cyan-400 text-slate-900 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-500/50 hover:scale-[1.02] transition-all duration-300"
+              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 hover:scale-[1.02] transition-all"
             >
               <Users className="w-3.5 h-3.5" />
-              <span>Student Login</span>
+              <span>Student Portal</span>
             </Link>
 
             <button
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="md:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/5 transition-colors border border-slate-200"
+              className="md:hidden p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors border border-slate-200"
               aria-label="Toggle Navigation Menu"
             >
               {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -363,8 +363,8 @@ export default function HomePage() {
 
         {/* Mobile Dropdown */}
         {mobileNavOpen && (
-          <div className="md:hidden  border-b border-slate-200 px-6 py-5 space-y-4 animate-slide-up-fade">
-            <nav className="flex flex-col space-y-3 text-sm">
+          <div className="md:hidden bg-white border-b border-slate-200 px-6 py-5 space-y-4 shadow-lg animate-slide-up-fade">
+            <nav className="flex flex-col space-y-3 text-sm font-semibold">
               <a href="#portals" onClick={() => setMobileNavOpen(false)} className="text-slate-700 hover:text-slate-900">
                 Campus Portals
               </a>
@@ -389,42 +389,42 @@ export default function HomePage() {
               <Link
                 href="/principal"
                 onClick={() => setMobileNavOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 shadow-sm"
               >
-                <Landmark className="w-4 h-4 text-amber-400" />
-                Principal Login
+                <Landmark className="w-4 h-4 text-amber-700" />
+                Principal Portal
               </Link>
               <Link
                 href="/skills"
                 onClick={() => setMobileNavOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-sm"
               >
-                <Sparkles className="w-4 h-4 text-cyan-400" />
+                <Sparkles className="w-4 h-4 text-emerald-700" />
                 Placement Center
+              </Link>
+              <Link
+                href="/faculty/dashboard"
+                onClick={() => setMobileNavOpen(false)}
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 shadow-sm"
+              >
+                <GraduationCap className="w-4 h-4 text-purple-700" />
+                Faculty Portal
+              </Link>
+              <Link
+                href="/hod/dashboard"
+                onClick={() => setMobileNavOpen(false)}
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 shadow-sm"
+              >
+                <Scale className="w-4 h-4 text-blue-700" />
+                HOD Portal
               </Link>
               <Link
                 href="/dashboard"
                 onClick={() => setMobileNavOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-indigo-600/30 text-indigo-300 border border-indigo-500/40"
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20"
               >
-                <Users className="w-4 h-4 text-indigo-400" />
-                Student Login
-              </Link>
-              <Link
-                href="/faculty/login"
-                onClick={() => setMobileNavOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-semibold bg-purple-600/10 text-purple-300 border border-purple-500/30"
-              >
-                <GraduationCap className="w-4 h-4 text-purple-400" />
-                Faculty Login
-              </Link>
-              <Link
-                href="/hod/login"
-                onClick={() => setMobileNavOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-semibold bg-blue-600/10 text-blue-300 border border-blue-500/30"
-              >
-                <Scale className="w-4 h-4 text-blue-400" />
-                HOD Login
+                <Users className="w-4 h-4 text-white" />
+                Student Portal
               </Link>
             </div>
           </div>
@@ -512,141 +512,294 @@ export default function HomePage() {
           </div>
 
           {/* 5 Core University Operational Portals Quick-Launch Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 w-full max-w-5xl" id="portals">
-            {/* 1. Principal Portal */}
-            <Link
-              href="/principal"
-              className="group p-5 rounded-2xl bg-gradient-to-b from-amber-950/30 via-slate-900/80 to-slate-950/90 border border-amber-500/40 hover:border-amber-400/80 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-300 flex flex-col justify-between text-left hover-lift"
-            >
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Landmark className="w-5 h-5 text-amber-400" />
-                  </div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    Executive
-                  </span>
-                </div>
-                <h3 className="text-base font-bold text-slate-900 group-hover:text-amber-300 transition-colors">
-                  Principal Login
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Macro University Cockpit, 9-Department Matrix, Strategic AI reasoning engine, and NAAC/NIRF Governance.
-                </p>
-              </div>
-              <div className="pt-4 flex items-center gap-1.5 text-xs font-semibold text-amber-400">
-                <span>Principal Login</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
+          <div className="w-full max-w-6xl pt-6" id="portals">
+            <div className="text-center mb-6">
+              <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200">
+                Institutional Subsystems
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
+                All Campus Portals & Core Features
+              </h2>
+              <p className="text-sm text-slate-600 mt-1 max-w-2xl mx-auto">
+                Explore all live portals with full interactive access. Every department and leadership tier is fully functional.
+              </p>
+            </div>
 
-            {/* 2. Placement Center */}
-            <Link
-              href="/skills"
-              className="group p-5 rounded-2xl bg-gradient-to-b from-cyan-950/30 via-slate-900/80 to-slate-950/90 border border-cyan-500/40 hover:border-cyan-400/80 hover:shadow-2xl hover:shadow-cyan-500/20 transition-all duration-300 flex flex-col justify-between text-left hover-lift"
-            >
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Sparkles className="w-5 h-5 text-cyan-400" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {/* 1. Principal Portal */}
+              <div className="p-6 rounded-2xl bg-white border border-amber-200 shadow-md hover:shadow-xl hover:border-amber-400 transition-all flex flex-col justify-between text-left group">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-11 h-11 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+                      <Landmark className="w-6 h-6 text-amber-700" />
+                    </div>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                      Institutional Executive
+                    </span>
                   </div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                    Careers
-                  </span>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 group-hover:text-amber-700 transition-colors">
+                      Principal Portal
+                    </h3>
+                    <p className="text-xs font-medium text-amber-800">Executive Operations Cockpit</p>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Plenary executive oversight and strategic AI intelligence across the university ecosystem.
+                  </p>
+                  <ul className="space-y-1.5 pt-2 border-t border-slate-100 text-xs text-slate-700">
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-amber-600 font-bold">✓</span>
+                      <span>Macro Cockpit across 9 academic departments</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-amber-600 font-bold">✓</span>
+                      <span>NAAC Grade A++ & NIRF rank telemetry</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-amber-600 font-bold">✓</span>
+                      <span>Multi-crore Research grants & Budget oversight</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-amber-600 font-bold">✓</span>
+                      <span>Strategic AI Institutional Reasoning Engine</span>
+                    </li>
+                  </ul>
                 </div>
-                <h3 className="text-base font-bold text-slate-900 group-hover:text-cyan-300 transition-colors">
-                  Placement Center
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  6 Industry Tracks, Interactive Assessment Arena, Live 6-Axis Radar Telemetry & Verified Certifications.
-                </p>
+                <div className="pt-5 mt-4 border-t border-slate-100">
+                  <Link
+                    href="/principal"
+                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition-all"
+                  >
+                    <span>Enter Principal Portal</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
-              <div className="pt-4 flex items-center gap-1.5 text-xs font-semibold text-cyan-400">
-                <span>Placement Center</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
 
-            {/* 3. Student Login */}
-            <Link
-              href="/dashboard"
-              className="group p-5 rounded-2xl bg-gradient-to-b from-indigo-500 via-slate-900/80 to-slate-950/90 border border-indigo-500/40 hover:border-indigo-400/80 hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-300 flex flex-col justify-between text-left hover-lift"
-            >
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Users className="w-5 h-5 text-indigo-400" />
+              {/* 2. Placement Center */}
+              <div className="p-6 rounded-2xl bg-white border border-emerald-200 shadow-md hover:shadow-xl hover:border-emerald-400 transition-all flex flex-col justify-between text-left group">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                      <Sparkles className="w-6 h-6 text-emerald-700" />
+                    </div>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      Career Competency
+                    </span>
                   </div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                    Academic Hub
-                  </span>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 group-hover:text-emerald-700 transition-colors">
+                      Placement Center
+                    </h3>
+                    <p className="text-xs font-medium text-emerald-800">Career Competency Accelerator</p>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Industry readiness, skill evaluation benchmarks, and career placement engine.
+                  </p>
+                  <ul className="space-y-1.5 pt-2 border-t border-slate-100 text-xs text-slate-700">
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>6 Industry Career Tracks (GenAI, Cloud, Cyber...)</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>Interactive Assessment Arena & Coding challenges</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>Live 6-Axis Skills Radar visualization</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span>Verified Industry Certifications & Dossier</span>
+                    </li>
+                  </ul>
                 </div>
-                <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-300 transition-colors">
-                  Student Login
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Live Attendance, GPA Tracking, Course Schedules, Ledger Balances, and Multi-turn RAG Assistant.
-                </p>
+                <div className="pt-5 mt-4 border-t border-slate-100">
+                  <Link
+                    href="/skills"
+                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all"
+                  >
+                    <span>Enter Placement Center</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
-              <div className="pt-4 flex items-center gap-1.5 text-xs font-semibold text-indigo-400">
-                <span>Student Login</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
 
-            {/* 4. Faculty Login */}
-            <Link
-              href="/faculty/login"
-              className="group p-5 rounded-2xl bg-gradient-to-b from-purple-950/30 via-slate-900/80 to-slate-950/90 border border-purple-500/40 hover:border-purple-400/80 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 flex flex-col justify-between text-left hover-lift"
-            >
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <GraduationCap className="w-5 h-5 text-purple-400" />
+              {/* 3. Student Portal */}
+              <div className="p-6 rounded-2xl bg-white border border-indigo-200 shadow-md hover:shadow-xl hover:border-indigo-400 transition-all flex flex-col justify-between text-left group">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-11 h-11 rounded-xl bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold">
+                      <Users className="w-6 h-6 text-indigo-700" />
+                    </div>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-300">
+                      Academic Core
+                    </span>
                   </div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                    Faculty
-                  </span>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 group-hover:text-indigo-700 transition-colors">
+                      Student Portal
+                    </h3>
+                    <p className="text-xs font-medium text-indigo-800">Academic & Course Cockpit</p>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Personalized learning, attendance tracking, course RAG, and lecture slice delivery.
+                  </p>
+                  <ul className="space-y-1.5 pt-2 border-t border-slate-100 text-xs text-slate-700">
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-indigo-600 font-bold">✓</span>
+                      <span>Live Course Attendance, GPA & Ledger</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-indigo-600 font-bold">✓</span>
+                      <span>Multi-turn Academic RAG Assistant (/chat)</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-indigo-600 font-bold">✓</span>
+                      <span>Headless PDF Slide & Lecture Slicer Engine</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-indigo-600 font-bold">✓</span>
+                      <span>Research Workspace & Knowledge Bases</span>
+                    </li>
+                  </ul>
                 </div>
-                <h3 className="text-base font-bold text-slate-900 group-hover:text-purple-300 transition-colors">
-                  Faculty Login
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Weekly Teaching Timetables, Course Syllabi Vector RAG, Seating Layouts, and Research Grants.
-                </p>
+                <div className="pt-5 mt-4 border-t border-slate-100">
+                  <Link
+                    href="/dashboard"
+                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
+                  >
+                    <span>Enter Student Portal</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
-              <div className="pt-4 flex items-center gap-1.5 text-xs font-semibold text-purple-400">
-                <span>Faculty Login</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
 
-            {/* 5. HOD Login */}
-            <Link
-              href="/hod/login"
-              className="group p-5 rounded-2xl bg-gradient-to-b from-blue-950/30 via-slate-900/80 to-slate-950/90 border border-blue-500/40 hover:border-blue-400/80 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 flex flex-col justify-between text-left hover-lift sm:col-span-2 lg:col-span-2"
-            >
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Scale className="w-5 h-5 text-blue-400" />
+              {/* 4. Faculty Portal */}
+              <div className="p-6 rounded-2xl bg-white border border-purple-200 shadow-md hover:shadow-xl hover:border-purple-400 transition-all flex flex-col justify-between text-left group">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-11 h-11 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-bold">
+                      <GraduationCap className="w-6 h-6 text-purple-700" />
+                    </div>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 border border-purple-300">
+                      Faculty Core
+                    </span>
                   </div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                    Governance
-                  </span>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 group-hover:text-purple-700 transition-colors">
+                      Faculty Portal
+                    </h3>
+                    <p className="text-xs font-medium text-purple-800">Academic Operations & Timetables</p>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Teaching schedules, syllabus ingestion, smart exam seating, and faculty records.
+                  </p>
+                  <ul className="space-y-1.5 pt-2 border-t border-slate-100 text-xs text-slate-700">
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-purple-600 font-bold">✓</span>
+                      <span>Dynamic Weekly Teaching Timetables (/faculty/timetables)</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-purple-600 font-bold">✓</span>
+                      <span>Academic Document Ingestion & Syllabi (/faculty/documents)</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-purple-600 font-bold">✓</span>
+                      <span>AI Exam Hall Seating Grid Planner (/faculty/seating)</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-purple-600 font-bold">✓</span>
+                      <span>Assigned Faculty Dossiers (/faculty/assigned-faculty)</span>
+                    </li>
+                  </ul>
                 </div>
-                <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-300 transition-colors">
-                  HOD Login
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  7-Dimension Department Health Index, Faculty Workload Rebalancer, At-Risk Student Radars, and Policy Condonation Approval Docket.
-                </p>
+                <div className="pt-5 mt-4 border-t border-slate-100 flex gap-2">
+                  <Link
+                    href="/faculty/dashboard"
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-sm transition-all"
+                  >
+                    <span>Enter Portal</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                  <Link
+                    href="/faculty/login"
+                    className="inline-flex items-center justify-center py-2.5 px-3 rounded-xl text-xs font-bold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 transition-all"
+                  >
+                    Login
+                  </Link>
+                </div>
               </div>
-              <div className="pt-4 flex items-center gap-1.5 text-xs font-semibold text-blue-400">
-                <span>HOD Login</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+
+              {/* 5. HOD Portal */}
+              <div className="p-6 rounded-2xl bg-white border border-blue-200 shadow-md hover:shadow-xl hover:border-blue-400 transition-all flex flex-col justify-between text-left group md:col-span-2 lg:col-span-2">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="w-11 h-11 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-bold">
+                      <Scale className="w-6 h-6 text-blue-700" />
+                    </div>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 border border-blue-300">
+                      Department Governance
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 group-hover:text-blue-700 transition-colors">
+                      HOD Portal (Head of Department)
+                    </h3>
+                    <p className="text-xs font-medium text-blue-800">Department Governance & Health Command Center</p>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Department health indexing, faculty workload rebalancing, student risk radars, and approval dockets.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-xs text-slate-700">
+                    <div className="space-y-1.5">
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-blue-600 font-bold">✓</span>
+                        <span>7-Dimension Department Health Index & Live Pulse</span>
+                      </div>
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-blue-600 font-bold">✓</span>
+                        <span>Faculty Workload Engine & Allocation (/hod/faculty)</span>
+                      </div>
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-blue-600 font-bold">✓</span>
+                        <span>Student At-Risk Radar & Attendance Condonations</span>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-blue-600 font-bold">✓</span>
+                        <span>Master Timetables & Smart Conflict-Free Grids (/hod/timetable)</span>
+                      </div>
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-blue-600 font-bold">✓</span>
+                        <span>Department Curriculum & Syllabi Comparator (/hod/courses)</span>
+                      </div>
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-blue-600 font-bold">✓</span>
+                        <span>Research Grant Proposal Review & Approvals (/hod/approvals)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="pt-5 mt-4 border-t border-slate-100 flex gap-2">
+                  <Link
+                    href="/hod/dashboard"
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all"
+                  >
+                    <span>Enter HOD Command Center</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                  <Link
+                    href="/hod/login"
+                    className="inline-flex items-center justify-center py-2.5 px-4 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 transition-all"
+                  >
+                    Login
+                  </Link>
+                </div>
               </div>
-            </Link>
+            </div>
           </div>
 
           {/* Quick Metrics Strip */}

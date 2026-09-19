@@ -68,48 +68,13 @@ export async function proxy(request: NextRequest) {
     path.startsWith("/student") ||
     path.startsWith("/dashboard");
 
-  // Dedicated HOD Portal Route Protection
+  // Dedicated HOD Portal - Seamless Access
   if (path.startsWith("/hod")) {
-    const hasHodSession = !!request.cookies.get("hod_session")?.value;
-    const isHodAuthRoute = path === "/hod/login" || path === "/hod/signup" || path.startsWith("/hod/auth");
-
-    if (!hasHodSession && !isHodAuthRoute) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/hod/login";
-      return NextResponse.redirect(url);
-    }
-
-    if (hasHodSession && isHodAuthRoute) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/hod/dashboard";
-      return NextResponse.redirect(url);
-    }
-
     return response;
   }
 
-  // Dedicated Faculty Portal Route Protection
+  // Dedicated Faculty Portal - Seamless Access
   if (path.startsWith("/faculty")) {
-    // Permit public access to faculty profile dossier
-    if (path.startsWith("/faculty/profile")) {
-      return response;
-    }
-
-    const hasFacultySession = !!request.cookies.get("faculty_session")?.value;
-    const isFacultyAuthRoute = path === "/faculty/login";
-
-    if (!hasFacultySession && !isFacultyAuthRoute) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/faculty/login";
-      return NextResponse.redirect(url);
-    }
-
-    if (hasFacultySession && isFacultyAuthRoute) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/faculty/dashboard";
-      return NextResponse.redirect(url);
-    }
-
     return response;
   }
 

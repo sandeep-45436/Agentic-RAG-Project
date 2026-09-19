@@ -26,6 +26,7 @@ import { AnimatedBackground } from "@/components/animated-background";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PortalSwitcher } from "@/components/portal-switcher";
 
 export default function PrincipalDashboardPage() {
   const [overview, setOverview] = useState<any>(null);
@@ -117,6 +118,9 @@ export default function PrincipalDashboardPage() {
   return (
     <AnimatedBackground>
     <div className="space-y-6 pb-12 font-sans">
+      {/* ── UNIFIED SUBSYSTEM PORTAL SWITCHER ─────────────────────────────── */}
+      <PortalSwitcher />
+
       {/* ── ALITS PRINCIPAL INSTITUTIONAL BRAND HEADER ────────────────────── */}
       <div className="light-glass-card anim-fade-up-1 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80 bg-white/80 backdrop-blur-sm">
         <div className="flex items-center gap-3.5">

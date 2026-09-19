@@ -3,7 +3,7 @@
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { CommandMenu } from "@/components/command-menu";
-import { Search } from "lucide-react";
+import { Search, Building2 } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -61,13 +61,13 @@ export default function DashboardLayout({
       <div className="flex h-screen w-full bg-background overflow-hidden text-foreground">
         <AppSidebar />
         <SidebarInset className="flex flex-col flex-1 h-full w-full bg-background border-l border-border/50">
-          <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border/50 bg-background/70 backdrop-blur-xl px-4 sm:px-6 sticky top-0 z-10 shadow-sm">
+          <header className="flex h-14 shrink-0 items-center justify-between gap-2 sm:gap-3 border-b border-border/50 bg-background/80 backdrop-blur-xl px-3 sm:px-6 sticky top-0 z-10 shadow-xs">
             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
               <SidebarTrigger className="-ml-1 sm:-ml-2 hover:bg-muted transition-colors rounded-xl p-2 shrink-0" />
               
               <div className="flex md:hidden items-center gap-1.5 min-w-0">
                 <img src="/images/college-logo.png" alt="ALITS" className="h-6 w-auto object-contain shrink-0" />
-                <span className="font-bold text-xs text-slate-900 truncate">ALITS NexusIQ</span>
+                <span className="font-bold text-xs text-foreground truncate">ALITS NexusIQ</span>
               </div>
 
               <Button 
@@ -93,12 +93,24 @@ export default function DashboardLayout({
               </Button>
             </div>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger className={cn(buttonVariants({ variant: "ghost" }), "relative h-9 w-9 rounded-full p-0 border-0 shrink-0")}>
-                <Avatar className="h-9 w-9 border border-border/50 shadow-soft hover:shadow-md transition-shadow">
-                  <AvatarFallback className="bg-primary/10 text-primary">{userInitials}</AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
+            <div className="flex items-center gap-2 shrink-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push("/")}
+                className="hidden sm:inline-flex text-xs text-muted-foreground hover:text-foreground h-8 px-2.5 rounded-lg border border-border/50 hover:bg-muted"
+                title="Return to Public Campus Landing"
+              >
+                <Building2 className="w-3.5 h-3.5 mr-1 text-indigo-500" />
+                <span>Campus Home</span>
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger className={cn(buttonVariants({ variant: "ghost" }), "relative h-9 w-9 rounded-full p-0 border-0 shrink-0")}>
+                  <Avatar className="h-9 w-9 border border-border/50 shadow-soft hover:shadow-md transition-shadow">
+                    <AvatarFallback className="bg-primary/10 text-primary">{userInitials}</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end">
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
@@ -123,7 +135,8 @@ export default function DashboardLayout({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </header>
+          </div>
+        </header>
           <main className="flex-1 overflow-auto p-4 sm:p-6 md:p-10 relative">
             <div className="mx-auto w-full max-w-6xl animate-slide-up-fade">
               {children}

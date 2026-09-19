@@ -230,6 +230,18 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Lock body scroll when mobile nav drawer is open
+  React.useEffect(() => {
+    if (mobileNavOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileNavOpen]);
+
   const handleCopy = () => {
     navigator.clipboard.writeText(selectedDemo.answer);
     setCopied(true);
@@ -268,125 +280,144 @@ export default function HomePage() {
       {/* ─────────────────────────────────────────────────────────────────── */}
       {/* 1. STICKY LUMINOUS NAVIGATION HEADER (Solid, responsive)             */}
       {/* ─────────────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
+      <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 shadow-xs transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 sm:h-18 lg:h-20 flex items-center justify-between gap-2 sm:gap-4">
+          {/* Brand Logo & Title */}
           <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0 min-w-0">
             <img
               src="/images/college-logo.png"
               alt="ALITS College Logo"
-              className="h-9 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-sm shrink-0"
+              className="h-8 sm:h-10 md:h-12 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-sm shrink-0"
             />
-            <div className="border-l border-slate-300 pl-2 sm:pl-3 min-w-0">
+            <div className="border-l border-slate-300 dark:border-slate-700 pl-2 sm:pl-3 min-w-0 flex flex-col justify-center">
               <div className="flex items-center gap-1 sm:gap-1.5">
-                <span className="text-sm sm:text-lg font-black tracking-tight text-slate-900 truncate">
+                <span className="text-sm sm:text-base md:text-lg font-black tracking-tight text-slate-900 dark:text-white whitespace-nowrap">
                   ALITS <span className="bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">NexusIQ</span>
                 </span>
-                <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0 hidden sm:inline-block">
+                <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0 hidden md:inline-block">
                   Autonomous
                 </span>
               </div>
-              <p className="text-[10px] text-slate-600 font-medium hidden sm:block truncate max-w-[280px] lg:max-w-none">
+              <p className="text-[10px] text-slate-600 dark:text-slate-400 font-medium hidden sm:block truncate max-w-[200px] md:max-w-[280px] lg:max-w-none">
                 Anantha Lakshmi Institute of Technology & Sciences
               </p>
             </div>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-5 xl:gap-8 text-xs font-semibold text-slate-700">
-            <a href="#portals" className="hover:text-slate-900 transition-colors flex items-center gap-1">
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-4 xl:gap-7 text-xs font-semibold text-slate-700 dark:text-slate-200">
+            <a href="#portals" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors py-1 flex items-center gap-1">
               <span>Campus Portals</span>
             </a>
-            <a href="#playground" className="hover:text-slate-900 transition-colors flex items-center gap-1">
-              <span>Live Playground</span>
+            <a href="#playground" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors py-1 flex items-center gap-1">
+              <span>Playground</span>
             </a>
-            <a href="#slicer" className="hover:text-slate-900 transition-colors flex items-center gap-1">
+            <a href="#slicer" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors py-1 flex items-center gap-1">
               <span>PDF Slicer</span>
             </a>
-            <a href="#pipeline" className="hover:text-slate-900 transition-colors flex items-center gap-1">
+            <a href="#pipeline" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors py-1 flex items-center gap-1">
               <span>Neural Pipeline</span>
             </a>
-            <a href="#features" className="hover:text-slate-900 transition-colors flex items-center gap-1">
+            <a href="#features" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors py-1 flex items-center gap-1">
               <span>Features</span>
             </a>
-            <a href="#faq" className="hover:text-slate-900 transition-colors">
+            <a href="#faq" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors py-1">
               FAQ
             </a>
           </nav>
 
+          {/* Right Actions: Responsive CTA & Toggle */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop Only Portal Shortcuts */}
             <Link
               href="/principal"
-              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 shadow-xs transition-all"
+              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/50 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800 shadow-xs transition-all"
             >
-              <Landmark className="w-3.5 h-3.5 text-amber-700" />
+              <Landmark className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
               <span>Principal</span>
             </Link>
 
             <Link
               href="/skills"
-              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-xs transition-all"
+              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/50 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 shadow-xs transition-all"
             >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+              <Sparkles className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
               <span>Placement Center</span>
             </Link>
 
             <Link
               href="/faculty/dashboard"
-              className="hidden 2xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 shadow-xs transition-all"
+              className="hidden 2xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-900/50 text-purple-900 dark:text-purple-300 border border-purple-300 dark:border-purple-800 shadow-xs transition-all"
             >
-              <GraduationCap className="w-3.5 h-3.5 text-purple-700" />
+              <GraduationCap className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
               <span>Faculty</span>
             </Link>
 
             <Link
               href="/hod/dashboard"
-              className="hidden 2xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 shadow-xs transition-all"
+              className="hidden 2xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/50 text-blue-900 dark:text-blue-300 border border-blue-300 dark:border-blue-800 shadow-xs transition-all"
             >
-              <Scale className="w-3.5 h-3.5 text-blue-700" />
+              <Scale className="w-3.5 h-3.5 text-blue-700 dark:text-blue-400" />
               <span>HOD</span>
             </Link>
 
-            {/* Primary Student Portal Button */}
+            {/* Primary Student Portal Button — Fluid scale (compact on mobile phone, full on tablet/desktop) */}
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 hover:scale-[1.02] transition-all shrink-0"
+              className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 hover:scale-[1.02] transition-all shrink-0"
             >
-              <Users className="w-3.5 h-3.5" />
-              <span>Student Portal</span>
+              <Users className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">Student Portal</span>
+              <span className="sm:hidden">Portal</span>
             </Link>
 
-            {/* Hamburger Toggle */}
+            {/* Responsive Mobile Hamburger Toggle */}
             <button
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="lg:hidden p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors border border-slate-200 shrink-0"
-              aria-label="Toggle Navigation Menu"
+              className="lg:hidden p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-800 shrink-0 flex items-center justify-center min-w-[38px] min-h-[38px]"
+              aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={mobileNavOpen}
             >
               {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
+        {/* Backdrop Overlay for Mobile Drawer */}
+        {mobileNavOpen && (
+          <div
+            className="fixed inset-0 top-16 sm:top-18 lg:top-20 bg-slate-950/50 backdrop-blur-xs z-40 lg:hidden animate-fade-in"
+            onClick={() => setMobileNavOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
         {/* Responsive Mobile Drawer */}
         {mobileNavOpen && (
-          <div className="lg:hidden bg-white/98 backdrop-blur-2xl border-b border-slate-200 px-4 sm:px-6 py-5 shadow-2xl animate-slide-up-fade max-h-[85vh] overflow-y-auto">
+          <div className="relative z-50 lg:hidden bg-white/98 dark:bg-slate-900/98 backdrop-blur-2xl border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-5 shadow-2xl animate-slide-up-fade max-h-[calc(100vh-4.5rem)] overflow-y-auto">
             {/* 5 Subsystem Portals Header */}
             <div className="mb-4">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5">
-                Campus Subsystem Portals
-              </p>
+              <div className="flex items-center justify-between mb-2.5">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Campus Subsystem Portals
+                </p>
+                <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
+                  Select Role
+                </span>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <Link
                   href="/dashboard"
                   onClick={() => setMobileNavOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition-colors"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
                     <div className="p-1.5 bg-indigo-600 text-white rounded-lg">
                       <Users className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900">Student Portal</p>
-                      <p className="text-[10px] text-slate-500">Attendance, GPA & RAG Chat</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white">Student Portal</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Attendance, GPA & RAG Chat</p>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-indigo-400" />
@@ -395,15 +426,15 @@ export default function HomePage() {
                 <Link
                   href="/skills"
                   onClick={() => setMobileNavOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
                     <div className="p-1.5 bg-emerald-600 text-white rounded-lg">
                       <Sparkles className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900">Placement Center</p>
-                      <p className="text-[10px] text-slate-500">Skills Radar & Tests</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white">Placement Center</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Skills Radar & Tests</p>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-emerald-400" />
@@ -412,15 +443,15 @@ export default function HomePage() {
                 <Link
                   href="/faculty/dashboard"
                   onClick={() => setMobileNavOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl bg-purple-50 border border-purple-200 hover:bg-purple-100 transition-colors"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
                     <div className="p-1.5 bg-purple-600 text-white rounded-lg">
                       <GraduationCap className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900">Faculty Portal</p>
-                      <p className="text-[10px] text-slate-500">Timetables, Seating & Uploads</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white">Faculty Portal</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Timetables, Seating & Uploads</p>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-purple-400" />
@@ -429,15 +460,15 @@ export default function HomePage() {
                 <Link
                   href="/hod/dashboard"
                   onClick={() => setMobileNavOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
                     <div className="p-1.5 bg-blue-600 text-white rounded-lg">
                       <Scale className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900">HOD Portal</p>
-                      <p className="text-[10px] text-slate-500">Governance & Workload</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white">HOD Portal</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Governance & Workload</p>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-blue-400" />
@@ -446,15 +477,15 @@ export default function HomePage() {
                 <Link
                   href="/principal"
                   onClick={() => setMobileNavOpen(false)}
-                  className="sm:col-span-2 flex items-center justify-between p-2.5 rounded-xl bg-amber-50 border border-amber-200 hover:bg-amber-100 transition-colors"
+                  className="sm:col-span-2 flex items-center justify-between p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
                     <div className="p-1.5 bg-amber-600 text-white rounded-lg">
                       <Landmark className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900">Principal Portal</p>
-                      <p className="text-[10px] text-slate-500">All Depts, NAAC & Grants</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white">Principal Portal</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">All Depts, NAAC & Grants</p>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-amber-400" />
@@ -463,54 +494,73 @@ export default function HomePage() {
             </div>
 
             {/* In-Page Navigation Links */}
-            <div className="pt-3 border-t border-slate-200">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
+            <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                 Page Sections
               </p>
               <nav className="grid grid-cols-2 gap-2 text-xs font-semibold">
                 <a
                   href="#portals"
                   onClick={() => setMobileNavOpen(false)}
-                  className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                  className="p-2.5 rounded-lg text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5"
                 >
-                  Campus Portals
+                  <Building2 className="w-3.5 h-3.5 text-indigo-500" />
+                  <span>Campus Portals</span>
                 </a>
                 <a
                   href="#playground"
                   onClick={() => setMobileNavOpen(false)}
-                  className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                  className="p-2.5 rounded-lg text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5"
                 >
-                  Live Playground
+                  <Play className="w-3.5 h-3.5 text-cyan-500" />
+                  <span>Live Playground</span>
                 </a>
                 <a
                   href="#slicer"
                   onClick={() => setMobileNavOpen(false)}
-                  className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                  className="p-2.5 rounded-lg text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5"
                 >
-                  PDF Slicer
+                  <Scissors className="w-3.5 h-3.5 text-rose-500" />
+                  <span>PDF Slicer</span>
                 </a>
                 <a
                   href="#pipeline"
                   onClick={() => setMobileNavOpen(false)}
-                  className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                  className="p-2.5 rounded-lg text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5"
                 >
-                  Neural Pipeline
+                  <Cpu className="w-3.5 h-3.5 text-purple-500" />
+                  <span>Neural Pipeline</span>
                 </a>
                 <a
                   href="#features"
                   onClick={() => setMobileNavOpen(false)}
-                  className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                  className="p-2.5 rounded-lg text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5"
                 >
-                  Features
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Features</span>
                 </a>
                 <a
                   href="#faq"
                   onClick={() => setMobileNavOpen(false)}
-                  className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                  className="p-2.5 rounded-lg text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5"
                 >
-                  FAQ
+                  <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>FAQ</span>
                 </a>
               </nav>
+            </div>
+
+            {/* Bottom Quick Action: Student Academic Portal */}
+            <div className="pt-4 mt-3 border-t border-slate-200 dark:border-slate-800">
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileNavOpen(false)}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-colors"
+              >
+                <Users className="w-4 h-4" />
+                <span>Launch Student Academic Portal</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
           </div>
         )}

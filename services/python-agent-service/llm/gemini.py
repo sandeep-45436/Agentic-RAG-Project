@@ -33,7 +33,8 @@ class GeminiProvider:
                 model=model_name,
                 temperature=temperature,
                 api_key=OPENROUTER_API_KEY,
-                base_url=OPENROUTER_BASE_URL
+                base_url=OPENROUTER_BASE_URL,
+                max_tokens=2048
             )
         else:
             # When direct GEMINI_API_KEY is provided via standard Google API endpoint
@@ -42,7 +43,8 @@ class GeminiProvider:
                 model="gemini-2.5-flash",
                 temperature=temperature,
                 api_key=GEMINI_API_KEY,
-                base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+                base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+                max_tokens=2048
             )
 
     @classmethod

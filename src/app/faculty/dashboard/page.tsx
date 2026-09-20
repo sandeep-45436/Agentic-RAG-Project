@@ -130,7 +130,7 @@ export default function FacultyDashboardPage() {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
           <Link
             href="/faculty/timetables"
             className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-purple-300 hover:shadow-md transition-all"
@@ -479,24 +479,24 @@ export default function FacultyDashboardPage() {
 
       {/* ── DOCUMENT PREVIEW / DETAIL MODAL ───────────────────────── */}
       {selectedDoc && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="p-5 border-b border-slate-800 flex items-start justify-between gap-4">
+            <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="p-2.5 rounded-xl bg-indigo-500/15 text-indigo-400 shrink-0">
+                <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 shrink-0">
                   <FileText className="h-6 w-6" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-base font-bold text-white truncate">{selectedDoc.fileName}</h3>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white truncate">{selectedDoc.fileName}</h3>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
-                    <Badge variant="outline" className="text-[10px] bg-indigo-500/10 text-indigo-300 border-indigo-500/30">
+                    <Badge variant="outline" className="text-[10px] bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800">
                       {selectedDoc.department?.code || "Department Scope"}
                     </Badge>
-                    <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/30">
+                    <Badge variant="outline" className="text-[10px] bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800">
                       {selectedDoc.visibility || "DEPARTMENT"}
                     </Badge>
-                    <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-300 border-emerald-500/30">
+                    <Badge variant="outline" className="text-[10px] bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800">
                       {selectedDoc.processingStatus || "COMPLETED"}
                     </Badge>
                   </div>
@@ -504,7 +504,7 @@ export default function FacultyDashboardPage() {
               </div>
               <button
                 onClick={() => setSelectedDoc(null)}
-                className="text-slate-400 hover:text-slate-800 p-1 rounded-lg hover:bg-slate-100 transition-colors shrink-0"
+                className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
               >
                 <X className="h-5 w-5" />
               </button>

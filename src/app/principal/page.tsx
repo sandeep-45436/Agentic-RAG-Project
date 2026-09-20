@@ -136,7 +136,7 @@ export default function PrincipalDashboardPage() {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
           <Link
             href="/principal"
             className="group flex flex-col justify-between p-3.5 rounded-xl border border-amber-300 bg-amber-50/50 hover:bg-white hover:shadow-md transition-all"

@@ -97,7 +97,7 @@ export default function SkillDevelopmentPortalPage() {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
           <Link
             href="/skills"
             className="group flex flex-col justify-between p-3.5 rounded-xl border border-cyan-300 bg-cyan-50/50 hover:bg-white hover:shadow-md transition-all"

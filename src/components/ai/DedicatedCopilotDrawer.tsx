@@ -28,6 +28,8 @@ import {
   Terminal,
   Layers,
   ArrowRight,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -64,11 +66,23 @@ export function DedicatedCopilotDrawer({
   quickPrompts,
 }: DedicatedCopilotDrawerProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"chat" | "simulator" | "artifacts">("chat");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedTraceId, setExpandedTraceId] = useState<string | null>(null);
+
+  // Close drawer on Escape key (Desktop/Laptop UX)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   // Conversational Multi-Turn Message History
   const [messages, setMessages] = useState<Message[]>([]);
@@ -228,8 +242,12 @@ export function DedicatedCopilotDrawer({
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10">
-            <div className="w-screen max-w-2xl bg-white dark:bg-slate-900 shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col h-full">
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-4 sm:pl-10">
+            <div
+              className={`w-screen ${
+                isExpanded ? "max-w-5xl xl:max-w-6xl" : "max-w-xl sm:max-w-2xl"
+              } bg-white dark:bg-slate-900 shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col h-full transition-all duration-300 ease-in-out`}
+            >
               {/* Header */}
               <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-md">
                 <div className="flex items-center gap-3">
@@ -249,7 +267,14 @@ export function DedicatedCopilotDrawer({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    title={isExpanded ? "Restore compact drawer" : "Expand to wide desktop view"}
+                    className="hidden md:flex p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  >
+                    {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                  </button>
                   <button
                     onClick={() => setMessages([])}
                     title="Clear Conversation"
@@ -259,6 +284,7 @@ export function DedicatedCopilotDrawer({
                   </button>
                   <button
                     onClick={() => setIsOpen(false)}
+                    title="Close Drawer (Esc)"
                     className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                   >
                     <X className="h-5 w-5" />
@@ -315,7 +341,7 @@ export function DedicatedCopilotDrawer({
                         <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
                           Instant One-Click Actions:
                         </span>
-                        <div className="grid grid-cols-1 gap-2">
+                        <div className={`grid gap-2.5 ${isExpanded ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"}`}>
                           {quickPrompts.map((qp, idx) => (
                             <button
                               key={idx}
@@ -493,7 +519,7 @@ export function DedicatedCopilotDrawer({
 
               {/* Tab 2: All Deliverables Repository */}
               {activeTab === "artifacts" && (
-                <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-5">
                   {allArtifacts.length === 0 ? (
                     <div className="text-center py-16 space-y-3 text-slate-500">
                       <FileText className="h-10 w-10 mx-auto opacity-40" />
@@ -503,42 +529,44 @@ export function DedicatedCopilotDrawer({
                       </p>
                     </div>
                   ) : (
-                    allArtifacts.map((art, idx) => {
-                      const contentStr =
-                        typeof art.data === "object"
-                          ? JSON.stringify(art.data, null, 2)
-                          : art.content || JSON.stringify(art, null, 2);
+                    <div className={`grid gap-4 ${isExpanded ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"}`}>
+                      {allArtifacts.map((art, idx) => {
+                        const contentStr =
+                          typeof art.data === "object"
+                            ? JSON.stringify(art.data, null, 2)
+                            : art.content || JSON.stringify(art, null, 2);
 
-                      return (
-                        <div
-                          key={idx}
-                          className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 p-4 space-y-3 shadow-xs"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <FileText className="h-4 w-4 text-indigo-600" />
-                              <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                                {art.title || art.type}
-                              </h4>
+                        return (
+                          <div
+                            key={idx}
+                            className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 p-4 space-y-3 shadow-xs flex flex-col justify-between"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <FileText className="h-4 w-4 text-indigo-600" />
+                                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                                  {art.title || art.type}
+                                </h4>
+                              </div>
+                              <button
+                                onClick={() => copyToClipboard(contentStr, `art-${idx}`)}
+                                className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-indigo-600 transition-colors"
+                              >
+                                {copiedId === `art-${idx}` ? (
+                                  <Check className="h-3 w-3 text-emerald-500" />
+                                ) : (
+                                  <Copy className="h-3 w-3" />
+                                )}
+                                <span>{copiedId === `art-${idx}` ? "Copied" : "Copy"}</span>
+                              </button>
                             </div>
-                            <button
-                              onClick={() => copyToClipboard(contentStr, `art-${idx}`)}
-                              className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-indigo-600 transition-colors"
-                            >
-                              {copiedId === `art-${idx}` ? (
-                                <Check className="h-3 w-3 text-emerald-500" />
-                              ) : (
-                                <Copy className="h-3 w-3" />
-                              )}
-                              <span>{copiedId === `art-${idx}` ? "Copied" : "Copy"}</span>
-                            </button>
+                            <pre className={`p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono text-slate-800 dark:text-slate-200 overflow-x-auto ${isExpanded ? "max-h-[380px]" : "max-h-60"}`}>
+                              {contentStr}
+                            </pre>
                           </div>
-                          <pre className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono text-slate-800 dark:text-slate-200 overflow-x-auto max-h-60">
-                            {contentStr}
-                          </pre>
-                        </div>
-                      );
-                    })
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
               )}

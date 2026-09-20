@@ -29,7 +29,7 @@ export function AnimatedBackground({
   return (
     <div
       ref={containerRef}
-      className={`relative min-h-screen w-full bg-gradient-to-br from-slate-50/90 via-white to-blue-50/30 text-slate-900 overflow-x-hidden ${className}`}
+      className={`relative min-h-full w-full bg-gradient-to-br from-slate-50/90 via-white to-blue-50/30 text-slate-900 overflow-x-hidden ${className}`}
     >
       {/* ── 1. CAMPUS PHOTO BACKDROP — OUT OF FOCUS / BOKEH BLUR (NOT CLEAR/SHARP) ──── */}
       {showCampusWatermark && (

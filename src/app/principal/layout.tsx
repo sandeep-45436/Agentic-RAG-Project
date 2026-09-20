@@ -17,6 +17,7 @@ import {
   GraduationCap,
   Scale,
   Zap,
+  Users,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -102,10 +103,11 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
           <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/dashboard"
-              className="hidden lg:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-600 text-xs font-medium border border-slate-200 transition-colors"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-semibold border border-amber-200 transition-colors shrink-0"
+              title="Switch to Student Portal"
             >
-              <span>Student Portal</span>
-              <ExternalLink className="h-3 w-3 text-slate-400" />
+              <Users className="h-3.5 w-3.5 text-amber-700" />
+              <span className="hidden sm:inline">Student Portal</span>
             </Link>
 
             <div className="h-9 px-2.5 sm:px-3 rounded-full bg-amber-50 border border-amber-200/60 flex items-center gap-2 text-xs">
@@ -164,8 +166,8 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
         )}
       </header>
 
-      {/* ── MAIN EXECUTIVE BODY ───────────────────────────────────────── */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-6 xl:p-8 space-y-6">
+      {/* ── MAIN EXECUTIVE BODY — FULL SPACE FLUID LAYOUT ───────────────── */}
+      <main className="flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-6">
         {children}
       </main>
     </div>

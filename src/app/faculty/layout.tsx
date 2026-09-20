@@ -375,6 +375,16 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Direct Student Portal Quick Jump from Navbar */}
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold border border-indigo-200 shadow-xs transition-colors shrink-0"
+              title="Switch to Student Portal"
+            >
+              <Users className="h-3.5 w-3.5 text-indigo-600" />
+              <span className="hidden sm:inline">Student Portal</span>
+            </Link>
+
             {faculty && (
               <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs bg-indigo-50/80 border border-indigo-200/60 px-2.5 sm:px-3 py-1.5 rounded-full text-slate-700">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
@@ -388,9 +398,9 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
           </div>
         </header>
 
-        {/* Content Body */}
+        {/* Content Body — Full Space Fluid Layout */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-6 xl:p-8">
-          <div className="max-w-7xl w-full mx-auto space-y-6">{children}</div>
+          <div className="w-full space-y-6">{children}</div>
         </main>
       </div>
     </div>

@@ -23,7 +23,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { PortalSwitcher } from "@/components/portal-switcher";
 
 interface FacultySession {
   id: string;
@@ -320,12 +319,7 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
 
         {/* Content Body */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {/* ── Subsystem Portals Navigator & Quick Jump ── */}
-            <PortalSwitcher />
-
-            {children}
-          </div>
+          <div className="max-w-7xl mx-auto space-y-6">{children}</div>
         </main>
       </div>
     </div>

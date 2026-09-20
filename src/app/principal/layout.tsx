@@ -20,7 +20,6 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PortalSwitcher } from "@/components/portal-switcher";
 
 const navLinks = [
   { href: "/principal", label: "Executive Command", icon: LayoutDashboard },
@@ -161,9 +160,6 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
 
       {/* ── MAIN EXECUTIVE BODY ───────────────────────────────────────── */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-        {/* ── Subsystem Portals Navigator & Quick Jump ── */}
-        <PortalSwitcher />
-
         {children}
       </main>
     </div>

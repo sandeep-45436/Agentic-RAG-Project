@@ -143,25 +143,11 @@ export function PortalSwitcher({ className = "" }: { className?: string }) {
 
   // Determine active portal based on current pathname
   const activePortal =
-    portals.find((p) => {
-      if (p.id === "faculty") return pathname.startsWith("/faculty");
-      if (p.id === "hod") return pathname.startsWith("/hod");
-      if (p.id === "principal") return pathname.startsWith("/principal");
-      if (p.id === "skills") return pathname.startsWith("/skills");
-      if (p.id === "student") {
-        return (
-          pathname === "/dashboard" ||
-          pathname.startsWith("/chat") ||
-          pathname.startsWith("/documents") ||
-          pathname.startsWith("/knowledge-bases") ||
-          pathname.startsWith("/research") ||
-          pathname.startsWith("/student") ||
-          pathname.startsWith("/agents") ||
-          pathname.startsWith("/analytics")
-        );
-      }
-      return pathname.startsWith(p.href);
-    }) || portals[0];
+    portals.find((p) =>
+      p.id === "student"
+        ? pathname === "/dashboard" || pathname.startsWith("/chat") || pathname.startsWith("/documents") || pathname.startsWith("/knowledge-bases") || pathname.startsWith("/research")
+        : pathname.startsWith(p.href)
+    ) || portals[0];
 
   return (
     <div className={`w-full overflow-hidden rounded-2xl bg-white/95 border border-slate-200 p-3.5 shadow-md backdrop-blur-xl ${className}`}>

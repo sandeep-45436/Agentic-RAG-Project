@@ -35,6 +35,7 @@ import {
 } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { PortalSwitcher } from "@/components/portal-switcher";
+import { DedicatedCopilotDrawer } from "@/components/ai/DedicatedCopilotDrawer";
 
 export default function SkillDevelopmentPortalPage() {
   const [data, setData] = useState<any>(null);
@@ -628,6 +629,18 @@ export default function SkillDevelopmentPortalPage() {
           ))}
         </div>
       </div>
+
+      {/* ── PLACEMENT ORCHESTRATOR DEDICATED LANGGRAPH COPILOT DRAWER ── */}
+      <DedicatedCopilotDrawer
+        role="placement"
+        title="Placement Orchestrator"
+        subtitle="JD Parsing • Deterministic Eligibility & Ranking • Mock Viva"
+        quickPrompts={[
+          { label: "Configure Campus Drive (Amazon AWS)", query: "We are recruiting for Amazon Web Services Cloud Associate. Minimum CGPA 7.5, zero active backlogs, skills: Python, AWS, SQL. Shortlist eligible candidates and generate technical viva questionnaire." },
+          { label: "Filter Eligible Candidates for Top Tech", query: "Run deterministic eligibility check on candidate cohort with cutoff CGPA >= 8.0 and no backlogs." },
+          { label: "Generate Technical Viva & Coding Challenge", query: "Synthesize 5-question technical interview questionnaire and algorithmic challenge for Distributed Systems & Cloud." }
+        ]}
+      />
     </div>
     </AnimatedBackground>
   );

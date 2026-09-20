@@ -27,6 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PortalSwitcher } from "@/components/portal-switcher";
+import { DedicatedCopilotDrawer } from "@/components/ai/DedicatedCopilotDrawer";
 
 export default function PrincipalDashboardPage() {
   const [overview, setOverview] = useState<any>(null);
@@ -652,6 +653,18 @@ export default function PrincipalDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* ── PRINCIPAL DEDICATED LANGGRAPH COPILOT DRAWER ── */}
+      <DedicatedCopilotDrawer
+        role="principal"
+        title="Executive Intelligence Copilot"
+        subtitle="Institutional Benchmarking • Cross-Department Audit • Board Briefings"
+        quickPrompts={[
+          { label: "Synthesize Board of Governors Briefing", query: "Produce an executive briefing on institutional performance, placement benchmarks, and research outputs for the Governing Body meeting." },
+          { label: "Benchmark Departmental Placement & Pass Rates", query: "Analyze cross-departmental comparative performance across CSE, ECE, MECH, and AI&DS." },
+          { label: "Draft AICTE/UGC Compliance Circular", query: "Draft an official institutional circular regarding academic integrity and semester ordinance compliance." }
+        ]}
+      />
     </div>
     </AnimatedBackground>
   );

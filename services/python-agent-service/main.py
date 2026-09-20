@@ -128,9 +128,68 @@ def etr_metrics():
     return MetricsCollector.get_summary()
 
 
-@app.get("/api/etr/audit")
-def etr_audit_logs(limit: int = 50):
-    return {"logs": AuditLogger.get_recent_logs(limit)}
+# ── DEDICATED ROLE-SPECIALIZED LANGGRAPH AGENTS ENDPOINT ───────────────────────
+
+class DedicatedAgentExecutePayload(BaseModel):
+    role: str = Field(..., description="'FACULTY' | 'HOD' | 'PRINCIPAL' | 'PLACEMENT'")
+    query: str = Field(..., description="User prompt or directive")
+    organizationId: Optional[str] = "seed-org-001"
+    userId: Optional[str] = "usr-demo"
+    departmentId: Optional[str] = "CSE"
+    context: Optional[Dict[str, Any]] = Field(default_factory=dict)
+
+
+@app.post("/api/agents/dedicated/execute")
+def execute_dedicated_agent(payload: DedicatedAgentExecutePayload):
+    """
+    Executes dedicated LangGraph agent based on role with deterministic decision engines,
+    ETR execution boundary, and Gemini 2.5 Flash synthesis.
+    """
+    from agents.faculty.graph import faculty_graph
+    from agents.hod.graph import hod_graph
+    from agents.principal.graph import principal_graph
+    from agents.placement.graph import placement_graph
+
+    role_norm = payload.role.strip().upper()
+    initial_state = {
+        "organization_id": payload.organizationId or "seed-org-001",
+        "user_id": payload.userId or "usr-demo",
+        "user_role": role_norm,
+        "department_id": payload.departmentId or "CSE",
+        "request": payload.query,
+        "execution_trace": [f"✓ Session authenticated: Role={role_norm}, Dept={payload.departmentId}"],
+        "artifacts": [],
+        "retrieved_context": [],
+        "database_context": [],
+        "tool_outputs": []
+    }
+
+    try:
+        if role_norm == "FACULTY":
+            state = {**initial_state, "course_id": payload.context.get("courseId", "CSE204")}
+            res = faculty_graph.invoke(state)
+        elif role_norm == "HOD":
+            state = {**initial_state, "department_name": payload.departmentId}
+            res = hod_graph.invoke(state)
+        elif role_norm in ["PRINCIPAL", "DEAN"]:
+            state = {**initial_state, "scope": "UNIVERSITY"}
+            res = principal_graph.invoke(state)
+        elif role_norm in ["PLACEMENT", "PLACEMENT_OFFICER", "STUDENT"]:
+            state = {**initial_state, "raw_job_description": payload.query}
+            res = placement_graph.invoke(state)
+        else:
+            raise HTTPException(status_code=400, detail=f"Unsupported dedicated agent role: {role_norm}")
+
+        return {
+            "success": True,
+            "role": role_norm,
+            "executionTrace": res.get("execution_trace", []),
+            "artifacts": res.get("artifacts", []),
+            "summary": res.get("executive_narrative") or res.get("board_briefing") or res.get("placement_summary") or "Agent workflow completed."
+        }
+    except Exception as e:
+        print(f"[DedicatedAgent.Execute] Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

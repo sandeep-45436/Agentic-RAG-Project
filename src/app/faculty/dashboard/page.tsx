@@ -27,6 +27,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PortalSwitcher } from "@/components/portal-switcher";
+import { DedicatedCopilotDrawer } from "@/components/ai/DedicatedCopilotDrawer";
 
 const DEFAULT_PROFILE = {
   id: "faculty-cse-001",
@@ -587,6 +588,19 @@ export default function FacultyDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* ── FACULTY DEDICATED LANGGRAPH COPILOT DRAWER ── */}
+      <DedicatedCopilotDrawer
+        role="faculty"
+        title="Faculty Copilot"
+        subtitle="Question Paper Gen • Bloom's Taxonomy • Student Intervention"
+        departmentId={profile.department?.code || "CSE"}
+        quickPrompts={[
+          { label: "Generate Mid-Term Exam (CSE204)", query: "Generate a 30-mark mid-term question paper for CSE204 covering Distributed Architecture with Bloom's Taxonomy rubrics." },
+          { label: "Audit At-Risk Students & Attendance", query: "Evaluate student cohort attendance and internal marks to flag at-risk students below 75%." },
+          { label: "Create 4-Week Remedial Plan", query: "Formulate a tailored 4-week remedial study roadmap for students with low attendance." }
+        ]}
+      />
     </div>
     </AnimatedBackground>
   );

@@ -39,6 +39,7 @@ import { Badge } from "@/components/ui/badge";
 import { useHOD } from "../context";
 import { PortalSwitcher } from "@/components/portal-switcher";
 import { AnimatedBackground } from "@/components/animated-background";
+import { DedicatedCopilotDrawer } from "@/components/ai/DedicatedCopilotDrawer";
 
 export default function HODDashboardPage() {
   const { session, activeDepartment, isDean } = useHOD();
@@ -914,6 +915,19 @@ export default function HODDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* ── HOD DEDICATED LANGGRAPH COPILOT DRAWER ── */}
+      <DedicatedCopilotDrawer
+        role="hod"
+        title="HOD Governance Copilot"
+        subtitle="NBA CO-PO Attainment • Faculty Workload Balancing • Accreditation"
+        departmentId={typeof activeDepartment === "string" ? activeDepartment : (activeDepartment as any)?.code || "CSE"}
+        quickPrompts={[
+          { label: "Audit NBA CO-PO Attainment", query: "Execute mathematical CO-PO attainment analysis for our department and synthesize NBA compliance narrative." },
+          { label: "Check Faculty Teaching Workload", query: "Run Faculty Workload Balancer to evaluate weekly teaching and lab hours against AICTE limits." },
+          { label: "Synthesize Department Overview", query: "Produce an executive overview of departmental operations, pacing, and resource allocations." }
+        ]}
+      />
     </div>
     </AnimatedBackground>
   );

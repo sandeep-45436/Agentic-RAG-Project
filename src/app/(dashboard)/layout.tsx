@@ -20,6 +20,7 @@ import { createClient } from "@/utils/insforge/client";
 import { signOutAction } from "@/server/actions/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { PortalSwitcher } from "@/components/portal-switcher";
 
 export default function DashboardLayout({
   children,
@@ -137,8 +138,11 @@ export default function DashboardLayout({
             </DropdownMenu>
           </div>
         </header>
-          <main className="flex-1 overflow-auto p-4 sm:p-6 md:p-10 relative">
-            <div className="mx-auto w-full max-w-6xl animate-slide-up-fade">
+          <main className="flex-1 overflow-auto p-4 sm:p-6 md:p-8 relative">
+            <div className="mx-auto w-full max-w-6xl space-y-6 animate-slide-up-fade">
+              {/* ── Subsystem Portals Navigator & Quick Jump ── */}
+              <PortalSwitcher />
+
               {children}
             </div>
           </main>

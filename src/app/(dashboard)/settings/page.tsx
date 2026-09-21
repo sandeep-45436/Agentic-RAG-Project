@@ -32,7 +32,7 @@ export default function SettingsPage() {
 
   return (
     <AnimatedBackground>
-      <div className="space-y-6 max-w-4xl">
+      <div className="space-y-6 w-full">
         <div className="light-glass-card anim-fade-up-1 p-6 rounded-2xl">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Settings</h1>
           <p className="text-slate-500">Manage your account settings and preferences.</p>

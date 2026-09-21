@@ -60,7 +60,7 @@ export default function PrincipalProfilePage() {
 
   return (
     <AnimatedBackground showCampusWatermark={true}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 font-sans">
+      <div className="w-full space-y-8 font-sans">
         {/* ── 1. INSTITUTIONAL TOP BAR ─────────────────────────────────── */}
         <div className="light-glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/80">
           <div className="flex items-center gap-3.5">

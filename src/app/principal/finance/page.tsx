@@ -88,7 +88,7 @@ export default function PrincipalFinancePage() {
 
   return (
     <AnimatedBackground>
-      <div className="space-y-6 max-w-6xl mx-auto pb-12 font-sans">
+      <div className="space-y-6 w-full pb-12 font-sans">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>

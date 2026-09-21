@@ -37,7 +37,7 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30 text-slate-900 flex flex-col font-sans">
       {/* ── TOP EXECUTIVE BANNER & NAVIGATION ─────────────────────────── */}
       <header className="sticky top-0 z-40 bg-white/80 border-b border-amber-200/60 backdrop-blur-xl shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
           {/* Brand and University Crest */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
@@ -167,7 +167,7 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
       </header>
 
       {/* ── MAIN EXECUTIVE BODY — FULL SPACE FLUID LAYOUT ───────────────── */}
-      <main className="flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-6">
+      <main className="flex-1 w-full p-3 sm:p-5 lg:p-6 space-y-6 max-w-none">
         {children}
       </main>
     </div>

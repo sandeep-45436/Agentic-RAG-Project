@@ -137,8 +137,8 @@ export default function DashboardLayout({
             </DropdownMenu>
           </div>
         </header>
-          <main className="flex-1 overflow-auto p-4 sm:p-6 md:p-10 relative">
-            <div className="mx-auto w-full max-w-6xl animate-slide-up-fade">
+          <main className="flex-1 overflow-auto p-3 sm:p-5 lg:p-6 relative w-full">
+            <div className="w-full space-y-6 max-w-none animate-slide-up-fade">
               {children}
             </div>
           </main>

@@ -60,7 +60,7 @@ export default function UsagePage() {
           {error}
         </div>
       ) : data ? (
-        <div className="space-y-4 max-w-3xl">
+        <div className="space-y-4 w-full">
           <div className="rounded-xl border p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-medium">AI Generations (this month)</h3>

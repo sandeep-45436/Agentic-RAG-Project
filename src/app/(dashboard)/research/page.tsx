@@ -517,7 +517,7 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
 
   return (
     <AnimatedBackground>
-      <div className="container mx-auto p-4 md:p-6 max-w-7xl space-y-6">
+      <div className="w-full space-y-6">
         {/* ── Page Header ──────────────────────────────────────────────────────── */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-5 bg-card/60 backdrop-blur-md p-4 rounded-xl border">
           <div>

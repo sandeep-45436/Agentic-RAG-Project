@@ -112,7 +112,7 @@ export default function FacultyDashboardPage() {
 
   return (
     <AnimatedBackground>
-    <div className="space-y-6 pb-12 font-sans relative z-10">
+    <div className="w-full space-y-6 pb-12 font-sans relative z-10">
       {/* ── FACULTY ACADEMIC OPERATIONS SUB-FEATURES HUB ────────────────── */}
       <div className="bg-white/95 rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-100 gap-2">

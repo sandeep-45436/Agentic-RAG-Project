@@ -122,7 +122,11 @@ export default function HODLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("hod_sidebar_collapsed");
-      if (saved === "true") setIsCollapsed(true);
+      if (saved === "true") {
+        setIsCollapsed(true);
+      } else if (saved === null && window.innerWidth < 1280) {
+        setIsCollapsed(true);
+      }
     }
   }, []);
 
@@ -555,9 +559,9 @@ export default function HODLayout({ children }: { children: React.ReactNode }) {
             </div>
           </header>
 
-          {/* Content Body — Full Space Fluid Layout */}
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-6 xl:p-8">
-            <div className="w-full space-y-6">{children}</div>
+          {/* Content Body — Full Space Fluid Edge-to-Edge Layout */}
+          <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 w-full">
+            <div className="w-full space-y-6 max-w-none">{children}</div>
           </main>
         </div>
       </div>

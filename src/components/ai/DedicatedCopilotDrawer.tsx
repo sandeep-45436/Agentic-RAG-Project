@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { CopilotStructuredArtifact } from "./CopilotStructuredArtifact";
 
 interface QuickPrompt {
   label: string;
@@ -448,50 +449,22 @@ export function DedicatedCopilotDrawer({
                           </div>
                         )}
 
-                        {/* Inline Artifact Cards */}
+                        {/* Inline Structured Deliverable Cards */}
                         {msg.artifacts && msg.artifacts.length > 0 && (
-                          <div className="mt-3 pt-3 border-t border-slate-200/80 dark:border-slate-700/80 space-y-2">
-                            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block">
-                              Synthesized Output:
-                            </span>
-                            {msg.artifacts.map((art, aIdx) => {
-                              const rawString =
-                                typeof art.data === "object"
-                                  ? JSON.stringify(art.data, null, 2)
-                                  : art.content || JSON.stringify(art, null, 2);
-
-                              return (
-                                <div
-                                  key={aIdx}
-                                  className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 space-y-2"
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                      <FileText className="h-3.5 w-3.5 text-indigo-600" />
-                                      <span className="text-xs font-bold text-slate-900 dark:text-white">
-                                        {art.title || art.type}
-                                      </span>
-                                    </div>
-                                    <button
-                                      onClick={() => copyToClipboard(rawString, `${msg.id}-${aIdx}`)}
-                                      className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 transition-colors"
-                                    >
-                                      {copiedId === `${msg.id}-${aIdx}` ? (
-                                        <Check className="h-3 w-3 text-emerald-500" />
-                                      ) : (
-                                        <Copy className="h-3 w-3" />
-                                      )}
-                                      <span>
-                                        {copiedId === `${msg.id}-${aIdx}` ? "Copied" : "Copy"}
-                                      </span>
-                                    </button>
-                                  </div>
-                                  <pre className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-slate-800 dark:text-slate-200 overflow-x-auto max-h-48">
-                                    {rawString}
-                                  </pre>
-                                </div>
-                              );
-                            })}
+                          <div className="mt-3 pt-3 border-t border-slate-200/80 dark:border-slate-700/80 space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider flex items-center gap-1.5">
+                                <Sparkles className="h-3 w-3 text-indigo-500" />
+                                Institutional Deliverable ({msg.artifacts.length})
+                              </span>
+                            </div>
+                            {msg.artifacts.map((art, aIdx) => (
+                              <CopilotStructuredArtifact
+                                key={aIdx}
+                                artifact={art}
+                                role={role}
+                              />
+                            ))}
                           </div>
                         )}
                       </div>
@@ -530,42 +503,13 @@ export function DedicatedCopilotDrawer({
                     </div>
                   ) : (
                     <div className={`grid gap-4 ${isExpanded ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"}`}>
-                      {allArtifacts.map((art, idx) => {
-                        const contentStr =
-                          typeof art.data === "object"
-                            ? JSON.stringify(art.data, null, 2)
-                            : art.content || JSON.stringify(art, null, 2);
-
-                        return (
-                          <div
-                            key={idx}
-                            className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 p-4 space-y-3 shadow-xs flex flex-col justify-between"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <FileText className="h-4 w-4 text-indigo-600" />
-                                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                                  {art.title || art.type}
-                                </h4>
-                              </div>
-                              <button
-                                onClick={() => copyToClipboard(contentStr, `art-${idx}`)}
-                                className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-indigo-600 transition-colors"
-                              >
-                                {copiedId === `art-${idx}` ? (
-                                  <Check className="h-3 w-3 text-emerald-500" />
-                                ) : (
-                                  <Copy className="h-3 w-3" />
-                                )}
-                                <span>{copiedId === `art-${idx}` ? "Copied" : "Copy"}</span>
-                              </button>
-                            </div>
-                            <pre className={`p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono text-slate-800 dark:text-slate-200 overflow-x-auto ${isExpanded ? "max-h-[380px]" : "max-h-60"}`}>
-                              {contentStr}
-                            </pre>
-                          </div>
-                        );
-                      })}
+                      {allArtifacts.map((art, idx) => (
+                        <CopilotStructuredArtifact
+                          key={idx}
+                          artifact={art}
+                          role={role}
+                        />
+                      ))}
                     </div>
                   )}
                 </div>

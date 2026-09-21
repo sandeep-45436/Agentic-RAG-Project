@@ -70,8 +70,10 @@ def synthesize_exam_paper(state: FacultyState) -> Dict[str, Any]:
         "data": paper_json
     })
 
+    narrative = f"Generated university-compliant examination paper for {course} adhering to Bloom's Revised Taxonomy (Part A: Remembering/Understanding, Part B: Applying/Analyzing) with standardized marking rubrics."
     return {
         "quiz_artifact": paper_json,
+        "executive_narrative": narrative,
         "artifacts": artifacts,
         "execution_trace": trace
     }
@@ -127,6 +129,7 @@ def formulate_remedial_plan(state: FacultyState) -> Dict[str, Any]:
     
     return {
         "remedial_plan": {"plan": remedial_text, "riskSummary": risk},
+        "executive_narrative": remedial_text,
         "artifacts": artifacts,
         "execution_trace": trace
     }

@@ -1,10 +1,5 @@
-import { AnimatedBackground } from "@/components/animated-background";
-import FacultyDashboardPage from "./dashboard/page";
-
+import { redirect } from "next/navigation";
+ 
 export default function FacultyRootPage() {
-  return (
-    <AnimatedBackground>
-      <FacultyDashboardPage />
-    </AnimatedBackground>
-  );
+  redirect("/faculty/dashboard");
 }

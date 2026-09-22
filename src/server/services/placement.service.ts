@@ -169,7 +169,7 @@ export interface PlacementAnalyticsData {
 // IN-MEMORY SIMULATION REPOSITORIES (Resilient fallback + demo dataset)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const DEMO_DRIVES: PlacementDrive[] = [
+let DEMO_DRIVES: PlacementDrive[] = [
   {
     id: "drv_aws_cloud_arch",
     company: "Amazon Web Services (AWS)",
@@ -544,6 +544,42 @@ export class PlacementService {
   static async getDriveById(id: string): Promise<PlacementDrive | null> {
     const drive = DEMO_DRIVES.find((d) => d.id === id);
     return drive || null;
+  }
+
+  /**
+   * TPO ADMIN OPERATION: Create & publish new campus recruitment drive
+   */
+  static async createDrive(driveData: Partial<PlacementDrive>): Promise<PlacementDrive> {
+    const newDrive: PlacementDrive = {
+      id: `drv_${Date.now()}`,
+      company: driveData.company || "New Recruiter",
+      logo: driveData.logo || "https://upload.wikimedia.org/wikipedia/commons/e/e8/Building_icon.svg",
+      role: driveData.role || "Software Engineer",
+      tier: (driveData.tier as PlacementTier) || "Dream",
+      ctc: driveData.ctc || "₹12.00 LPA",
+      baseSalary: driveData.baseSalary || "₹10.00 LPA",
+      stocks: driveData.stocks || "N/A",
+      joiningBonus: driveData.joiningBonus || "₹1.00 LPA",
+      stipend: driveData.stipend || "₹30,000 / mo",
+      location: driveData.location || "Bengaluru / Hyderabad",
+      driveDate: driveData.driveDate || new Date(Date.now() + 14 * 86400000).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
+      applicationDeadline: driveData.applicationDeadline || new Date(Date.now() + 7 * 86400000).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
+      status: "OPEN",
+      minCgpa: Number(driveData.minCgpa) || 7.0,
+      maxBacklogs: Number(driveData.maxBacklogs) || 0,
+      allowedBranches: driveData.allowedBranches && driveData.allowedBranches.length > 0 ? driveData.allowedBranches : ["CSE", "AI&DS", "IT", "ECE"],
+      requiredSkills: driveData.requiredSkills && driveData.requiredSkills.length > 0 ? driveData.requiredSkills : ["Data Structures", "Python", "SQL"],
+      description: driveData.description || "Official on-campus recruitment drive published by ALITS Placement Directorate.",
+      hiringRounds: driveData.hiringRounds && driveData.hiringRounds.length > 0 ? driveData.hiringRounds : [
+        { roundNumber: 1, name: "Online Coding & Aptitude Assessment", description: "Assessment on programming & fundamentals", date: "Round 1" },
+        { roundNumber: 2, name: "Technical Interview", description: "In-depth problem solving & architecture", date: "Round 2" },
+        { roundNumber: 3, name: "HR & Managerial Discussion", description: "Cultural alignment and offer briefing", date: "Round 3" },
+      ],
+      isDemo: false,
+      totalApplicantsCount: 0,
+    };
+    DEMO_DRIVES.unshift(newDrive);
+    return newDrive;
   }
 
   /**

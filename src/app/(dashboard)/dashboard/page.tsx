@@ -17,7 +17,6 @@ import {
   Calendar, Layers, ArrowRight, Eye, Download, User, BookMarked,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { PortalSwitcher } from "@/components/portal-switcher";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

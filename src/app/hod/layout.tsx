@@ -556,6 +556,17 @@ export default function HODLayout({ children }: { children: React.ReactNode }) {
                 <span className="text-slate-400 hidden sm:inline">|</span>
                 <span className="text-blue-600 font-mono hidden sm:inline">{session.hodCode}</span>
               </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 h-8 px-2.5 rounded-xl border border-rose-200/60 font-semibold transition-colors flex items-center gap-1.5"
+                title="Sign Out"
+              >
+                <LogOut className="h-3.5 w-3.5 text-rose-600" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </Button>
             </div>
           </header>
 

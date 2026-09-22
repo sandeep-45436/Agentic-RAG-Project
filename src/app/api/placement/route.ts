@@ -73,6 +73,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, message: res.message });
     }
 
+    if (action === "create_drive") {
+      const { drive } = body;
+      if (!drive || !drive.company || !drive.role) {
+        return NextResponse.json(
+          { success: false, error: "Missing required drive details (company, role)" },
+          { status: 400 }
+        );
+      }
+      const created = await PlacementService.createDrive(drive);
+      return NextResponse.json({ success: true, drive: created });
+    }
+
     return NextResponse.json(
       { success: false, error: `Unrecognized action '${action}'` },
       { status: 400 }

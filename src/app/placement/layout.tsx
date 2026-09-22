@@ -2,43 +2,51 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Briefcase,
   TrendingUp,
   Award,
   FileText,
-  Sliders,
   Target,
   Zap,
   Menu,
   X,
-  Sparkles,
-  ShieldCheck,
+  CheckCircle2,
   ChevronRight,
+  LogOut,
+  LayoutDashboard,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { PortalSwitcher } from "@/components/portal-switcher";
+import { Button } from "@/components/ui/button";
+import { signOutAction } from "@/server/actions/auth";
 
-const placementNav = [
+const studentPlacementNav = [
   { href: "/placement?tab=drives", label: "Campus Drives", icon: Briefcase },
-  { href: "/placement?tab=pipeline", label: "Pipeline & Offers", icon: TrendingUp },
+  { href: "/placement?tab=pipeline", label: "My Applications", icon: TrendingUp },
   { href: "/placement?tab=ats", label: "ATS Resume Match", icon: FileText },
   { href: "/placement?tab=mock-interview", label: "Technical Viva", icon: Award },
-  { href: "/placement?tab=tpo", label: "TPO Cockpit", icon: Sliders },
-  { href: "/placement?tab=analytics", label: "Salary & Stats", icon: Target },
+  { href: "/placement?tab=eligibility", label: "Eligibility", icon: CheckCircle2 },
   { href: "/skills", label: "Skills Radar", icon: Zap },
 ];
 
 export default function PlacementLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showPortalSwitcher, setShowPortalSwitcher] = useState(false);
+
+  const handleSignOut = async () => {
+    const res = await signOutAction();
+    if (res.success) {
+      router.push("/login");
+      router.refresh();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* ── TOP NAV HEADER ────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-white/90 border-b border-slate-200/90 backdrop-blur-xl shadow-xs">
+      <header className="sticky top-0 z-40 bg-white/95 border-b border-slate-200/90 backdrop-blur-xl shadow-xs">
         <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Brand & Crest */}
           <div className="flex items-center gap-3">
@@ -57,22 +65,22 @@ export default function PlacementLayout({ children }: { children: React.ReactNod
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight">
-                    ALITS Placement Portal
+                    ALITS Placement Center
                   </span>
                   <Badge className="bg-cyan-50 text-cyan-700 border-cyan-200 text-[10px] font-bold">
-                    Careers Hub
+                    Student Portal
                   </Badge>
                 </div>
                 <span className="text-[11px] text-slate-500 font-medium block">
-                  Campus Recruitment & LangGraph Career Engine
+                  Campus Recruitment & AI Career Engine
                 </span>
               </div>
             </Link>
           </div>
 
-          {/* Desktop Nav Items */}
+          {/* Desktop Nav Items (Student-centric) */}
           <nav className="hidden lg:flex items-center gap-1">
-            {placementNav.map((item) => {
+            {studentPlacementNav.map((item) => {
               const Icon = item.icon;
               return (
                 <Link
@@ -87,37 +95,34 @@ export default function PlacementLayout({ children }: { children: React.ReactNod
             })}
           </nav>
 
-          {/* Portal Switcher & Action buttons */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowPortalSwitcher(!showPortalSwitcher)}
-              className="text-xs font-bold text-slate-700 hover:text-slate-950 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl transition-colors flex items-center gap-1.5"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
-              <span className="hidden sm:inline">Switch Portal</span>
-            </button>
-
+          {/* Action buttons with Sign Out */}
+          <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/dashboard"
-              className="text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 px-3.5 py-2 rounded-xl shadow-xs transition-colors flex items-center gap-1"
+              className="text-xs font-bold text-slate-700 hover:text-slate-950 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl transition-colors flex items-center gap-1.5"
+              title="Return to Student Academic Dashboard"
             >
-              <span>Student Hub</span>
-              <ChevronRight className="h-3.5 w-3.5" />
+              <LayoutDashboard className="h-3.5 w-3.5 text-indigo-600" />
+              <span className="hidden sm:inline">Student Dashboard</span>
             </Link>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSignOut}
+              className="text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 h-9 px-3 rounded-xl border border-rose-200/60 font-semibold transition-colors flex items-center gap-1.5"
+              title="Sign Out"
+            >
+              <LogOut className="h-3.5 w-3.5 text-rose-600" />
+              <span className="hidden sm:inline">Sign Out</span>
+            </Button>
           </div>
         </div>
-
-        {/* Portal Switcher Dropdown Modal */}
-        {showPortalSwitcher && (
-          <div className="absolute top-16 right-4 sm:right-8 z-50 w-full max-w-md shadow-2xl rounded-2xl animate-in fade-in">
-            <PortalSwitcher />
-          </div>
-        )}
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-slate-200 bg-white p-4 space-y-1">
-            {placementNav.map((item) => {
+            {studentPlacementNav.map((item) => {
               const Icon = item.icon;
               return (
                 <Link
@@ -131,12 +136,29 @@ export default function PlacementLayout({ children }: { children: React.ReactNod
                 </Link>
               );
             })}
+            <div className="pt-2 border-t border-slate-200 flex justify-between gap-2">
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 py-2 text-center text-xs font-bold bg-slate-100 rounded-xl text-slate-700"
+              >
+                Student Dashboard
+              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSignOut}
+                className="flex-1 text-xs text-rose-600 font-bold border border-rose-200 rounded-xl"
+              >
+                Sign Out
+              </Button>
+            </div>
           </div>
         )}
       </header>
 
-      {/* ── MAIN CONTENT VIEW ─────────────────────────────────────── */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* ── MAIN CONTENT VIEW — FULL SPACE FLUID EDGE-TO-EDGE ─────────── */}
+      <main className="flex-1 w-full max-w-none px-4 sm:px-6 lg:px-8 py-6">
         {children}
       </main>
     </div>

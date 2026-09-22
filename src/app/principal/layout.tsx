@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Landmark,
   LayoutDashboard,
@@ -18,9 +18,11 @@ import {
   Scale,
   Zap,
   Users,
+  LogOut,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { signOutAction } from "@/server/actions/auth";
 
 const navLinks = [
   { href: "/principal", label: "Executive Command", icon: LayoutDashboard },
@@ -31,7 +33,16 @@ const navLinks = [
 
 export default function PrincipalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    const res = await signOutAction();
+    if (res.success) {
+      router.push("/login");
+      router.refresh();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30 text-slate-900 flex flex-col font-sans">
@@ -117,6 +128,17 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
               </span>
               <span className="text-[10px] text-amber-700 font-mono hidden sm:inline">| VC-01</span>
             </div>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSignOut}
+              className="text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 h-8 px-2.5 rounded-xl border border-rose-200/60 font-semibold transition-colors flex items-center gap-1.5"
+              title="Sign Out"
+            >
+              <LogOut className="h-3.5 w-3.5 text-rose-600" />
+              <span className="hidden sm:inline">Sign Out</span>
+            </Button>
           </div>
         </div>
 

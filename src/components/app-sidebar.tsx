@@ -59,7 +59,7 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   {
-    label: "Student Portal",
+    label: "Student Academic Hub",
     items: [
       { title: "Student Dashboard", url: "/dashboard", icon: LayoutDashboard },
       { title: "AI Academic Chat", url: "/chat", icon: MessageSquare },
@@ -69,23 +69,16 @@ const navSections: NavSection[] = [
     ],
   },
   {
-    label: "Placement Center",
+    label: "Placement Center (Student)",
     items: [
       { title: "Placement Hub", url: "/placement", icon: Briefcase, badge: "Live" },
       { title: "Campus Drives", url: "/placement?tab=drives", icon: Building2, badge: "Apply" },
-      { title: "Application Pipeline", url: "/placement?tab=pipeline", icon: TrendingUp, badge: "Kanban" },
+      { title: "My Applications", url: "/placement?tab=pipeline", icon: TrendingUp, badge: "Kanban" },
       { title: "Resume ATS Match", url: "/placement?tab=ats", icon: FileText, badge: "AI" },
       { title: "Technical Viva Arena", url: "/placement?tab=mock-interview", icon: Award, badge: "Simulate" },
+      { title: "Placement Eligibility", url: "/placement?tab=eligibility", icon: CheckCircle2, badge: "Verified" },
       { title: "Skills & Radar", url: "/skills", icon: Zap, badge: "Radar" },
       { title: "Certifications", url: "/skills/certifications", icon: CheckCircle2, badge: "Badges" },
-    ],
-  },
-  {
-    label: "Campus Subsystems",
-    items: [
-      { title: "Principal Portal", url: "/principal", icon: Landmark, badge: "Executive" },
-      { title: "Faculty Portal", url: "/faculty/dashboard", icon: GraduationCap, badge: "Academic" },
-      { title: "HOD Portal", url: "/hod/dashboard", icon: Scale, badge: "Dept HQ" },
     ],
   },
   {

@@ -83,6 +83,21 @@ export default function PlacementPortalPage() {
   const [tpoRunning, setTpoRunning] = useState<boolean>(false);
   const [tpoShortlist, setTpoShortlist] = useState<any[]>([]);
 
+  const [portalMode, setPortalMode] = useState<"student" | "tpo">("student");
+
+  // New Drive Form state for TPO Admin
+  const [newDriveCompany, setNewDriveCompany] = useState<string>("");
+  const [newDriveRole, setNewDriveRole] = useState<string>("");
+  const [newDriveCtc, setNewDriveCtc] = useState<string>("₹14.50 LPA");
+  const [newDriveTier, setNewDriveTier] = useState<string>("Dream");
+  const [newDriveMinCgpa, setNewDriveMinCgpa] = useState<number>(7.0);
+  const [newDriveMaxBacklogs, setNewDriveMaxBacklogs] = useState<number>(0);
+  const [newDriveLocation, setNewDriveLocation] = useState<string>("Bengaluru / Hyderabad");
+  const [newDriveDeadline, setNewDriveDeadline] = useState<string>("Nov 15, 2026");
+  const [newDriveSkills, setNewDriveSkills] = useState<string>("Python, SQL, AWS, Problem Solving");
+  const [newDriveDesc, setNewDriveDesc] = useState<string>("");
+  const [creatingDrive, setCreatingDrive] = useState<boolean>(false);
+
   // Load Main Placement Portal Data
   const loadPortalData = async () => {
     setLoading(true);
@@ -106,10 +121,59 @@ export default function PlacementPortalPage() {
   // Synchronize Tab with URL search params if present
   useEffect(() => {
     const tab = searchParams.get("tab");
-    if (tab && ["drives", "pipeline", "ats", "mock-interview", "tpo", "analytics"].includes(tab)) {
+    if (tab && ["drives", "pipeline", "ats", "mock-interview", "eligibility", "tpo", "analytics", "create-drive"].includes(tab)) {
+      if (tab === "tpo" || tab === "create-drive") {
+        setPortalMode("tpo");
+      }
       setActiveTab(tab);
     }
   }, [searchParams]);
+
+  // Handle New Drive creation (TPO Admin)
+  const handleCreateDrive = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDriveCompany.trim() || !newDriveRole.trim()) {
+      showToast("Please enter Company Name and Role", true);
+      return;
+    }
+    setCreatingDrive(true);
+    try {
+      const res = await fetch("/api/placement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "create_drive",
+          drive: {
+            company: newDriveCompany.trim(),
+            role: newDriveRole.trim(),
+            ctc: newDriveCtc,
+            tier: newDriveTier,
+            minCgpa: newDriveMinCgpa,
+            maxBacklogs: newDriveMaxBacklogs,
+            location: newDriveLocation,
+            applicationDeadline: newDriveDeadline,
+            requiredSkills: newDriveSkills.split(",").map((s) => s.trim()).filter(Boolean),
+            description: newDriveDesc.trim() || `Official campus recruitment drive for ${newDriveRole} at ${newDriveCompany}.`,
+          },
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        showToast(`🎉 Drive for ${newDriveCompany} published! Students can now apply.`);
+        setNewDriveCompany("");
+        setNewDriveRole("");
+        setNewDriveDesc("");
+        await loadPortalData();
+        setActiveTab("drives");
+      } else {
+        showToast(json.error || "Failed to publish drive", true);
+      }
+    } catch {
+      showToast("Network error publishing drive", true);
+    } finally {
+      setCreatingDrive(false);
+    }
+  };
 
   // Load Interview Questions when switching to mock interview
   useEffect(() => {
@@ -393,16 +457,84 @@ export default function PlacementPortalPage() {
           </div>
         </div>
 
-        {/* ── 3. SIX-TAB OPERATIONAL NAVIGATION PILLS ──────────────────── */}
+        {/* ── 2.5 ROLE BOUNDARY & OPERATIONAL SCOPE BANNER ──────── */}
+        <div className="rounded-2xl p-4 bg-white border border-slate-200/90 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className={`h-11 w-11 rounded-xl flex items-center justify-center font-bold text-white shadow-xs shrink-0 ${
+              portalMode === "student" ? "bg-indigo-600" : "bg-cyan-700"
+            }`}>
+              {portalMode === "student" ? <Users className="h-5 w-5" /> : <Sliders className="h-5 w-5" />}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  Active Mode:
+                </span>
+                <Badge className={portalMode === "student" ? "bg-indigo-100 text-indigo-800 border-indigo-200 text-xs font-bold" : "bg-cyan-100 text-cyan-800 border-cyan-200 text-xs font-bold"}>
+                  {portalMode === "student" ? "🎓 Student Operations Mode" : "🏢 Placement Center Admin (TPO) Mode"}
+                </Badge>
+                <span className="text-[11px] font-mono text-slate-500 hidden sm:inline">
+                  {portalMode === "student" ? "Role: Candidate / Student" : "Role: Directorate Admin"}
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 mt-1 leading-snug">
+                {portalMode === "student"
+                  ? `Logged in as: ${studentProfile.name} (${studentProfile.studentId} • CGPA: ${Number(studentProfile.cgpa).toFixed(2)}) • Only student operations are available. Recruitment drives, cutoffs, and hiring rules are published by the Placement Center Admin.`
+                  : `Officer: Dr. R. Sundaram (Director of Placement & Industry Relations) • Authorized to create campus recruitment drives, configure cutoff criteria, and execute candidate shortlists.`}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {portalMode === "student" ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setPortalMode("tpo");
+                  setActiveTab("create-drive");
+                  showToast("Switched to Placement Center Admin (TPO) Mode");
+                }}
+                className="text-xs font-bold border-cyan-300 text-cyan-800 hover:bg-cyan-50 rounded-xl flex items-center gap-1.5 shadow-xs"
+              >
+                <Sliders className="h-3.5 w-3.5 text-cyan-700" />
+                <span>Switch to TPO Admin Cockpit</span>
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setPortalMode("student");
+                  setActiveTab("drives");
+                  showToast("Returned to Student Operations Mode");
+                }}
+                className="text-xs font-bold border-indigo-300 text-indigo-800 hover:bg-indigo-50 rounded-xl flex items-center gap-1.5 shadow-xs"
+              >
+                <Users className="h-3.5 w-3.5 text-indigo-700" />
+                <span>Return to Student Mode</span>
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* ── 3. OPERATIONAL NAVIGATION PILLS ──────────────────── */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-200">
-          {[
-            { id: "drives", label: "Live Campus Drives", icon: Briefcase, badge: `${drives.length} Active` },
-            { id: "pipeline", label: "My Application Pipeline", icon: TrendingUp, badge: `${applications.length} Active` },
-            { id: "ats", label: "AI Resume ATS Optimizer", icon: FileText, badge: "AI Match" },
-            { id: "mock-interview", label: "AI Technical Viva Arena", icon: Award, badge: "Simulate" },
-            { id: "tpo", label: "TPO Command Cockpit", icon: Sliders, badge: "Recruiter Ops" },
-            { id: "analytics", label: "Placement Analytics & Salary", icon: Target, badge: "NAAC Benchmarks" },
-          ].map((tab) => {
+          {(portalMode === "student"
+            ? [
+                { id: "drives", label: "Live Campus Drives", icon: Briefcase, badge: `${drives.length} Active` },
+                { id: "pipeline", label: "My Application Pipeline", icon: TrendingUp, badge: `${applications.length} Active` },
+                { id: "ats", label: "AI Resume ATS Optimizer", icon: FileText, badge: "AI Match" },
+                { id: "mock-interview", label: "AI Technical Viva Arena", icon: Award, badge: "Simulate" },
+                { id: "eligibility", label: "Placement Eligibility & Clearance", icon: CheckCircle2, badge: "Verified" },
+              ]
+            : [
+                { id: "create-drive", label: "➕ Post New Campus Drive", icon: Sparkles, badge: "Admin Form" },
+                { id: "drives", label: "Manage Active Drives", icon: Briefcase, badge: `${drives.length} Posted` },
+                { id: "tpo", label: "Deterministic Shortlist Engine", icon: Sliders, badge: "Cutoff Ops" },
+                { id: "analytics", label: "Placement Analytics & Salary", icon: Target, badge: "NAAC Reports" },
+              ]
+          ).map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
@@ -432,6 +564,37 @@ export default function PlacementPortalPage() {
         {/* ── TAB 1: LIVE CAMPUS RECRUITMENT DRIVES ─────────────────────── */}
         {activeTab === "drives" && (
           <div className="space-y-5">
+            {portalMode === "student" ? (
+              <div className="p-3.5 rounded-2xl bg-cyan-50 border border-cyan-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-cyan-900 shadow-xs">
+                <div className="flex items-center gap-2.5">
+                  <Building2 className="h-4 w-4 text-cyan-700 shrink-0" />
+                  <span>
+                    <strong>Directorate Notice:</strong> Campus recruitment drives below are officially published by the Placement Center Admin. You are viewing candidate operations. Your CGPA (<strong>{Number(studentProfile.cgpa).toFixed(2)}</strong>) and backlog clearance are validated in real-time.
+                  </span>
+                </div>
+                <Badge className="bg-cyan-200 text-cyan-900 border-cyan-300 shrink-0 self-start sm:self-center">
+                  TPO Verified
+                </Badge>
+              </div>
+            ) : (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950 text-white border border-cyan-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-md">
+                <div>
+                  <span className="font-bold text-sm block">Directorate Drive Master Control</span>
+                  <span className="text-slate-300 text-[11px] block mt-0.5">
+                    Currently managing {drives.length} published campus recruitment drives. Need to register another visiting company?
+                  </span>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => setActiveTab("create-drive")}
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-xs font-bold shrink-0 shadow-xs"
+                >
+                  <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                  Post New Campus Drive
+                </Button>
+              </div>
+            )}
+
             {/* Filter & Search Bar */}
             <div className="light-glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs border border-slate-200">
               <div className="relative w-full sm:w-80">
@@ -1264,6 +1427,331 @@ export default function PlacementPortalPage() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── TAB: POST NEW CAMPUS DRIVE (TPO ADMIN ONLY) ────────── */}
+        {activeTab === "create-drive" && (
+          <div className="space-y-6">
+            <div className="rounded-3xl bg-gradient-to-r from-slate-900 to-indigo-950 p-6 text-white border border-cyan-500/30 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/40 text-xs">
+                    TPO Officer Authoring Desk
+                  </Badge>
+                  <span className="text-xs text-slate-300 font-mono">Form Action: <code>create_drive</code></span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black tracking-tight">
+                  Publish New Campus Recruitment Drive
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+                  Configure hiring criteria, compensation package, and cutoff filters. Published drives immediately synchronize across the ALITS Student Portal so students can verify eligibility and submit 1-click applications.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setActiveTab("drives")}
+                className="border-slate-700 text-white hover:bg-white/10 rounded-xl text-xs"
+              >
+                View Existing Drives ({drives.length})
+              </Button>
+            </div>
+
+            <form onSubmit={handleCreateDrive} className="rounded-3xl bg-white border border-slate-200 p-6 shadow-xs space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">Company Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Cisco Systems, Oracle, Microsoft"
+                    value={newDriveCompany}
+                    onChange={(e) => setNewDriveCompany(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">Job Role / Profile *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Cloud Systems Engineer, SDE-1"
+                    value={newDriveRole}
+                    onChange={(e) => setNewDriveRole(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">Total CTC Package *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. ₹16.50 LPA"
+                    value={newDriveCtc}
+                    onChange={(e) => setNewDriveCtc(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">Recruitment Tier *</label>
+                  <select
+                    value={newDriveTier}
+                    onChange={(e) => setNewDriveTier(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  >
+                    <option value="Super Dream">Super Dream Tier (₹20+ LPA)</option>
+                    <option value="Dream">Dream Tier (₹8 - 20 LPA)</option>
+                    <option value="Enterprise">Enterprise Tier (&lt; ₹8 LPA)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">Minimum CGPA Cutoff</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="10"
+                    value={newDriveMinCgpa}
+                    onChange={(e) => setNewDriveMinCgpa(parseFloat(e.target.value) || 0)}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-cyan-500 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">Max Active Backlogs Allowed</label>
+                  <select
+                    value={newDriveMaxBacklogs}
+                    onChange={(e) => setNewDriveMaxBacklogs(parseInt(e.target.value) || 0)}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-cyan-500 font-mono"
+                  >
+                    <option value={0}>0 Backlogs (Strict Zero Tolerance)</option>
+                    <option value={1}>At most 1 Active Backlog</option>
+                    <option value={2}>At most 2 Active Backlogs</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">Work Location</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Bengaluru / Hyderabad / Pune"
+                    value={newDriveLocation}
+                    onChange={(e) => setNewDriveLocation(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">Application Deadline</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Nov 25, 2026"
+                    value={newDriveDeadline}
+                    onChange={(e) => setNewDriveDeadline(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">Required Skills (comma separated)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Python, SQL, AWS, Docker"
+                    value={newDriveSkills}
+                    onChange={(e) => setNewDriveSkills(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1.5">Job Description & Profile Overview</label>
+                <textarea
+                  rows={3}
+                  placeholder="Enter detailed job overview, team responsibilities, and expected technical challenges..."
+                  value={newDriveDesc}
+                  onChange={(e) => setNewDriveDesc(e.target.value)}
+                  className="w-full p-3 rounded-2xl border border-slate-200 text-xs bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-cyan-500 leading-relaxed"
+                />
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[11px] text-slate-500">
+                  ⚡ All criteria are deterministically enforced when students click Apply.
+                </span>
+                <Button
+                  type="submit"
+                  disabled={creatingDrive}
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-xs font-bold shadow-md shadow-cyan-600/20 px-5"
+                >
+                  {creatingDrive ? (
+                    <>
+                      <RefreshCw className="h-3.5 w-3.5 mr-2 animate-spin" />
+                      Publishing Drive...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                      Publish Campus Recruitment Drive
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* ── TAB: PLACEMENT ELIGIBILITY & CLEARANCE (STUDENT ONLY) ──── */}
+        {activeTab === "eligibility" && (
+          <div className="space-y-6">
+            {/* Clearance Pass Card */}
+            <div className="rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-emerald-500/40 p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                <CheckCircle2 className="h-48 w-48 text-emerald-400" />
+              </div>
+              <div className="relative z-10 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-xs font-bold px-3 py-1">
+                      <ShieldCheck className="h-3.5 w-3.5 mr-1 text-emerald-400" /> Institutional Placement Clearance Pass
+                    </Badge>
+                    <span className="text-xs text-slate-400 font-mono">ID: ALITS-TPO-2026-CS101</span>
+                  </div>
+                  <Badge className="bg-white/10 text-white border-white/20 text-xs">
+                    Season 2025–2026 Active
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Candidate Name</span>
+                    <span className="text-base font-black text-white">{studentProfile.name}</span>
+                    <span className="text-[11px] text-slate-400 font-mono block mt-0.5">{studentProfile.studentId}</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Cumulative GPA</span>
+                    <span className="text-base font-black text-cyan-300 font-mono">{Number(studentProfile.cgpa).toFixed(2)} / 10.0</span>
+                    <span className="text-[11px] text-emerald-400 font-bold block mt-0.5">✓ First Class Distinction</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Active Backlogs</span>
+                    <span className="text-base font-black text-emerald-300 font-mono">{studentProfile.activeBacklogs} Backlogs</span>
+                    <span className="text-[11px] text-emerald-400 font-bold block mt-0.5">✓ Zero Backlog Clearance</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Department / Branch</span>
+                    <span className="text-base font-black text-white truncate block">{studentProfile.department}</span>
+                    <span className="text-[11px] text-slate-400 block mt-0.5">CSE Autonomous Program</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Clearance Checklist & Tier Eligibility Matrix */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* TPO Clearance Gateways */}
+              <div className="lg:col-span-6 rounded-3xl bg-white border border-slate-200 p-6 shadow-xs space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-black text-slate-900">Official Placement Gateways</h3>
+                  <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs">
+                    All 4 Clearances Passed
+                  </Badge>
+                </div>
+
+                <div className="space-y-3">
+                  {[
+                    { title: "Central TPO Registration", desc: "Mandatory campus placement registry completed and verified with Aadhaar/Govt ID.", pass: true, code: "TPO-REG-VERIFIED" },
+                    { title: "Department HOD Clearance (NOC)", desc: "Department of Computer Science & Engineering academic standing & attendance clearance (>80%).", pass: true, code: "CS-HOD-NOC-882" },
+                    { title: "Career Development Cell Resume Audit", desc: "STAR-method resume approved by college communication panel.", pass: true, code: "CDC-RESUME-A1" },
+                    { title: "Institutional Placement Policy Undertaking", desc: "Signed agreement to adhere to the ALITS One-Offer / Dream Upgrade recruitment rule.", pass: true, code: "POLICY-SIGNED" },
+                  ].map((gw, idx) => (
+                    <div key={idx} className="p-3.5 rounded-2xl border border-slate-100 bg-slate-50/60 flex items-start gap-3">
+                      <div className="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                        <CheckCircle2 className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-bold text-slate-900">{gw.title}</span>
+                          <span className="text-[10px] font-mono text-emerald-700 font-bold">{gw.code}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">{gw.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tier-by-Tier Cutoff Verification Matrix */}
+              <div className="lg:col-span-6 rounded-3xl bg-white border border-slate-200 p-6 shadow-xs space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-black text-slate-900">Campus Recruitment Tier Matrix</h3>
+                  <span className="text-[11px] text-slate-500">Based on CGPA {studentProfile.cgpa}</span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="p-3.5 rounded-2xl border border-purple-200 bg-purple-50/50 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-purple-100 text-purple-800 border-purple-300 text-[10px] font-bold">
+                          Super Dream Tier
+                        </Badge>
+                        <span className="text-xs font-bold text-slate-900">₹20+ LPA (Google, AWS, Microsoft)</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-1">Rule: CGPA ≥ 8.00 and 0 active backlogs</p>
+                    </div>
+                    <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-xs font-bold">
+                      ✓ Eligible
+                    </Badge>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl border border-cyan-200 bg-cyan-50/50 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-cyan-100 text-cyan-800 border-cyan-300 text-[10px] font-bold">
+                          Dream Tier
+                        </Badge>
+                        <span className="text-xs font-bold text-slate-900">₹8 - 20 LPA (Deloitte, Tata Elxsi, Infosys)</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-1">Rule: CGPA ≥ 6.50 and ≤ 1 active backlog</p>
+                    </div>
+                    <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-xs font-bold">
+                      ✓ Eligible
+                    </Badge>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl border border-emerald-200 bg-emerald-50/50 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px] font-bold">
+                          Enterprise Tier
+                        </Badge>
+                        <span className="text-xs font-bold text-slate-900">&lt; ₹8 LPA (Mass / Service Recruiters)</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-1">Rule: CGPA ≥ 6.00 and all departments allowed</p>
+                    </div>
+                    <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-xs font-bold">
+                      ✓ Eligible
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+                  <span>Want to test interview readiness?</span>
+                  <Button
+                    size="sm"
+                    onClick={() => setActiveTab("mock-interview")}
+                    className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs"
+                  >
+                    Start AI Viva Simulation
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

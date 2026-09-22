@@ -34,7 +34,6 @@ import {
   Tooltip,
 } from "recharts";
 import { Badge } from "@/components/ui/badge";
-import { PortalSwitcher } from "@/components/portal-switcher";
 import { DedicatedCopilotDrawer } from "@/components/ai/DedicatedCopilotDrawer";
 
 export default function SkillDevelopmentPortalPage() {

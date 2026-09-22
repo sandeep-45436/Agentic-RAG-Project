@@ -3,7 +3,7 @@
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { CommandMenu } from "@/components/command-menu";
-import { Search, Building2 } from "lucide-react";
+import { Search, Building2, LogOut } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -103,6 +103,17 @@ export default function DashboardLayout({
               >
                 <Building2 className="w-3.5 h-3.5 mr-1 text-indigo-500" />
                 <span>Campus Home</span>
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSignOut}
+                className="text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 h-8 px-2.5 rounded-lg border border-rose-200/60 transition-colors flex items-center gap-1.5"
+                title="Sign out of Student Portal"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline font-medium">Sign Out</span>
               </Button>
 
               <DropdownMenu>

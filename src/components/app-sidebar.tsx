@@ -24,6 +24,8 @@ import {
   Award,
   Building2,
   DollarSign,
+  Briefcase,
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -69,8 +71,12 @@ const navSections: NavSection[] = [
   {
     label: "Placement Center",
     items: [
-      { title: "Placement Center", url: "/skills", icon: Zap, badge: "Radar" },
-      { title: "Assessment Arena", url: "/skills/assessment", icon: Award, badge: "Tests" },
+      { title: "Placement Hub", url: "/placement", icon: Briefcase, badge: "Live" },
+      { title: "Campus Drives", url: "/placement?tab=drives", icon: Building2, badge: "Apply" },
+      { title: "Application Pipeline", url: "/placement?tab=pipeline", icon: TrendingUp, badge: "Kanban" },
+      { title: "Resume ATS Match", url: "/placement?tab=ats", icon: FileText, badge: "AI" },
+      { title: "Technical Viva Arena", url: "/placement?tab=mock-interview", icon: Award, badge: "Simulate" },
+      { title: "Skills & Radar", url: "/skills", icon: Zap, badge: "Radar" },
       { title: "Certifications", url: "/skills/certifications", icon: CheckCircle2, badge: "Badges" },
     ],
   },

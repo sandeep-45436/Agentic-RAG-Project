@@ -65,3 +65,5 @@ test_reportlab.pdf
 .windsurf
 .freebuff
 .kiro
+__pycache__/
+*.pyc

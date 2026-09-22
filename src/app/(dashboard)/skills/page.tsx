@@ -80,6 +80,33 @@ export default function SkillDevelopmentPortalPage() {
   return (
     <AnimatedBackground>
       <div className="space-y-6 pb-12 font-sans">
+      {/* ── TOP CALLOUT BANNER TO NEW ADVANCED PLACEMENT PORTAL ── */}
+      <div className="rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 border border-cyan-500/40 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shrink-0">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-black text-white">Campus Placement Command Center is Live!</h2>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                8 Active Drives
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 mt-0.5">
+              Explore corporate recruitment drives (Amazon, Google, Microsoft), live application Kanban pipeline, AI ATS resume optimizer, and technical viva arena.
+            </p>
+          </div>
+        </div>
+        <Link
+          href="/placement"
+          className="shrink-0 text-xs font-bold text-slate-950 bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-1.5"
+        >
+          <span>Launch Placement Hub</span>
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+
       {/* ── PLACEMENT CENTER CAREER LAUNCHPAD SUB-FEATURES HUB ───────── */}
       <div className="bg-white/95 rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-100 gap-2">
@@ -99,21 +126,21 @@ export default function SkillDevelopmentPortalPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
           <Link
-            href="/skills"
+            href="/placement"
             className="group flex flex-col justify-between p-3.5 rounded-xl border border-cyan-300 bg-cyan-50/50 hover:bg-white hover:shadow-md transition-all"
           >
             <div className="flex items-center justify-between mb-2">
               <div className="p-2 rounded-lg bg-cyan-100 text-cyan-700 group-hover:scale-105 transition-transform">
                 <Zap className="h-4 w-4" />
               </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-700">Radar</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-700">Live Hub</span>
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">Placement Match Radar</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">Role competency fitment & industry benchmarks</p>
+              <p className="text-xs font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">Placement Command Hub</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Corporate drives, application pipeline & ATS match</p>
             </div>
             <div className="mt-2 pt-1.5 border-t border-slate-200/50 flex items-center text-[10px] font-semibold text-cyan-700">
-              <span>View Fitment Radar</span>
+              <span>Open Placement Portal</span>
               <ChevronRight className="h-3 w-3 ml-0.5" />
             </div>
           </Link>

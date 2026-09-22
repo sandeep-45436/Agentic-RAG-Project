@@ -589,9 +589,9 @@ export default function StudentProfilePage() {
                       <h2 className="text-base font-bold text-slate-900">Verified Industry Credentials & Badges</h2>
                       <p className="text-xs text-slate-500">Directly accredited through autonomous skill track assessments</p>
                     </div>
-                    <Link href="/skills">
+                    <Link href="/placement">
                       <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold">
-                        Open Placement Center <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                        Open Placement Portal <ChevronRight className="h-3.5 w-3.5 ml-1" />
                       </Button>
                     </Link>
                   </div>

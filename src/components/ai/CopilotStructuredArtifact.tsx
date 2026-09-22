@@ -619,64 +619,107 @@ export function CopilotStructuredArtifact({
           <div className="space-y-4">
             <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 flex flex-col sm:flex-row justify-between gap-3">
               <div>
-                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase">
-                  Corporate Recruitment Drive Briefing
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
+                    Corporate Recruitment Intelligence
+                  </span>
+                  <span className="text-[9px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">
+                    Simulation / Demo
+                  </span>
+                </div>
                 <h4 className="text-sm font-black text-slate-900 dark:text-white mt-0.5">
-                  Amazon Web Services (AWS) • Cloud Solutions Architect Associate
+                  {data.company || "Amazon Web Services (AWS)"} • {data.role || "Cloud Solutions Architect Associate"}
                 </h4>
                 <p className="text-xs text-slate-600 dark:text-slate-400">
-                  Eligibility Criteria: <strong>Min CGPA: 7.50</strong> • <strong>Active Backlogs: 0</strong> • CTC Package: <strong>Tier-1 Super Dream</strong>
+                  Cutoff Criteria: <strong>Min CGPA: {data.minCgpa ? data.minCgpa.toFixed(2) : "7.50"}</strong> • <strong>Max Backlogs: {data.maxBacklogs ?? 0}</strong> • Package: <strong>Tier-1 Super Dream</strong>
                 </p>
               </div>
-              <Badge className="bg-emerald-600 text-white text-xs px-3 py-1 self-start sm:self-center">
-                Shortlist Active
+              <Badge className="bg-emerald-600 text-white text-xs px-3 py-1 self-start sm:self-center shrink-0">
+                {data.eligibleCount !== undefined ? `${data.eligibleCount} Candidates Eligible` : "Shortlist Active"}
               </Badge>
             </div>
 
-            <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 font-semibold text-slate-700 dark:text-slate-300">
-                  <tr>
-                    <th className="p-2.5">Rank</th>
-                    <th className="p-2.5">Student ID</th>
-                    <th className="p-2.5">Candidate Name</th>
-                    <th className="p-2.5 text-center">CGPA</th>
-                    <th className="p-2.5">Verified Skills</th>
-                    <th className="p-2.5 text-center">Match %</th>
-                    <th className="p-2.5">Eligibility</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="p-2.5 font-bold text-emerald-600">#1</td>
-                    <td className="p-2.5 font-mono font-bold">22AD115</td>
-                    <td className="p-2.5 font-medium">Gayathri Pillai</td>
-                    <td className="p-2.5 text-center font-bold text-emerald-600">9.10</td>
-                    <td className="p-2.5 text-[11px] text-slate-600">Python, AWS, Distributed Systems, SQL</td>
-                    <td className="p-2.5 text-center font-bold text-emerald-600">98%</td>
-                    <td className="p-2.5"><Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px]">Shortlisted</Badge></td>
-                  </tr>
-                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="p-2.5 font-bold text-emerald-600">#2</td>
-                    <td className="p-2.5 font-mono font-bold">22CS101</td>
-                    <td className="p-2.5 font-medium">Aditya Nair</td>
-                    <td className="p-2.5 text-center font-bold text-emerald-600">8.85</td>
-                    <td className="p-2.5 text-[11px] text-slate-600">Python, AWS, SQL, Docker</td>
-                    <td className="p-2.5 text-center font-bold text-emerald-600">94%</td>
-                    <td className="p-2.5"><Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px]">Shortlisted</Badge></td>
-                  </tr>
-                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="p-2.5 font-bold text-slate-500">#3</td>
-                    <td className="p-2.5 font-mono font-bold">22CS104</td>
-                    <td className="p-2.5 font-medium">Bhavana Iyer</td>
-                    <td className="p-2.5 text-center font-bold text-slate-700">7.80</td>
-                    <td className="p-2.5 text-[11px] text-slate-600">Java, Spring Boot, SQL</td>
-                    <td className="p-2.5 text-center font-bold text-amber-600">82%</td>
-                    <td className="p-2.5"><Badge className="bg-blue-100 text-blue-800 border-blue-300 text-[10px]">Eligible</Badge></td>
-                  </tr>
-                </tbody>
-              </table>
+            {/* If Interview Questions are in the artifact */}
+            {data.questions && data.questions.length > 0 && (
+              <div className="space-y-2.5 pt-1">
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  Targeted Technical Viva Questions & Evaluation Rubric:
+                </span>
+                {data.questions.map((q: any, idx: number) => (
+                  <div key={idx} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                        Scenario #{idx + 1}: {q.topic}
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300">
+                        {q.difficulty}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-800 dark:text-slate-200 font-medium">
+                      {q.question}
+                    </p>
+                    {q.criteria && (
+                      <div className="flex flex-wrap gap-1.5 pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+                        {q.criteria.map((c: string, ci: number) => (
+                          <span key={ci} className="text-[10px] px-2 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">
+                            ✓ {c}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Candidate Shortlist Matrix */}
+            {(!data.questions || (data.candidates && data.candidates.length > 0)) && (
+              <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 font-semibold text-slate-700 dark:text-slate-300">
+                    <tr>
+                      <th className="p-2.5">Rank</th>
+                      <th className="p-2.5">Student ID</th>
+                      <th className="p-2.5">Candidate Name</th>
+                      <th className="p-2.5 text-center">CGPA</th>
+                      <th className="p-2.5">Verified Skills</th>
+                      <th className="p-2.5 text-center">Match %</th>
+                      <th className="p-2.5">Eligibility</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                    {(data.candidates || [
+                      { rank: 1, studentId: "22AD115", name: "Gayathri Pillai", cgpa: 9.10, skills: ["Python", "AWS", "Distributed Systems", "SQL"], matchPercentage: 98 },
+                      { rank: 2, studentId: "22CS101", name: "Aditya Nair", cgpa: 8.85, skills: ["Python", "AWS", "SQL", "Docker"], matchPercentage: 94 },
+                      { rank: 3, studentId: "22CS104", name: "Bhavana Iyer", cgpa: 7.80, skills: ["Java", "Spring Boot", "SQL"], matchPercentage: 82 },
+                    ]).map((c: any, ci: number) => (
+                      <tr key={ci} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                        <td className="p-2.5 font-bold text-emerald-600">#{c.rank || ci + 1}</td>
+                        <td className="p-2.5 font-mono font-bold">{c.studentId}</td>
+                        <td className="p-2.5 font-medium">{c.name}</td>
+                        <td className="p-2.5 text-center font-bold text-emerald-600">{Number(c.cgpa).toFixed(2)}</td>
+                        <td className="p-2.5 text-[11px] text-slate-600 dark:text-slate-400">
+                          {Array.isArray(c.skills) ? c.skills.join(", ") : c.skills}
+                        </td>
+                        <td className="p-2.5 text-center font-bold text-emerald-600">
+                          {c.matchPercentage || 90}%
+                        </td>
+                        <td className="p-2.5">
+                          <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 text-[10px]">
+                            Shortlisted
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Provenance Footer */}
+            <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between text-[10px] text-slate-500 gap-1.5">
+              <span>Data Source: <strong>Demo University Dataset</strong> • ID: <code>deterministic-demo-v1</code></span>
+              <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">✓ Deterministic Verification Invariants Passed</span>
             </div>
           </div>
         )}

@@ -23,6 +23,10 @@ import {
   BookMarked,
   Layers,
   ChevronRight,
+  Briefcase,
+  TrendingUp,
+  Sliders,
+  Target,
 } from "lucide-react";
 
 interface SubFeature {
@@ -66,19 +70,23 @@ const portals: Portal[] = [
     ],
   },
   {
-    id: "skills",
-    name: "Placement Center",
-    shortName: "Placement Center",
-    href: "/skills",
-    icon: Zap,
+    id: "placement",
+    name: "Placement Portal",
+    shortName: "Placement Hub",
+    href: "/placement",
+    icon: Briefcase,
     badge: "Careers",
     badgeColor: "bg-cyan-100 text-cyan-700 border-cyan-200",
     activeColor: "bg-cyan-50 border-cyan-300 ring-2 ring-cyan-200",
-    role: "Skills Radar & Certifications",
+    role: "Campus Drives, Pipeline & AI Viva",
     subFeatures: [
-      { title: "Placement Hub", href: "/skills", icon: Zap, badge: "Match Radar", description: "Placement readiness & company match" },
-      { title: "Assessment Arena", href: "/skills/assessment", icon: Award, badge: "Tests", description: "Live coding & technical skill tests" },
-      { title: "Industry Certifications", href: "/skills/certifications", icon: CheckCircle2, badge: "Badges", description: "Verified industry credentials & badges" },
+      { title: "Campus Drives", href: "/placement?tab=drives", icon: Briefcase, badge: "Live", description: "Active recruitment drives & 1-click apply" },
+      { title: "Application Pipeline", href: "/placement?tab=pipeline", icon: TrendingUp, badge: "Kanban", description: "Multi-stage interview rounds & offer status" },
+      { title: "AI Resume ATS Match", href: "/placement?tab=ats", icon: FileText, badge: "AI Match", description: "JD keyword matching & STAR bullet rewrite" },
+      { title: "Technical Viva Arena", href: "/placement?tab=mock-interview", icon: Award, badge: "Simulate", description: "Company viva scenarios with live AI scoring" },
+      { title: "TPO Command Cockpit", href: "/placement?tab=tpo", icon: Sliders, badge: "TPO Ops", description: "Deterministic candidate ranking & shortlists" },
+      { title: "Placement Analytics", href: "/placement?tab=analytics", icon: Target, description: "Salary distribution & branch benchmarks" },
+      { title: "Skills Radar & Roadmap", href: "/skills", icon: Zap, description: "Competency vectors & learning tracks" },
     ],
   },
   {
@@ -141,13 +149,22 @@ const portals: Portal[] = [
 export function PortalSwitcher({ className = "" }: { className?: string }) {
   const pathname = usePathname();
 
-  // Determine active portal based on current pathname
   const activePortal =
-    portals.find((p) =>
-      p.id === "student"
-        ? pathname === "/dashboard" || pathname.startsWith("/chat") || pathname.startsWith("/documents") || pathname.startsWith("/knowledge-bases") || pathname.startsWith("/research")
-        : pathname.startsWith(p.href)
-    ) || portals[0];
+    portals.find((p) => {
+      if (p.id === "student") {
+        return (
+          pathname === "/dashboard" ||
+          pathname.startsWith("/chat") ||
+          pathname.startsWith("/documents") ||
+          pathname.startsWith("/knowledge-bases") ||
+          pathname.startsWith("/research")
+        );
+      }
+      if (p.id === "placement") {
+        return pathname.startsWith("/placement") || pathname.startsWith("/skills");
+      }
+      return pathname.startsWith(p.href);
+    }) || portals[0];
 
   return (
     <div className={`w-full overflow-hidden rounded-2xl bg-white/95 border border-slate-200 p-3.5 shadow-md backdrop-blur-xl ${className}`}>

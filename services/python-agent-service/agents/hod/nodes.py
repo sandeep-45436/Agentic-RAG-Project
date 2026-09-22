@@ -51,11 +51,18 @@ def execute_copo_calculation(state: HODState) -> Dict[str, Any]:
     explanation = GeminiProvider.invoke(sys_prompt, user_prompt)
     trace.append("✓ Accreditation narrative and remedial actions synthesized via Gemini 2.5 Flash")
 
+    provenance = {
+        "source": "ALITS Departmental SIS & AICTE Audit Database",
+        "datasetId": "hod-operations-v1",
+        "mode": "Departmental Governance Sandbox",
+        "isDemo": True,
+    }
+
     artifacts = list(state.get("artifacts", []))
     artifacts.append({
         "type": "COPO_AUDIT_REPORT",
         "title": f"NBA Tier-1 Attainment Audit ({dept})",
-        "data": result,
+        "data": {**result, "provenance": provenance},
         "narrative": explanation
     })
 
@@ -89,11 +96,18 @@ def execute_workload_balance(state: HODState) -> Dict[str, Any]:
     narrative = GeminiProvider.invoke(sys_prompt, user_prompt)
     trace.append("✓ Workload redistribution recommendations synthesized via Gemini 2.5 Flash")
 
+    provenance = {
+        "source": "ALITS Departmental SIS & AICTE Audit Database",
+        "datasetId": "hod-operations-v1",
+        "mode": "Departmental Governance Sandbox",
+        "isDemo": True,
+    }
+
     artifacts = list(state.get("artifacts", []))
     artifacts.append({
         "type": "WORKLOAD_AUDIT_REPORT",
         "title": f"Faculty Teaching Load Balancing ({dept})",
-        "data": workload_res,
+        "data": {**workload_res, "provenance": provenance},
         "narrative": narrative
     })
 

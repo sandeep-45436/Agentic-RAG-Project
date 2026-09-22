@@ -1171,4 +1171,263 @@ export class HODService {
       ],
     };
   }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ADVANCED DEPARTMENTAL GOVERNANCE ENGINES (DETERMINISTIC & AUDITED)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Deterministic NBA Tier-1 Accreditation & CO-PO Attainment Engine
+   */
+  static getNBAAttainmentAudit(departmentCode = "CSE") {
+    const dept = departmentCode.toUpperCase();
+    const benchmark = 2.0; // Standard 2.00 / 3.00 NBA Target
+
+    const programOutcomes = [
+      { code: "PO1", name: "Engineering Knowledge", attained: 2.85, benchmark, status: "SURPASSED", delta: 0.85 },
+      { code: "PO2", name: "Problem Analysis", attained: 2.40, benchmark, status: "ATTAINED", delta: 0.40 },
+      { code: "PO3", name: "Design & Development", attained: 2.65, benchmark, status: "ATTAINED", delta: 0.65 },
+      { code: "PO4", name: "Investigations & Experiments", attained: 2.50, benchmark, status: "ATTAINED", delta: 0.50 },
+      { code: "PO5", name: "Modern Tool Usage (DevOps/Cloud)", attained: 1.85, benchmark, status: "GAP_IDENTIFIED", delta: -0.15 },
+      { code: "PO6", name: "The Engineer & Society", attained: 2.20, benchmark, status: "ATTAINED", delta: 0.20 },
+      { code: "PO7", name: "Environment & Sustainability", attained: 2.10, benchmark, status: "ATTAINED", delta: 0.10 },
+      { code: "PO8", name: "Ethics & Professional Integrity", attained: 2.35, benchmark, status: "ATTAINED", delta: 0.35 },
+      { code: "PO9", name: "Individual & Team Work", attained: 2.45, benchmark, status: "ATTAINED", delta: 0.45 },
+      { code: "PO10", name: "Communication Skills", attained: 2.30, benchmark, status: "ATTAINED", delta: 0.30 },
+      { code: "PO11", name: "Project Management & Finance", attained: 2.15, benchmark, status: "ATTAINED", delta: 0.15 },
+      { code: "PO12", name: "Life-long Learning & Autonomy", attained: 2.40, benchmark, status: "ATTAINED", delta: 0.40 },
+    ];
+
+    const attainedCount = programOutcomes.filter((po) => po.attained >= benchmark).length;
+    const overallCompliancePct = parseFloat(((attainedCount / programOutcomes.length) * 100).toFixed(1));
+
+    const courseOutcomes = [
+      { code: "CO1", title: "Autonomous Multi-Agent Fundamentals", directScore: 2.8, indirectScore: 2.9, mappedPO: "PO1, PO2", status: "ATTAINED" },
+      { code: "CO2", title: "Hybrid Vector Search & Indexing", directScore: 2.6, indirectScore: 2.7, mappedPO: "PO2, PO3", status: "ATTAINED" },
+      { code: "CO3", title: "Deterministic Guardrails & Invariants", directScore: 2.5, indirectScore: 2.6, mappedPO: "PO3, PO4", status: "ATTAINED" },
+      { code: "CO4", title: "Container Orchestration & DevOps Tools", directScore: 1.8, indirectScore: 1.9, mappedPO: "PO5", status: "DEFICIT" },
+      { code: "CO5", title: "Production Evaluation & Latency Budgets", directScore: 2.3, indirectScore: 2.4, mappedPO: "PO11, PO12", status: "ATTAINED" },
+    ];
+
+    return {
+      departmentCode: dept,
+      departmentName: dept === "CSE" ? "Computer Science & Engineering" : `${dept} Department`,
+      evaluatedProgram: "B.Tech Computer Science & Engineering (R23 Autonomous)",
+      accreditationTier: "NBA Tier-1 (Autonomous Institutions)",
+      overallCompliancePct, // 83.3%
+      targetBenchmark: benchmark,
+      attainedCount,
+      totalPOs: programOutcomes.length,
+      criticalGaps: [
+        {
+          po: "PO5",
+          title: "Modern Tool Usage (DevOps/Cloud)",
+          currentScore: 1.85,
+          targetScore: 2.0,
+          deficit: -0.15,
+          remedialPlan: "Conduct 2-week hands-on weekend workshop on Docker/Kubernetes container orchestration and GitHub Actions CI/CD to bridge the 0.15 gap prior to NBA external review.",
+          assignedFaculty: "Prof. V. Rajesh",
+          targetCompletionDate: "2026-10-15",
+        },
+      ],
+      programOutcomes,
+      courseOutcomes,
+      provenance: {
+        source: "ALITS Departmental SIS & AICTE Audit Database",
+        datasetId: "hod-operations-v1",
+        mode: "Departmental Governance Sandbox",
+        isDemo: true,
+      },
+    };
+  }
+
+  /**
+   * Deterministic Faculty Workload Balancer & AICTE Audit (16/18 hrs)
+   */
+  static getDetailedFacultyWorkload(departmentCode = "CSE") {
+    const dept = departmentCode.toUpperCase();
+
+    const faculty = [
+      {
+        id: "FAC-CSE-001",
+        facultyCode: "FAC-CSE-001",
+        name: "Dr. K. S. Ramanujan",
+        designation: "Professor & Chair",
+        rank: "PROFESSOR",
+        aicteLimitHours: 16,
+        totalHours: 16,
+        breakdown: { theory: 8, lab: 6, mentorship: 2, admin: 0 },
+        assignedCourses: ["CSE401 (Theory - 4h)", "CSE401L (Lab - 6h)", "CSE301 (Theory - 4h)"],
+        isOverloaded: false,
+        status: "COMPLIANT",
+        guidanceProjects: 4,
+      },
+      {
+        id: "FAC-CSE-002",
+        facultyCode: "FAC-CSE-002",
+        name: "Dr. S. Ananya",
+        designation: "Associate Professor",
+        rank: "ASSOCIATE_PROFESSOR",
+        aicteLimitHours: 16,
+        totalHours: 14,
+        breakdown: { theory: 8, lab: 4, mentorship: 2, admin: 0 },
+        assignedCourses: ["CSE302 (Theory - 4h)", "CSE201 (Theory - 4h)", "CSE302L (Lab - 4h)"],
+        isOverloaded: false,
+        status: "BALANCED",
+        guidanceProjects: 3,
+      },
+      {
+        id: "FAC-CSE-003",
+        facultyCode: "FAC-CSE-003",
+        name: "Prof. V. Rajesh",
+        designation: "Assistant Professor",
+        rank: "ASSISTANT_PROFESSOR",
+        aicteLimitHours: 18,
+        totalHours: 19, // Over by 1 hr
+        breakdown: { theory: 9, lab: 8, mentorship: 2, admin: 0 },
+        assignedCourses: ["CSE204 (Theory - 5h)", "CSE204L (Lab - 8h)", "CSE101 (Theory - 4h)"],
+        isOverloaded: true,
+        overloadDelta: 1.0,
+        status: "OVERLOADED",
+        guidanceProjects: 2,
+      },
+      {
+        id: "FAC-CSE-004",
+        facultyCode: "FAC-CSE-004",
+        name: "Prof. M. Sneha",
+        designation: "Assistant Professor",
+        rank: "ASSISTANT_PROFESSOR",
+        aicteLimitHours: 18,
+        totalHours: 12, // Underloaded by 6 hrs
+        breakdown: { theory: 6, lab: 4, mentorship: 2, admin: 0 },
+        assignedCourses: ["CSE202 (Theory - 6h)", "CSE202L (Lab - 4h)"],
+        isOverloaded: false,
+        underloadCapacity: 6.0,
+        status: "CAPACITY_AVAILABLE",
+        guidanceProjects: 1,
+      },
+      {
+        id: "FAC-CSE-005",
+        facultyCode: "FAC-CSE-005",
+        name: "Dr. B. Harish",
+        designation: "Associate Professor",
+        rank: "ASSOCIATE_PROFESSOR",
+        aicteLimitHours: 16,
+        totalHours: 15,
+        breakdown: { theory: 8, lab: 5, mentorship: 2, admin: 0 },
+        assignedCourses: ["CSE403 (Theory - 4h)", "CSE304 (Theory - 4h)", "CSE403L (Lab - 5h)"],
+        isOverloaded: false,
+        status: "COMPLIANT",
+        guidanceProjects: 3,
+      },
+    ];
+
+    const overloadedCount = faculty.filter((f) => f.isOverloaded).length;
+    const totalFacultyCount = faculty.length;
+    const avgTeachingHours = parseFloat((faculty.reduce((sum, f) => sum + f.totalHours, 0) / totalFacultyCount).toFixed(1));
+
+    const proposedRebalance = {
+      fromFaculty: "Prof. V. Rajesh (19 hrs → 17 hrs)",
+      toFaculty: "Prof. M. Sneha (12 hrs → 14 hrs)",
+      transferredSection: "CSE204L Lab Section 02 (2 contact hours/week)",
+      resultingStatus: "All 5 faculty members compliant with AICTE statutory ceilings (<=16h Prof, <=18h Asst Prof).",
+      collisionFree: true,
+    };
+
+    return {
+      departmentCode: dept,
+      totalFacultyCount,
+      overloadedCount,
+      avgTeachingHours,
+      aicteNorms: {
+        professorsMax: 16,
+        associateProfessorsMax: 16,
+        assistantProfessorsMax: 18,
+      },
+      faculty,
+      proposedRebalance,
+      provenance: {
+        source: "ALITS Departmental SIS & AICTE Audit Database",
+        datasetId: "hod-operations-v1",
+        mode: "Departmental Governance Sandbox",
+        isDemo: true,
+      },
+    };
+  }
+
+  /**
+   * Deterministic Student Exam Clearance & Condonation Gateway
+   */
+  static async getStudentExamClearanceAudit(departmentCode = "CSE") {
+    const dept = departmentCode.toUpperCase();
+
+    // Roster of students requiring exam eligibility review
+    const students = [
+      {
+        studentId: "STU-003",
+        rollNo: "22CS103",
+        name: "Aarav Sharma",
+        attendancePct: 68.5,
+        internalMarksPct: 42.0,
+        feeHold: false,
+        hallTicketStatus: "WITHHELD_ATTENDANCE",
+        condonationEligible: true,
+        condonationReason: "Documented fever & medical leave submitted to Health Center. Eligible for HOD 10% waiver (68.5% >= 65.0%).",
+        deficitDelta: 6.5,
+      },
+      {
+        studentId: "STU-005",
+        rollNo: "22CS105",
+        name: "Chetan Verma",
+        attendancePct: 62.0,
+        internalMarksPct: 58.0,
+        feeHold: false,
+        hallTicketStatus: "WITHHELD_ATTENDANCE",
+        condonationEligible: false,
+        condonationReason: "Attendance below 65.0% statutory condonation floor. Requires Dean of Academic Affairs escalation.",
+        deficitDelta: 13.0,
+      },
+      {
+        studentId: "STU-007",
+        rollNo: "22CS107",
+        name: "Eshan Reddy",
+        attendancePct: 71.0,
+        internalMarksPct: 38.0,
+        feeHold: false,
+        hallTicketStatus: "WITHHELD_ATTENDANCE",
+        condonationEligible: true,
+        condonationReason: "Represented university in Inter-Collegiate Autonomous Hackathon. On-Duty attendance compensatory claim.",
+        deficitDelta: 4.0,
+      },
+      {
+        studentId: "STU-010",
+        rollNo: "22CS110",
+        name: "Harish Kalyan",
+        attendancePct: 69.0,
+        internalMarksPct: 45.0,
+        feeHold: true,
+        feeOutstanding: 12000,
+        hallTicketStatus: "WITHHELD_ATTENDANCE_AND_FEE",
+        condonationEligible: true,
+        condonationReason: "Eligible for medical condonation (69.0% >= 65.0%). Fee clearance pending with Bursar.",
+        deficitDelta: 6.0,
+      },
+    ];
+
+    return {
+      departmentCode: dept,
+      statutoryAttendanceFloor: 75.0,
+      medicalCondonationFloor: 65.0,
+      totalAudited: 48,
+      blockedCount: students.length,
+      eligibleForCondonationCount: students.filter((s) => s.condonationEligible).length,
+      students,
+      provenance: {
+        source: "ALITS Departmental SIS & AICTE Audit Database",
+        datasetId: "hod-operations-v1",
+        mode: "Departmental Governance Sandbox",
+        isDemo: true,
+      },
+    };
+  }
 }

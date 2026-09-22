@@ -349,18 +349,47 @@ A structured 4-week pedagogical intervention plan has been formulated with compe
         summary = `### NBA Tier-1 Accreditation Attainment Audit (${dept})
 
 **Department:** ${dept} • Evaluated Program: B.Tech Computer Science & Engineering  
-**Overall NBA Compliance:** 83.5% (Accreditation Ready)  
+**Overall NBA Compliance:** 83.3% (Accreditation Ready • 11 of 12 POs Attained)  
 **Target Benchmark:** 2.00 / 3.00 Scale across Program Outcomes PO1-PO12
 
-**Key Finding:** Program Outcomes PO1 through PO4 and PO12 exceed threshold. A 0.15 deficit was detected in **PO5 (Modern Tool Usage)**, for which a 2-week remedial workshop has been scheduled.`;
+**Key Findings & Remedial Directive:**
+- Program Outcomes **PO1, PO2, PO3, PO4, PO8, PO9, PO12** exceed threshold (Top: PO1 at 2.85).
+- A 0.15 deficit was detected in **PO5 (Modern Tool Usage)** at 1.85 / 2.00.
+- **Action Formulated:** 2-week mandatory container orchestration (Docker/K8s) & CI/CD pipeline workshop assigned to Prof. V. Rajesh to close the gap prior to NBA external peer review.`;
 
         artifacts.push({
           type: "COPO_AUDIT_REPORT",
           title: `NBA Tier-1 Attainment Matrix (${dept})`,
           data: {
-            overallCompliancePct: 83.5,
+            overallCompliancePct: 83.3,
             benchmarkScore: 2.0,
             department: dept,
+            programOutcomes: [
+              { code: "PO1", name: "Engineering Knowledge", attained: 2.85, benchmark: 2.0, status: "SURPASSED", delta: 0.85 },
+              { code: "PO2", name: "Problem Analysis", attained: 2.40, benchmark: 2.0, status: "ATTAINED", delta: 0.40 },
+              { code: "PO3", name: "Design & Development", attained: 2.65, benchmark: 2.0, status: "ATTAINED", delta: 0.65 },
+              { code: "PO4", name: "Investigations & Experiments", attained: 2.50, benchmark: 2.0, status: "ATTAINED", delta: 0.50 },
+              { code: "PO5", name: "Modern Tool Usage (DevOps/Cloud)", attained: 1.85, benchmark: 2.0, status: "GAP_IDENTIFIED", delta: -0.15 },
+              { code: "PO12", name: "Life-long Learning & Autonomy", attained: 2.40, benchmark: 2.0, status: "ATTAINED", delta: 0.40 },
+            ],
+            criticalGaps: [
+              {
+                po: "PO5",
+                title: "Modern Tool Usage (DevOps/Cloud)",
+                currentScore: 1.85,
+                targetScore: 2.0,
+                deficit: -0.15,
+                remedialPlan: "2-week hands-on weekend workshop on Docker/Kubernetes container orchestration and GitHub Actions CI/CD to bridge the 0.15 gap prior to NBA external review.",
+                assignedFaculty: "Prof. V. Rajesh",
+                targetCompletionDate: "2026-10-15",
+              },
+            ],
+            provenance: {
+              source: "ALITS Departmental SIS & AICTE Audit Database",
+              datasetId: "hod-operations-v1",
+              mode: "Departmental Governance Sandbox",
+              isDemo: true,
+            },
           },
         });
       } else if (
@@ -370,36 +399,65 @@ A structured 4-week pedagogical intervention plan has been formulated with compe
         qLower.includes("load") ||
         qLower.includes("allocation")
       ) {
-        summary = `### Department Faculty Teaching Workload Compliance Audit
+        summary = `### Department Faculty Teaching Workload Compliance Audit (${dept})
 
-**Department:** ${dept} • Total Active Faculty: 28  
-**AICTE Statutory Norms:** Professors (Max 16 hrs/week) • Assistant Professors (Max 18 hrs/week)  
-**Overload Status:** 1 Faculty Member exceeded teaching cap (+2.0 hrs)  
-**Action Plan:** Workload rebalancing scheduled by assigning lab section to Teaching Assistant.`;
+**Department:** ${dept} • Total Active Faculty: 28 (5 Core Full-Time Sampled)  
+**AICTE Statutory Norms:** Professors/Assoc Profs (Max 16 hrs/week) • Assistant Professors (Max 18 hrs/week)  
+**Overload Status:** 1 Faculty Member exceeded statutory teaching cap (+1.0 hr)  
+**Deterministic Rebalance Plan:** Transfer **CSE204L Lab Section 02 (2 hrs/wk)** from Prof. V. Rajesh (19h → 17h) to Prof. M. Sneha (12h → 14h), restoring 100% AICTE compliance with zero timetable clashes.`;
 
         artifacts.push({
           type: "WORKLOAD_AUDIT_REPORT",
-          title: `Faculty Workload Distribution (${dept})`,
+          title: `Faculty Workload Distribution & AICTE Balance (${dept})`,
           data: {
             overloadedCount: 1,
             department: dept,
+            totalFaculty: 5,
+            avgHours: 15.2,
+            facultyWorkload: [
+              { name: "Dr. K. S. Ramanujan", rank: "Professor", totalHours: 16, limit: 16, status: "COMPLIANT" },
+              { name: "Dr. S. Ananya", rank: "Associate Professor", totalHours: 14, limit: 16, status: "BALANCED" },
+              { name: "Prof. V. Rajesh", rank: "Assistant Professor", totalHours: 19, limit: 18, status: "OVERLOADED (+1h)" },
+              { name: "Prof. M. Sneha", rank: "Assistant Professor", totalHours: 12, limit: 18, status: "AVAILABLE (+6h)" },
+              { name: "Dr. B. Harish", rank: "Associate Professor", totalHours: 15, limit: 16, status: "COMPLIANT" },
+            ],
+            proposedRebalance: {
+              from: "Prof. V. Rajesh (19h → 17h)",
+              to: "Prof. M. Sneha (12h → 14h)",
+              section: "CSE204L Lab Section 02",
+              impact: "100% Departmental AICTE Compliance Restored",
+            },
+            provenance: {
+              source: "ALITS Departmental SIS & AICTE Audit Database",
+              datasetId: "hod-operations-v1",
+              mode: "Departmental Governance Sandbox",
+              isDemo: true,
+            },
           },
         });
       } else {
         summary = `### Department Governance & Operational Command Briefing (${dept})
 
-**Academic Term:** Fall Term 2026-2027  
-**Enrolled Cohort:** 420 Students across Year I-IV  
-**Operating Metrics:** All 4 major laboratories equipped, zig-zag exam seating plans ready, and syllabus pacing tracked at 64% mid-term completion.`;
+**Academic Regulation:** R23 Autonomous • Fall Term 2026-2027  
+**Enrolled Cohort:** 420 Students across Year I-IV • 4 Specialized Laboratories Equipped  
+**Governance Health Score:** 84 / 100 (Stable Operational Integrity)  
+**Academic Pacing:** 68% Mid-Term Syllabus Coverage • Exam Cell Seating Grid Interleaved (0 Clashes)`;
 
         artifacts.push({
           type: "GOVERNANCE_BRIEF",
-          title: `Department Command Dossier (${dept})`,
+          title: `Department Governance Command Dossier (${dept})`,
           data: {
             department: dept,
             totalStudents: 420,
             totalFaculty: 28,
+            healthScore: 84,
             activeExams: 4,
+            provenance: {
+              source: "ALITS Departmental SIS & AICTE Audit Database",
+              datasetId: "hod-operations-v1",
+              mode: "Departmental Governance Sandbox",
+              isDemo: true,
+            },
           },
         });
       }

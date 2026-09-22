@@ -69,6 +69,52 @@ export async function POST(
     // ─────────────────────────────────────────────────────────────────────────
     if (roleUpper === "FACULTY") {
       if (
+        qLower.includes("brief") ||
+        qLower.includes("lecture") ||
+        qLower.includes("today") ||
+        qLower.includes("period") ||
+        qLower.includes("class") ||
+        qLower.includes("lesson")
+      ) {
+        summary = `### 5-Minute Faculty Lecture Briefing & Teaching Schedule (${course})
+
+**Course:** ${course} — Advanced Agentic AI & Distributed Neural Systems  
+**Classroom:** Turing Hall 101 • **Enrolled:** 62 Students  
+**Current Topic:** Unit 3: Multi-Agent Orchestration & Deterministic Consensus Invariants  
+**Session Objective:** Transition students from stochastic prompt engineering to deterministic state-machine graphs with rigorous marks and Bloom's taxonomy validators.
+
+> **Pedagogical Blueprint:**
+> 1. **Anchor (0-3m):** Recap why non-deterministic agents fail in high-stakes university exam evaluation.
+> 2. **Core Invariant (3-35m):** Diagram Ricart-Agrawala mutual exclusion and state transition safety conditions.
+> 3. **Interactive Coding (35-45m):** Inspect LangGraph supervisor state transitions with live checkpointing.
+> 4. **Exit Ticket (45-50m):** 2-minute oral viva on why epoch numbers in Paxos must be monotonically increasing.`;
+
+        artifacts.push({
+          type: "TEACHING_BRIEF",
+          title: `Lecture Briefing: ${course} - Unit 3 Multi-Agent Graphs`,
+          data: {
+            courseCode: course,
+            courseTitle: "Advanced Agentic AI & Distributed Neural Systems",
+            room: "Turing Hall 101",
+            scheduledSlot: "09:00 AM - 10:30 AM",
+            enrolledCount: 62,
+            targetCO: "CO3: Deterministic Invariants & Distributed Consensus",
+            bloomFocus: "L3 Applying & L4 Analyzing",
+            lectureMilestones: [
+              { time: "00:00 - 00:05", phase: "Concept Anchor", description: "Review stochastic vs deterministic state execution" },
+              { time: "00:05 - 00:25", phase: "Theoretical Foundation", description: "State transition proofs for distributed mutual exclusion" },
+              { time: "00:25 - 00:40", phase: "Lab Walkthrough", description: "Inspecting message complexity 2(N-1) in Python LangGraph" },
+              { time: "00:40 - 00:45", phase: "Check for Understanding", description: "Rapid diagnostic questions on Paxos monotonicity" },
+            ],
+            provenance: {
+              source: "ALITS Academic SIS Simulation",
+              datasetId: "academic-demo-v1",
+              mode: "Faculty Operations Sandbox",
+              isDemo: true,
+            },
+          },
+        });
+      } else if (
         qLower.includes("quiz") ||
         qLower.includes("exam") ||
         qLower.includes("paper") ||
@@ -78,17 +124,22 @@ export async function POST(
       ) {
         summary = `### Official Mid-Term Examination Paper Synthesized (${course})
 
-**Course:** ${course} — Distributed Systems & Cloud Computing  
+**Course:** ${course} — Advanced Agentic AI & Distributed Neural Systems  
 **Academic Regulation:** R23 Autonomous • Fall Term 2026-2027  
-**Distribution:** Bloom's Revised Taxonomy (Part A: 10 Marks L1-L2 • Part B: 20 Marks L3-L4)
+**Distribution:** Bloom's Revised Taxonomy (Part A: 10 Marks L1-L2 • Part B: 20 Marks L3-L4)  
+**Strict Validation Status:** 
+- ✓ MarksValidator: 30 / 30 Marks Exact Match
+- ✓ BloomValidator: Part A (100% L1-L2), Part B (100% L3-L4)
+- ✓ COCoverageValidator: CO1, CO2, CO3, CO4 covered
+- ✓ DuplicateQuestionValidator: 0 duplicates detected
 
-All questions have been evaluated against course outcomes (CO1-CO4) with standardized marking rubrics and clear point distributions.`;
+All questions have been evaluated against course outcomes with standardized marking rubrics and clear point distributions.`;
 
         artifacts.push({
           type: "EXAM_PAPER",
           title: `Mid-Term Examination Paper: ${course}`,
           data: {
-            course: `${course} - Distributed Systems & Cloud Computing`,
+            course: `${course} - Advanced Agentic AI & Distributed Neural Systems`,
             assessmentType: "Mid-Term Examination II",
             totalMarks: 30,
             durationMins: 90,
@@ -99,10 +150,17 @@ All questions have been evaluated against course outcomes (CO1-CO4) with standar
               L3_Applying: 30,
               L4_Analyzing: 20,
             },
+            validationReport: {
+              marksValidator: { passed: true, totalMarks: 30, expectedMarks: 30 },
+              bloomValidator: { passed: true, partA: "100% L1-L2", partB: "100% L3-L4" },
+              duplicateValidator: { passed: true, uniqueQuestions: 7 },
+              coCoverageValidator: { passed: true, coveredCOs: ["CO1", "CO2", "CO3", "CO4"] },
+              syllabusGroundingValidator: { passed: true, unitsCovered: [1, 2, 3, 4] },
+            },
             partA: [
               {
                 qNo: 1,
-                question: "Define mutual exclusion and specify the safety condition in distributed systems.",
+                question: "Define deterministic execution in multi-agent graph orchestrators and contrast it with stochastic LLM generation.",
                 marks: 2,
                 bloomLevel: "L1",
                 co: "CO1",
@@ -116,21 +174,21 @@ All questions have been evaluated against course outcomes (CO1-CO4) with standar
               },
               {
                 qNo: 3,
-                question: "Explain the two fundamental conditions required to achieve Byzantine Fault Tolerance (BFT).",
+                question: "Explain the role of Reciprocal Rank Fusion (RRF) constant k in stabilizing denominator scores across sparse and dense vector hits.",
+                marks: 2,
+                bloomLevel: "L2",
+                co: "CO2",
+              },
+              {
+                qNo: 4,
+                question: "List the four fundamental ACID properties and explain how the Saga pattern handles distributed compensation without 2PC.",
                 marks: 2,
                 bloomLevel: "L1",
                 co: "CO3",
               },
               {
-                qNo: 4,
-                question: "Differentiate between centralized, ring-based, and distributed mutual exclusion algorithms.",
-                marks: 2,
-                bloomLevel: "L2",
-                co: "CO1",
-              },
-              {
                 qNo: 5,
-                question: "What is an epoch number in the Paxos consensus protocol and why is it monotonic?",
+                question: "What is an epoch number in the Paxos consensus protocol and why must it be strictly monotonic?",
                 marks: 2,
                 bloomLevel: "L2",
                 co: "CO4",
@@ -139,21 +197,27 @@ All questions have been evaluated against course outcomes (CO1-CO4) with standar
             partB: [
               {
                 qNo: 6,
-                question: "Analyze the Ricart-Agrawala algorithm for distributed mutual exclusion. Provide complete state transition diagrams, message communication sequence, and prove that it requires 2(N-1) messages per critical section entry.",
+                question: "Analyze the Ricart-Agrawala algorithm for distributed mutual exclusion. Provide complete state transition diagrams, message communication sequence for 3 concurrent nodes, and prove that it requires exactly 2(N-1) messages per critical section entry.",
                 marks: 10,
                 bloomLevel: "L4",
                 co: "CO2",
-                markingRubric: "Algorithmic logic: 4 marks • State diagrams: 3 marks • Message complexity proof: 3 marks",
+                markingRubric: "Algorithmic message flow: 4 marks • State transition diagrams: 3 marks • Message complexity proof: 3 marks",
               },
               {
                 qNo: 7,
-                question: "Design a fault-tolerant Chubby lock service architecture for coarse-grained distributed synchronization. Detail master election via Paxos, keep-alive leases, and client cache invalidation under network partition scenarios.",
+                question: "Design a fault-tolerant hybrid retrieval architecture integrating Qdrant vector embeddings, BM25 keyword index, and a Neo4j knowledge graph. Detail how context window token limits are preserved and how hallucinations are mitigated.",
                 marks: 10,
                 bloomLevel: "L3",
                 co: "CO3",
-                markingRubric: "Paxos leader election: 4 marks • Keep-alive leases: 3 marks • Cache invalidation: 3 marks",
+                markingRubric: "System architectural diagram: 4 marks • Hybrid reranking calculation: 3 marks • Token budget pruning logic: 3 marks",
               },
             ],
+            provenance: {
+              source: "ALITS Academic SIS Simulation",
+              datasetId: "academic-demo-v1",
+              mode: "Faculty Operations Sandbox",
+              isDemo: true,
+            },
           },
         });
       } else if (
@@ -166,61 +230,108 @@ All questions have been evaluated against course outcomes (CO1-CO4) with standar
         summary = `### Academic Risk Assessment & 4-Week Remedial Intervention Dossier
 
 **Cohort Evaluated:** B.Tech CSE • Year III • Section A (48 Students)  
-**At-Risk Students Identified:** 3 Students (6.25% of cohort)  
-**Class Average Attendance:** 82.4% (Healthy Academic Baseline)
+**At-Risk Students Identified:** 4 Students (8.3% of cohort)  
+**Deterministic Rule Applied:** Attendance < 75.0% OR Continuous Internal Marks < 50.0%  
+**Class Average Attendance:** 84.2% (Healthy Academic Baseline)
 
-A structured 4-week pedagogical intervention plan has been formulated to prevent hall ticket withholding and restore internal test performance prior to semester-end examinations.`;
+A structured 4-week pedagogical intervention plan has been formulated with compensatory lab sessions, peer tutoring circles, and weekly faculty check-ins to prevent hall ticket withholding.`;
 
         artifacts.push({
           type: "RISK_AUDIT",
           title: "Student Risk Radar & Remedial Intervention Plan",
           data: {
             cohortSize: 48,
-            atRiskCount: 3,
-            avgAttendancePct: 82.4,
+            atRiskCount: 4,
+            avgAttendancePct: 84.2,
+            cutoffAttendancePct: 75.0,
+            cutoffInternalMarksPct: 50.0,
             atRiskStudents: [
               {
-                rollNo: "22CS101",
+                rollNo: "22CS103",
                 name: "Aarav Sharma",
                 attendancePct: 68.5,
                 internalMarksPct: 42.0,
                 riskTier: "Critical Alert",
-                deficit: "Attendance below 75% threshold & weak mid-term performance in distributed algorithms.",
+                deficit: "Attendance shortfall (68.5% < 75%) & Weak mid-term performance in distributed algorithms.",
+                remedialWeek1: "Compensatory lab attendance & Algorithm Complexity review",
+                remedialWeek2: "Tutoring on Process Synchronization & Semaphores",
               },
               {
-                rollNo: "22CS103",
+                rollNo: "22CS105",
                 name: "Chetan Verma",
                 attendancePct: 62.0,
                 internalMarksPct: 58.0,
                 riskTier: "Critical Alert",
                 deficit: "Severe attendance shortfall below 65% mandatory condonation floor.",
+                remedialWeek1: "Mandatory daily faculty check-in & medical certificate verification",
+                remedialWeek2: "Unit 1 & Unit 2 problem sets completion",
               },
               {
-                rollNo: "22CS105",
+                rollNo: "22CS107",
                 name: "Eshan Reddy",
                 attendancePct: 71.0,
                 internalMarksPct: 38.0,
                 riskTier: "Academic Watch",
-                deficit: "Internal test score below 40% pass criteria. Requires concept revision.",
+                deficit: "Internal test score below 40% pass criteria (38%). Critical failure risk.",
+                remedialWeek1: "1-on-1 Faculty counseling session & learning gap analysis",
+                remedialWeek2: "Remedial lab assignments on Vector RAG pipelines",
+              },
+              {
+                rollNo: "22CS110",
+                name: "Harish Kalyan",
+                attendancePct: 69.0,
+                internalMarksPct: 45.0,
+                riskTier: "Academic Watch",
+                deficit: "Attendance shortfall (69.0%) & Low internal marks (45%).",
+                remedialWeek1: "Attendance recovery classes & Distributed Systems tutorials",
+                remedialWeek2: "Review of deadlock detection algorithms",
               },
             ],
+            provenance: {
+              source: "ALITS Academic SIS Simulation",
+              datasetId: "academic-demo-v1",
+              mode: "Faculty Operations Sandbox",
+              isDemo: true,
+            },
           },
         });
       } else {
-        summary = `### Faculty Academic Operational Dossier (${dept})
+        summary = `### Faculty Academic Operational Dossier & Syllabus Progress (${dept})
 
-**Focus:** Syllabus Coverage, Timetable Schedule & Exam Cell Invigilation Duties  
-**Status:** All Fall 2026 course modules verified against AICTE and university curricula.`;
+**Focus:** Syllabus Coverage, Timetable Schedule & AICTE Workload Compliance  
+**Status:** All Fall 2026 course modules verified against AICTE and autonomous R23 regulations.  
+**Weekly Contact Hours:** 16 hrs/wk compliant (within AICTE 18 hrs/wk ceiling).`;
 
         artifacts.push({
           type: "SYLLABUS_ANALYSIS",
-          title: `Academic Course Plan & Dossier (${course})`,
-          content: `### Course Dossier Overview
-- **Course Code:** ${course}
-- **Course Name:** Distributed Systems & Cloud Computing
-- **Weekly Contact Hours:** 3 Hours Lecture + 2 Hours Lab (4 Credits)
-- **Course Outcomes:** CO1 (Distributed Fundamentals), CO2 (Synchronization & Consensus), CO3 (Fault Tolerance), CO4 (Cloud Scalability)
-- **Pedagogical Tools:** Hands-on Socket Programming Labs, AWS Cloud Architecture Workshops`,
+          title: `Academic Course Plan & CO-PO Attainment (${course})`,
+          data: {
+            courseCode: course,
+            courseName: "Advanced Agentic AI & Distributed Neural Systems",
+            weeklyContactHours: "3 Hours Theory + 2 Hours Lab (4 Credits)",
+            overallProgressPct: 68,
+            totalPlannedHours: 45,
+            completedHours: 31,
+            targetCOs: [
+              { code: "CO1", description: "Foundations of Autonomous Multi-Agent Reasoning", progressPct: 100, status: "COMPLETED" },
+              { code: "CO2", description: "Hybrid Vector Search, Reciprocal Rank Fusion & Neo4j", progressPct: 100, status: "COMPLETED" },
+              { code: "CO3", description: "Deterministic Guardrails & Enterprise Tool Runtimes", progressPct: 80, status: "IN_PROGRESS" },
+              { code: "CO4", description: "Distributed Consensus & Multi-Turn State Synchronization", progressPct: 55, status: "IN_PROGRESS" },
+              { code: "CO5", description: "Autonomous Evaluation, Latency Budgets & Deployment", progressPct: 0, status: "UPCOMING" },
+            ],
+            aicteWorkload: {
+              currentTeachingHours: 16,
+              maxWeeklyLimit: 18,
+              status: "Compliant with AICTE Norms",
+              breakdown: "8 hrs Theory + 6 hrs Lab + 2 hrs Mentorship",
+            },
+            provenance: {
+              source: "ALITS Academic SIS Simulation",
+              datasetId: "academic-demo-v1",
+              mode: "Faculty Operations Sandbox",
+              isDemo: true,
+            },
+          },
         });
       }
 

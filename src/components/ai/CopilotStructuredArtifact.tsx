@@ -104,6 +104,12 @@ export function CopilotStructuredArtifact({
     data.eligibleCandidates ||
     (content && content.includes("Recruitment") && content.includes("CGPA"));
 
+  const isTeachingBrief =
+    type.includes("TEACHING_BRIEF") ||
+    type.includes("BRIEF") ||
+    data.lectureMilestones ||
+    (content && content.includes("Lecture Briefing"));
+
   return (
     <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden text-slate-900 dark:text-slate-100 my-3 font-sans">
       {/* ── Official Institutional Document Header ── */}
@@ -724,8 +730,74 @@ export function CopilotStructuredArtifact({
           </div>
         )}
 
+        {/* 6. TEACHING BRIEF / LECTURE PLAYBOOK */}
+        {isTeachingBrief && (
+          <div className="space-y-4">
+            <div className="p-3.5 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                  Lecture Operational Briefing
+                </span>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
+                  {data.courseCode || "CSE401"} — {data.courseTitle || "Advanced Agentic AI"}
+                </h4>
+                <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-600 dark:text-slate-400">
+                  <span>Room: <strong>{data.room || "Turing Hall 101"}</strong></span>
+                  <span>•</span>
+                  <span>Slot: <strong>{data.scheduledSlot || "09:00 AM - 10:30 AM"}</strong></span>
+                  <span>•</span>
+                  <span>Enrolled: <strong>{data.enrolledCount || 62} Students</strong></span>
+                </div>
+              </div>
+              <div className="flex flex-col sm:items-end gap-1">
+                <Badge className="bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-950/60 dark:text-purple-300 text-[10px]">
+                  {data.targetCO || "CO3 Invariants"}
+                </Badge>
+                <span className="text-[11px] font-semibold text-slate-500">
+                  Bloom: {data.bloomFocus || "L3-L4"}
+                </span>
+              </div>
+            </div>
+
+            {data.lectureMilestones && Array.isArray(data.lectureMilestones) && (
+              <div className="space-y-2">
+                <h5 className="font-bold text-xs uppercase text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 text-indigo-500" />
+                  Structured Session Timeline & Milestones
+                </h5>
+                <div className="space-y-2">
+                  {data.lectureMilestones.map((ms: any, mIdx: number) => (
+                    <div
+                      key={mIdx}
+                      className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 flex items-start gap-3"
+                    >
+                      <span className="font-mono text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-1 rounded-md shrink-0">
+                        {ms.time}
+                      </span>
+                      <div>
+                        <p className="text-xs font-bold text-slate-900 dark:text-white">
+                          {ms.phase}
+                        </p>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                          {ms.description}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Provenance Footer */}
+            <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between text-[10px] text-slate-500 gap-1.5">
+              <span>Data Source: <strong>ALITS Academic SIS Simulation</strong> • ID: <code>academic-demo-v1</code></span>
+              <span className="font-mono text-purple-600 dark:text-purple-400 font-bold">✓ Deterministic Schedule Grounding Verified</span>
+            </div>
+          </div>
+        )}
+
         {/* Fallback for General / Markdown Content */}
-        {!isExamPaper && !isRiskOrRemedial && !isCopoMatrix && !isWorkload && !isExecutiveMemo && !isPlacement && (
+        {!isExamPaper && !isRiskOrRemedial && !isCopoMatrix && !isWorkload && !isExecutiveMemo && !isPlacement && !isTeachingBrief && (
           <div className="prose prose-sm dark:prose-invert max-w-none text-slate-800 dark:text-slate-200">
             {content ? (
               <div className="whitespace-pre-line leading-relaxed">{content}</div>

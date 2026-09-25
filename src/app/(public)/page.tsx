@@ -372,6 +372,8 @@ export default function HomePage() {
 
             {/* Responsive Mobile Hamburger Toggle */}
             <button
+              type="button"
+              suppressHydrationWarning
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
               className="xl:hidden p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-800 shrink-0 flex items-center justify-center min-w-[38px] min-h-[38px]"
               aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
@@ -980,6 +982,8 @@ export default function HomePage() {
               const isSelected = selectedDemo.id === preset.id;
               return (
                 <button
+                  type="button"
+                  suppressHydrationWarning
                   key={preset.id}
                   onClick={() => {
                     setSelectedDemo(preset);
@@ -1020,6 +1024,8 @@ export default function HomePage() {
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> {selectedDemo.confidence} Grounded
                 </span>
                 <button
+                  type="button"
+                  suppressHydrationWarning
                   onClick={() => runInferenceSimulation(selectedDemo)}
                   className="flex items-center gap-1 text-[11px] text-slate-700 hover:text-slate-900 bg-white/5 hover:bg-white/10 px-2 py-1 rounded-lg transition-colors"
                 >
@@ -1087,6 +1093,8 @@ export default function HomePage() {
                         <BookOpen className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">Source: {selectedDemo.source}</span>
                       </span>
                       <button
+                        type="button"
+                        suppressHydrationWarning
                         onClick={handleCopy}
                         className="text-xs text-slate-600 hover:text-slate-900 flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] transition-colors shrink-0 ml-2"
                       >
@@ -1239,6 +1247,8 @@ export default function HomePage() {
             {/* Trigger Button & Download Result */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <button
+                type="button"
+                suppressHydrationWarning
                 onClick={handleTriggerLaserSlice}
                 disabled={isSlicingLaser}
                 className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-slate-900 text-xs font-bold shadow-xl shadow-cyan-600/30 flex items-center justify-center gap-2 transition-all hover:scale-105"
@@ -1460,6 +1470,8 @@ export default function HomePage() {
                   className="rounded-2xl  border border-indigo-100 overflow-hidden transition-all duration-200 backdrop-blur-xl"
                 >
                   <button
+                    type="button"
+                    suppressHydrationWarning
                     onClick={() => setOpenFaq(isOpen ? null : idx)}
                     className="w-full p-6 text-left flex items-center justify-between gap-4 font-bold text-slate-900 text-sm hover:text-indigo-400 transition-colors"
                   >

@@ -121,7 +121,7 @@ export default function PlacementLayout({ children }: { children: React.ReactNod
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200 bg-white p-4 space-y-1">
+          <div className="lg:hidden border-t border-slate-200 bg-white p-4 space-y-1 animate-drop-in">
             {studentPlacementNav.map((item) => {
               const Icon = item.icon;
               return (
@@ -158,7 +158,7 @@ export default function PlacementLayout({ children }: { children: React.ReactNod
       </header>
 
       {/* ── MAIN CONTENT VIEW — FULL SPACE FLUID EDGE-TO-EDGE ─────────── */}
-      <main className="flex-1 w-full max-w-none px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 w-full max-w-none px-4 sm:px-6 lg:px-8 py-6 animate-page-fade-up entrance-stagger">
         {children}
       </main>
     </div>

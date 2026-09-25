@@ -144,7 +144,7 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
 
         {/* Mobile Navigation Drawer */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-slate-200 bg-white/95 p-4 space-y-2">
+          <div className="md:hidden border-t border-slate-200 bg-white/95 p-4 space-y-2 animate-drop-in">
             {navLinks.map((tab) => {
               const isActive =
                 tab.href === "/principal"
@@ -189,7 +189,7 @@ export default function PrincipalLayout({ children }: { children: React.ReactNod
       </header>
 
       {/* ── MAIN EXECUTIVE BODY — FULL SPACE FLUID LAYOUT ───────────────── */}
-      <main className="flex-1 w-full p-3 sm:p-5 lg:p-6 space-y-6 max-w-none">
+      <main className="flex-1 w-full p-3 sm:p-5 lg:p-6 space-y-6 max-w-none animate-page-fade-up entrance-stagger">
         {children}
       </main>
     </div>

@@ -61,7 +61,7 @@ export default function DashboardLayout({
       <div className="flex h-screen w-full bg-background overflow-hidden text-foreground">
         <AppSidebar />
         <SidebarInset className="flex flex-col flex-1 h-full w-full bg-background border-l border-border/50">
-          <header className="flex h-14 shrink-0 items-center justify-between gap-2 sm:gap-3 border-b border-border/50 bg-background/80 backdrop-blur-xl px-3 sm:px-6 sticky top-0 z-10 shadow-xs">
+          <header className="flex h-14 shrink-0 items-center justify-between gap-2 sm:gap-3 border-b border-border/50 bg-background/80 backdrop-blur-xl px-3 sm:px-6 sticky top-0 z-10 shadow-xs anim-slide-down">
             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
               <SidebarTrigger className="-ml-1 sm:-ml-2 hover:bg-muted transition-colors rounded-xl p-2 shrink-0" />
               
@@ -149,7 +149,7 @@ export default function DashboardLayout({
           </div>
         </header>
           <main className="flex-1 overflow-auto p-3 sm:p-5 lg:p-6 relative w-full">
-            <div className="w-full space-y-6 max-w-none animate-slide-up-fade">
+            <div className="w-full space-y-6 max-w-none animate-page-fade-up entrance-stagger">
               {children}
             </div>
           </main>

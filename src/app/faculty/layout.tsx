@@ -248,7 +248,7 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
       )}
 
       {/* Navigation Menu */}
-      <nav className="flex-1 px-2 py-3 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-2 py-3 space-y-1 overflow-y-auto entrance-stagger">
         {!collapsed && (
           <p className="px-3 pb-1 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
             Academic Operations
@@ -345,7 +345,7 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
       {/* ── MAIN CONTENT AREA ── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Bar */}
-        <header className="h-16 shrink-0 border-b border-slate-200/80 bg-white/70 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between gap-3 shadow-xs">
+        <header className="h-16 shrink-0 border-b border-slate-200/80 bg-white/70 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between gap-3 shadow-xs anim-slide-down">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             {/* Mobile Hamburger Button */}
             <button
@@ -415,7 +415,7 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
 
         {/* Content Body — Full Space Fluid Edge-to-Edge Layout */}
         <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 w-full">
-          <div className="w-full space-y-6 max-w-none">{children}</div>
+          <div className="w-full space-y-6 max-w-none animate-page-fade-up entrance-stagger">{children}</div>
         </main>
       </div>
     </div>

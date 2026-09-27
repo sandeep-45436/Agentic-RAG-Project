@@ -56,12 +56,18 @@
   --animate-page-slide-right: pageSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-page-scale: pageScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 
-  /* Pop-Up Animations */
-  --animate-pop-in: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
-  --animate-pop-in-bounce: popInBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  --animate-pop-in-elastic: popInElastic 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) both;
-  --animate-drop-in: dropIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-  --animate-flip-in: flipIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* Pop-Up Animations (Medium Slow Motion) */
+  --animate-pop-in: popIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-pop-in-bounce: popInBounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-pop-in-elastic: popInElastic 0.65s cubic-bezier(0.68, -0.55, 0.265, 1.55) both;
+  --animate-drop-in: dropIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-flip-in: flipIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-modal-in: modalPopInCenter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-modal-out: modalPopOutCenter 0.35s ease-out forwards;
+  --animate-dropdown-in: dropdownMediumSlowIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-dropdown-out: dropdownMediumSlowOut 0.25s ease-out forwards;
+  --animate-overlay-in: overlayFadeInSlow 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-overlay-out: overlayFadeOutSlow 0.35s ease-out forwards;
 
   /* Loading Animations */
   --animate-neural-pulse: neuralPulse 1.8s ease-in-out infinite;
@@ -762,6 +768,77 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+ * 💫 MEDIUM SLOW MOTION POP-UP & MODAL KEYFRAMES
+ * ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes modalPopInCenter {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@keyframes modalPopOutCenter {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -47%) scale(0.95);
+  }
+}
+@keyframes dropdownMediumSlowIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes dropdownMediumSlowOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95) translateY(-6px);
+  }
+}
+@keyframes overlayFadeInSlow {
+  0% { opacity: 0; backdrop-filter: blur(0px); }
+  100% { opacity: 1; backdrop-filter: blur(8px); }
+}
+@keyframes overlayFadeOutSlow {
+  0% { opacity: 1; backdrop-filter: blur(8px); }
+  100% { opacity: 0; backdrop-filter: blur(0px); }
+}
+
+/* Soundwave Equalizer for Career / Placement Engine */
+@keyframes soundwaveBar {
+  0%   { transform: scaleY(0.25); }
+  50%  { transform: scaleY(1); }
+  100% { transform: scaleY(0.25); }
+}
+
+/* Continuous Radar Sweep */
+@keyframes radarSweepContinuous {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Radar Target Blip Pulse */
+@keyframes radarBlip {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50%      { opacity: 1; transform: scale(1.3); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
  * 🔄 LOADING & PROCESSING KEYFRAMES
  * ═══════════════════════════════════════════════════════════════════════════ */
 @keyframes neuralPulse {
@@ -862,14 +939,23 @@
 .animate-page-slide-right { animation: pageSlideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .animate-page-scale { animation: pageScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
-/* Pop-ups */
-.animate-pop-in { animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-pop-in-bounce { animation: popInBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-.animate-pop-in-elastic { animation: popInElastic 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) both; }
-.animate-drop-in { animation: dropIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-flip-in { animation: flipIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-pop-out { animation: popOut 0.2s ease-in both; }
-.animate-drop-out { animation: dropOut 0.2s ease-in both; }
+/* Pop-ups & Modals (Medium Slow Motion) */
+.animate-pop-in { animation: popIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-pop-in-bounce { animation: popInBounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-pop-in-elastic { animation: popInElastic 0.65s cubic-bezier(0.68, -0.55, 0.265, 1.55) both; }
+.animate-drop-in { animation: dropIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-flip-in { animation: flipIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-pop-out { animation: popOut 0.25s ease-in both; }
+.animate-drop-out { animation: dropOut 0.25s ease-in both; }
+
+.animate-modal-in { animation: modalPopInCenter 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-modal-out { animation: modalPopOutCenter 0.35s ease-out forwards; }
+.animate-dropdown-in { animation: dropdownMediumSlowIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-dropdown-out { animation: dropdownMediumSlowOut 0.25s ease-out forwards; }
+.animate-overlay-in { animation: overlayFadeInSlow 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-overlay-out { animation: overlayFadeOutSlow 0.35s ease-out forwards; }
+.animate-radar-sweep-continuous { animation: radarSweepContinuous 3.2s linear infinite; }
+.animate-radar-blip { animation: radarBlip 2.2s ease-in-out infinite; }
 
 /* Loading states */
 .animate-neural-pulse { animation: neuralPulse 1.8s ease-in-out infinite; }

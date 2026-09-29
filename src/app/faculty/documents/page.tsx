@@ -42,28 +42,28 @@ const VISIBILITY_OPTIONS = [
     label: "Department Scope (Default)",
     desc: "Visible to faculty & authorized students in your department",
     icon: Building,
-    badgeClass: "bg-indigo-500/10 text-indigo-300 border-indigo-500/30",
+    badgeClass: "bg-indigo-50 text-indigo-700 border-indigo-200",
   },
   {
     value: "PRIVATE",
     label: "Private (Confidential)",
     desc: "Visible only to you and Department Head (HOD)",
     icon: Lock,
-    badgeClass: "bg-purple-500/10 text-purple-300 border-purple-500/30",
+    badgeClass: "bg-purple-50 text-purple-700 border-purple-200",
   },
   {
     value: "COLLEGE",
     label: "College Scope",
     desc: "Visible across engineering/allied departments in college",
     icon: Shield,
-    badgeClass: "bg-amber-500/10 text-amber-300 border-amber-500/30",
+    badgeClass: "bg-amber-50 text-amber-800 border-amber-200",
   },
   {
     value: "UNIVERSITY",
     label: "University-Wide",
     desc: "Visible to all university members (requires admin authorization)",
     icon: Globe,
-    badgeClass: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30",
+    badgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
   },
 ];
 
@@ -249,30 +249,30 @@ export default function FacultyDocumentsPage() {
     switch (vis) {
       case "DEPARTMENT":
         return (
-          <Badge variant="outline" className="text-[10px] bg-indigo-500/10 text-indigo-300 border-indigo-500/30">
-            <Building className="h-3 w-3 mr-1" /> Department
+          <Badge variant="outline" className="text-[10px] font-bold bg-indigo-50 text-indigo-700 border-indigo-200">
+            <Building className="h-3 w-3 mr-1 text-indigo-600" /> Department
           </Badge>
         );
       case "PRIVATE":
         return (
-          <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/30">
-            <Lock className="h-3 w-3 mr-1" /> Private
+          <Badge variant="outline" className="text-[10px] font-bold bg-purple-50 text-purple-700 border-purple-200">
+            <Lock className="h-3 w-3 mr-1 text-purple-600" /> Private
           </Badge>
         );
       case "COLLEGE":
         return (
-          <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-300 border-amber-500/30">
-            <Shield className="h-3 w-3 mr-1" /> College
+          <Badge variant="outline" className="text-[10px] font-bold bg-amber-50 text-amber-800 border-amber-200">
+            <Shield className="h-3 w-3 mr-1 text-amber-600" /> College
           </Badge>
         );
       case "UNIVERSITY":
         return (
-          <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-300 border-emerald-500/30">
-            <Globe className="h-3 w-3 mr-1" /> University
+          <Badge variant="outline" className="text-[10px] font-bold bg-emerald-50 text-emerald-700 border-emerald-200">
+            <Globe className="h-3 w-3 mr-1 text-emerald-600" /> University
           </Badge>
         );
       default:
-        return <Badge variant="outline">{vis}</Badge>;
+        return <Badge variant="outline" className="bg-slate-100 text-slate-700 border-slate-200 font-semibold">{vis}</Badge>;
     }
   };
 
@@ -298,21 +298,21 @@ export default function FacultyDocumentsPage() {
     <AnimatedBackground>
       <div className="space-y-6">
       {/* ── HEADER BANNER ────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl bg-[#121824] border border-slate-800 p-5 sm:p-6 shadow-sm">
+      <div className="relative overflow-hidden rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200/90 p-5 sm:p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <Badge className="bg-indigo-500/10 text-indigo-300 border-indigo-500/30 text-xs font-semibold">
+              <Badge className="bg-indigo-50 text-indigo-700 border-indigo-200 text-xs font-bold shadow-2xs">
                 Department Document Center
               </Badge>
-              <span className="text-xs text-slate-400 font-mono">
+              <span className="text-xs text-slate-500 font-mono font-semibold">
                 {facultyContext?.facultyCode || "FAC-MEMBER"}
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               Academic Documents & Syllabi
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-600 font-medium">
               Department of {facultyContext?.departmentName || "Computer Science"} ({facultyContext?.departmentCode || "CSE"})
             </p>
           </div>
@@ -322,9 +322,9 @@ export default function FacultyDocumentsPage() {
               variant="outline"
               size="sm"
               onClick={() => fetchDocuments()}
-              className="border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-white rounded-xl text-xs px-3 py-2"
+              className="border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs px-3.5 py-2 shadow-2xs"
             >
-              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 text-indigo-600 ${loading ? "animate-spin" : ""}`} />
               Refresh
             </Button>
           </div>
@@ -333,42 +333,42 @@ export default function FacultyDocumentsPage() {
 
       {/* ── METRIC TILES ─────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-        <Card className="bg-[#121824] border-slate-800 shadow-sm rounded-2xl">
+        <Card className="bg-white/95 backdrop-blur-xl border-slate-200/90 shadow-sm rounded-2xl">
           <CardContent className="p-4 sm:p-5 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-slate-400">Department Documents</p>
-              <p className="text-2xl font-bold text-white mt-1">{facultyContext?.totalDeptDocs ?? documents.length}</p>
-              <p className="text-[11px] text-indigo-400 mt-0.5">{facultyContext?.departmentCode || "CSE"} Exclusive Scope</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Department Documents</p>
+              <p className="text-2xl font-black text-slate-900 mt-1">{facultyContext?.totalDeptDocs ?? documents.length}</p>
+              <p className="text-[11px] text-indigo-600 font-semibold mt-0.5">{facultyContext?.departmentCode || "CSE"} Exclusive Scope</p>
             </div>
-            <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <div className="p-3 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-2xs">
               <Building className="h-5 w-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#121824] border-slate-800 shadow-sm rounded-2xl">
+        <Card className="bg-white/95 backdrop-blur-xl border-slate-200/90 shadow-sm rounded-2xl">
           <CardContent className="p-4 sm:p-5 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-slate-400">University-Wide Policies</p>
-              <p className="text-2xl font-bold text-white mt-1">{facultyContext?.totalUnivDocs ?? 0}</p>
-              <p className="text-[11px] text-emerald-400 mt-0.5">Regulations & Academic Rules</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">University-Wide Policies</p>
+              <p className="text-2xl font-black text-slate-900 mt-1">{facultyContext?.totalUnivDocs ?? 0}</p>
+              <p className="text-[11px] text-emerald-700 font-semibold mt-0.5">Regulations & Academic Rules</p>
             </div>
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <div className="p-3 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-2xs">
               <Globe className="h-5 w-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#121824] border-slate-800 shadow-sm rounded-2xl">
+        <Card className="bg-white/95 backdrop-blur-xl border-slate-200/90 shadow-sm rounded-2xl">
           <CardContent className="p-4 sm:p-5 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-slate-400">Indexed RAG Chunks</p>
-              <p className="text-2xl font-bold text-white mt-1">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Indexed RAG Chunks</p>
+              <p className="text-2xl font-black text-slate-900 mt-1">
                 {documents.reduce((acc, d) => acc + (d._count?.chunks || 0), 0)}
               </p>
-              <p className="text-[11px] text-purple-400 mt-0.5">Vectors in Qdrant & BM25</p>
+              <p className="text-[11px] text-purple-700 font-semibold mt-0.5">Vectors in Qdrant & BM25</p>
             </div>
-            <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            <div className="p-3 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 shadow-2xs">
               <Shield className="h-5 w-5" />
             </div>
           </CardContent>
@@ -376,28 +376,28 @@ export default function FacultyDocumentsPage() {
       </div>
 
       {/* ── UPLOAD ZONE & CATEGORIZATION ─────────────────────────── */}
-      <Card className="bg-[#121824] border-slate-800 shadow-sm rounded-2xl">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg text-white font-semibold flex items-center gap-2">
-            <UploadCloud className="h-5 w-5 text-indigo-400" />
+      <Card className="bg-white/95 backdrop-blur-xl border-slate-200/90 shadow-sm rounded-2xl">
+        <CardHeader className="pb-4 border-b border-slate-100">
+          <CardTitle className="text-lg text-slate-900 font-bold flex items-center gap-2">
+            <UploadCloud className="h-5 w-5 text-indigo-600" />
             Upload Academic Document
           </CardTitle>
-          <CardDescription className="text-slate-400 text-xs">
-            Documents are automatically tagged with your authenticated department (<strong className="text-slate-200">{facultyContext?.departmentCode || "CSE"}</strong>) and indexed for zero-hallucination RAG.
+          <CardDescription className="text-slate-600 text-xs font-medium">
+            Documents are automatically tagged with your authenticated department (<strong className="text-slate-900 font-bold">{facultyContext?.departmentCode || "CSE"}</strong>) and indexed for zero-hallucination RAG.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-4">
           {/* Form Options */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-slate-300">Document Category</Label>
+              <Label className="text-xs font-bold text-slate-700">Document Category</Label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-[#0B0F17] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-2xs"
               >
                 {DOCUMENT_CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat} className="bg-[#0B0F17] text-slate-200">
+                  <option key={cat} value={cat} className="bg-white text-slate-900">
                     {cat}
                   </option>
                 ))}
@@ -405,24 +405,24 @@ export default function FacultyDocumentsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-slate-300">Course Code (Optional)</Label>
+              <Label className="text-xs font-bold text-slate-700">Course Code (Optional)</Label>
               <Input
                 placeholder="e.g. CS401, CS501"
                 value={courseCode}
                 onChange={(e) => setCourseCode(e.target.value.toUpperCase())}
-                className="bg-[#0B0F17] border-slate-800 rounded-xl text-xs text-slate-200 placeholder:text-slate-600 focus:border-indigo-500"
+                className="bg-white border-slate-200 rounded-xl text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-2xs"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-slate-300">Visibility Scope</Label>
+              <Label className="text-xs font-bold text-slate-700">Visibility Scope</Label>
               <select
                 value={visibility}
                 onChange={(e) => setVisibility(e.target.value)}
-                className="w-full bg-[#0B0F17] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-2xs"
               >
                 {VISIBILITY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value} className="bg-[#0B0F17] text-slate-200">
+                  <option key={opt.value} value={opt.value} className="bg-white text-slate-900">
                     {opt.label}
                   </option>
                 ))}
@@ -435,8 +435,8 @@ export default function FacultyDocumentsPage() {
             <div
               className={`border-2 border-dashed rounded-2xl p-7 flex flex-col items-center justify-center space-y-3 cursor-pointer transition-all ${
                 dragging
-                  ? "border-indigo-500 bg-indigo-500/10"
-                  : "border-slate-800 hover:border-indigo-500/50 bg-[#0B0F17]/60 hover:bg-[#0B0F17]"
+                  ? "border-indigo-500 bg-indigo-50/60"
+                  : "border-slate-300 hover:border-indigo-400 bg-slate-50/60 hover:bg-slate-50"
               }`}
               onClick={() => fileInputRef.current?.click()}
               onDragOver={(e) => {
@@ -450,14 +450,14 @@ export default function FacultyDocumentsPage() {
                 if (e.dataTransfer.files?.[0]) handleSelectFile(e.dataTransfer.files[0]);
               }}
             >
-              <div className="bg-indigo-500/10 p-3 rounded-full text-indigo-400">
+              <div className="bg-indigo-50 p-3.5 rounded-full text-indigo-600 border border-indigo-100 shadow-2xs">
                 <UploadCloud className="h-6 w-6" />
               </div>
               <div className="text-center">
-                <p className="text-sm font-medium text-slate-200">
+                <p className="text-sm font-bold text-slate-900">
                   Click to select or drag and drop document
                 </p>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-slate-500 mt-0.5 font-medium">
                   PDF, DOCX, or TXT formats (Max: 25 MB)
                 </p>
               </div>
@@ -472,16 +472,16 @@ export default function FacultyDocumentsPage() {
               />
             </div>
           ) : (
-            <div className="p-4 rounded-xl bg-[#0B0F17] border border-slate-800 space-y-3">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                  <div className="p-2.5 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-100">
                     <FileText className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white truncate max-w-sm">{file.name}</p>
-                    <p className="text-xs text-slate-400">
-                      {(file.size / 1024 / 1024).toFixed(2)} MB • {category} • Scope: <span className="text-indigo-400 font-semibold">{visibility}</span>
+                    <p className="text-sm font-bold text-slate-900 truncate max-w-sm">{file.name}</p>
+                    <p className="text-xs text-slate-500 font-medium">
+                      {(file.size / 1024 / 1024).toFixed(2)} MB • {category} • Scope: <span className="text-indigo-700 font-bold">{visibility}</span>
                     </p>
                   </div>
                 </div>
@@ -493,7 +493,7 @@ export default function FacultyDocumentsPage() {
                       setFile(null);
                       setUploadStatus("idle");
                     }}
-                    className="text-slate-400 hover:text-white"
+                    className="text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -503,23 +503,23 @@ export default function FacultyDocumentsPage() {
               {uploading && (
                 <div className="space-y-3 py-2">
                   <QuantumNexusLoader size="sm" text="Vectorizing & Embedding Chunks..." />
-                  <Progress value={progress} className="h-2 bg-slate-800" />
-                  <p className="text-xs text-indigo-300 text-center animate-pulse">
+                  <Progress value={progress} className="h-2 bg-slate-200" />
+                  <p className="text-xs text-indigo-700 font-bold text-center animate-pulse">
                     Ingesting into Multimodal RAG Engine with Department Metadata...
                   </p>
                 </div>
               )}
 
               {uploadStatus === "success" && (
-                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-emerald-500/10 text-emerald-300 text-xs border border-emerald-500/30">
-                  <CheckCircle2 className="h-4 w-4 shrink-0" />
+                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-emerald-50 text-emerald-800 text-xs border border-emerald-200 font-semibold">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
                   <span>{successMessage}</span>
                 </div>
               )}
 
               {uploadStatus === "error" && (
-                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-rose-500/10 text-rose-300 text-xs border border-rose-500/30">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
+                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-rose-50 text-rose-800 text-xs border border-rose-200 font-semibold">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
                   <span>{errorMessage}</span>
                 </div>
               )}
@@ -528,7 +528,7 @@ export default function FacultyDocumentsPage() {
                 {!uploading && uploadStatus !== "success" && (
                   <Button
                     onClick={handleUpload}
-                    className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold h-9"
+                    className="w-full bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold h-9 shadow-sm transition-all active:scale-98"
                   >
                     Confirm & Ingest to {facultyContext?.departmentCode || "Department"} Repository
                   </Button>
@@ -540,7 +540,7 @@ export default function FacultyDocumentsPage() {
                       setFile(null);
                       setUploadStatus("idle");
                     }}
-                    className="w-full border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 rounded-xl text-xs h-9"
+                    className="w-full border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-bold rounded-xl text-xs h-9 shadow-2xs"
                   >
                     Upload Another Document
                   </Button>
@@ -552,49 +552,49 @@ export default function FacultyDocumentsPage() {
       </Card>
 
       {/* ── DOCUMENT DIRECTORY TABLE ─────────────────────────────── */}
-      <Card className="bg-[#121824] border-slate-800 shadow-sm rounded-2xl">
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
+      <Card className="bg-white/95 backdrop-blur-xl border-slate-200/90 shadow-sm rounded-2xl">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
-            <CardTitle className="text-lg text-white font-semibold flex items-center gap-2">
-              <FolderOpen className="h-5 w-5 text-indigo-400" />
+            <CardTitle className="text-lg text-slate-900 font-bold flex items-center gap-2">
+              <FolderOpen className="h-5 w-5 text-indigo-600" />
               Authorized Department Document Repository
             </CardTitle>
-            <CardDescription className="text-slate-400 text-xs">
+            <CardDescription className="text-slate-600 text-xs font-medium">
               {filteredDocs.length} Documents authorized for your role & department • Click any document to view preview
             </CardDescription>
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             {/* Filter Tabs */}
-            <div className="flex bg-[#0B0F17] p-1 rounded-xl border border-slate-800 text-[11px] overflow-x-auto scrollbar-none max-w-full">
+            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-[11px] overflow-x-auto scrollbar-none max-w-full">
               <button
                 onClick={() => setActiveTab("ALL")}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                  activeTab === "ALL" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"
+                className={`px-3 py-1 rounded-lg font-bold transition-all ${
+                  activeTab === "ALL" ? "bg-white text-indigo-700 shadow-2xs" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 All
               </button>
               <button
                 onClick={() => setActiveTab("DEPARTMENT")}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                  activeTab === "DEPARTMENT" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"
+                className={`px-3 py-1 rounded-lg font-bold transition-all ${
+                  activeTab === "DEPARTMENT" ? "bg-white text-indigo-700 shadow-2xs" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 {facultyContext?.departmentCode || "Dept"} Only
               </button>
               <button
                 onClick={() => setActiveTab("UNIVERSITY")}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                  activeTab === "UNIVERSITY" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"
+                className={`px-3 py-1 rounded-lg font-bold transition-all ${
+                  activeTab === "UNIVERSITY" ? "bg-white text-indigo-700 shadow-2xs" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 University
               </button>
               <button
                 onClick={() => setActiveTab("MY_UPLOADS")}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                  activeTab === "MY_UPLOADS" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"
+                className={`px-3 py-1 rounded-lg font-bold transition-all ${
+                  activeTab === "MY_UPLOADS" ? "bg-white text-indigo-700 shadow-2xs" : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 My Uploads
@@ -602,12 +602,12 @@ export default function FacultyDocumentsPage() {
             </div>
 
             <div className="relative w-full sm:w-56">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
               <Input
                 placeholder="Search documents..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-[#0B0F17] border-slate-800 text-xs text-white rounded-xl placeholder:text-slate-500 focus:border-indigo-500"
+                className="pl-9 bg-white border-slate-200 text-xs font-medium text-slate-900 rounded-xl placeholder:text-slate-400 focus:border-indigo-500 shadow-2xs"
               />
             </div>
 
@@ -616,38 +616,38 @@ export default function FacultyDocumentsPage() {
               size="sm"
               onClick={() => fetchDocuments()}
               disabled={loading}
-              className="h-9 px-3 rounded-xl border-slate-800 bg-[#0B0F17] text-xs text-slate-300 hover:text-white hover:border-slate-700 gap-1.5 shrink-0"
+              className="h-9 px-3 rounded-xl border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 gap-1.5 shrink-0 shadow-2xs"
               title="Refresh document repository status"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-3.5 w-3.5 text-indigo-600 ${loading ? "animate-spin" : ""}`} />
               <span className="hidden sm:inline">Sync</span>
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           {loading ? (
-            <div className="py-12 text-center text-slate-400 text-xs">Loading authorized documents...</div>
+            <div className="py-12 text-center text-slate-500 text-xs font-semibold">Loading authorized documents...</div>
           ) : filteredDocs.length === 0 ? (
             <div className="py-12 text-center space-y-2">
-              <FolderOpen className="h-10 w-10 text-slate-600 mx-auto" />
-              <p className="text-sm font-medium text-slate-300">No documents found in this scope</p>
-              <p className="text-xs text-slate-500">Upload your course materials above or change the filter tab.</p>
+              <FolderOpen className="h-10 w-10 text-slate-400 mx-auto" />
+              <p className="text-sm font-bold text-slate-900">No documents found in this scope</p>
+              <p className="text-xs text-slate-500 font-medium">Upload your course materials above or change the filter tab.</p>
             </div>
           ) : (
             <div className="overflow-x-auto -mx-6 px-6">
               <table className="w-full min-w-[720px] text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider">
-                    <th className="pb-3 font-semibold">Document Name & Department</th>
-                    <th className="pb-3 font-semibold">Visibility</th>
-                    <th className="pb-3 font-semibold">Size</th>
-                    <th className="pb-3 font-semibold">Chunks</th>
-                    <th className="pb-3 font-semibold">Status</th>
-                    <th className="pb-3 font-semibold">Uploaded</th>
-                    <th className="pb-3 font-semibold text-right">Actions</th>
+                  <tr className="border-b border-slate-200 text-slate-700 uppercase text-[11px] font-bold tracking-wider bg-slate-50/60">
+                    <th className="py-3 px-3">Document Name & Department</th>
+                    <th className="py-3 px-2">Visibility</th>
+                    <th className="py-3 px-2">Size</th>
+                    <th className="py-3 px-2">Chunks</th>
+                    <th className="py-3 px-2">Status</th>
+                    <th className="py-3 px-2">Uploaded</th>
+                    <th className="py-3 px-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/80">
+                <tbody className="divide-y divide-slate-100">
                   {filteredDocs.map((doc) => {
                     const isOwnDoc =
                       doc.uploadedBy === facultyContext?.id ||
@@ -656,21 +656,21 @@ export default function FacultyDocumentsPage() {
                       <tr
                         key={doc.id}
                         onClick={() => handleViewDoc(doc.id)}
-                        className="hover:bg-slate-800/40 cursor-pointer transition-colors"
+                        className="hover:bg-indigo-50/40 cursor-pointer transition-colors"
                       >
-                        <td className="py-3.5 pr-4">
+                        <td className="py-3.5 px-3">
                           <div className="flex items-center gap-2.5">
-                            <div className="p-1.5 rounded-md bg-indigo-500/10 text-indigo-400">
+                            <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-2xs">
                               <FileText className="h-4 w-4" />
                             </div>
                             <div>
-                              <p className="font-semibold text-white truncate max-w-xs">{doc.fileName}</p>
-                              <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                                <span className="text-indigo-400 font-medium">
+                              <p className="font-bold text-slate-900 truncate max-w-xs">{doc.fileName}</p>
+                              <p className="text-[11px] text-slate-500 flex items-center gap-1.5 font-medium">
+                                <span className="text-indigo-700 font-bold">
                                   {doc.department?.code || doc.department?.name || (doc.visibility === "UNIVERSITY" ? "University-Wide" : "Department")}
                                 </span>
                                 {isOwnDoc && (
-                                  <span className="text-[9px] px-1.5 py-0.2 bg-slate-800 text-slate-300 rounded border border-slate-700">
+                                  <span className="text-[9px] px-2 py-0.2 bg-purple-50 text-purple-700 rounded-full border border-purple-200 font-bold">
                                     Your Upload
                                   </span>
                                 )}
@@ -678,31 +678,31 @@ export default function FacultyDocumentsPage() {
                             </div>
                           </div>
                         </td>
-                        <td className="py-3.5">
+                        <td className="py-3.5 px-2">
                           {getVisibilityBadge(doc.visibility || "DEPARTMENT")}
                         </td>
-                        <td className="py-3.5 text-slate-300">{(doc.fileSize / 1024 / 1024).toFixed(2)} MB</td>
-                        <td className="py-3.5 text-slate-300">
-                          <span className="font-mono text-indigo-300">{doc._count?.chunks || 0}</span> chunks
+                        <td className="py-3.5 px-2 text-slate-600 font-medium">{(doc.fileSize / 1024 / 1024).toFixed(2)} MB</td>
+                        <td className="py-3.5 px-2 text-slate-600 font-medium">
+                          <span className="font-mono text-indigo-700 font-bold">{doc._count?.chunks || 0}</span> chunks
                         </td>
-                        <td className="py-3.5">
+                        <td className="py-3.5 px-2">
                           <Badge
                             variant="outline"
-                            className={`text-[10px] ${
+                            className={`text-[10px] font-bold ${
                               doc.processingStatus === "COMPLETED"
-                                ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                                 : doc.processingStatus === "PROCESSING"
-                                ? "bg-amber-500/10 text-amber-300 border-amber-500/30 animate-pulse"
-                                : "bg-rose-500/10 text-rose-300 border-rose-500/30"
+                                ? "bg-amber-50 text-amber-800 border-amber-200 animate-pulse"
+                                : "bg-rose-50 text-rose-700 border-rose-200"
                             }`}
                           >
                             {doc.processingStatus}
                           </Badge>
                         </td>
-                        <td className="py-3.5 text-slate-400">
+                        <td className="py-3.5 px-2 text-slate-500 font-medium">
                           {new Date(doc.createdAt).toLocaleDateString()}
                         </td>
-                        <td className="py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
+                        <td className="py-3.5 px-3 text-right" onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center justify-end gap-1">
                             {doc.processingStatus !== "COMPLETED" && (
                               <Button
@@ -711,7 +711,7 @@ export default function FacultyDocumentsPage() {
                                 title="Re-process document extraction & vector embeddings"
                                 disabled={doc.processingStatus === "PROCESSING" || reprocessingId === doc.id}
                                 onClick={(e) => handleReprocessDoc(doc.id, e)}
-                                className="rounded-lg h-7 px-2 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10"
+                                className="rounded-lg h-7 px-2 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
                               >
                                 <RefreshCw className={`h-3.5 w-3.5 ${doc.processingStatus === "PROCESSING" || reprocessingId === doc.id ? "animate-spin" : ""}`} />
                               </Button>
@@ -721,7 +721,7 @@ export default function FacultyDocumentsPage() {
                               size="sm"
                               title="View document details & indexed chunks"
                               onClick={() => handleViewDoc(doc.id)}
-                              className="rounded-lg h-7 px-2 text-slate-400 hover:text-white hover:bg-slate-800"
+                              className="rounded-lg h-7 px-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50"
                             >
                               <Eye className="h-3.5 w-3.5" />
                             </Button>
@@ -732,8 +732,8 @@ export default function FacultyDocumentsPage() {
                               onClick={() => handleDelete(doc.id)}
                               className={`rounded-lg h-7 px-2 ${
                                 isOwnDoc
-                                  ? "text-slate-400 hover:text-rose-400 hover:bg-rose-500/10"
-                                  : "text-slate-600 hover:text-slate-500 cursor-pointer"
+                                  ? "text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                                  : "text-slate-300 hover:text-slate-400 cursor-not-allowed"
                               }`}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
@@ -752,24 +752,24 @@ export default function FacultyDocumentsPage() {
 
       {/* ── DOCUMENT PREVIEW / DETAIL MODAL ───────────────────────── */}
       {selectedDoc && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-overlay-in">
-          <div className="bg-[#121824] border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl popup-card-in">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 animate-overlay-in">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl popup-card-in">
             {/* Modal Header */}
-            <div className="p-5 border-b border-slate-800 flex items-start justify-between gap-4 bg-[#121824]">
+            <div className="p-5 border-b border-slate-200 flex items-start justify-between gap-4 bg-slate-50/60">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="p-2.5 rounded-xl bg-indigo-500/15 text-indigo-400 shrink-0">
+                <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 shrink-0">
                   <FileText className="h-6 w-6" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-base font-bold text-white truncate">{selectedDoc.fileName}</h3>
+                  <h3 className="text-base font-bold text-slate-900 truncate">{selectedDoc.fileName}</h3>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
-                    <Badge variant="outline" className="text-[10px] bg-indigo-500/10 text-indigo-300 border-indigo-500/30">
+                    <Badge variant="outline" className="text-[10px] font-bold bg-indigo-50 text-indigo-700 border-indigo-200">
                       {selectedDoc.department?.code || "Department Scope"}
                     </Badge>
-                    <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/30">
+                    <Badge variant="outline" className="text-[10px] font-bold bg-purple-50 text-purple-700 border-purple-200">
                       {selectedDoc.visibility || "DEPARTMENT"}
                     </Badge>
-                    <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-300 border-emerald-500/30">
+                    <Badge variant="outline" className="text-[10px] font-bold bg-emerald-50 text-emerald-700 border-emerald-200">
                       {selectedDoc.processingStatus || "COMPLETED"}
                     </Badge>
                   </div>
@@ -777,54 +777,56 @@ export default function FacultyDocumentsPage() {
               </div>
               <button
                 onClick={() => setSelectedDoc(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors shrink-0"
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors shrink-0"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-4 text-xs text-slate-300">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#0B0F17] p-3.5 rounded-xl border border-slate-800">
+            <div className="p-5 overflow-y-auto space-y-4 text-xs text-slate-700">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                 <div>
-                  <span className="text-slate-500 block text-[10px]">File Size</span>
-                  <span className="font-semibold text-white">{(selectedDoc.fileSize / 1024 / 1024).toFixed(2)} MB</span>
+                  <span className="text-slate-500 block text-[10px] font-bold uppercase">File Size</span>
+                  <span className="font-bold text-slate-900">{(selectedDoc.fileSize / 1024 / 1024).toFixed(2)} MB</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px]">Indexed Chunks</span>
-                  <span className="font-semibold text-indigo-400 font-mono">{selectedDoc._count?.chunks || selectedDoc.chunks?.length || 0} Chunks</span>
+                  <span className="text-slate-500 block text-[10px] font-bold uppercase">Indexed Chunks</span>
+                  <span className="font-extrabold text-indigo-700 font-mono">{selectedDoc._count?.chunks || selectedDoc.chunks?.length || 0} Chunks</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px]">Uploaded On</span>
-                  <span className="font-semibold text-white">{new Date(selectedDoc.createdAt).toLocaleDateString()}</span>
+                  <span className="text-slate-500 block text-[10px] font-bold uppercase">Uploaded On</span>
+                  <span className="font-bold text-slate-900">{new Date(selectedDoc.createdAt).toLocaleDateString()}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px]">Vector Search Status</span>
-                  <span className="font-semibold text-emerald-400">Online & Ready</span>
+                  <span className="text-slate-500 block text-[10px] font-bold uppercase">Vector Search Status</span>
+                  <span className="font-bold text-emerald-700 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Online & Ready
+                  </span>
                 </div>
               </div>
 
               <div>
-                <h4 className="font-semibold text-white text-xs mb-2 flex items-center justify-between">
+                <h4 className="font-bold text-slate-900 text-xs mb-2 flex items-center justify-between">
                   <span>Indexed Content Chunks Preview</span>
-                  <span className="text-[10px] text-slate-500 font-normal">
+                  <span className="text-[10px] text-slate-500 font-medium">
                     Showing top {selectedDoc.chunks?.length || 0} chunks
                   </span>
                 </h4>
 
                 {(!selectedDoc.chunks || selectedDoc.chunks.length === 0) ? (
-                  <div className="p-6 text-center text-slate-400 bg-[#0B0F17] rounded-xl border border-slate-800">
+                  <div className="p-6 text-center text-slate-500 bg-slate-50 rounded-xl border border-slate-200 font-medium">
                     No indexed chunks preview available.
                   </div>
                 ) : (
                   <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
                     {selectedDoc.chunks.map((chunk: any, i: number) => (
-                      <div key={chunk.id || i} className="p-3 bg-[#0B0F17] rounded-xl border border-slate-800 space-y-1.5">
-                        <div className="flex items-center justify-between text-[10px] text-indigo-400 font-mono">
+                      <div key={chunk.id || i} className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                        <div className="flex items-center justify-between text-[10px] text-indigo-700 font-mono font-bold">
                           <span>Chunk #{chunk.chunkIndex ?? i + 1} {chunk.pageNumber ? `(Page ${chunk.pageNumber})` : ""}</span>
-                          <span className="text-slate-500">{chunk.tokenCount ? `${chunk.tokenCount} tokens` : ""}</span>
+                          <span className="text-slate-500 font-normal">{chunk.tokenCount ? `${chunk.tokenCount} tokens` : ""}</span>
                         </div>
-                        <p className="text-slate-300 leading-relaxed line-clamp-4 font-mono text-[11px]">
+                        <p className="text-slate-700 leading-relaxed line-clamp-4 font-mono text-[11px]">
                           {chunk.content}
                         </p>
                       </div>
@@ -835,25 +837,25 @@ export default function FacultyDocumentsPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-slate-800 bg-[#0E131F] flex items-center justify-between gap-3">
+            <div className="p-4 border-t border-slate-200 bg-slate-50/60 flex items-center justify-between gap-3">
               {selectedDoc.signedUrl ? (
                 <a
                   href={selectedDoc.signedUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all shadow-sm"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold transition-all shadow-sm active:scale-98"
                 >
                   <Eye className="h-3.5 w-3.5" /> Open / Download File
                 </a>
               ) : (
-                <span className="text-xs text-slate-500">Original file stored securely</span>
+                <span className="text-xs text-slate-500 font-medium">Original file stored securely</span>
               )}
 
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setSelectedDoc(null)}
-                className="border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 rounded-xl text-xs"
+                className="border-slate-200 bg-white text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-bold shadow-2xs"
               >
                 Close Preview
               </Button>

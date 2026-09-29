@@ -109,34 +109,40 @@ function greeting() {
 function StatCard({
   icon: Icon,
   iconBg,
+  cardBg,
+  borderColor,
   label,
   value,
   subtext,
   badge,
+  badgeClass,
 }: {
   icon: React.ElementType;
   iconBg: string;
+  cardBg?: string;
+  borderColor?: string;
   label: string;
   value: string;
   subtext?: string;
   badge?: string;
+  badgeClass?: string;
 }) {
   return (
-    <div className="bg-[#121824] border border-slate-800 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 hover:border-slate-700 shadow-sm">
+    <div className={`rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-lg shadow-sm border ${cardBg || "bg-white/95"} ${borderColor || "border-slate-200/90"} backdrop-blur-xl`}>
       <div className="flex items-start justify-between gap-3">
-        <div className={`${iconBg} p-2.5 rounded-xl shrink-0 shadow-sm`}>
-          <Icon className="w-5 h-5 text-white" />
+        <div className={`${iconBg} p-3 rounded-2xl shrink-0 shadow-md text-white`}>
+          <Icon className="w-5 h-5" />
         </div>
         {badge && (
-          <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-semibold">
+          <Badge className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${badgeClass || "bg-emerald-50 text-emerald-700 border-emerald-200"}`}>
             {badge}
           </Badge>
         )}
       </div>
       <div className="mt-4">
-        <p className="text-xs text-slate-400 font-medium">{label}</p>
-        <p className="text-2xl font-bold text-white mt-1 tracking-tight font-mono">{value}</p>
-        {subtext && <p className="text-[11px] text-slate-400 mt-1 leading-tight">{subtext}</p>}
+        <p className="text-xs text-slate-500 font-semibold tracking-wide uppercase">{label}</p>
+        <p className="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tracking-tight font-mono">{value}</p>
+        {subtext && <p className="text-[11px] text-slate-600 mt-1 font-medium leading-tight">{subtext}</p>}
       </div>
     </div>
   );
@@ -220,7 +226,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
       </div>
     );
   }
@@ -228,12 +234,12 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
-        <div className="bg-[#121824] border border-red-500/30 rounded-2xl p-8 max-w-md text-center shadow-xl">
-          <h2 className="text-lg font-semibold text-red-400 mb-2">Connection Issue</h2>
-          <p className="text-sm text-slate-400 mb-6">{error}</p>
+        <div className="bg-white border border-red-200 rounded-3xl p-8 max-w-md text-center shadow-xl">
+          <h2 className="text-lg font-bold text-red-600 mb-2">Connection Issue</h2>
+          <p className="text-sm text-slate-600 mb-6">{error}</p>
           <button
             onClick={() => load()}
-            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 text-sm font-medium transition-colors shadow-lg"
+            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 text-sm font-semibold transition-all shadow-md shadow-indigo-600/25"
           >
             Try Again
           </button>
@@ -253,145 +259,145 @@ export default function DashboardPage() {
     <AnimatedBackground>
     <div className="space-y-6 pb-12 font-sans">
       {/* ── STUDENT ACADEMIC OPERATIONS SUB-FEATURES HUB ────────────────── */}
-      <div className="bg-[#121824] rounded-2xl border border-slate-800 p-4 sm:p-5 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-800 gap-2">
-          <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold">
-              <GraduationCap className="h-4.5 w-4.5" />
+      <div className="bg-white/95 rounded-3xl border border-indigo-100/90 p-5 sm:p-6 shadow-sm shadow-indigo-100/30 backdrop-blur-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 mb-4 border-b border-slate-100 gap-2">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-500/25">
+              <GraduationCap className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-sm sm:text-base font-bold text-white">Student Academic Modules & Resources Hub</h2>
-              <p className="text-[11px] text-slate-400">Access your department faculty materials, AI study assistant, notes repository, and research tools</p>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900">Student Academic Modules & Resources Hub</h2>
+              <p className="text-xs text-slate-500">Access your department faculty materials, AI study assistant, notes repository, and research tools</p>
             </div>
           </div>
-          <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 w-fit">
-            5 Student Sub-Features Available
+          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/80 shadow-xs w-fit">
+            ✨ 5 Student Sub-Features Available
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
           <a
             href="#dept-feed"
-            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-800 bg-[#0B0F17] hover:border-indigo-500/40 hover:bg-[#0E1422] transition-all"
+            className="group flex flex-col justify-between p-4 rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50/70 via-white to-blue-50/40 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-100/50 hover:-translate-y-1 transition-all"
           >
-            <div className="flex items-center justify-between mb-2">
-              <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 group-hover:scale-105 transition-transform">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-500/20 group-hover:scale-110 transition-transform">
                 <FileText className="h-4 w-4" />
               </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Live Feed</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Live Feed</span>
             </div>
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-indigo-400 transition-colors">Faculty Uploads Feed</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">Syllabi, course handouts & lecture notes</p>
+              <p className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Faculty Uploads Feed</p>
+              <p className="text-[11px] text-slate-600 mt-0.5">Syllabi, course handouts & lecture notes</p>
             </div>
-            <div className="mt-2 pt-1.5 border-t border-slate-800 flex items-center text-[10px] font-semibold text-indigo-400">
+            <div className="mt-3 pt-2 border-t border-indigo-100/80 flex items-center text-[11px] font-bold text-indigo-600">
               <span>Jump to Feed</span>
-              <ChevronRight className="h-3 w-3 ml-0.5" />
+              <ChevronRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
             </div>
           </a>
 
           <Link
             href="/chat"
-            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-800 bg-[#0B0F17] hover:border-purple-500/40 hover:bg-[#0E1422] transition-all"
+            className="group flex flex-col justify-between p-4 rounded-2xl border border-purple-100 bg-gradient-to-br from-purple-50/70 via-white to-fuchsia-50/40 hover:border-purple-300 hover:shadow-lg hover:shadow-purple-100/50 hover:-translate-y-1 transition-all"
           >
-            <div className="flex items-center justify-between mb-2">
-              <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 group-hover:scale-105 transition-transform">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 rounded-xl bg-purple-600 text-white shadow-md shadow-purple-500/20 group-hover:scale-110 transition-transform">
                 <Bot className="h-4 w-4" />
               </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">RAG AI</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">RAG AI</span>
             </div>
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-purple-400 transition-colors">AI Academic Chat</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">Ask questions on textbooks, syllabus & slides</p>
+              <p className="text-sm font-bold text-slate-900 group-hover:text-purple-600 transition-colors">AI Academic Chat</p>
+              <p className="text-[11px] text-slate-600 mt-0.5">Ask questions on textbooks, syllabus & slides</p>
             </div>
-            <div className="mt-2 pt-1.5 border-t border-slate-800 flex items-center text-[10px] font-semibold text-purple-400">
+            <div className="mt-3 pt-2 border-t border-purple-100/80 flex items-center text-[11px] font-bold text-purple-600">
               <span>Start Chat</span>
-              <ChevronRight className="h-3 w-3 ml-0.5" />
+              <ChevronRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
 
           <Link
             href="/documents"
-            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-800 bg-[#0B0F17] hover:border-blue-500/40 hover:bg-[#0E1422] transition-all"
+            className="group flex flex-col justify-between p-4 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/70 via-white to-cyan-50/40 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-100/50 hover:-translate-y-1 transition-all"
           >
-            <div className="flex items-center justify-between mb-2">
-              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 group-hover:scale-105 transition-transform">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20 group-hover:scale-110 transition-transform">
                 <BookOpen className="h-4 w-4" />
               </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">Docs</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Docs</span>
             </div>
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors">Browse Notes & Docs</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">Searchable textbook chunks & question banks</p>
+              <p className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Browse Notes & Docs</p>
+              <p className="text-[11px] text-slate-600 mt-0.5">Searchable textbook chunks & question banks</p>
             </div>
-            <div className="mt-2 pt-1.5 border-t border-slate-800 flex items-center text-[10px] font-semibold text-blue-400">
+            <div className="mt-3 pt-2 border-t border-blue-100/80 flex items-center text-[11px] font-bold text-blue-600">
               <span>Browse Documents</span>
-              <ChevronRight className="h-3 w-3 ml-0.5" />
+              <ChevronRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
 
           <Link
             href="/knowledge-bases"
-            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-800 bg-[#0B0F17] hover:border-emerald-500/40 hover:bg-[#0E1422] transition-all"
+            className="group flex flex-col justify-between p-4 rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/40 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-100/50 hover:-translate-y-1 transition-all"
           >
-            <div className="flex items-center justify-between mb-2">
-              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 group-hover:scale-105 transition-transform">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 rounded-xl bg-emerald-600 text-white shadow-md shadow-emerald-500/20 group-hover:scale-110 transition-transform">
                 <Layers className="h-4 w-4" />
               </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Repositories</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Repositories</span>
             </div>
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors">Knowledge Bases</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">Indexed department collections & curriculum</p>
+              <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">Knowledge Bases</p>
+              <p className="text-[11px] text-slate-600 mt-0.5">Indexed department collections & curriculum</p>
             </div>
-            <div className="mt-2 pt-1.5 border-t border-slate-800 flex items-center text-[10px] font-semibold text-emerald-400">
+            <div className="mt-3 pt-2 border-t border-emerald-100/80 flex items-center text-[11px] font-bold text-emerald-600">
               <span>View Repositories</span>
-              <ChevronRight className="h-3 w-3 ml-0.5" />
+              <ChevronRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
 
           <Link
             href="/research"
-            className="group flex flex-col justify-between p-3.5 rounded-xl border border-slate-800 bg-[#0B0F17] hover:border-amber-500/40 hover:bg-[#0E1422] transition-all"
+            className="group flex flex-col justify-between p-4 rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50/70 via-white to-orange-50/40 hover:border-amber-300 hover:shadow-lg hover:shadow-amber-100/50 hover:-translate-y-1 transition-all"
           >
-            <div className="flex items-center justify-between mb-2">
-              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 group-hover:scale-105 transition-transform">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 rounded-xl bg-amber-600 text-white shadow-md shadow-amber-500/20 group-hover:scale-110 transition-transform">
                 <BookMarked className="h-4 w-4" />
               </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">Research</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Research</span>
             </div>
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors">Research Workspace</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">AI literature analysis & project research</p>
+              <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors">Research Workspace</p>
+              <p className="text-[11px] text-slate-600 mt-0.5">AI literature analysis & project research</p>
             </div>
-            <div className="mt-2 pt-1.5 border-t border-slate-800 flex items-center text-[10px] font-semibold text-amber-400">
+            <div className="mt-3 pt-2 border-t border-amber-100/80 flex items-center text-[11px] font-bold text-amber-600">
               <span>Open Workspace</span>
-              <ChevronRight className="h-3 w-3 ml-0.5" />
+              <ChevronRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
         </div>
       </div>
 
       {/* ── ALITS STUDENT INSTITUTIONAL BRAND HEADER ──────────────────────── */}
-      <div className="bg-[#121824] rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-800">
+      <div className="bg-white/95 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/90 backdrop-blur-xl">
         <div className="flex items-center gap-3.5">
-          <div className="relative h-11 w-36 sm:w-44 flex items-center justify-start">
+          <div className="relative h-12 w-36 sm:w-44 flex items-center justify-start">
             <img
               src="/images/college-logo.png"
               alt="ALITS University Logo"
-              className="h-10 object-contain drop-shadow-sm brightness-110"
+              className="h-10 object-contain drop-shadow-sm"
               onError={(e) => {
                 (e.target as HTMLElement).style.display = "none";
               }}
             />
           </div>
-          <div className="h-7 w-[1px] bg-slate-800 hidden sm:block" />
+          <div className="h-8 w-[1px] bg-slate-200 hidden sm:block" />
           <div>
-            <span className="text-xs font-bold text-white block tracking-tight">
+            <span className="text-xs sm:text-sm font-bold text-slate-900 block tracking-tight">
               Anantha Lakshmi Institute of Technology & Sciences
             </span>
-            <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
-              <ShieldCheck className="h-3.5 w-3.5 text-indigo-400" />
+            <span className="text-[11px] sm:text-xs text-indigo-600 font-semibold flex items-center gap-1.5 mt-0.5">
+              <ShieldCheck className="h-4 w-4 text-emerald-600" />
               Student Academic Intelligence & Learning Portal
             </span>
           </div>
@@ -400,7 +406,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
           <Link
             href="/student/profile"
-            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-sm text-xs font-semibold px-4 py-2.5 transition-all"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl shadow-md shadow-indigo-600/25 text-xs font-bold px-4 py-2.5 transition-all hover:scale-105"
           >
             <User className="h-4 w-4" />
             My Student Profile ({ac?.studentNumber || "STU-CSE-001"})
@@ -410,53 +416,54 @@ export default function DashboardPage() {
       </div>
 
       {/* ── ACADEMIC HERO BANNER ────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#121824] via-[#151D2C] to-[#121824] border border-slate-800 p-6 lg:p-8 shadow-sm">
-        <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 p-6 sm:p-8 text-white shadow-xl shadow-indigo-500/20">
+        <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-white/20 blur-3xl pointer-events-none" />
+        <div className="absolute left-1/3 bottom-0 -mb-10 h-48 w-48 rounded-full bg-purple-400/20 blur-2xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="bg-indigo-500/15 text-indigo-300 border-indigo-500/30 text-xs font-semibold px-2.5 py-0.5">
-                Academic Year 2026-2027 • Fall Term
+              <Badge className="bg-white/20 hover:bg-white/25 text-white border-white/30 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md">
+                🎓 Academic Year 2026-2027 • Fall Term
               </Badge>
-              <Badge className="bg-emerald-500/15 text-emerald-300 border-emerald-500/30 text-xs">
-                {ac?.academicStatus || "Good Standing"}
+              <Badge className="bg-emerald-400/30 text-white border-emerald-300/40 text-xs font-bold px-2.5 py-0.5 rounded-full backdrop-blur-md">
+                ✓ {ac?.academicStatus || "Good Standing"}
               </Badge>
-              <span className="text-xs text-slate-400 font-mono">
+              <span className="text-xs text-white/80 font-mono font-bold bg-white/10 px-2 py-0.5 rounded-md">
                 {ac?.studentNumber || "STU-CS-101"}
               </span>
             </div>
             
-            <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight drop-shadow-sm">
               {greeting()}, {studentName}
             </h1>
             
-            <p className="text-sm text-slate-400 max-w-xl leading-relaxed">
-              <span className="font-semibold text-slate-200">{deptName} ({deptCode})</span>
+            <p className="text-sm text-indigo-50 max-w-xl leading-relaxed font-medium">
+              <span className="font-bold text-white bg-white/15 px-2 py-0.5 rounded-md">{deptName} ({deptCode})</span>
               {" • "}
               <span>{ac?.enrolledCoursesCount || 5} Active Enrolled Courses</span>
               {" • "}
-              <span className="text-emerald-400 font-medium">Department Retrieval Scope Active</span>
+              <span className="text-emerald-200 font-semibold">Department Retrieval Scope Active</span>
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             <Link
               href="/chat"
-              className="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-sm text-xs font-semibold px-4 py-2.5 transition-all gap-2"
+              className="inline-flex items-center justify-center bg-white text-indigo-700 hover:bg-indigo-50 rounded-2xl shadow-lg shadow-black/10 text-xs font-bold px-5 py-3 transition-all gap-2 hover:scale-105"
             >
-              <Bot className="h-4 w-4" />
+              <Bot className="h-4 w-4 text-indigo-600" />
               Ask Department AI
             </Link>
             <Link
               href="/documents"
-              className="inline-flex items-center justify-center border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold px-4 py-2.5 transition-all gap-2"
+              className="inline-flex items-center justify-center border border-white/40 bg-white/15 hover:bg-white/25 text-white rounded-2xl text-xs font-bold px-4 py-3 transition-all gap-2 backdrop-blur-md"
             >
-              <BookOpen className="h-4 w-4 text-indigo-400" />
+              <BookOpen className="h-4 w-4" />
               Browse Notes
             </Link>
             <button
               onClick={() => load()}
-              className="p-2.5 text-slate-400 hover:text-white bg-[#0B0F17] hover:bg-slate-800 border border-slate-800 rounded-xl transition-colors"
+              className="p-3 text-white hover:text-white bg-white/15 hover:bg-white/25 border border-white/30 rounded-2xl transition-all backdrop-blur-md"
               title="Refresh metrics"
             >
               <RefreshCw className="w-4 h-4" />
@@ -469,34 +476,47 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           icon={FileText}
-          iconBg="bg-indigo-600"
+          iconBg="bg-gradient-to-tr from-indigo-600 to-blue-500"
+          cardBg="bg-gradient-to-br from-indigo-50/60 via-white to-blue-50/40"
+          borderColor="border-indigo-100"
           label="Authorized Knowledge Base"
           value={fmtNum(authDocs)}
           subtext={`Syllabi & Notes in ${deptCode} + University-wide`}
           badge="Live Synced"
+          badgeClass="bg-emerald-100 text-emerald-800 border-emerald-300"
         />
         <StatCard
           icon={Building}
-          iconBg="bg-purple-600"
+          iconBg="bg-gradient-to-tr from-purple-600 to-fuchsia-500"
+          cardBg="bg-gradient-to-br from-purple-50/60 via-white to-fuchsia-50/40"
+          borderColor="border-purple-100"
           label="Active Knowledge Scope"
           value={deptCode}
           subtext={deptName}
           badge="Scoped"
+          badgeClass="bg-purple-100 text-purple-800 border-purple-300"
         />
         <StatCard
           icon={MessageSquare}
-          iconBg="bg-blue-600"
+          iconBg="bg-gradient-to-tr from-blue-600 to-cyan-500"
+          cardBg="bg-gradient-to-br from-blue-50/60 via-white to-cyan-50/40"
+          borderColor="border-blue-100"
           label="Grounded AI Consultations"
           value={fmtNum(s?.totalConversations ?? 0)}
           subtext="Verified Page-Level Citations"
+          badge="Grounded"
+          badgeClass="bg-blue-100 text-blue-800 border-blue-300"
         />
         <StatCard
           icon={Database}
-          iconBg="bg-emerald-600"
+          iconBg="bg-gradient-to-tr from-emerald-600 to-teal-500"
+          cardBg="bg-gradient-to-br from-emerald-50/60 via-white to-teal-50/40"
+          borderColor="border-emerald-100"
           label="Cognitive Subsystems"
           value="Hybrid RAG"
           subtext="Qdrant + BM25 + Neo4j Graph"
           badge="Online"
+          badgeClass="bg-emerald-100 text-emerald-800 border-emerald-300"
         />
       </div>
 
@@ -507,15 +527,17 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Department Course Materials Feed */}
-          <div id="dept-feed" className="bg-[#121824] border border-slate-800 rounded-2xl p-5 space-y-4 shadow-sm">
+          <div id="dept-feed" className="bg-white/95 border border-slate-200/90 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm backdrop-blur-xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-indigo-400" />
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600">
+                  <BookOpen className="w-5 h-5" />
+                </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white tracking-wide">
+                  <h3 className="text-base font-bold text-slate-900 tracking-tight">
                     {deptCode} Faculty Course Uploads & Syllabi
                   </h3>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-xs text-slate-500">
                     Official documents & lecture notes uploaded by {deptName} faculty
                   </p>
                 </div>
@@ -523,22 +545,22 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/faculty/documents"
-                  className="text-xs text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 px-2.5 py-1 rounded-lg font-medium transition-all"
+                  className="text-xs text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-xl font-bold transition-all shadow-xs"
                 >
                   + Upload Material
                 </Link>
                 <Link
                   href="/documents"
-                  className="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-medium"
+                  className="text-xs text-slate-600 hover:text-slate-900 flex items-center gap-1 font-semibold"
                 >
-                  All Docs <ChevronRight className="w-3 h-3" />
+                  All Docs <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
 
             {/* Department Quick Filter Tabs */}
-            <div className="flex flex-wrap items-center gap-1.5 pt-1 pb-2 border-b border-slate-800">
-              <span className="text-[11px] font-semibold text-slate-500 mr-1">Switch Dept:</span>
+            <div className="flex flex-wrap items-center gap-1.5 pt-1 pb-2 border-b border-slate-100">
+              <span className="text-[11px] font-bold text-slate-500 mr-1">Switch Dept:</span>
               {[
                 { code: "CSE", name: "Computer Science" },
                 { code: "ECE", name: "Electronics" },
@@ -555,10 +577,10 @@ export default function DashboardPage() {
                       setSelectedDept(d.code);
                       load(d.code);
                     }}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                       isActive
-                        ? "bg-indigo-600 text-white shadow-sm"
-                        : "bg-[#0B0F17] hover:bg-slate-800 text-slate-400 border border-slate-800"
+                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25"
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-700"
                     }`}
                   >
                     {label}
@@ -567,41 +589,41 @@ export default function DashboardPage() {
               })}
             </div>
 
-            <div className="divide-y divide-slate-800/80">
+            <div className="divide-y divide-slate-100">
               {(!ac?.recentDepartmentDocs || ac.recentDepartmentDocs.length === 0) ? (
                 <div className="py-8 text-center text-xs text-slate-500">
                   No materials uploaded yet for this department.
                 </div>
               ) : (
                 ac.recentDepartmentDocs.map((doc) => (
-                  <div key={doc.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-800/30 px-2 rounded-xl transition-colors">
+                  <div key={doc.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-indigo-50/30 px-3 rounded-2xl transition-colors">
                     <div className="flex items-start gap-3 min-w-0">
-                      <div className="p-2 bg-indigo-500/10 text-indigo-400 rounded-lg shrink-0 mt-0.5">
+                      <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl shrink-0 mt-0.5 shadow-xs">
                         <FileText className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold text-white truncate">{doc.fileName}</p>
+                        <p className="text-sm font-bold text-slate-900 truncate">{doc.fileName}</p>
                         {doc.facultyAuthor && (
-                          <p className="text-[11px] text-slate-400 mt-0.5">
-                            Uploaded by <span className="font-semibold text-slate-300">{doc.facultyAuthor}</span>
+                          <p className="text-xs text-slate-600 mt-0.5">
+                            Uploaded by <span className="font-semibold text-slate-900">{doc.facultyAuthor}</span>
                             {doc.facultyTitle ? ` • ${doc.facultyTitle}` : ""}
                           </p>
                         )}
-                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <div className="flex flex-wrap items-center gap-2 mt-1.5">
                           {doc.courseCode && (
-                            <span className="text-[10px] font-bold text-indigo-300 font-mono bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">
+                            <span className="text-[10px] font-bold text-indigo-700 font-mono bg-indigo-100/80 px-2 py-0.5 rounded-md border border-indigo-200">
                               {doc.courseCode}
                             </span>
                           )}
-                          <span className="text-[10px] text-slate-400 font-mono bg-[#0B0F17] px-1.5 py-0.5 rounded border border-slate-800">
+                          <span className="text-[10px] text-slate-700 font-mono font-medium bg-slate-100 px-2 py-0.5 rounded-md">
                             {doc.departmentCode}
                           </span>
                           {doc.fileSizeText && (
-                            <span className="text-[10px] text-slate-500">
+                            <span className="text-[10px] text-slate-500 font-medium">
                               {doc.fileSizeText}
                             </span>
                           )}
-                          <span className="text-[10px] text-slate-500">
+                          <span className="text-[10px] text-slate-500 font-medium">
                             {timeAgo(doc.createdAt)}
                           </span>
                         </div>
@@ -611,13 +633,13 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                       <button
                         onClick={() => openDocViewer(doc.id)}
-                        className="text-[11px] text-slate-300 hover:text-white bg-[#0B0F17] hover:bg-slate-800 px-2.5 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1 border border-slate-800 shadow-xs"
+                        className="text-xs text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 px-3 py-1.5 rounded-xl font-semibold transition-all flex items-center gap-1.5 border border-slate-200 shadow-xs"
                       >
-                        <Eye className="w-3 h-3 text-cyan-400" /> View
+                        <Eye className="w-3.5 h-3.5 text-cyan-600" /> View
                       </button>
                       <Link
                         href={`/chat`}
-                        className="text-[11px] text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-1.5 rounded-lg font-semibold transition-all border border-indigo-500/20 shadow-xs"
+                        className="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-3.5 py-1.5 rounded-xl font-bold transition-all shadow-sm shadow-indigo-600/20"
                       >
                         Ask AI
                       </Link>
@@ -629,10 +651,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Activity Timeline */}
-          <div className="bg-[#121824] border border-slate-800 rounded-2xl p-5 space-y-4 shadow-sm">
+          <div className="bg-white/95 border border-slate-200/90 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm backdrop-blur-xl">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-              <h3 className="text-sm font-bold text-white tracking-wide">
+              <Sparkles className="w-5 h-5 text-amber-500" />
+              <h3 className="text-base font-bold text-slate-900 tracking-tight">
                 Live Knowledge Platform Activity
               </h3>
             </div>
@@ -642,17 +664,17 @@ export default function DashboardPage() {
                 <p className="text-xs text-slate-500 py-4 text-center">No recent activity.</p>
               ) : (
                 data.activity.map((act) => (
-                  <div key={act.id} className="flex items-center justify-between gap-3 py-2 border-b border-slate-800/80 last:border-0">
+                  <div key={act.id} className="flex items-center justify-between gap-3 py-2.5 border-b border-slate-100 last:border-0">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={`p-1.5 rounded-lg shrink-0 ${act.type === "document" ? "bg-purple-500/10 text-purple-400" : "bg-blue-500/10 text-blue-400"}`}>
-                        {act.type === "document" ? <FileText className="w-3.5 h-3.5" /> : <MessageSquare className="w-3.5 h-3.5" />}
+                      <div className={`p-2 rounded-xl shrink-0 ${act.type === "document" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
+                        {act.type === "document" ? <FileText className="w-4 h-4" /> : <MessageSquare className="w-4 h-4" />}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-slate-200 truncate">{act.label}</p>
-                        <p className="text-[11px] text-slate-400 truncate">{act.sublabel}</p>
+                        <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">{act.label}</p>
+                        <p className="text-xs text-slate-600 truncate">{act.sublabel}</p>
                       </div>
                     </div>
-                    <span className="text-[10px] text-slate-500 shrink-0">{timeAgo(act.time)}</span>
+                    <span className="text-xs text-slate-500 font-medium shrink-0">{timeAgo(act.time)}</span>
                   </div>
                 ))
               )}
@@ -664,30 +686,30 @@ export default function DashboardPage() {
         <div className="space-y-6">
 
           {/* Active Knowledge Scope Card */}
-          <div className="bg-[#121824] border border-indigo-500/30 rounded-2xl p-5 space-y-4 shadow-sm">
+          <div className="bg-gradient-to-br from-indigo-50/80 via-white to-purple-50/60 border border-indigo-200/90 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-indigo-400" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                <ShieldCheck className="w-5 h-5 text-indigo-600" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
                   Access Authorization Policy
                 </h3>
               </div>
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             </div>
 
-            <div className="bg-[#0B0F17] rounded-xl p-3 border border-slate-800 space-y-2">
-              <p className="text-xs text-slate-300 font-medium">Your Scoped Retrieval Boundary:</p>
-              <div className="space-y-1.5 text-xs">
-                <div className="flex items-center gap-2 text-emerald-400">
-                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+            <div className="bg-white rounded-2xl p-4 border border-indigo-100 space-y-2.5 shadow-xs">
+              <p className="text-xs text-slate-800 font-bold">Your Scoped Retrieval Boundary:</p>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center gap-2.5 text-emerald-700 font-semibold">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
                   <span>{deptCode} Department Documents</span>
                 </div>
-                <div className="flex items-center gap-2 text-emerald-400">
-                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                <div className="flex items-center gap-2.5 text-emerald-700 font-semibold">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
                   <span>University-Wide Regulations</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-500">
-                  <XCircle className="w-3.5 h-3.5 shrink-0" />
+                <div className="flex items-center gap-2.5 text-slate-500 font-medium">
+                  <XCircle className="w-4 h-4 shrink-0 text-slate-400" />
                   <span>Other Academic Departments (Blocked)</span>
                 </div>
               </div>
@@ -695,81 +717,81 @@ export default function DashboardPage() {
 
             <Link
               href="/chat"
-              className="w-full flex items-center justify-center gap-2 bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 text-xs font-semibold py-2.5 rounded-xl transition-all"
+              className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-3 rounded-2xl shadow-md shadow-indigo-600/25 transition-all hover:scale-102"
             >
-              Open Scoped Chat Portal <ArrowRight className="w-3.5 h-3.5" />
+              Open Scoped Chat Portal <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
           {/* Quick Academic Shortcuts */}
-          <div className="bg-[#121824] border border-slate-800 rounded-2xl p-5 space-y-3 shadow-sm">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          <div className="bg-white/95 border border-slate-200/90 rounded-3xl p-5 sm:p-6 space-y-3.5 shadow-sm backdrop-blur-xl">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
               University Subsystems
             </h3>
 
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               <Link
                 href="/chat"
-                className="flex items-center justify-between p-3 rounded-xl bg-[#0B0F17] hover:bg-slate-800/60 border border-slate-800 transition-colors group"
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50/80 hover:bg-indigo-50/60 border border-slate-200/80 hover:border-indigo-200 transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
+                  <div className="p-2.5 bg-blue-100 rounded-xl text-blue-700">
                     <MessageSquare className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-slate-200 group-hover:text-indigo-400">Department AI Chat</p>
-                    <p className="text-[10px] text-slate-400">Grounded Q&A with page citations</p>
+                    <p className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Department AI Chat</p>
+                    <p className="text-[11px] text-slate-500">Grounded Q&A with page citations</p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors" />
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
               </Link>
 
               <Link
                 href="/documents"
-                className="flex items-center justify-between p-3 rounded-xl bg-[#0B0F17] hover:bg-slate-800/60 border border-slate-800 transition-colors group"
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50/80 hover:bg-purple-50/60 border border-slate-200/80 hover:border-purple-200 transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
+                  <div className="p-2.5 bg-purple-100 rounded-xl text-purple-700">
                     <FileText className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-slate-200 group-hover:text-indigo-400">Academic Repository</p>
-                    <p className="text-[10px] text-slate-400">Course notes & regulations</p>
+                    <p className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-purple-600 transition-colors">Academic Repository</p>
+                    <p className="text-[11px] text-slate-500">Course notes & regulations</p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors" />
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 transition-colors" />
               </Link>
 
               <Link
                 href="/faculty/timetables"
-                className="flex items-center justify-between p-3 rounded-xl bg-[#0B0F17] hover:bg-slate-800/60 border border-slate-800 transition-colors group"
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50/80 hover:bg-amber-50/60 border border-slate-200/80 hover:border-amber-200 transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-amber-500/10 rounded-lg text-amber-400">
+                  <div className="p-2.5 bg-amber-100 rounded-xl text-amber-700">
                     <Calendar className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-slate-200 group-hover:text-indigo-400">Class & Lab Schedules</p>
-                    <p className="text-[10px] text-slate-400">Weekly timetable matrix</p>
+                    <p className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors">Class & Lab Schedules</p>
+                    <p className="text-[11px] text-slate-500">Weekly timetable matrix</p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors" />
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600 transition-colors" />
               </Link>
 
               <Link
                 href="/faculty/login"
-                className="flex items-center justify-between p-3 rounded-xl bg-[#0B0F17] hover:bg-slate-800/60 border border-slate-800 transition-colors group"
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50/80 hover:bg-emerald-50/60 border border-slate-200/80 hover:border-emerald-200 transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">
+                  <div className="p-2.5 bg-emerald-100 rounded-xl text-emerald-700">
                     <GraduationCap className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-slate-200 group-hover:text-indigo-400">Faculty Portal Gateway</p>
-                    <p className="text-[10px] text-slate-400">Instructor auth & document uploads</p>
+                    <p className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">Faculty Portal Gateway</p>
+                    <p className="text-[11px] text-slate-500">Instructor auth & document uploads</p>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors" />
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-colors" />
               </Link>
             </div>
           </div>
@@ -779,66 +801,66 @@ export default function DashboardPage() {
 
       {/* Document Viewer Modal */}
       {viewerDocId && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#121824] border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="p-2 bg-indigo-500/10 rounded-xl text-indigo-400">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-overlay-in">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col popup-card-in">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3.5">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="p-2.5 bg-indigo-50 rounded-2xl text-indigo-600 shadow-xs">
                   <FileText className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-sm font-bold text-white truncate">
+                  <h3 className="text-base font-bold text-slate-900 truncate">
                     {viewerDoc?.fileName || "Loading Document..."}
                   </h3>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-xs text-slate-500 font-medium">
                     {viewerDoc?.department?.name || deptName} • {viewerDoc?.visibility || "DEPARTMENT"} Scope
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => { setViewerDocId(null); setViewerDoc(null); }}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
               >
                 <XCircle className="w-5 h-5" />
               </button>
             </div>
 
             {loadingDoc ? (
-              <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-400 text-xs">
-                <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
+              <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-500 text-xs">
+                <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
                 <span>Loading document metadata and extracted chunks...</span>
               </div>
             ) : viewerDoc ? (
               <div className="flex-1 overflow-y-auto space-y-4 text-xs pr-1">
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-2 bg-[#0B0F17] p-3 rounded-xl border border-slate-800 font-mono text-[11px]">
+                <div className="grid grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 font-mono text-[11px]">
                   <div>
-                    <span className="text-slate-500 block text-[10px]">Total Size</span>
-                    <span className="font-bold text-slate-200">{(viewerDoc.fileSize / 1024).toFixed(1)} KB</span>
+                    <span className="text-slate-500 block text-[10px] font-sans font-semibold uppercase">Total Size</span>
+                    <span className="font-bold text-slate-900 text-sm">{(viewerDoc.fileSize / 1024).toFixed(1)} KB</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block text-[10px]">RAG Chunks</span>
-                    <span className="font-bold text-indigo-400">{viewerDoc._count?.chunks || viewerDoc.chunks?.length || 0} Chunks</span>
+                    <span className="text-slate-500 block text-[10px] font-sans font-semibold uppercase">RAG Chunks</span>
+                    <span className="font-bold text-indigo-600 text-sm">{viewerDoc._count?.chunks || viewerDoc.chunks?.length || 0} Chunks</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block text-[10px]">Status</span>
-                    <span className="font-bold text-emerald-400">{viewerDoc.processingStatus}</span>
+                    <span className="text-slate-500 block text-[10px] font-sans font-semibold uppercase">Status</span>
+                    <span className="font-bold text-emerald-600 text-sm">{viewerDoc.processingStatus}</span>
                   </div>
                 </div>
 
                 {/* Chunks Preview */}
                 <div className="space-y-2">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                  <span className="text-xs uppercase font-bold text-slate-700 block">
                     Extracted Text Chunks ({viewerDoc.chunks?.length || 0} displayed)
                   </span>
-                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                  <div className="space-y-2.5 max-h-60 overflow-y-auto">
                     {viewerDoc.chunks && viewerDoc.chunks.length > 0 ? (
                       viewerDoc.chunks.map((c: any, i: number) => (
-                        <div key={i} className="p-3 rounded-xl bg-[#0B0F17] border border-slate-800 space-y-1">
-                          <span className="text-[10px] font-mono text-indigo-400 block font-semibold">
+                        <div key={i} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+                          <span className="text-[10px] font-mono text-indigo-600 block font-bold">
                             Chunk {c.chunkIndex + 1} {c.pageNumber ? `(Page ${c.pageNumber})` : ""} · {c.tokenCount} Tokens
                           </span>
-                          <p className="text-[11px] text-slate-300 leading-relaxed line-clamp-3">
+                          <p className="text-xs text-slate-700 leading-relaxed line-clamp-3">
                             {c.content}
                           </p>
                         </div>
@@ -850,10 +872,10 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+                <div className="flex items-center justify-between pt-3.5 border-t border-slate-100">
                   <Link
                     href={`/chat`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-colors shadow-sm"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-md shadow-indigo-600/25"
                   >
                     <Bot className="w-4 h-4" /> Ask Questions in Chat
                   </Link>
@@ -863,7 +885,7 @@ export default function DashboardPage() {
                       href={viewerDoc.signedUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold transition-all shadow-xs"
                     >
                       <Download className="w-3.5 h-3.5" /> Download Full Document
                     </a>
@@ -871,7 +893,7 @@ export default function DashboardPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-rose-400 text-center py-6">Failed to load document details.</p>
+              <p className="text-rose-500 text-center py-6 font-medium">Failed to load document details.</p>
             )}
           </div>
         </div>

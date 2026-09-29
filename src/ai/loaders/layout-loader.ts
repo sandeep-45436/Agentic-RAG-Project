@@ -56,6 +56,28 @@ export async function parsePdfNativeMultimodal(
   pdfBuffer: Buffer,
   fileName: string
 ): Promise<ParsedElement[]> {
+  // Fast Path: Extract text with pages locally first.
+  // This executes in < 100ms, does not require OpenRouter file balance ($0.50 minimum),
+  // and preserves accurate per-page text boundaries.
+  try {
+    const { pages, fullText } = await extractTextWithPages(pdfBuffer);
+    if (pages && pages.length > 0 && fullText.trim().length > 50) {
+      console.log(`[LayoutLoader] Fast local PDF extraction successful for "${fileName}": ${pages.length} pages, ${fullText.length} characters.`);
+      return pages.map((p) => ({
+        type: "text" as const,
+        content: p.text,
+        pageNumber: p.pageNumber,
+        metadata: {
+          title: fileName,
+          summary: p.text.slice(0, 200).replace(/\s+/g, " ").trim(),
+        },
+      }));
+    }
+  } catch (localErr) {
+    console.warn(`[LayoutLoader] Local PDF extraction error for ${fileName}, attempting multimodal:`, localErr);
+  }
+
+  // Fallback Path: For scanned PDFs or image-only documents, use Gemini Multimodal Vision
   try {
     const base64Pdf = pdfBuffer.toString("base64");
     
@@ -88,10 +110,10 @@ Output the result as a single, valid JSON array containing objects matching this
 Return ONLY the raw JSON array. Do not include markdown formatting wraps, fences (like \`\`\`json), or any introductory text.
 `;
 
-    // Try OpenRouter first or Direct Gemini
-    const model = process.env.OPENROUTER_API_KEY
-      ? getOpenRouter().chat(ModelConfig.multimodal)
-      : getGoogleProvider()(ModelConfig.multimodalDirect);
+    // Try Direct Gemini or OpenRouter
+    const model = process.env.GEMINI_API_KEY
+      ? getGoogleProvider()(ModelConfig.multimodalDirect)
+      : getOpenRouter().chat(ModelConfig.multimodal);
 
     const response = await generateText({
       model,
@@ -125,9 +147,9 @@ Return ONLY the raw JSON array. Do not include markdown formatting wraps, fences
     }
     throw new Error("Empty elements returned from multimodal parsing");
   } catch (error) {
-    console.warn(`[LayoutLoader] Multimodal PDF parsing failed for ${fileName}, falling back to local text extraction:`, error instanceof Error ? error.message : error);
+    console.warn(`[LayoutLoader] Multimodal PDF parsing failed for ${fileName}:`, error instanceof Error ? error.message : error);
     
-    // Resilient fallback: extract text with pages locally
+    // Final fallback
     const { pages, fullText } = await extractTextWithPages(pdfBuffer);
     if (pages && pages.length > 0) {
       return pages.map((p) => ({

@@ -290,3 +290,34 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: error.message || "Failed to delete document" }, { status: 500 });
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const { documentId, action } = body;
+
+    if (!documentId) {
+      return NextResponse.json({ error: "Document ID is required" }, { status: 400 });
+    }
+
+    if (action === "reprocess") {
+      // Start reprocessing
+      DocumentService.reprocessDocument(documentId).catch((err) => {
+        console.error(`[Reprocess] Failed for document ${documentId}:`, err);
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: "Document reprocessing initiated in background.",
+      });
+    }
+
+    return NextResponse.json({ error: "Unsupported action" }, { status: 400 });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error?.message || "Failed to trigger reprocess" },
+      { status: 500 }
+    );
+  }
+}
+

@@ -18,14 +18,36 @@ export class AuditService {
     try {
       const { orgId, userId, action, ip, userAgent, metadata } = params;
 
+      let validUserId: string | null = null;
+      if (userId) {
+        const userExists = await db.user.findUnique({
+          where: { id: userId },
+          select: { id: true },
+        });
+        if (userExists) {
+          validUserId = userExists.id;
+        } else {
+          const faculty = await db.faculty.findUnique({
+            where: { id: userId },
+            select: { userId: true },
+          });
+          if (faculty?.userId) {
+            validUserId = faculty.userId;
+          }
+        }
+      }
+
       const logEntry = await db.auditLog.create({
         data: {
           organizationId: orgId,
-          userId: userId || null,
+          userId: validUserId,
           action,
           ipAddress: ip || null,
           userAgent: userAgent || null,
-          metadata: metadata ? (typeof metadata === "object" ? metadata : { raw: metadata }) : undefined,
+          metadata: {
+            ...(metadata && typeof metadata === "object" ? metadata : { raw: metadata }),
+            ...(userId && !validUserId ? { originalCallerId: userId } : {}),
+          },
         },
       });
 

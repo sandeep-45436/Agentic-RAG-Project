@@ -188,6 +188,9 @@ export class DocumentService {
       const docHash = generateDocumentHash(buffer);
       const documentVersion = 1; // Default to canonical v1 for newly ingested documents
 
+      // Clean up previous chunks for idempotent re-processing
+      await db.chunk.deleteMany({ where: { documentId } });
+
       for (let i = 0; i < layoutChunks.length; i += BATCH_SIZE) {
         const batchChunks = layoutChunks.slice(i, i + BATCH_SIZE);
         
@@ -338,5 +341,40 @@ export class DocumentService {
 
       throw error;
     }
+  }
+
+  /**
+   * Reprocesses an existing document from InsForge storage.
+   */
+  static async reprocessDocument(documentId: string) {
+    const doc = await db.document.findUnique({ where: { id: documentId } });
+    if (!doc) throw new Error("Document not found");
+
+    await db.document.update({
+      where: { id: documentId },
+      data: { processingStatus: "PROCESSING" },
+    });
+
+    const insforge = await createClient();
+    const { data, error } = await insforge.storage
+      .from("documents")
+      .download(doc.storagePath);
+
+    if (error || !data) {
+      await db.document.update({
+        where: { id: documentId },
+        data: { processingStatus: "FAILED" },
+      });
+      throw new Error(`Failed to download document from storage: ${error?.message || "No data"}`);
+    }
+
+    const fileBuffer = await data.arrayBuffer();
+    return DocumentService.processDocumentAsync(
+      doc.id,
+      fileBuffer,
+      doc.organizationId,
+      doc.knowledgeBaseId || undefined,
+      doc.fileName
+    );
   }
 }

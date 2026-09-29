@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { QuantumNexusLoader } from "@/components/ui/extraordinary-loader";
 
 const DOCUMENT_CATEGORIES = [
   "Course Syllabus",
@@ -90,9 +91,12 @@ export default function FacultyDocumentsPage() {
   const [dragging, setDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchDocuments = async () => {
+  const [reprocessingId, setReprocessingId] = useState<string | null>(null);
+
+  const fetchDocuments = async (silent?: boolean | unknown) => {
+    const isSilent = silent === true;
     try {
-      setLoading(true);
+      if (!isSilent) setLoading(true);
       const res = await fetch("/api/faculty/documents");
       const data = await res.json();
       if (data.documents) {
@@ -104,13 +108,50 @@ export default function FacultyDocumentsPage() {
     } catch (err) {
       console.error("Failed to fetch documents:", err);
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchDocuments();
   }, []);
+
+  // Active polling: auto-refresh every 3s while any document is PROCESSING
+  useEffect(() => {
+    const hasProcessing = documents.some((d) => d.processingStatus === "PROCESSING");
+    if (!hasProcessing) return;
+
+    const interval = setInterval(() => {
+      fetchDocuments(true);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [documents]);
+
+  const handleReprocessDoc = async (docId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      setReprocessingId(docId);
+      setDocuments((prev) =>
+        prev.map((d) => (d.id === docId ? { ...d, processingStatus: "PROCESSING" } : d))
+      );
+      const res = await fetch("/api/faculty/documents", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ documentId: docId, action: "reprocess" }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed to trigger re-process");
+        fetchDocuments(true);
+      }
+    } catch (err) {
+      alert("Network error triggering re-process");
+      fetchDocuments(true);
+    } finally {
+      setReprocessingId(null);
+    }
+  };
 
   const handleSelectFile = (selected: File) => {
     const ext = selected.name.split(".").pop()?.toLowerCase();
@@ -280,7 +321,7 @@ export default function FacultyDocumentsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={fetchDocuments}
+              onClick={() => fetchDocuments()}
               className="border-slate-200 bg-white/80 backdrop-blur-sm text-slate-700 hover:text-white rounded-xl text-xs"
             >
               <RefreshCw className={`h-4 w-4 mr-1.5 ${loading ? "animate-spin" : ""}`} />
@@ -460,7 +501,8 @@ export default function FacultyDocumentsPage() {
               </div>
 
               {uploading && (
-                <div className="space-y-1.5">
+                <div className="space-y-3 py-2">
+                  <QuantumNexusLoader size="sm" text="Vectorizing & Embedding Chunks..." />
                   <Progress value={progress} className="h-2 bg-slate-800" />
                   <p className="text-xs text-indigo-300 text-center animate-pulse">
                     Ingesting into Multimodal RAG Engine with Department Metadata...
@@ -565,9 +607,21 @@ export default function FacultyDocumentsPage() {
                 placeholder="Search documents..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-slate-50 border-slate-200 text-xs text-white rounded-xl placeholder:text-slate-600"
+                className="pl-9 bg-slate-50 border-slate-200 text-xs text-slate-800 rounded-xl placeholder:text-slate-600"
               />
             </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchDocuments()}
+              disabled={loading}
+              className="h-9 px-3 rounded-xl border-slate-200 text-xs text-slate-700 hover:text-indigo-600 gap-1.5 shrink-0"
+              title="Refresh document repository status"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+              <span className="hidden sm:inline">Sync</span>
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -650,6 +704,18 @@ export default function FacultyDocumentsPage() {
                         </td>
                         <td className="py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center justify-end gap-1">
+                            {doc.processingStatus !== "COMPLETED" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                title="Re-process document extraction & vector embeddings"
+                                disabled={doc.processingStatus === "PROCESSING" || reprocessingId === doc.id}
+                                onClick={(e) => handleReprocessDoc(doc.id, e)}
+                                className="rounded-lg h-7 px-2 text-amber-600 hover:text-amber-700 hover:bg-amber-500/10"
+                              >
+                                <RefreshCw className={`h-3.5 w-3.5 ${doc.processingStatus === "PROCESSING" || reprocessingId === doc.id ? "animate-spin" : ""}`} />
+                              </Button>
+                            )}
                             <Button
                               variant="ghost"
                               size="sm"
@@ -686,8 +752,8 @@ export default function FacultyDocumentsPage() {
 
       {/* ── DOCUMENT PREVIEW / DETAIL MODAL ───────────────────────── */}
       {selectedDoc && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-overlay-in">
+          <div className="bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/40 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl popup-card-in">
             {/* Modal Header */}
             <div className="p-5 border-b border-slate-200 flex items-start justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">

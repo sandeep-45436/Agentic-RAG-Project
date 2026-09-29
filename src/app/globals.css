@@ -4,6 +4,8 @@
 @import "../../node_modules/shadcn/dist/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant data-open (&:is([data-open], [data-state="open"], [data-popup-open], [data-status="open"]));
+@custom-variant data-closed (&:is([data-closed], [data-state="closed"], [data-status="closed"]));
 
 @theme inline {
   --color-background: var(--background);
@@ -826,6 +828,48 @@
   100% { transform: scaleY(0.25); }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ⚡ EXTRAORDINARY QUANTUM & POPUP KEYFRAMES
+ * ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes quantumOrbitA {
+  0% { transform: rotateX(65deg) rotateY(25deg) rotateZ(0deg); }
+  100% { transform: rotateX(65deg) rotateY(25deg) rotateZ(360deg); }
+}
+@keyframes quantumOrbitB {
+  0% { transform: rotateX(65deg) rotateY(-25deg) rotateZ(360deg); }
+  100% { transform: rotateX(65deg) rotateY(-25deg) rotateZ(0deg); }
+}
+@keyframes quantumOrbitC {
+  0% { transform: rotateX(25deg) rotateY(65deg) rotateZ(0deg); }
+  100% { transform: rotateX(25deg) rotateY(65deg) rotateZ(360deg); }
+}
+@keyframes laserScanBar {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+@keyframes popupCardEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
+}
+@keyframes neonPulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.4)) drop-shadow(0 0 20px rgba(6, 182, 212, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.8)) drop-shadow(0 0 40px rgba(6, 182, 212, 0.5));
+  }
+}
+
 /* Continuous Radar Sweep */
 @keyframes radarSweepContinuous {
   0%   { transform: rotate(0deg); }
@@ -956,8 +1000,14 @@
 .animate-overlay-out { animation: overlayFadeOutSlow 0.35s ease-out forwards; }
 .animate-radar-sweep-continuous { animation: radarSweepContinuous 3.2s linear infinite; }
 .animate-radar-blip { animation: radarBlip 2.2s ease-in-out infinite; }
+.popup-card-in { animation: popupCardEnter 0.48s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 /* Loading states */
+.animate-quantum-a { animation: quantumOrbitA 3.5s linear infinite; }
+.animate-quantum-b { animation: quantumOrbitB 4.2s linear infinite; }
+.animate-quantum-c { animation: quantumOrbitC 5s linear infinite; }
+.animate-laser-scan { animation: laserScanBar 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+.animate-neon-pulse { animation: neonPulseGlow 2.5s ease-in-out infinite; }
 .animate-neural-pulse { animation: neuralPulse 1.8s ease-in-out infinite; }
 .animate-orbital-spin { animation: orbitalSpin 3s linear infinite; }
 .animate-orbital-spin-reverse { animation: orbitalSpinReverse 4s linear infinite; }

@@ -1,7 +1,6 @@
 "use client";
 
-import { AnimatedBackground } from "@/components/animated-background";
-import { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import ReactMarkdown from "react-markdown";
@@ -22,11 +21,6 @@ import {
   ChevronDown,
   ChevronUp,
   Bot,
-  Bug,
-  Eye,
-  EyeOff,
-  Clock,
-  BarChart3,
   GraduationCap,
   Shield,
   CheckCircle2,
@@ -35,8 +29,7 @@ import {
   BookOpen,
   FlaskConical,
   Scale,
-  Search,
-  ExternalLink,
+  X,
 } from "lucide-react";
 import { createClient } from "@/utils/insforge/client";
 import {
@@ -48,7 +41,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
-import { NeuralSynapseLoader, QuantumNexusLoader } from "@/components/ui/extraordinary-loader";
+import { NeuralSynapseLoader } from "@/components/ui/extraordinary-loader";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -74,16 +67,6 @@ interface DebugChunk extends Chunk {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function timeAgo(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
-}
-
 function fmtTime(iso: string) {
   return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
@@ -102,14 +85,7 @@ function getMessageContent(m: any): string {
   return typeof m.content === "string" ? m.content : "";
 }
 
-function getConfidenceLevel(score: number): "high" | "medium" | "low" {
-  const pct = score * 100;
-  if (pct >= 70) return "high";
-  if (pct >= 40) return "medium";
-  return "low";
-}
-
-// ── Multi-Agent Reasoning Visualizer ─────────────────────────────────────────
+// ── Multi-Agent Reasoning Banner ──────────────────────────────────────────────
 
 function ReasoningAccordion({
   latency,
@@ -123,52 +99,42 @@ function ReasoningAccordion({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="mb-3 rounded-xl border border-indigo-500/20 bg-indigo-950/20 backdrop-blur-md overflow-hidden transition-all text-xs">
+    <div className="mb-3 rounded-xl border border-indigo-500/20 bg-indigo-950/20 overflow-hidden text-xs transition-all">
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="w-full flex items-center justify-between px-3 py-2 text-indigo-300 hover:text-indigo-200 transition-colors"
+        className="w-full flex items-center justify-between px-3 py-2 text-indigo-300 hover:text-indigo-200 transition-colors text-left"
       >
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="font-semibold flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-amber-400" />
-            Neural Agentic Pipeline
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="font-semibold flex items-center gap-1.5 text-xs text-white">
+            <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            Agentic Pipeline Verified
           </span>
-          <span className="text-[11px] text-indigo-400/80">
-            ({chunkCount} chunks grounded {latency ? `· ${latency}ms` : ""})
+          <span className="text-[11px] text-indigo-300/80 font-mono">
+            ({chunkCount} source chunks {latency ? `· ${latency}ms` : ""})
           </span>
         </div>
-        {open ? <ChevronUp className="w-4 h-4 opacity-70" /> : <ChevronDown className="w-4 h-4 opacity-70" />}
+        {open ? <ChevronUp className="w-3.5 h-3.5 opacity-70 shrink-0" /> : <ChevronDown className="w-3.5 h-3.5 opacity-70 shrink-0" />}
       </button>
 
       {open && (
-        <div className="px-3 pb-3 pt-1 border-t border-indigo-500/10 space-y-2 text-[11px]">
-          <div className="flex items-start gap-2.5">
+        <div className="px-3 pb-3 pt-1 border-t border-indigo-500/10 space-y-2 text-[11px] text-slate-300">
+          <div className="flex items-start gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
             <div>
-              <span className="font-semibold text-white">1. RBAC & Scope Isolation</span>
-              <p className="text-slate-400">Restricted query execution strictly to authorized [{deptCode}] and university documents.</p>
+              <span className="font-semibold text-white">1. Scope Gatekeeper:</span> Confined to [{deptCode}] department & university regulations.
             </div>
           </div>
-          <div className="flex items-start gap-2.5">
+          <div className="flex items-start gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
             <div>
-              <span className="font-semibold text-white">2. Hybrid Vector Search (Dense + BM25)</span>
-              <p className="text-slate-400">Scanned Qdrant high-dimensional collection with reciprocal rank fusion.</p>
+              <span className="font-semibold text-white">2. Hybrid Vector Search:</span> Dense embeddings & BM25 sparse fusion executed in Qdrant.
             </div>
           </div>
-          <div className="flex items-start gap-2.5">
+          <div className="flex items-start gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
             <div>
-              <span className="font-semibold text-white">3. Knowledge Cross-Verification</span>
-              <p className="text-slate-400">Selected top {chunkCount} authoritative syllabus & regulation excerpts for citations.</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-2.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
-            <div>
-              <span className="font-semibold text-white">4. Grounded Synthesis Engine</span>
-              <p className="text-slate-400">Generated hallucination-free response matching curriculum directives.</p>
+              <span className="font-semibold text-white">3. Precision Grounding:</span> Filtered top {chunkCount} authoritative syllabus excerpts.
             </div>
           </div>
         </div>
@@ -177,7 +143,7 @@ function ReasoningAccordion({
   );
 }
 
-// ── Interactive Citations Chips ──────────────────────────────────────────────
+// ── Interactive Citation Chips ────────────────────────────────────────────────
 
 function CitationChips({
   chunks,
@@ -189,37 +155,37 @@ function CitationChips({
   if (!chunks || chunks.length === 0) return null;
 
   return (
-    <div className="mt-3 pt-2.5 border-t border-white/10 flex flex-wrap items-center gap-1.5">
-      <span className="text-[10px] font-semibold tracking-wider uppercase text-slate-400 flex items-center gap-1 mr-1">
+    <div className="mt-3 pt-2.5 border-t border-white/[0.08] flex flex-wrap items-center gap-1.5">
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1 mr-1">
         <FileText className="w-3 h-3 text-indigo-400" />
-        Verified Sources:
+        Sources:
       </span>
-      {chunks.slice(0, 4).map((c, i) => {
+      {chunks.slice(0, 3).map((c, i) => {
         const scorePct = c.score ? Math.round(c.score * 100) : null;
         return (
           <button
             key={i}
             onClick={() => onSelectChunk(c)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-500/30 hover:border-indigo-400/50 text-[11px] text-indigo-200 transition-all active:scale-95 group"
-            title="Click to view extracted chunk text"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-500/30 text-[11px] text-indigo-200 transition-all active:scale-95 group max-w-[200px]"
+            title="Click to view full chunk excerpt"
           >
-            <span className="font-medium truncate max-w-[120px]">{c.documentName}</span>
+            <span className="font-medium truncate">{c.documentName}</span>
             {c.pageNumber && (
-              <span className="text-[9px] px-1 bg-indigo-500/20 rounded text-indigo-300">
-                P.{c.pageNumber}
+              <span className="text-[9px] px-1 bg-indigo-500/20 rounded text-indigo-300 font-mono shrink-0">
+                p.{c.pageNumber}
               </span>
             )}
             {scorePct && (
-              <span className="text-[9px] text-emerald-400 font-mono">
+              <span className="text-[9px] text-emerald-400 font-mono shrink-0">
                 {scorePct}%
               </span>
             )}
           </button>
         );
       })}
-      {chunks.length > 4 && (
-        <span className="text-[10px] text-slate-400 pl-1">
-          +{chunks.length - 4} more
+      {chunks.length > 3 && (
+        <span className="text-[10px] text-slate-400 pl-1 font-mono">
+          +{chunks.length - 3} more
         </span>
       )}
     </div>
@@ -231,27 +197,17 @@ function CitationChips({
 function UserBubble({
   content,
   time,
-  name,
-  initials,
 }: {
   content: string;
   time?: string;
-  name: string;
-  initials: string;
 }) {
   return (
-    <div className="flex gap-3 items-start justify-end group animate-in fade-in slide-in-from-bottom-2 duration-200">
-      <div className="flex flex-col items-end max-w-[85%] sm:max-w-[75%]">
-        <div className="flex items-center gap-2 mb-1 px-1">
-          <span className="text-xs font-semibold text-slate-300">{name}</span>
-          {time && <span className="text-[10px] text-slate-400">{time}</span>}
+    <div className="flex justify-end gap-2.5 group">
+      <div className="flex flex-col items-end max-w-[88%] sm:max-w-[78%]">
+        <div className="bg-indigo-600 text-white rounded-2xl rounded-tr-xs px-4 py-2.5 shadow-sm text-sm leading-relaxed whitespace-pre-wrap break-words">
+          {content}
         </div>
-        <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-lg shadow-indigo-900/20 border border-indigo-400/20">
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
-        </div>
-      </div>
-      <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shadow-md shrink-0 mt-5">
-        {initials}
+        {time && <span className="text-[10px] text-slate-500 mt-1 px-1">{time}</span>}
       </div>
     </div>
   );
@@ -305,23 +261,14 @@ function AssistantBubble({
   };
 
   return (
-    <div className="flex gap-3 items-start group animate-in fade-in slide-in-from-bottom-2 duration-200">
-      <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0 mt-5">
-        <Bot className="w-4 h-4 text-white" />
+    <div className="flex items-start gap-3 group">
+      <div className="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
+        <Bot className="w-4 h-4" />
       </div>
-      <div className="flex-1 min-w-0 max-w-[92%] sm:max-w-[85%]">
-        <div className="flex items-center gap-2 mb-1 px-1">
-          <span className="text-xs font-semibold text-white flex items-center gap-1.5">
-            Campus AI Assistant
-            <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/15 text-emerald-400 text-[9px] font-mono border border-emerald-500/20">
-              GROUNDED
-            </span>
-          </span>
-          {time && <span className="text-[10px] text-slate-400">{time}</span>}
-        </div>
 
-        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-2xl rounded-tl-sm p-4 sm:p-5 shadow-2xl transition-all">
-          {/* Multi-Agent Reasoning Steps */}
+      <div className="flex-1 min-w-0 max-w-[94%] sm:max-w-[88%]">
+        <div className="bg-[#121824] border border-slate-800/80 rounded-2xl rounded-tl-xs p-4 sm:p-5 shadow-md">
+          {/* Agentic pipeline banner */}
           {chunks && chunks.length > 0 && (
             <ReasoningAccordion
               latency={latency ?? null}
@@ -330,29 +277,29 @@ function AssistantBubble({
             />
           )}
 
-          {/* Formatted Markdown Body */}
+          {/* Formatted Markdown */}
           <div className="prose prose-invert prose-sm max-w-none text-slate-200 leading-relaxed
             prose-headings:text-white prose-headings:font-bold prose-headings:mt-4 prose-headings:mb-2
             prose-h2:text-base prose-h3:text-sm prose-p:my-2 prose-ul:my-2 prose-li:my-0.5
             prose-code:text-indigo-300 prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
             prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-800 prose-pre:rounded-xl
-            prose-table:border-collapse prose-th:bg-white/5 prose-th:p-2 prose-td:p-2 prose-td:border-b prose-td:border-white/10"
+            prose-table:border-collapse prose-th:bg-white/5 prose-th:p-2 prose-td:p-2 prose-td:border-b prose-td:border-white/10 overflow-x-auto"
           >
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
           </div>
 
-          {/* Interactive Source Chips */}
+          {/* Source Chips */}
           {chunks && chunks.length > 0 && (
             <CitationChips chunks={chunks} onSelectChunk={onSelectChunk} />
           )}
         </div>
 
-        {/* Action Toolbar */}
-        <div className="flex items-center gap-1 mt-2 ml-1">
+        {/* Micro-actions */}
+        <div className="flex items-center gap-1 mt-1.5 ml-1">
           <button
             onClick={() => handleFeedback("thumbs_up")}
-            title="Helpful response"
-            className={`p-1.5 rounded-lg transition-colors ${
+            title="Helpful"
+            className={`p-1.5 rounded-lg text-xs transition-colors ${
               feedback === "thumbs_up"
                 ? "text-emerald-400 bg-emerald-500/20"
                 : "text-slate-400 hover:text-white hover:bg-white/10"
@@ -362,8 +309,8 @@ function AssistantBubble({
           </button>
           <button
             onClick={() => handleFeedback("thumbs_down")}
-            title="Inaccurate response"
-            className={`p-1.5 rounded-lg transition-colors ${
+            title="Inaccurate"
+            className={`p-1.5 rounded-lg text-xs transition-colors ${
               feedback === "thumbs_down"
                 ? "text-rose-400 bg-rose-500/20"
                 : "text-slate-400 hover:text-white hover:bg-white/10"
@@ -373,18 +320,19 @@ function AssistantBubble({
           </button>
           <button
             onClick={handleCopy}
-            title={copied ? "Copied!" : "Copy message"}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1"
+            title={copied ? "Copied" : "Copy response"}
+            className="p-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-1"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
           </button>
           <button
             onClick={onRetry}
-            title="Regenerate response"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+            title="Regenerate"
+            className="p-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
+          {time && <span className="text-[10px] text-slate-500 ml-2">{time}</span>}
         </div>
       </div>
     </div>
@@ -396,7 +344,7 @@ function AssistantBubble({
 function EmptyState({
   onSuggest,
   deptCode = "CSE",
-  deptName = "Computer Science & Engineering",
+  deptName = "Computer Science",
 }: {
   onSuggest: (q: string) => void;
   deptCode?: string;
@@ -405,76 +353,68 @@ function EmptyState({
   const categories = [
     {
       icon: BookOpen,
-      title: "Course Syllabi & Notes",
-      desc: "Curriculum units, chapter outlines, key formulas, and exam weightage.",
+      title: "Course Syllabi & Units",
+      desc: "Curriculum modules, chapter outlines, key formulas, and exam weightage.",
       prompt: `Summarize the high-yield topics and syllabus units for ${deptCode}`,
-      color: "from-blue-500/20 to-indigo-500/20 text-blue-400 border-blue-500/30",
     },
     {
       icon: FlaskConical,
       title: "Lab Manuals & Code",
       desc: "Step-by-step experiment procedures, requirements, and test scenarios.",
       prompt: `Explain the required laboratory experiments and expected outputs for ${deptCode}`,
-      color: "from-purple-500/20 to-pink-500/20 text-purple-400 border-purple-500/30",
     },
     {
       icon: Scale,
       title: "Academic Regulations",
-      desc: "Official university attendance requirements, grading scale, and exam condonation.",
+      desc: "Official university attendance policies, grading scale, and exam condonation.",
       prompt: "What is the official university policy regarding minimum attendance and semester examinations?",
-      color: "from-amber-500/20 to-orange-500/20 text-amber-400 border-amber-500/30",
     },
     {
       icon: Sparkles,
       title: "AI Concept Breakdown",
       desc: "Clear pedagogical explanations with pseudo-code and intuitive examples.",
       prompt: "Explain Artificial Intelligence search algorithms (A*, Minimax, Alpha-Beta pruning) with examples",
-      color: "from-emerald-500/20 to-teal-500/20 text-emerald-400 border-emerald-500/30",
     },
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[75vh] px-4 py-8 text-center max-w-4xl mx-auto">
+    <div className="flex flex-col items-center justify-center py-6 sm:py-12 px-2 text-center max-w-2xl mx-auto w-full">
       {/* Brand Emblem */}
-      <div className="relative mb-6">
-        <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/30 via-purple-500/30 to-pink-500/30 rounded-3xl blur-2xl opacity-70 animate-pulse" />
-        <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800 flex items-center justify-center shadow-2xl border border-indigo-400/40">
-          <Bot className="w-8 h-8 text-white" />
-        </div>
+      <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center mb-3 text-indigo-400 shadow-sm">
+        <Bot className="w-6 h-6" />
       </div>
 
-      {/* Scope Badge */}
-      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-4 backdrop-blur-md">
-        <GraduationCap className="w-4 h-4 text-indigo-400" />
-        <span>{deptName} ({deptCode}) Knowledge Base</span>
+      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-3">
+        <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
+        <span>{deptName} ({deptCode}) Knowledge Scope</span>
       </div>
 
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
-        Campus Academic Intelligence
+      <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight mb-2">
+        Academic AI Assistant
       </h1>
-      <p className="text-sm text-slate-400 max-w-lg mb-8 leading-relaxed">
-        Ask questions scoped directly to your department repository. Every answer is cross-verified against official faculty documents with source citations.
+      <p className="text-xs sm:text-sm text-slate-400 max-w-md mb-6 leading-relaxed">
+        Ask questions scoped directly to your department repository. Every answer is cross-verified against official faculty documents.
       </p>
 
-      {/* 4 Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full">
+      {/* Responsive Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
         {categories.map((cat, idx) => {
           const Icon = cat.icon;
           return (
             <button
               key={idx}
               onClick={() => onSuggest(cat.prompt)}
-              className="group text-left p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-850/80 border border-slate-800 hover:border-indigo-500/50 backdrop-blur-xl transition-all duration-200 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-0.5"
+              className="text-left p-3.5 rounded-xl bg-[#121824] hover:bg-[#182030] border border-slate-800 hover:border-indigo-500/40 transition-all text-xs group"
             >
-              <div className="flex items-start gap-3">
-                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${cat.color} border shrink-0 transition-transform group-hover:scale-105`}>
+              <div className="flex items-start gap-2.5">
+                <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
                   <Icon className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors">
+                  <h3 className="font-semibold text-white group-hover:text-indigo-300 transition-colors">
                     {cat.title}
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">
                     {cat.desc}
                   </p>
                 </div>
@@ -484,9 +424,9 @@ function EmptyState({
         })}
       </div>
 
-      {/* Quick Prompts Chips */}
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-2 max-w-2xl">
-        <span className="text-xs text-slate-500 font-medium">Quick starters:</span>
+      {/* Quick Prompts */}
+      <div className="mt-5 flex flex-wrap items-center justify-center gap-1.5">
+        <span className="text-[11px] text-slate-500 font-medium">Quick starters:</span>
         {[
           "AI Units 1-2 Syllabus",
           "CNIP Lab Manual",
@@ -506,7 +446,7 @@ function EmptyState({
   );
 }
 
-// ── Context / Citations Panel ────────────────────────────────────────────────
+// ── Citations Drawer Content ──────────────────────────────────────────────────
 
 function ContextPanelContent({
   chunks,
@@ -518,11 +458,11 @@ function ContextPanelContent({
   onClearSelected: () => void;
 }) {
   return (
-    <div className="flex flex-col h-full overflow-y-auto p-4 space-y-4">
+    <div className="flex flex-col h-full overflow-y-auto p-4 space-y-3 text-xs">
       {selectedChunk ? (
         <div className="space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-white/10">
-            <span className="text-xs font-bold text-white flex items-center gap-1.5">
+          <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
+            <span className="font-bold text-white flex items-center gap-1.5">
               <FileText className="w-4 h-4 text-indigo-400" />
               Source Excerpt
             </span>
@@ -534,29 +474,27 @@ function ContextPanelContent({
             </button>
           </div>
           <div className="p-3.5 rounded-xl bg-slate-900 border border-indigo-500/30 space-y-2">
-            <p className="text-xs font-semibold text-white">{selectedChunk.documentName}</p>
+            <p className="font-semibold text-white">{selectedChunk.documentName}</p>
             {selectedChunk.pageNumber && (
               <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono inline-block">
                 Page {selectedChunk.pageNumber}
               </span>
             )}
-            <p className="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed">
+            <p className="text-slate-300 whitespace-pre-wrap leading-relaxed">
               {selectedChunk.chunkText}
             </p>
           </div>
         </div>
       ) : (
         <>
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Retrieved Chunks ({chunks.length})
-            </span>
-          </div>
+          <span className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">
+            Retrieved Citations ({chunks.length})
+          </span>
 
           {chunks.length === 0 ? (
             <div className="py-12 text-center text-slate-500 space-y-2">
               <Sparkles className="w-6 h-6 text-indigo-400/40 mx-auto" />
-              <p className="text-xs">No citations yet. Ask a question to view ground-truth excerpts.</p>
+              <p className="text-xs">No citations yet. Send a message to inspect ground-truth excerpts.</p>
             </div>
           ) : (
             chunks.map((c, i) => {
@@ -564,23 +502,23 @@ function ContextPanelContent({
               return (
                 <div
                   key={i}
-                  className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-indigo-500/40 space-y-2 transition-colors"
+                  className="p-3 rounded-xl bg-[#121824] border border-slate-800 space-y-1.5 hover:border-indigo-500/40 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-white truncate">{c.documentName}</p>
+                      <p className="font-semibold text-white truncate">{c.documentName}</p>
                       <p className="text-[10px] text-slate-400">
                         Chunk {c.chunkIndex + 1}
                         {c.pageNumber && ` · Page ${c.pageNumber}`}
                       </p>
                     </div>
                     {scorePct && (
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 text-[10px] font-mono font-bold shrink-0">
-                        {scorePct}% match
+                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 text-[10px] font-mono font-bold shrink-0">
+                        {scorePct}%
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-300 line-clamp-4 leading-relaxed font-sans">
+                  <p className="text-slate-300 line-clamp-3 leading-relaxed">
                     {c.chunkText}
                   </p>
                 </div>
@@ -593,7 +531,7 @@ function ContextPanelContent({
   );
 }
 
-// ── Main Page Component ───────────────────────────────────────────────────────
+// ── Main Chat Page Component ──────────────────────────────────────────────────
 
 export default function ChatPage() {
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -611,9 +549,6 @@ export default function ChatPage() {
   const [mobileHistoryOpen, setMobileHistoryOpen] = useState(false);
   const [mobileContextOpen, setMobileContextOpen] = useState(false);
   const [selectedChunk, setSelectedChunk] = useState<Chunk | null>(null);
-
-  const [debugOpen, setDebugOpen] = useState(false);
-  const [debugChunks, setDebugChunks] = useState<DebugChunk[]>([]);
   const [retrievalLatency, setRetrievalLatency] = useState<number | null>(null);
 
   // Department Knowledge Scope
@@ -621,7 +556,7 @@ export default function ChatPage() {
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
   const [userScope, setUserScope] = useState<any>(null);
 
-  // Load departments and scope
+  // Load departments
   useEffect(() => {
     fetch("/api/departments")
       .then((r) => r.json())
@@ -644,16 +579,13 @@ export default function ChatPage() {
     insforge.auth.getCurrentUser().then((res: any) => {
       const user = res?.data?.user;
       if (!user) return;
-      const name =
-        user.profile?.name ??
-        user.email?.split("@")[0] ??
-        "Student";
+      const name = user.profile?.name ?? user.email?.split("@")[0] ?? "Student";
       setUserName(name);
       setUserInitials(name.slice(0, 2).toUpperCase());
     });
   }, []);
 
-  // Load conversation history
+  // Load history
   const loadHistory = useCallback(() => {
     fetch("/api/conversations")
       .then((r) => r.json())
@@ -680,7 +612,6 @@ export default function ChatPage() {
       setConversationId(data.conversation.id);
       setInitialMessages([]);
       setChunks([]);
-      setDebugChunks([]);
       setRetrievalLatency(null);
       loadHistory();
     }
@@ -690,7 +621,6 @@ export default function ChatPage() {
   const loadConversation = useCallback(async (id: string) => {
     setConversationId(id);
     setChunks([]);
-    setDebugChunks([]);
     setRetrievalLatency(null);
     const res = await fetch(`/api/conversations/${id}`);
     const data = await res.json();
@@ -711,7 +641,6 @@ export default function ChatPage() {
             : lastAssistant.citations;
           if (Array.isArray(parsed)) {
             setChunks(parsed.slice(0, 5));
-            setDebugChunks(parsed.slice(0, 5));
           }
         } catch {}
       }
@@ -727,7 +656,6 @@ export default function ChatPage() {
       setConversationId(null);
       setInitialMessages([]);
       setChunks([]);
-      setDebugChunks([]);
       setRetrievalLatency(null);
     }
     loadHistory();
@@ -749,17 +677,6 @@ export default function ChatPage() {
             const parsed = JSON.parse(decodeURIComponent(raw));
             if (Array.isArray(parsed)) {
               setChunks(parsed);
-              const debugParsed: DebugChunk[] = parsed.map((c: any) => ({
-                documentName: c.documentName,
-                chunkText: c.chunkText,
-                score: c.score ?? null,
-                chunkIndex: c.chunkIndex,
-                pageNumber: c.pageNumber ?? null,
-                vectorScore: c.vectorScore ?? c.score ?? null,
-                bm25Score: c.bm25Score ?? null,
-                fusionScore: c.fusionScore ?? null,
-              }));
-              setDebugChunks(debugParsed);
             }
           } catch {}
         }
@@ -773,17 +690,14 @@ export default function ChatPage() {
 
   const isLoading = status === "submitted" || status === "streaming";
 
-  // Sync initialMessages when switching conversations
   useEffect(() => {
     setMessages(initialMessages);
   }, [initialMessages]); // eslint-disable-line
 
-  // Auto-scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  // Submit handler
   const handleFormSubmit = useCallback(
     async (e?: React.FormEvent) => {
       if (e) e.preventDefault();
@@ -826,196 +740,186 @@ export default function ChatPage() {
     [conversationId, input, isLoading, sendMessage, loadHistory, selectedDepartmentId]
   );
 
-  const currentTitle = history.find((h) => h.id === conversationId)?.title ?? "Campus AI Consultation";
+  const currentTitle = history.find((h) => h.id === conversationId)?.title ?? "Academic Consultation";
 
   return (
-    <AnimatedBackground>
-      <div className="flex h-[calc(100vh-3.5rem)] text-white overflow-hidden -m-6 md:-m-10 bg-slate-950/80 backdrop-blur-2xl">
-        
-        {/* ── Left Sidebar: Conversations (Desktop) ────────────────── */}
-        <aside className="w-64 shrink-0 border-r border-white/10 bg-slate-950/60 backdrop-blur-xl hidden md:flex flex-col">
-          <div className="p-3.5">
-            <button
-              onClick={createNew}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-semibold shadow-lg shadow-indigo-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <Plus className="w-4 h-4" /> New Session
-            </button>
-          </div>
+    <div className="flex h-full w-full bg-[#0B0F17] text-slate-100 overflow-hidden relative">
+      
+      {/* ── Left Sidebar (Desktop) ─────────────────────────────────── */}
+      <aside className="w-64 shrink-0 border-r border-slate-800/80 bg-[#0E131F] hidden md:flex flex-col z-10">
+        <div className="p-3">
+          <button
+            onClick={createNew}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition-all active:scale-98"
+          >
+            <Plus className="w-4 h-4" /> New Session
+          </button>
+        </div>
 
-          <div className="px-4 pb-2 flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Recent Consultations
-            </span>
-            <span className="text-[10px] font-mono text-slate-500">{history.length}</span>
-          </div>
+        <div className="px-3 pb-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          <span>Recent Sessions</span>
+          <span className="font-mono text-slate-500">{history.length}</span>
+        </div>
 
-          <div className="flex-1 overflow-y-auto px-2 space-y-1">
-            {historyLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
-              </div>
-            ) : history.length === 0 ? (
-              <div className="text-center py-10 px-4 text-slate-500 text-xs">
-                No previous conversations.
-              </div>
-            ) : (
-              history.map((conv) => (
-                <div
-                  key={conv.id}
-                  onClick={() => loadConversation(conv.id)}
-                  className={`group flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer text-xs transition-all ${
-                    conversationId === conv.id
-                      ? "bg-indigo-600/20 text-white border border-indigo-500/40 shadow-sm"
-                      : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
-                  }`}
+        <div className="flex-1 overflow-y-auto px-2 space-y-0.5">
+          {historyLoading ? (
+            <div className="flex justify-center py-6">
+              <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
+            </div>
+          ) : history.length === 0 ? (
+            <div className="text-center py-8 px-4 text-slate-500 text-xs">
+              No conversations yet.
+            </div>
+          ) : (
+            history.map((conv) => (
+              <div
+                key={conv.id}
+                onClick={() => loadConversation(conv.id)}
+                className={`group flex items-center gap-2 px-2.5 py-2 rounded-lg cursor-pointer text-xs transition-colors ${
+                  conversationId === conv.id
+                    ? "bg-indigo-600/20 text-white border border-indigo-500/30"
+                    : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                }`}
+              >
+                <MessageSquare className="w-3.5 h-3.5 shrink-0 text-indigo-400 opacity-70" />
+                <span className="flex-1 truncate font-medium">{conv.title || "New Session"}</span>
+                <button
+                  onClick={(e) => deleteConv(conv.id, e)}
+                  className="opacity-0 group-hover:opacity-100 p-1 hover:text-rose-400 transition-opacity"
+                  title="Delete"
                 >
-                  <MessageSquare className="w-3.5 h-3.5 shrink-0 text-indigo-400 opacity-70 group-hover:opacity-100" />
-                  <span className="flex-1 truncate font-medium">{conv.title || "New Consultation"}</span>
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="p-3 border-t border-slate-800/80 flex items-center gap-2 bg-[#0B0F17]/60">
+          <div className="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold text-xs flex items-center justify-center shrink-0">
+            {userInitials}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold text-white truncate">{userName}</p>
+            <p className="text-[10px] text-emerald-400 flex items-center gap-1 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              Verified Student
+            </p>
+          </div>
+        </div>
+      </aside>
+
+      {/* ── Main Chat Column ────────────────────────────────────────── */}
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative">
+        
+        {/* Header */}
+        <header className="h-14 border-b border-slate-800/80 bg-[#0B0F17]/95 px-3 sm:px-6 flex items-center justify-between shrink-0 z-10 gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            {/* Mobile History Drawer */}
+            <Sheet open={mobileHistoryOpen} onOpenChange={setMobileHistoryOpen}>
+              <SheetTrigger className="md:hidden flex items-center gap-1 text-xs text-slate-300 hover:text-white bg-slate-800/80 border border-slate-700/80 rounded-lg px-2.5 py-1.5 shrink-0">
+                <MessageSquare className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Chats</span>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[85vw] sm:max-w-xs bg-[#0E131F] border-r border-slate-800 p-0 text-white">
+                <SheetHeader className="p-4 border-b border-slate-800">
+                  <SheetTitle className="text-white text-sm">Consultation History</SheetTitle>
+                  <SheetDescription className="text-xs text-slate-400">
+                    Switch or resume previous sessions
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="p-3">
                   <button
-                    onClick={(e) => deleteConv(conv.id, e)}
-                    className="opacity-0 group-hover:opacity-100 p-1 hover:text-rose-400 rounded transition-all"
-                    title="Delete session"
+                    onClick={() => {
+                      createNew();
+                      setMobileHistoryOpen(false);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Plus className="w-4 h-4" /> New Session
                   </button>
                 </div>
-              ))
-            )}
-          </div>
-
-          {/* User Status Footer */}
-          <div className="p-3 border-t border-white/10 flex items-center gap-2.5 bg-slate-950/40">
-            <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-300 font-bold text-xs">
-              {userInitials}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-white truncate">{userName}</p>
-              <p className="text-[10px] text-emerald-400 flex items-center gap-1 font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Verified Student
-              </p>
-            </div>
-          </div>
-        </aside>
-
-        {/* ── Main Chat Area ────────────────────────────────────────── */}
-        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-          
-          {/* Executive Header */}
-          <header className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-white/10 bg-slate-950/40 backdrop-blur-md shrink-0 gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              {/* Mobile Drawer Trigger */}
-              <Sheet open={mobileHistoryOpen} onOpenChange={setMobileHistoryOpen}>
-                <SheetTrigger className="md:hidden flex items-center gap-1.5 text-xs text-slate-300 hover:text-white bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5">
-                  <MessageSquare className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Chats</span>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-[85vw] sm:max-w-xs bg-slate-950 border-r border-white/10 p-0 text-white">
-                  <SheetHeader className="p-4 border-b border-white/10">
-                    <SheetTitle className="text-white text-sm">Consultations</SheetTitle>
-                    <SheetDescription className="text-xs text-slate-400">
-                      Switch or resume previous sessions
-                    </SheetDescription>
-                  </SheetHeader>
-                  <div className="p-3">
-                    <button
+                <div className="flex-1 overflow-y-auto px-2 space-y-1">
+                  {history.map((conv) => (
+                    <div
+                      key={conv.id}
                       onClick={() => {
-                        createNew();
+                        loadConversation(conv.id);
                         setMobileHistoryOpen(false);
                       }}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold"
+                      className="flex items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:bg-white/5 rounded-lg cursor-pointer"
                     >
-                      <Plus className="w-4 h-4" /> New Session
-                    </button>
-                  </div>
-                  <div className="flex-1 overflow-y-auto px-2 space-y-1">
-                    {history.map((conv) => (
-                      <div
-                        key={conv.id}
-                        onClick={() => {
-                          loadConversation(conv.id);
-                          setMobileHistoryOpen(false);
-                        }}
-                        className="flex items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:bg-white/5 rounded-lg cursor-pointer"
-                      >
-                        <MessageSquare className="w-3.5 h-3.5 text-indigo-400" />
-                        <span className="truncate flex-1">{conv.title || "New Consultation"}</span>
-                      </div>
-                    ))}
-                  </div>
-                </SheetContent>
-              </Sheet>
+                      <MessageSquare className="w-3.5 h-3.5 text-indigo-400" />
+                      <span className="truncate flex-1">{conv.title || "New Session"}</span>
+                    </div>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
 
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse hidden sm:block" />
-                <h1 className="text-sm sm:text-base font-bold text-white truncate max-w-[180px] xs:max-w-[260px] sm:max-w-md">
-                  {currentTitle}
-                </h1>
-              </div>
+            <h1 className="text-xs sm:text-sm font-semibold text-white truncate max-w-[150px] sm:max-w-md">
+              {currentTitle}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Scope Badge */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-950/40 border border-indigo-500/20 text-indigo-200 text-xs">
+              <GraduationCap className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+              <span className="font-semibold text-white">{selectedDepartment?.code || "CSE"}</span>
+              <span className="text-[11px] text-slate-400 hidden sm:inline">Scope</span>
             </div>
 
-            {/* Department Knowledge Scope Badge & Actions */}
-            <div className="flex items-center gap-2 shrink-0">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-950/60 to-purple-950/60 border border-indigo-500/30 text-indigo-200">
-                <GraduationCap className="w-4 h-4 text-indigo-400 shrink-0" />
-                <span className="text-xs font-bold text-white">
-                  {selectedDepartment?.code || "CSE"}
-                </span>
-                <span className="text-[11px] text-slate-400 hidden lg:inline truncate max-w-[140px]">
-                  {selectedDepartment?.name || "Department Knowledge"}
-                </span>
-              </div>
-
-              {/* Citations Sheet Trigger */}
-              <Sheet open={mobileContextOpen} onOpenChange={setMobileContextOpen}>
-                <SheetTrigger
-                  className="flex items-center gap-1.5 text-xs text-indigo-300 hover:text-white bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-500/30 rounded-xl px-3 py-1.5 transition-colors"
-                  title="View citations"
-                >
-                  <FileText className="w-3.5 h-3.5 text-indigo-400" />
-                  <span className="hidden sm:inline">Citations</span>
-                  {chunks.length > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full bg-indigo-500 text-[10px] text-white font-bold">
-                      {chunks.length}
-                    </span>
-                  )}
-                </SheetTrigger>
-                <SheetContent side="right" className="w-[90vw] sm:max-w-md bg-slate-950 border-l border-white/10 p-0 text-white">
-                  <SheetHeader className="p-4 border-b border-white/10">
-                    <SheetTitle className="text-white text-sm">Grounded Sources & Citations</SheetTitle>
-                    <SheetDescription className="text-xs text-slate-400">
-                      Authoritative excerpts retrieved from official syllabus & documents
-                    </SheetDescription>
-                  </SheetHeader>
-                  <ContextPanelContent
-                    chunks={chunks}
-                    selectedChunk={selectedChunk}
-                    onClearSelected={() => setSelectedChunk(null)}
-                  />
-                </SheetContent>
-              </Sheet>
-
-              {/* Share Button */}
-              <button
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator.share({ title: currentTitle, url: window.location.href }).catch(() => {});
-                  } else {
-                    copyText(window.location.href);
-                    alert("Chat link copied to clipboard!");
-                  }
-                }}
-                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white transition-colors"
-                title="Share session"
+            {/* Citations Sheet */}
+            <Sheet open={mobileContextOpen} onOpenChange={setMobileContextOpen}>
+              <SheetTrigger
+                className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white bg-slate-800/80 border border-slate-700/80 rounded-lg px-2.5 py-1.5 transition-colors"
+                title="View Grounded Citations"
               >
-                <Share2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </header>
+                <FileText className="w-3.5 h-3.5 text-indigo-400" />
+                <span className="hidden sm:inline">Sources</span>
+                {chunks.length > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-indigo-500 text-[10px] text-white font-bold font-mono">
+                    {chunks.length}
+                  </span>
+                )}
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[90vw] sm:max-w-md bg-[#0E131F] border-l border-slate-800 p-0 text-white">
+                <SheetHeader className="p-4 border-b border-slate-800">
+                  <SheetTitle className="text-white text-sm">Grounded Sources & Citations</SheetTitle>
+                  <SheetDescription className="text-xs text-slate-400">
+                    Official syllabus & regulation excerpts retrieved for this conversation
+                  </SheetDescription>
+                </SheetHeader>
+                <ContextPanelContent
+                  chunks={chunks}
+                  selectedChunk={selectedChunk}
+                  onClearSelected={() => setSelectedChunk(null)}
+                />
+              </SheetContent>
+            </Sheet>
 
-          {/* Messages Stream */}
-          <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-6">
+            {/* Share */}
+            <button
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({ title: currentTitle, url: window.location.href }).catch(() => {});
+                } else {
+                  copyText(window.location.href);
+                  alert("Chat link copied to clipboard!");
+                }
+              }}
+              className="p-1.5 rounded-lg bg-slate-800/80 border border-slate-700/80 text-slate-400 hover:text-white transition-colors"
+              title="Share"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </header>
+
+        {/* Messages Stream */}
+        <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4">
+          <div className="max-w-3xl mx-auto w-full space-y-4">
             {messages.length === 0 ? (
               <EmptyState
                 onSuggest={(q) => setInput(q)}
@@ -1030,8 +934,6 @@ export default function ChatPage() {
                     key={m.id}
                     content={textContent}
                     time={m.createdAt ? fmtTime(m.createdAt.toISOString?.() ?? m.createdAt) : undefined}
-                    name={userName}
-                    initials={userInitials}
                   />
                 ) : (
                   <AssistantBubble
@@ -1060,17 +962,17 @@ export default function ChatPage() {
               })
             )}
 
-            {/* Typing / Agent Processing State */}
+            {/* Typing Loader */}
             {isLoading && (messages[messages.length - 1]?.role === "user" || (messages[messages.length - 1]?.role === "assistant" && !getMessageContent(messages[messages.length - 1]))) && (
-              <div className="flex gap-3 items-start popup-card-in">
-                <NeuralSynapseLoader text={`Reasoning over ${selectedDepartment?.code || "department"} knowledge base...`} />
+              <div className="flex gap-3 items-start">
+                <NeuralSynapseLoader text={`Retrieving & synthesizing verified ${selectedDepartment?.code || "CSE"} knowledge...`} />
               </div>
             )}
 
             {error && (
               <div className="flex justify-center">
-                <div className="flex items-center gap-3 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-xl px-4 py-2.5 text-xs">
-                  An error occurred while communicating with the AI model.
+                <div className="flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-xl px-4 py-2 text-xs">
+                  <span>Unable to complete response.</span>
                   <button onClick={() => regenerate()} className="underline font-bold text-white hover:text-rose-200">
                     Retry
                   </button>
@@ -1080,69 +982,66 @@ export default function ChatPage() {
 
             <div ref={bottomRef} />
           </div>
+        </div>
 
-          {/* Executive Floating Input Dock */}
-          <div className="shrink-0 px-4 sm:px-8 pb-4 pt-2 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent">
-            <div className="max-w-4xl mx-auto">
-              <form onSubmit={handleFormSubmit}>
-                <div className="relative rounded-2xl bg-slate-900/90 border border-slate-700/70 focus-within:border-indigo-500/60 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-2xl backdrop-blur-2xl transition-all">
-                  <textarea
-                    ref={textareaRef}
-                    value={input}
-                    onChange={(e) => {
-                      setInput(e.target.value);
-                      e.target.style.height = "auto";
-                      e.target.style.height = Math.min(e.target.scrollHeight, 180) + "px";
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        handleFormSubmit();
-                      }
-                    }}
-                    placeholder={`Ask questions about ${selectedDepartment?.code || "CSE"} course syllabi, lab manuals, regulations...`}
-                    disabled={isLoading}
-                    rows={1}
-                    className="w-full bg-transparent text-sm text-white placeholder-slate-400 px-4 pt-3.5 pb-2 resize-none outline-none min-h-[48px] max-h-44 leading-relaxed font-sans"
-                  />
+        {/* Input Bar */}
+        <div className="shrink-0 border-t border-slate-800/80 bg-[#0B0F17]/95 px-3 sm:px-6 py-3 z-10">
+          <div className="max-w-3xl mx-auto w-full">
+            <form onSubmit={handleFormSubmit}>
+              <div className="rounded-2xl bg-[#121824] border border-slate-800 focus-within:border-indigo-500/60 focus-within:ring-1 focus-within:ring-indigo-500/30 transition-all">
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    e.target.style.height = "auto";
+                    e.target.style.height = Math.min(e.target.scrollHeight, 140) + "px";
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleFormSubmit();
+                    }
+                  }}
+                  placeholder={`Ask anything about ${selectedDepartment?.code || "CSE"} syllabi, lab manuals, regulations...`}
+                  disabled={isLoading}
+                  rows={1}
+                  className="w-full bg-transparent text-sm text-white placeholder-slate-500 px-4 pt-3 pb-1 resize-none outline-none min-h-[44px] max-h-36 leading-relaxed"
+                />
 
-                  {/* Input Footer Bar */}
-                  <div className="flex items-center justify-between px-3.5 pb-2.5 pt-1 border-t border-white/5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
-                        <Shield className="w-3 h-3 text-indigo-400" />
-                        Grounded Search
-                      </span>
-                    </div>
+                <div className="flex items-center justify-between px-3 pb-2 pt-1 border-t border-white/[0.04]">
+                  <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-mono">
+                    <Shield className="w-3 h-3 text-indigo-400" />
+                    <span>Grounded Search Active</span>
+                  </div>
 
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-slate-400 hidden sm:inline">
-                        Press Enter ↵ to send
-                      </span>
-                      <button
-                        type="submit"
-                        disabled={isLoading || !input?.trim()}
-                        className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 disabled:opacity-30 disabled:cursor-not-allowed text-white shadow-md shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 shrink-0"
-                      >
-                        {isLoading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        )}
-                      </button>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-slate-500 hidden sm:inline">
+                      Enter ↵ to send
+                    </span>
+                    <button
+                      type="submit"
+                      disabled={isLoading || !input?.trim()}
+                      className="w-8 h-8 flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed text-white transition-all active:scale-95"
+                    >
+                      {isLoading ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Send className="w-3.5 h-3.5" />
+                      )}
+                    </button>
                   </div>
                 </div>
-              </form>
+              </div>
+            </form>
 
-              <p className="text-center text-[10px] text-slate-400 mt-2">
-                All responses are synthesized from verified university documents. Cross-check citations for examination purposes.
-              </p>
-            </div>
+            <p className="text-center text-[10px] text-slate-500 mt-1.5">
+              Grounded in verified institutional documents. Cross-check citations for examination requirements.
+            </p>
           </div>
         </div>
 
       </div>
-    </AnimatedBackground>
+    </div>
   );
 }

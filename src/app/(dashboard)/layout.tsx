@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { createClient } from "@/utils/insforge/client";
 import { signOutAction } from "@/server/actions/auth";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function DashboardLayout({
@@ -27,6 +27,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const isChat = pathname === "/chat";
   const [userEmail, setUserEmail] = useState<string>("");
   const [userInitials, setUserInitials] = useState<string>("U");
 
@@ -148,11 +150,17 @@ export default function DashboardLayout({
             </DropdownMenu>
           </div>
         </header>
-          <main className="flex-1 overflow-auto p-3 sm:p-5 lg:p-6 relative w-full">
-            <div className="w-full space-y-6 max-w-none animate-page-fade-up entrance-stagger">
+          {isChat ? (
+            <main className="flex-1 overflow-hidden relative w-full h-[calc(100vh-3.5rem)]">
               {children}
-            </div>
-          </main>
+            </main>
+          ) : (
+            <main className="flex-1 overflow-auto p-3 sm:p-5 lg:p-6 relative w-full">
+              <div className="w-full space-y-6 max-w-none animate-page-fade-up entrance-stagger">
+                {children}
+              </div>
+            </main>
+          )}
         </SidebarInset>
       </div>
       <CommandMenu />

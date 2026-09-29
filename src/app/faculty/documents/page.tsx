@@ -298,33 +298,33 @@ export default function FacultyDocumentsPage() {
     <AnimatedBackground>
       <div className="space-y-6">
       {/* ── HEADER BANNER ────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900/60 via-purple-900/40 to-pink-600 border border-indigo-500/20 p-6 backdrop-blur-xl">
+      <div className="relative overflow-hidden rounded-2xl bg-[#121824] border border-slate-800 p-5 sm:p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/40 text-xs">
+              <Badge className="bg-indigo-500/10 text-indigo-300 border-indigo-500/30 text-xs font-semibold">
                 Department Document Center
               </Badge>
-              <span className="text-xs text-slate-500 font-mono">
+              <span className="text-xs text-slate-400 font-mono">
                 {facultyContext?.facultyCode || "FAC-MEMBER"}
               </span>
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Academic Documents & Syllabi
             </h1>
-            <p className="text-xs text-slate-700">
+            <p className="text-xs sm:text-sm text-slate-400">
               Department of {facultyContext?.departmentName || "Computer Science"} ({facultyContext?.departmentCode || "CSE"})
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <Button
               variant="outline"
               size="sm"
               onClick={() => fetchDocuments()}
-              className="border-slate-200 bg-white/80 backdrop-blur-sm text-slate-700 hover:text-white rounded-xl text-xs"
+              className="border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-white rounded-xl text-xs px-3 py-2"
             >
-              <RefreshCw className={`h-4 w-4 mr-1.5 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${loading ? "animate-spin" : ""}`} />
               Refresh
             </Button>
           </div>
@@ -332,43 +332,43 @@ export default function FacultyDocumentsPage() {
       </div>
 
       {/* ── METRIC TILES ─────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-white/80 backdrop-blur-sm border-slate-200/80 backdrop-blur-xl">
-          <CardContent className="p-4 flex items-center justify-between">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <Card className="bg-[#121824] border-slate-800 shadow-sm rounded-2xl">
+          <CardContent className="p-4 sm:p-5 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-slate-500">Department Documents</p>
-              <p className="text-2xl font-bold text-indigo-400 mt-1">{facultyContext?.totalDeptDocs ?? documents.length}</p>
-              <p className="text-[10px] text-slate-500 mt-0.5">{facultyContext?.departmentCode} Exclusive Scope</p>
+              <p className="text-xs font-medium text-slate-400">Department Documents</p>
+              <p className="text-2xl font-bold text-white mt-1">{facultyContext?.totalDeptDocs ?? documents.length}</p>
+              <p className="text-[11px] text-indigo-400 mt-0.5">{facultyContext?.departmentCode || "CSE"} Exclusive Scope</p>
             </div>
-            <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400">
+            <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
               <Building className="h-5 w-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/80 backdrop-blur-sm border-slate-200/80 backdrop-blur-xl">
-          <CardContent className="p-4 flex items-center justify-between">
+        <Card className="bg-[#121824] border-slate-800 shadow-sm rounded-2xl">
+          <CardContent className="p-4 sm:p-5 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-slate-500">University-Wide Policies</p>
-              <p className="text-2xl font-bold text-emerald-400 mt-1">{facultyContext?.totalUnivDocs ?? 0}</p>
-              <p className="text-[10px] text-slate-500 mt-0.5">Regulations & Academic Rules</p>
+              <p className="text-xs font-medium text-slate-400">University-Wide Policies</p>
+              <p className="text-2xl font-bold text-white mt-1">{facultyContext?.totalUnivDocs ?? 0}</p>
+              <p className="text-[11px] text-emerald-400 mt-0.5">Regulations & Academic Rules</p>
             </div>
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
+            <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               <Globe className="h-5 w-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/80 backdrop-blur-sm border-slate-200/80 backdrop-blur-xl">
-          <CardContent className="p-4 flex items-center justify-between">
+        <Card className="bg-[#121824] border-slate-800 shadow-sm rounded-2xl">
+          <CardContent className="p-4 sm:p-5 flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-slate-500">Indexed RAG Chunks</p>
-              <p className="text-2xl font-bold text-purple-400 mt-1">
+              <p className="text-xs font-medium text-slate-400">Indexed RAG Chunks</p>
+              <p className="text-2xl font-bold text-white mt-1">
                 {documents.reduce((acc, d) => acc + (d._count?.chunks || 0), 0)}
               </p>
-              <p className="text-[10px] text-slate-500 mt-0.5">Vectors in Qdrant & BM25</p>
+              <p className="text-[11px] text-purple-400 mt-0.5">Vectors in Qdrant & BM25</p>
             </div>
-            <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400">
+            <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
               <Shield className="h-5 w-5" />
             </div>
           </CardContent>
@@ -376,28 +376,28 @@ export default function FacultyDocumentsPage() {
       </div>
 
       {/* ── UPLOAD ZONE & CATEGORIZATION ─────────────────────────── */}
-      <Card className="bg-white/80 backdrop-blur-sm border-slate-200 backdrop-blur-xl">
+      <Card className="bg-[#121824] border-slate-800 shadow-sm rounded-2xl">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg text-white font-semibold flex items-center gap-2">
             <UploadCloud className="h-5 w-5 text-indigo-400" />
             Upload Academic Document
           </CardTitle>
-          <CardDescription className="text-slate-500 text-xs">
-            Documents are automatically tagged with your authenticated department (<strong className="text-slate-700">{facultyContext?.departmentCode || "CSE"}</strong>) and indexed for zero-hallucination RAG.
+          <CardDescription className="text-slate-400 text-xs">
+            Documents are automatically tagged with your authenticated department (<strong className="text-slate-200">{facultyContext?.departmentCode || "CSE"}</strong>) and indexed for zero-hallucination RAG.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Form Options */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-slate-700">Document Category</Label>
+              <Label className="text-xs font-medium text-slate-300">Document Category</Label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                className="w-full bg-[#0B0F17] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
               >
                 {DOCUMENT_CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
+                  <option key={cat} value={cat} className="bg-[#0B0F17] text-slate-200">
                     {cat}
                   </option>
                 ))}
@@ -405,24 +405,24 @@ export default function FacultyDocumentsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-slate-700">Course Code (Optional)</Label>
+              <Label className="text-xs font-medium text-slate-300">Course Code (Optional)</Label>
               <Input
                 placeholder="e.g. CS401, CS501"
                 value={courseCode}
                 onChange={(e) => setCourseCode(e.target.value.toUpperCase())}
-                className="bg-slate-50 border-slate-200 rounded-xl text-xs text-white"
+                className="bg-[#0B0F17] border-slate-800 rounded-xl text-xs text-slate-200 placeholder:text-slate-600 focus:border-indigo-500"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-slate-700">Visibility Scope</Label>
+              <Label className="text-xs font-medium text-slate-300">Visibility Scope</Label>
               <select
                 value={visibility}
                 onChange={(e) => setVisibility(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                className="w-full bg-[#0B0F17] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
               >
                 {VISIBILITY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
+                  <option key={opt.value} value={opt.value} className="bg-[#0B0F17] text-slate-200">
                     {opt.label}
                   </option>
                 ))}
@@ -436,7 +436,7 @@ export default function FacultyDocumentsPage() {
               className={`border-2 border-dashed rounded-2xl p-7 flex flex-col items-center justify-center space-y-3 cursor-pointer transition-all ${
                 dragging
                   ? "border-indigo-500 bg-indigo-500/10"
-                  : "border-slate-200 hover:border-indigo-500/40 bg-slate-50 hover:bg-slate-50"
+                  : "border-slate-800 hover:border-indigo-500/50 bg-[#0B0F17]/60 hover:bg-[#0B0F17]"
               }`}
               onClick={() => fileInputRef.current?.click()}
               onDragOver={(e) => {
@@ -457,7 +457,7 @@ export default function FacultyDocumentsPage() {
                 <p className="text-sm font-medium text-slate-200">
                   Click to select or drag and drop document
                 </p>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-400 mt-0.5">
                   PDF, DOCX, or TXT formats (Max: 25 MB)
                 </p>
               </div>
@@ -472,7 +472,7 @@ export default function FacultyDocumentsPage() {
               />
             </div>
           ) : (
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="p-4 rounded-xl bg-[#0B0F17] border border-slate-800 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
@@ -480,7 +480,7 @@ export default function FacultyDocumentsPage() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-white truncate max-w-sm">{file.name}</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-400">
                       {(file.size / 1024 / 1024).toFixed(2)} MB • {category} • Scope: <span className="text-indigo-400 font-semibold">{visibility}</span>
                     </p>
                   </div>
@@ -493,7 +493,7 @@ export default function FacultyDocumentsPage() {
                       setFile(null);
                       setUploadStatus("idle");
                     }}
-                    className="text-slate-500 hover:text-white"
+                    className="text-slate-400 hover:text-white"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -540,7 +540,7 @@ export default function FacultyDocumentsPage() {
                       setFile(null);
                       setUploadStatus("idle");
                     }}
-                    className="w-full border-slate-200 text-slate-700 rounded-xl text-xs h-9"
+                    className="w-full border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 rounded-xl text-xs h-9"
                   >
                     Upload Another Document
                   </Button>
@@ -552,25 +552,25 @@ export default function FacultyDocumentsPage() {
       </Card>
 
       {/* ── DOCUMENT DIRECTORY TABLE ─────────────────────────────── */}
-      <Card className="bg-white/80 backdrop-blur-sm border-slate-200 backdrop-blur-xl">
+      <Card className="bg-[#121824] border-slate-800 shadow-sm rounded-2xl">
         <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
           <div>
-            <CardTitle className="text-lg text-slate-900 font-semibold flex items-center gap-2">
+            <CardTitle className="text-lg text-white font-semibold flex items-center gap-2">
               <FolderOpen className="h-5 w-5 text-indigo-400" />
               Authorized Department Document Repository
             </CardTitle>
-            <CardDescription className="text-slate-500 text-xs">
+            <CardDescription className="text-slate-400 text-xs">
               {filteredDocs.length} Documents authorized for your role & department • Click any document to view preview
             </CardDescription>
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             {/* Filter Tabs */}
-            <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-200 text-[11px] overflow-x-auto scrollbar-none max-w-full">
+            <div className="flex bg-[#0B0F17] p-1 rounded-xl border border-slate-800 text-[11px] overflow-x-auto scrollbar-none max-w-full">
               <button
                 onClick={() => setActiveTab("ALL")}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                  activeTab === "ALL" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-500 hover:text-slate-200"
+                  activeTab === "ALL" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"
                 }`}
               >
                 All
@@ -578,7 +578,7 @@ export default function FacultyDocumentsPage() {
               <button
                 onClick={() => setActiveTab("DEPARTMENT")}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                  activeTab === "DEPARTMENT" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-500 hover:text-slate-200"
+                  activeTab === "DEPARTMENT" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"
                 }`}
               >
                 {facultyContext?.departmentCode || "Dept"} Only
@@ -586,7 +586,7 @@ export default function FacultyDocumentsPage() {
               <button
                 onClick={() => setActiveTab("UNIVERSITY")}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                  activeTab === "UNIVERSITY" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-500 hover:text-slate-200"
+                  activeTab === "UNIVERSITY" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"
                 }`}
               >
                 University
@@ -594,7 +594,7 @@ export default function FacultyDocumentsPage() {
               <button
                 onClick={() => setActiveTab("MY_UPLOADS")}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                  activeTab === "MY_UPLOADS" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-500 hover:text-slate-200"
+                  activeTab === "MY_UPLOADS" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"
                 }`}
               >
                 My Uploads
@@ -607,7 +607,7 @@ export default function FacultyDocumentsPage() {
                 placeholder="Search documents..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-slate-50 border-slate-200 text-xs text-slate-800 rounded-xl placeholder:text-slate-600"
+                className="pl-9 bg-[#0B0F17] border-slate-800 text-xs text-white rounded-xl placeholder:text-slate-500 focus:border-indigo-500"
               />
             </div>
 
@@ -616,7 +616,7 @@ export default function FacultyDocumentsPage() {
               size="sm"
               onClick={() => fetchDocuments()}
               disabled={loading}
-              className="h-9 px-3 rounded-xl border-slate-200 text-xs text-slate-700 hover:text-indigo-600 gap-1.5 shrink-0"
+              className="h-9 px-3 rounded-xl border-slate-800 bg-[#0B0F17] text-xs text-slate-300 hover:text-white hover:border-slate-700 gap-1.5 shrink-0"
               title="Refresh document repository status"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
@@ -626,18 +626,18 @@ export default function FacultyDocumentsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="py-12 text-center text-slate-500 text-xs">Loading authorized documents...</div>
+            <div className="py-12 text-center text-slate-400 text-xs">Loading authorized documents...</div>
           ) : filteredDocs.length === 0 ? (
             <div className="py-12 text-center space-y-2">
               <FolderOpen className="h-10 w-10 text-slate-600 mx-auto" />
-              <p className="text-sm font-medium text-slate-700">No documents found in this scope</p>
+              <p className="text-sm font-medium text-slate-300">No documents found in this scope</p>
               <p className="text-xs text-slate-500">Upload your course materials above or change the filter tab.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+            <div className="overflow-x-auto -mx-6 px-6">
+              <table className="w-full min-w-[720px] text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-200 text-slate-500 uppercase text-[10px] tracking-wider">
+                  <tr className="border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider">
                     <th className="pb-3 font-semibold">Document Name & Department</th>
                     <th className="pb-3 font-semibold">Visibility</th>
                     <th className="pb-3 font-semibold">Size</th>
@@ -647,7 +647,7 @@ export default function FacultyDocumentsPage() {
                     <th className="pb-3 font-semibold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-slate-800/80">
                   {filteredDocs.map((doc) => {
                     const isOwnDoc =
                       doc.uploadedBy === facultyContext?.id ||
@@ -656,7 +656,7 @@ export default function FacultyDocumentsPage() {
                       <tr
                         key={doc.id}
                         onClick={() => handleViewDoc(doc.id)}
-                        className="hover:bg-indigo-50/40 cursor-pointer transition-colors"
+                        className="hover:bg-slate-800/40 cursor-pointer transition-colors"
                       >
                         <td className="py-3.5 pr-4">
                           <div className="flex items-center gap-2.5">
@@ -665,12 +665,12 @@ export default function FacultyDocumentsPage() {
                             </div>
                             <div>
                               <p className="font-semibold text-white truncate max-w-xs">{doc.fileName}</p>
-                              <p className="text-[11px] text-slate-500 flex items-center gap-1.5">
-                                <span className="text-indigo-300 font-medium">
+                              <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
+                                <span className="text-indigo-400 font-medium">
                                   {doc.department?.code || doc.department?.name || (doc.visibility === "UNIVERSITY" ? "University-Wide" : "Department")}
                                 </span>
                                 {isOwnDoc && (
-                                  <span className="text-[9px] px-1.5 py-0.2 bg-slate-800 text-slate-700 rounded">
+                                  <span className="text-[9px] px-1.5 py-0.2 bg-slate-800 text-slate-300 rounded border border-slate-700">
                                     Your Upload
                                   </span>
                                 )}
@@ -681,8 +681,8 @@ export default function FacultyDocumentsPage() {
                         <td className="py-3.5">
                           {getVisibilityBadge(doc.visibility || "DEPARTMENT")}
                         </td>
-                        <td className="py-3.5 text-slate-700">{(doc.fileSize / 1024 / 1024).toFixed(2)} MB</td>
-                        <td className="py-3.5 text-slate-700">
+                        <td className="py-3.5 text-slate-300">{(doc.fileSize / 1024 / 1024).toFixed(2)} MB</td>
+                        <td className="py-3.5 text-slate-300">
                           <span className="font-mono text-indigo-300">{doc._count?.chunks || 0}</span> chunks
                         </td>
                         <td className="py-3.5">
@@ -699,7 +699,7 @@ export default function FacultyDocumentsPage() {
                             {doc.processingStatus}
                           </Badge>
                         </td>
-                        <td className="py-3.5 text-slate-500">
+                        <td className="py-3.5 text-slate-400">
                           {new Date(doc.createdAt).toLocaleDateString()}
                         </td>
                         <td className="py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
@@ -711,7 +711,7 @@ export default function FacultyDocumentsPage() {
                                 title="Re-process document extraction & vector embeddings"
                                 disabled={doc.processingStatus === "PROCESSING" || reprocessingId === doc.id}
                                 onClick={(e) => handleReprocessDoc(doc.id, e)}
-                                className="rounded-lg h-7 px-2 text-amber-600 hover:text-amber-700 hover:bg-amber-500/10"
+                                className="rounded-lg h-7 px-2 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10"
                               >
                                 <RefreshCw className={`h-3.5 w-3.5 ${doc.processingStatus === "PROCESSING" || reprocessingId === doc.id ? "animate-spin" : ""}`} />
                               </Button>
@@ -721,7 +721,7 @@ export default function FacultyDocumentsPage() {
                               size="sm"
                               title="View document details & indexed chunks"
                               onClick={() => handleViewDoc(doc.id)}
-                              className="rounded-lg h-7 px-2 text-indigo-400 hover:text-white hover:bg-indigo-500/20"
+                              className="rounded-lg h-7 px-2 text-slate-400 hover:text-white hover:bg-slate-800"
                             >
                               <Eye className="h-3.5 w-3.5" />
                             </Button>
@@ -732,7 +732,7 @@ export default function FacultyDocumentsPage() {
                               onClick={() => handleDelete(doc.id)}
                               className={`rounded-lg h-7 px-2 ${
                                 isOwnDoc
-                                  ? "text-slate-500 hover:text-rose-400 hover:bg-rose-500/10"
+                                  ? "text-slate-400 hover:text-rose-400 hover:bg-rose-500/10"
                                   : "text-slate-600 hover:text-slate-500 cursor-pointer"
                               }`}
                             >
@@ -753,9 +753,9 @@ export default function FacultyDocumentsPage() {
       {/* ── DOCUMENT PREVIEW / DETAIL MODAL ───────────────────────── */}
       {selectedDoc && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-overlay-in">
-          <div className="bg-slate-900/95 backdrop-blur-2xl border border-indigo-500/40 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl popup-card-in">
+          <div className="bg-[#121824] border border-slate-800 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl popup-card-in">
             {/* Modal Header */}
-            <div className="p-5 border-b border-slate-200 flex items-start justify-between gap-4">
+            <div className="p-5 border-b border-slate-800 flex items-start justify-between gap-4 bg-[#121824]">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="p-2.5 rounded-xl bg-indigo-500/15 text-indigo-400 shrink-0">
                   <FileText className="h-6 w-6" />
@@ -777,15 +777,15 @@ export default function FacultyDocumentsPage() {
               </div>
               <button
                 onClick={() => setSelectedDoc(null)}
-                className="text-slate-500 hover:text-white p-1 rounded-lg hover:bg-indigo-50 transition-colors shrink-0"
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors shrink-0"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-4 text-xs text-slate-700">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <div className="p-5 overflow-y-auto space-y-4 text-xs text-slate-300">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#0B0F17] p-3.5 rounded-xl border border-slate-800">
                 <div>
                   <span className="text-slate-500 block text-[10px]">File Size</span>
                   <span className="font-semibold text-white">{(selectedDoc.fileSize / 1024 / 1024).toFixed(2)} MB</span>
@@ -813,18 +813,18 @@ export default function FacultyDocumentsPage() {
                 </h4>
 
                 {(!selectedDoc.chunks || selectedDoc.chunks.length === 0) ? (
-                  <div className="p-6 text-center text-slate-500 bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="p-6 text-center text-slate-400 bg-[#0B0F17] rounded-xl border border-slate-800">
                     No indexed chunks preview available.
                   </div>
                 ) : (
                   <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
                     {selectedDoc.chunks.map((chunk: any, i: number) => (
-                      <div key={chunk.id || i} className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                      <div key={chunk.id || i} className="p-3 bg-[#0B0F17] rounded-xl border border-slate-800 space-y-1.5">
                         <div className="flex items-center justify-between text-[10px] text-indigo-400 font-mono">
                           <span>Chunk #{chunk.chunkIndex ?? i + 1} {chunk.pageNumber ? `(Page ${chunk.pageNumber})` : ""}</span>
                           <span className="text-slate-500">{chunk.tokenCount ? `${chunk.tokenCount} tokens` : ""}</span>
                         </div>
-                        <p className="text-slate-700 leading-relaxed line-clamp-4 font-mono text-[11px]">
+                        <p className="text-slate-300 leading-relaxed line-clamp-4 font-mono text-[11px]">
                           {chunk.content}
                         </p>
                       </div>
@@ -835,13 +835,13 @@ export default function FacultyDocumentsPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-3">
+            <div className="p-4 border-t border-slate-800 bg-[#0E131F] flex items-center justify-between gap-3">
               {selectedDoc.signedUrl ? (
                 <a
                   href={selectedDoc.signedUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all shadow-sm"
                 >
                   <Eye className="h-3.5 w-3.5" /> Open / Download File
                 </a>
@@ -853,7 +853,7 @@ export default function FacultyDocumentsPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setSelectedDoc(null)}
-                className="border-slate-200 text-slate-700 hover:text-white rounded-xl text-xs"
+                className="border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 rounded-xl text-xs"
               >
                 Close Preview
               </Button>

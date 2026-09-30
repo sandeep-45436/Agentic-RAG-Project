@@ -162,6 +162,8 @@ export class FusionService {
       organizationId: chunk.organizationId,
       documentId: chunk.documentId,
       documentName: chunk.documentName,
+      departmentId: (chunk as any).departmentId,
+      visibility: (chunk as any).visibility,
       chunkId: chunk.chunkId,
       chunkIndex: chunk.chunkIndex,
       chunkText: chunk.chunkText,
@@ -174,6 +176,9 @@ export class FusionService {
         bm25Score: chunk.bm25Score,
         fusionScore: chunk.fusionScore,
         fusionRank: chunk.fusionRank,
+        departmentCode: (chunk as any).departmentCode ?? chunk.metadata?.departmentCode ?? null,
+        departmentName: (chunk as any).departmentName ?? chunk.metadata?.departmentName ?? null,
+        visibility: (chunk as any).visibility ?? chunk.metadata?.visibility ?? "DEPARTMENT",
       },
     }));
   }

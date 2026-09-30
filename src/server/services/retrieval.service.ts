@@ -287,20 +287,44 @@ export class RetrievalService {
         });
       }
 
-      // 7. Enrich BM25-only results with document names
-      const docIds = [
+      // 7. Enrich all results with document names and department metadata
+      const allDocIds = [
         ...new Set(
-          fusedResults.filter((c) => c.documentName === "Unknown").map((c) => c.documentId)
+          fusedResults.map((c) => c.documentId).filter((id) => id && id !== "graph-knowledge")
         ),
       ];
 
-      if (docIds.length > 0) {
+      if (allDocIds.length > 0) {
         const docs = await db.document.findMany({
-          where: { id: { in: docIds } },
-          select: { id: true, fileName: true },
+          where: { id: { in: allDocIds } },
+          select: {
+            id: true,
+            fileName: true,
+            departmentId: true,
+            visibility: true,
+            department: { select: { code: true, name: true } },
+          },
         });
-        const nameMap = new Map(docs.map((d) => [d.id, d.fileName]));
-        FusionService.enrichDocumentNames(fusedResults, nameMap);
+        const docMap = new Map(docs.map((d) => [d.id, d]));
+        fusedResults.forEach((chunk) => {
+          const doc = docMap.get(chunk.documentId);
+          if (doc) {
+            if (chunk.documentName === "Unknown") {
+              chunk.documentName = doc.fileName;
+            }
+            const deptCode = doc.department?.code || (doc.visibility === "UNIVERSITY" ? "UNIV" : null);
+            const deptName = doc.department?.name || (doc.visibility === "UNIVERSITY" ? "University-Wide" : null);
+            (chunk as any).departmentCode = deptCode;
+            (chunk as any).departmentName = deptName;
+            (chunk as any).visibility = doc.visibility;
+            if (chunk.metadata) {
+              chunk.metadata.departmentCode = deptCode;
+              chunk.metadata.departmentName = deptName;
+              chunk.metadata.visibility = doc.visibility;
+              chunk.metadata.documentName = chunk.documentName;
+            }
+          }
+        });
       }
 
       // 8. Convert to VectorPayload format for reranking

@@ -420,7 +420,9 @@ export class DocumentAccessPolicy {
       if (studentRecord) {
         let effectiveDepartmentId = studentRecord.departmentId;
 
-        if (requestedDepartmentId && requestedDepartmentId !== studentRecord.departmentId) {
+        if (requestedDepartmentId === "ALL") {
+          effectiveDepartmentId = "ALL";
+        } else if (requestedDepartmentId && requestedDepartmentId !== studentRecord.departmentId) {
           // Check if requested department exists in organization
           const deptExists = await db.department.findFirst({
             where: { id: requestedDepartmentId, organizationId, deletedAt: null },
@@ -462,7 +464,7 @@ export class DocumentAccessPolicy {
           userId: facultyRecord.userId || facultyRecord.id,
           facultyId: facultyRecord.id,
           userRole: (facultyRecord.designation === "HOD" ? "HOD" : "FACULTY") as any,
-          departmentId: facultyRecord.departmentId,
+          departmentId: requestedDepartmentId === "ALL" ? "ALL" : facultyRecord.departmentId,
           collegeId: null,
         };
       }
@@ -475,7 +477,9 @@ export class DocumentAccessPolicy {
       const role = (membership?.role || "MEMBER") as any;
 
       let validatedDeptId: string | null = null;
-      if (requestedDepartmentId) {
+      if (requestedDepartmentId === "ALL") {
+        validatedDeptId = "ALL";
+      } else if (requestedDepartmentId) {
         const deptExists = await db.department.findFirst({
           where: { id: requestedDepartmentId, organizationId, deletedAt: null },
         });

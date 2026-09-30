@@ -156,6 +156,9 @@ export async function POST(req: Request) {
             bm25Score: metadata.bm25Score ?? null,
             chunkIndex: c.chunkIndex ?? metadata.chunkIndex ?? 0,
             pageNumber: c.pageNumber ?? metadata.pageNumber ?? null,
+            departmentCode: c.departmentCode ?? metadata.departmentCode ?? (c.departmentId ? "DEPT" : "UNIV"),
+            departmentName: c.departmentName ?? metadata.departmentName ?? null,
+            visibility: c.visibility ?? metadata.visibility ?? "DEPARTMENT",
           };
         })
       );

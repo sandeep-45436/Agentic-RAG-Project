@@ -57,6 +57,9 @@ interface Chunk {
   score: number | null;
   chunkIndex: number;
   pageNumber?: number | null;
+  departmentCode?: string | null;
+  departmentName?: string | null;
+  visibility?: string | null;
 }
 
 interface DebugChunk extends Chunk {
@@ -97,6 +100,7 @@ function ReasoningAccordion({
   deptCode: string;
 }) {
   const [open, setOpen] = useState(false);
+  const isAll = !deptCode || deptCode === "ALL";
 
   return (
     <div className="mb-3 rounded-2xl border border-emerald-200/80 bg-gradient-to-r from-emerald-50/80 via-teal-50/60 to-indigo-50/40 overflow-hidden text-xs transition-all shadow-xs">
@@ -122,7 +126,10 @@ function ReasoningAccordion({
           <div className="flex items-start gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
             <div>
-              <span className="font-bold text-slate-900">1. Scope Gatekeeper:</span> Confined to [{deptCode}] department & university regulations.
+              <span className="font-bold text-slate-900">1. Scope Gatekeeper:</span>{" "}
+              {isAll
+                ? "Grounded across All University Departments & Regulations."
+                : `Confined to [${deptCode}] Department & Institutional Regulations.`}
             </div>
           </div>
           <div className="flex items-start gap-2">
@@ -166,10 +173,15 @@ function CitationChips({
           <button
             key={i}
             onClick={() => onSelectChunk(c)}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-xs text-indigo-700 font-semibold transition-all active:scale-95 group max-w-[220px] shadow-xs"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-xs text-indigo-700 font-semibold transition-all active:scale-95 group max-w-[260px] shadow-xs"
             title="Click to view full chunk excerpt"
           >
             <span className="truncate">{c.documentName}</span>
+            {c.departmentCode && (
+              <span className="text-[9px] px-1.5 py-0.2 bg-purple-100 text-purple-800 rounded font-mono font-bold shrink-0">
+                {c.departmentCode}
+              </span>
+            )}
             {c.pageNumber && (
               <span className="text-[10px] px-1.5 py-0.2 bg-indigo-200/70 rounded-md text-indigo-800 font-mono shrink-0">
                 p.{c.pageNumber}
@@ -343,25 +355,30 @@ function AssistantBubble({
 
 function EmptyState({
   onSuggest,
-  deptCode = "CSE",
-  deptName = "Computer Science",
+  deptCode = "ALL",
+  deptName = "All Departments & University",
 }: {
   onSuggest: (q: string) => void;
   deptCode?: string;
   deptName?: string;
 }) {
+  const isAll = !deptCode || deptCode === "ALL";
   const categories = [
     {
       icon: BookOpen,
       title: "Course Syllabi & Units",
       desc: "Curriculum modules, chapter outlines, key formulas, and exam weightage.",
-      prompt: `Summarize the high-yield topics and syllabus units for ${deptCode}`,
+      prompt: isAll
+        ? "Summarize the high-yield topics and syllabus units for AI and Computer Science"
+        : `Summarize the high-yield topics and syllabus units for ${deptCode}`,
     },
     {
       icon: FlaskConical,
       title: "Lab Manuals & Code",
       desc: "Step-by-step experiment procedures, requirements, and test scenarios.",
-      prompt: `Explain the required laboratory experiments and expected outputs for ${deptCode}`,
+      prompt: isAll
+        ? "Explain the required laboratory experiments and expected outputs for CNIP Lab"
+        : `Explain the required laboratory experiments and expected outputs for ${deptCode}`,
     },
     {
       icon: Scale,
@@ -386,7 +403,7 @@ function EmptyState({
 
       <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold mb-3 shadow-xs">
         <GraduationCap className="w-4 h-4 text-indigo-600" />
-        <span>{deptName} ({deptCode}) Knowledge Scope</span>
+        <span>{isAll ? "Campus-Wide Knowledge Scope (All Departments & University)" : `${deptName} (${deptCode}) Knowledge Scope`}</span>
       </div>
 
       <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
@@ -511,7 +528,14 @@ function ContextPanelContent({
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="font-bold text-slate-900 truncate">{c.documentName}</p>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <p className="font-bold text-slate-900 truncate">{c.documentName}</p>
+                        {c.departmentCode && (
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                            {c.departmentCode}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[10px] text-slate-500 font-medium">
                         Chunk {c.chunkIndex + 1}
                         {c.pageNumber && ` · Page ${c.pageNumber}`}
@@ -558,7 +582,7 @@ export default function ChatPage() {
 
   // Department Knowledge Scope
   const [departments, setDepartments] = useState<any[]>([]);
-  const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>("ALL");
   const [userScope, setUserScope] = useState<any>(null);
 
   // Load departments
@@ -569,14 +593,17 @@ export default function ChatPage() {
         if (d.departments && d.departments.length > 0) {
           setDepartments(d.departments);
           setUserScope(d.userScope);
-          const defaultDept = d.departments.find((dep: any) => dep.code === "CSE") || d.departments[0];
-          setSelectedDepartmentId(d.userScope?.primaryDepartmentId || defaultDept.id);
+          // Default to ALL so queries search the entire knowledge base without restriction
+          setSelectedDepartmentId((prev) => (prev && prev !== "ALL" ? prev : "ALL"));
         }
       })
       .catch((e) => console.error("Failed loading departments:", e));
   }, []);
 
-  const selectedDepartment = departments.find((d) => d.id === selectedDepartmentId) || departments[0] || null;
+  const selectedDepartment =
+    !selectedDepartmentId || selectedDepartmentId === "ALL"
+      ? { id: "ALL", code: "ALL", name: "All Departments & University" }
+      : departments.find((d) => d.id === selectedDepartmentId) || { id: "ALL", code: "ALL", name: "All Departments & University" };
 
   // Load user info
   useEffect(() => {
@@ -868,11 +895,25 @@ export default function ChatPage() {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            {/* Scope Badge */}
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold shadow-xs">
+            {/* Department Scope Selector */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold shadow-xs">
               <GraduationCap className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-              <span className="font-extrabold text-indigo-900">{selectedDepartment?.code || "CSE"}</span>
-              <span className="text-[11px] text-indigo-600 hidden sm:inline font-semibold">Scope</span>
+              <span className="text-[11px] text-indigo-600 hidden sm:inline font-semibold">Scope:</span>
+              <select
+                value={selectedDepartmentId}
+                onChange={(e) => setSelectedDepartmentId(e.target.value)}
+                className="bg-transparent text-xs font-extrabold text-indigo-950 border-none outline-none focus:ring-0 cursor-pointer max-w-[130px] sm:max-w-[200px] truncate pr-1"
+                title="Select Academic Scope"
+              >
+                <option value="ALL" className="bg-white text-slate-900 font-bold">
+                  All Departments & Univ
+                </option>
+                {departments.map((dept) => (
+                  <option key={dept.id} value={dept.id} className="bg-white text-slate-900 font-medium">
+                    {dept.code} - {dept.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Citations Sheet */}
@@ -928,8 +969,8 @@ export default function ChatPage() {
             {messages.length === 0 ? (
               <EmptyState
                 onSuggest={(q) => setInput(q)}
-                deptCode={selectedDepartment?.code || "CSE"}
-                deptName={selectedDepartment?.name || "Computer Science"}
+                deptCode={selectedDepartment?.code || "ALL"}
+                deptName={selectedDepartment?.name || "All Departments & University"}
               />
             ) : (
               messages.map((m: any) => {
@@ -961,7 +1002,7 @@ export default function ChatPage() {
                       setMobileContextOpen(true);
                     }}
                     latency={retrievalLatency}
-                    deptCode={selectedDepartment?.code || "CSE"}
+                    deptCode={selectedDepartment?.code || "ALL"}
                   />
                 );
               })
@@ -970,7 +1011,7 @@ export default function ChatPage() {
             {/* Typing Loader */}
             {isLoading && (messages[messages.length - 1]?.role === "user" || (messages[messages.length - 1]?.role === "assistant" && !getMessageContent(messages[messages.length - 1]))) && (
               <div className="flex gap-3 items-start">
-                <NeuralSynapseLoader text={`Retrieving & synthesizing verified ${selectedDepartment?.code || "CSE"} knowledge...`} />
+                <NeuralSynapseLoader text={`Retrieving & synthesizing verified ${selectedDepartment?.code === "ALL" ? "university & departmental" : (selectedDepartment?.code || "academic")} knowledge...`} />
               </div>
             )}
 
@@ -1008,7 +1049,11 @@ export default function ChatPage() {
                       handleFormSubmit();
                     }
                   }}
-                  placeholder={`Ask anything about ${selectedDepartment?.code || "CSE"} syllabi, lab manuals, regulations...`}
+                  placeholder={
+                    selectedDepartment?.code === "ALL"
+                      ? "Ask anything across university syllabi, lab manuals, regulations..."
+                      : `Ask anything about ${selectedDepartment?.code || "academic"} syllabi, lab manuals, regulations...`
+                  }
                   disabled={isLoading}
                   rows={1}
                   className="w-full bg-transparent text-sm text-slate-900 placeholder-slate-400 font-medium px-4 pt-3.5 pb-1 resize-none outline-none min-h-[44px] max-h-36 leading-relaxed"

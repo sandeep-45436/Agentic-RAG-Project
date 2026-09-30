@@ -396,7 +396,8 @@ export class ResearchNotebookService {
     ctx: ResolvedUserContext,
     notebookId: string,
     mode?: SynthesisMode,
-    customPrompt?: string
+    customPrompt?: string,
+    language?: "en" | "te"
   ): Promise<{ title: string; markdown: string }> {
     // If starter workspace, synthesize directly
     if (notebookId.startsWith("ws-starter-")) {
@@ -414,6 +415,7 @@ export class ResearchNotebookService {
           sources: payload,
           mode,
           customPrompt,
+          language,
         });
       }
     }
@@ -449,6 +451,7 @@ export class ResearchNotebookService {
       sources: payload,
       mode,
       customPrompt,
+      language,
     });
 
     await AuditService.logEvent({

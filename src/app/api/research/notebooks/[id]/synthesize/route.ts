@@ -16,6 +16,7 @@ export async function POST(
     const body = await req.json().catch(() => ({}));
     const mode = body.mode ?? "summary";
     const customPrompt = body.prompt;
+    const language = (body.language === "te" ? "te" : "en") as "en" | "te";
 
     // Handle starter workspaces directly
     if (id.startsWith("ws-starter-")) {
@@ -33,6 +34,7 @@ export async function POST(
             sources: payload,
             mode,
             customPrompt,
+            language,
           });
           return NextResponse.json({ success: true, ...result }, { status: 200 });
         }
@@ -49,7 +51,8 @@ export async function POST(
       ctx,
       id,
       mode,
-      customPrompt
+      customPrompt,
+      language
     );
 
     return NextResponse.json({ success: true, ...result }, { status: 200 });

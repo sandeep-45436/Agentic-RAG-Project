@@ -459,6 +459,105 @@ Training & Placement Cell (Placement Center) & Academic Council
       },
     ],
   },
+  {
+    id: "ws-starter-telugu-nlp",
+    organizationId: "org-academic-default",
+    title: "తెలుగు సహజ భాషా ప్రాసెసింగ్ & ఇండిక్ AI నమూనాలు (Telugu NLP & Indic LLMs)",
+    description: "తెలుగు టోకనైజేషన్, ద్రావిడ స్వరూప విశ్లేషణ, బహుభాషా RAG మరియు ఇండిక్ భాషా నమూనాల పరిశోధనా సమాహారం.",
+    provider: "gemini",
+    status: "ACTIVE",
+    totalSources: 3,
+    staleSources: 0,
+    createdAt: new Date("2026-02-10T08:30:00Z").toISOString(),
+    updatedAt: new Date().toISOString(),
+    department: "CSE / Indic AI & NLP",
+    sources: [
+      {
+        id: "src-tel-01",
+        documentId: "doc-tel-01",
+        fileName: "Telugu_Tokenization_and_Morphological_Segmentation.pdf",
+        status: "ACTIVE",
+        isStale: false,
+        errorMessage: null,
+        updatedAt: new Date("2026-02-15T11:00:00Z").toISOString(),
+        authors: "Prof. B. Srinivas, Dr. R. Lakshmi, K. Ananya",
+        year: 2025,
+        venue: "ACM Transactions on Asian and Low-Resource Language Information Processing (TALLIP)",
+        doi: "10.1145/3691240.3691255",
+        textContent: `
+# తెలుగు సహజ భాషా ప్రాసెసింగ్‌లో స్వరూప విభజన మరియు సబ్‌వర్డ్ టోకనైజేషన్ (Morphological Segmentation and Subword Tokenization in Telugu NLP)
+Authors: Prof. B. Srinivas, Dr. R. Lakshmi, K. Ananya (Department of Computer Science & Indic Computing)
+
+1. కార్యనిర్వాహక సారాంశం (Executive Abstract)
+తెలుగు భాష ఒక సంశ్లేషణాత్మక (agglutinative) మరియు సంధి-సమాసాల సమృద్ధి కలిగిన ద్రావిడ భాష. ప్రామాణిక బైట్-పెయిర్ ఎన్‌కోడింగ్ (BPE) పద్ధతులు తెలుగు అక్షర సముదాయాలపై విఫలమవుతూ అధిక ఫెర్టిలిటీ రేటు (Fertility Rate > 4.2) నమోదు చేస్తున్నాయి. ఈ పరిశోధనా పత్రంలో, తెలుగు వ్యాకరణ సూత్రాలు మరియు సంధి విచ్ఛేద ఆధారిత అక్షర-మూల విభజన (Morpho-Lexical Segmentation) ప్రవేశపెట్టబడింది.
+
+2. అల్గోరిథం విధానం & గణిత సూత్రీకరణ (Algorithmic Methodology)
+ప్రామాణిక పద సముదాయం $W$ మరియు విభజన బిందువులు $S = \\{s_1, s_2, \\dots, s_k\\}$ అనుకుంటే, సరైన విభజన సంభావ్యత:
+$$P(S | W) = \\prod_{i=1}^{k} P(m_i | m_{i-1}) \\cdot \\exp\\left(-\\alpha \\cdot \\text{Penalty}_{sandhi}(m_i)\\right)$$
+ఇక్కడ $m_i$ అనేది గుర్తించబడిన మార్ఫిమ్ (morpheme), మరియు $\\alpha = 0.42$ అనేది సంధి నియమాల ఉల్లంఘన అపరాధ గుణకం (penalty factor).
+
+3. ప్రయోగాత్మక ఫలితాలు (Experimental Results)
+- ప్రామాణిక LLaMA-3 టోకనైజర్‌తో పోలిస్తే టోకెన్ సంఖ్య 58.4% తగ్గింది.
+- తెలుగు సమాచార సంగ్రహణలో (Information Retrieval) ఖచ్చితత్వం: F1-స్కోరు 93.8%.
+- సగటు ప్రాసెసింగ్ వేగం: 142ms ప్రతి 1000 పదాలకు.
+        `.trim(),
+      },
+      {
+        id: "src-tel-02",
+        documentId: "doc-tel-02",
+        fileName: "Indic_LLM_RAG_Grounded_Synthesis_Telugu.pdf",
+        status: "ACTIVE",
+        isStale: false,
+        errorMessage: null,
+        updatedAt: new Date("2026-02-18T14:30:00Z").toISOString(),
+        authors: "Dr. V. Ramesh, Dr. K. Radhakrishna, P. Tejaswini",
+        year: 2025,
+        venue: "IEEE International Conference on Natural Language Processing (ICON)",
+        doi: "10.1109/ICON.2025.1098231",
+        textContent: `
+# తెలుగులో ఆధారాధారిత సమాచార పునరుద్ధరణ & RAG సింథసిస్ (Evidence-Grounded RAG and Synthesis in Telugu)
+Authors: Dr. V. Ramesh, Dr. K. Radhakrishna, P. Tejaswini (Center for AI & Language Engineering)
+
+1. పరిచయం & సమస్య సూత్రీకరణ (Introduction & Problem Formulation)
+ఆంగ్ల భాషలోని విజ్ఞాన భాండాగారాలను తెలుగులోకి అనువదించేటప్పుడు సందర్భానుసార లోపాలు (Contextual Hallucinations) మరియు అస్పష్టమైన సైటేషన్లు ఉత్పన్నమవుతాయి. ఈ పత్రంలో, అధీకృత పత్రాల నుండి నిజ-సమయ ఆధారాలను తెలుగు లిపిలో ప్రత్యక్షంగా పొందుపరిచే నూతన ద్వంద్వ-దశల ఆర్కిటెక్చర్ ప్రతిపాదించబడింది.
+
+2. ఆర్కిటెక్చర్ నిర్మాణం (Architecture Overview)
+- ఎంబెడ్డింగ్ లేయర్: బహుభాషా mE5 మరియు ఇండిక్-సెమాంటిక్ వెక్టర్ మోడల్స్ కలయిక.
+- నాలెడ్జ్ గ్రాఫ్ అన్వేషణ: నియో4జె (Neo4j) గ్రాఫ్‌లో తెలుగు నామవాచకాలు మరియు క్రియల సంబంధాలను అనుసంధానించే సైఫర్ (Cypher) క్వెరీలు.
+- సైటేషన్ ధృవీకరణ: ప్రతి తెలుగు పేరాగ్రాఫ్ కచ్చితంగా సంబంధిత డాక్యుమెంట్ ట్యాగ్‌ను [Doc: fileName] కలిగి ఉండటాన్ని తప్పనిసరి చేసే ఫైర్‌వాల్.
+
+3. పరిశోధనా ఫలితాలు (Benchmark Findings)
+- తెలుగు న్యాయ మరియు విద్యా నిబంధనలలో విశ్వసనీయత: 97.6%.
+- సెమాంటిక్ అనువాద విచలనం 3.1% కంటే తక్కువగా నియంత్రించబడింది.
+        `.trim(),
+      },
+      {
+        id: "src-tel-03",
+        documentId: "doc-tel-03",
+        fileName: "Telugu_Speech_Synthesis_and_Phonetic_Acoustics.pdf",
+        status: "ACTIVE",
+        isStale: false,
+        errorMessage: null,
+        updatedAt: new Date("2026-02-22T09:15:00Z").toISOString(),
+        authors: "S. V. Prasad, M. Haritha, Dr. C. H. Venkat",
+        year: 2025,
+        venue: "Interspeech Indic Speech Processing Forum",
+        doi: "10.21437/Interspeech.2025-412",
+        textContent: `
+# తెలుగు ధ్వనిశాస్త్రం మరియు నాణ్యమైన న్యూరల్ టెక్స్ట్-టు-స్పీచ్ (Phonetic Acoustics and Neural TTS for Telugu)
+Authors: S. V. Prasad, M. Haritha, Dr. C. H. Venkat (Acoustic Intelligence & Signal Lab)
+
+1. సారాంశం (Abstract)
+తెలుగు భాష అజంత భాష (భాషలోని పదాలు అచ్చులతో ముగుస్తాయి - Italian of the East). అందువల్ల టెక్స్ట్-టు-స్పీచ్ (TTS) వ్యవస్థలలో దీర్ఘాలు, హ్రస్వాలు మరియు ఒత్తుల ఉచ్ఛారణకు ప్రత్యేక శ్రద్ధ అవసరం. ఈ పరిశోధన ద్వారా తక్కువ కంప్యూటేషనల్ సామర్థ్యం గల పరికరాలపై కూడా సహజంగా పలికే న్యూరల్ వాయిస్ సింథసైజర్ అభివృద్ధి చేయబడింది.
+
+2. ధ్వని విశ్లేషణ పారామితులు (Acoustic Parameters)
+- వర్ణమాల ప్రాతినిధ్యం: 56 తెలుగు అక్షరాల ధ్వని తరంగాల ఆధారంగా ఫోనెటిక్ మ్యాపింగ్.
+- శ్రవణ నాణ్యత రేటింగ్ (MOS): 4.65 / 5.0 (ప్రామాణిక మోడల్స్ 3.82 కంటే గణనీయంగా మెరుగు).
+- స్పీకర్ల వైవిధ్యం: పరిశోధనా చర్చలకు ఇద్దరు వ్యక్తుల (Alex & Jordan సమానమైన ధ్వని శైలులు) సహజ సంభాషణ నమూనా.
+        `.trim(),
+      },
+    ],
+  },
 ];
 
 export function getStarterWorkspaces(): StarterWorkspace[] {

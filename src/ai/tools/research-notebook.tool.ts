@@ -26,6 +26,7 @@ export interface ResearchNotebookInput {
   /** Mode for SYNTHESIZE: summary | faq | podcast | study_guide */
   mode?: "summary" | "faq" | "podcast" | "study_guide";
   customPrompt?: string;
+  language?: "en" | "te";
   /** Required for REMOVE_SOURCE */
   documentId?: string;
   /** Required for CREATE / ADD_SOURCE / SYNC — resolved server-side RBAC context */
@@ -69,6 +70,11 @@ export class ResearchNotebookTool {
         description: "Synthesis mode for SYNTHESIZE operation",
       },
       customPrompt: { type: "string", description: "Optional specific question or prompt for SYNTHESIZE" },
+      language: {
+        type: "string",
+        enum: ["en", "te"],
+        description: "Language for research synthesis: 'en' for English, 'te' for Telugu",
+      },
       documentId: { type: "string", description: "Single document ID (required for REMOVE_SOURCE)" },
       description: { type: "string", description: "Optional notebook description (for CREATE)" },
     },
@@ -146,7 +152,8 @@ export class ResearchNotebookTool {
           userContext,
           input.notebookId,
           input.mode,
-          input.customPrompt
+          input.customPrompt,
+          input.language
         );
         return { operation, ...result, provider: providerMeta };
       }

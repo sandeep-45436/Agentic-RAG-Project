@@ -97,6 +97,7 @@ export interface ResearchNotebookProvider {
     sources: Array<{ fileName: string; textContent: string }>;
     mode?: SynthesisMode;
     customPrompt?: string;
+    language?: "en" | "te";
   }): Promise<{ markdown: string; title: string }>;
 }
 

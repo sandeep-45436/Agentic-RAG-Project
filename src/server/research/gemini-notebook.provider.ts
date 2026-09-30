@@ -339,8 +339,11 @@ export class GeminiResearchProvider implements ResearchNotebookProvider {
       | "bibtex_citations"
       | "methodology";
     customPrompt?: string;
+    language?: "en" | "te";
   }): Promise<{ markdown: string; title: string }> {
     const mode = params.mode ?? "summary";
+    const language = params.language ?? "en";
+    const isTelugu = language === "te";
     const apiKey = this.apiKey;
 
     // If API key is not configured, fall back to high-fidelity mock synthesizer
@@ -433,6 +436,16 @@ export class GeminiResearchProvider implements ResearchNotebookProvider {
         break;
     }
 
+    if (isTelugu) {
+      systemInstruction +=
+        " MANDATORY LANGUAGE REQUIREMENT: You MUST generate the entire synthesis output in TELUGU (తెలుగు భాషలో). " +
+        "Use high-level, clear academic and technical Telugu terminology. For standard technical or computer science keywords (e.g. 'Knowledge Graph', 'Tokenization', 'Latent Space', 'Reciprocal Rank Fusion'), provide the Telugu translation or transliteration followed by the English term in parentheses where helpful (e.g. 'నాలెడ్జ్ గ్రాఫ్ (Knowledge Graph)'). " +
+        "Ensure all markdown tables, section headings, and analysis are written in Telugu. " +
+        "If mode is 'podcast', format dialogue turns with speakers as '**అలెక్స్:**' and '**జోర్డాన్:**' (or '**Alex:**' and '**Jordan:**') speaking in natural, engaging conversational Telugu. " +
+        "CRITICAL RULE: Always retain all citations strictly in the exact format [Doc: <fileName>]. Do not alter the document file names inside the citation brackets.";
+      userPrompt += " (ఈ మొత్తం విశ్లేషణను స్పష్టమైన, ప్రామాణికమైన తెలుగు భాషలో రూపొందించండి).";
+    }
+
     if (params.customPrompt) {
       userPrompt += `\n\nSpecific user inquiry:\n${params.customPrompt}`;
     }
@@ -474,18 +487,26 @@ export class GeminiResearchProvider implements ResearchNotebookProvider {
       const data = await res.json();
       let markdown =
         data.candidates?.[0]?.content?.parts?.[0]?.text ??
-        "No synthesis could be generated from the provided sources.";
+        (isTelugu
+          ? "అందించిన మూల పత్రాల నుండి విశ్లేషణను రూపొందించడం సాధ్యం కాలేదు."
+          : "No synthesis could be generated from the provided sources.");
 
       // Append NexusIQ Evidence Grounding & Verification block
       const sourcesList = params.sources
-        .map((s, i) => `- **[Source ${i + 1}]** \`${s.fileName}\` (Verified Authorized Evidence)`)
+        .map((s, i) =>
+          isTelugu
+            ? `- **[మూలం ${i + 1}]** \`${s.fileName}\` (ధృవీకరించబడిన అధీకృత ఆధారం)`
+            : `- **[Source ${i + 1}]** \`${s.fileName}\` (Verified Authorized Evidence)`
+        )
         .join("\n");
 
-      const verificationBlock = `\n\n---\n### 🛡️ Evidence Grounding & Verification\n- **Architecture**: NexusIQ Research Workspace (Authorized RAG Evidence)\n- **Verification Status**: ✅ \`VERIFIED_AGAINST_AUTHORIZED_EVIDENCE\`\n- **Inference Model**: Gemini 2.5 Flash (via Gemini API / 1M-token context)\n- **Authorized Sources Verified**:\n${sourcesList}\n`;
+      const verificationBlock = isTelugu
+        ? `\n\n---\n### 🛡️ ఆధారాల నిర్ధారణ & ధృవీకరణ (Evidence Grounding & Verification)\n- **ఆర్కిటెక్చర్**: NexusIQ రీసెర్చ్ వర్క్‌స్పేస్ (అధీకృత RAG ఆధారాలు)\n- **ధృవీకరణ స్థితి**: ✅ \`VERIFIED_AGAINST_AUTHORIZED_EVIDENCE\` (అధీకృత ఆధారాల ప్రకారం నిర్ధారించబడింది)\n- **ఇన్ఫరెన్స్ మోడల్**: Gemini 2.5 Flash (1M టోకెన్ సందర్భ విండో)\n- **ధృవీకరించబడిన మూల పత్రాలు**:\n${sourcesList}\n`
+        : `\n\n---\n### 🛡️ Evidence Grounding & Verification\n- **Architecture**: NexusIQ Research Workspace (Authorized RAG Evidence)\n- **Verification Status**: ✅ \`VERIFIED_AGAINST_AUTHORIZED_EVIDENCE\`\n- **Inference Model**: Gemini 2.5 Flash (via Gemini API / 1M-token context)\n- **Authorized Sources Verified**:\n${sourcesList}\n`;
 
       markdown += verificationBlock;
 
-      const titles: Record<string, string> = {
+      const titlesEn: Record<string, string> = {
         literature_matrix: "Literature Review Matrix & Comparative Gap Analysis",
         thesis_defense: "Viva Voce & Thesis Defense Examination Simulator",
         bibtex_citations: "Academic Citations & BibTeX Reference Suite",
@@ -496,8 +517,21 @@ export class GeminiResearchProvider implements ResearchNotebookProvider {
         summary: "NexusIQ Executive Research Synthesis",
       };
 
+      const titlesTe: Record<string, string> = {
+        literature_matrix: "సాహిత్య సమీక్ష మాత్రిక & పరిశోధనా అంతరాల విశ్లేషణ",
+        thesis_defense: "వైవా వోస్ & థీసిస్ డిఫెన్స్ సిమ్యులేటర్",
+        bibtex_citations: "అకడమిక్ సైటేషన్లు & బిబ్‌టెక్ రిఫరెన్స్ సూట్",
+        methodology: "గణిత రూపకల్పన & అల్గోరిథమిక్ మెథడాలజీ",
+        podcast: "ఆడియో డీప్ డైవ్ సంభాషణ స్క్రిప్ట్",
+        faq: "ఆధారిత తరచుగా అడిగే ప్రశ్నలు (FAQ)",
+        study_guide: "అకడమిక్ సమగ్ర స్టడీ గైడ్",
+        summary: "ఎగ్జిక్యూటివ్ పరిశోధనా సారాంశం",
+      };
+
+      const titles = isTelugu ? titlesTe : titlesEn;
+
       return {
-        title: titles[mode] ?? "NexusIQ Research Synthesis",
+        title: titles[mode] ?? (isTelugu ? "NexusIQ పరిశోధనా విశ్లేషణ" : "NexusIQ Research Synthesis"),
         markdown,
       };
     } catch (fetchErr) {

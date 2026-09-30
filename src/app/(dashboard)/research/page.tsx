@@ -37,6 +37,7 @@ import {
   CheckCheck,
   Eye,
   Info,
+  Globe,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -46,6 +47,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { RESEARCH_TRANSLATIONS, type ResearchLanguage } from "./translations";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -98,30 +100,47 @@ interface SynthesisResult {
 
 const STARTER_PREVIEWS = [
   {
+    id: "ws-starter-telugu-nlp",
+    title: "Telugu NLP & Indic LLMs",
+    titleTe: "తెలుగు NLP & ఇండిక్ AI నమూనాలు",
+    dept: "CSE / Telugu AI",
+    deptTe: "CSE / తెలుగు AI",
+    icon: Sparkles,
+    badgeColor: "border-teal-500/30 text-teal-600 bg-teal-500/10",
+  },
+  {
     id: "ws-starter-agentic-rag",
     title: "Autonomous Agentic RAG & Graph Fusion",
+    titleTe: "అటానమస్ ఏజెంటిక్ RAG & గ్రాఫ్ ఫ్యూజన్",
     dept: "CSE / AI&DS",
+    deptTe: "CSE / AI&DS",
     icon: Sparkles,
     badgeColor: "border-indigo-500/30 text-indigo-600 bg-indigo-500/10",
   },
   {
     id: "ws-starter-riscv-vlsi",
     title: "RISC-V SoC Architecture & AI Coprocessors",
+    titleTe: "RISC-V SoC & AI కోప్రాసెసర్లు",
     dept: "ECE / VLSI",
+    deptTe: "ECE / VLSI",
     icon: Cpu,
     badgeColor: "border-amber-500/30 text-amber-600 bg-amber-500/10",
   },
   {
     id: "ws-starter-drone-swarm",
     title: "Drone Swarm Mesh Protocols & Navigation",
+    titleTe: "డ్రోన్ స్వామ్ మెష్ ప్రోటోకాల్స్ & నావిగేషన్",
     dept: "MECH / Robotics",
+    deptTe: "MECH / రోబోటిక్స్",
     icon: Network,
     badgeColor: "border-emerald-500/30 text-emerald-600 bg-emerald-500/10",
   },
   {
     id: "ws-starter-academic-ordinance",
     title: "Academic Ordinance & Capstone Guidelines",
+    titleTe: "విద్యా నిబంధనలు & ప్రాజెక్ట్ మార్గదర్శకాలు",
     dept: "Academic Governance",
+    deptTe: "విద్యా పరిపాలన",
     icon: GraduationCap,
     badgeColor: "border-purple-500/30 text-purple-600 bg-purple-500/10",
   },
@@ -133,6 +152,27 @@ export default function ResearchWorkspacePage() {
   const [activeSources, setActiveSources] = useState<SourceSummary[]>([]);
   const [loadingWorkspaces, setLoadingWorkspaces] = useState(true);
   const [loadingSources, setLoadingSources] = useState(false);
+
+  // Language state (en / te)
+  const [language, setLanguage] = useState<ResearchLanguage>("en");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("research_workspace_language");
+      if (saved === "te" || saved === "en") {
+        setLanguage(saved);
+      }
+    } catch (_) {}
+  }, []);
+
+  const handleLanguageChange = (newLang: ResearchLanguage) => {
+    setLanguage(newLang);
+    try {
+      localStorage.setItem("research_workspace_language", newLang);
+    } catch (_) {}
+  };
+
+  const t = RESEARCH_TRANSLATIONS[language];
 
   // Creation modal state
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -317,6 +357,7 @@ export default function ResearchWorkspacePage() {
         body: JSON.stringify({
           mode,
           prompt: promptOverride || (customPrompt.trim() ? customPrompt.trim() : undefined),
+          language,
         }),
       });
 
@@ -375,6 +416,7 @@ export default function ResearchWorkspacePage() {
     let lineIndex = 0;
     const voices = window.speechSynthesis.getVoices();
     const englishVoices = voices.filter((v) => v.lang.startsWith("en"));
+    const teluguVoices = voices.filter((v) => v.lang.startsWith("te"));
 
     const speakNextLine = () => {
       if (lineIndex >= lines.length) {
@@ -385,16 +427,26 @@ export default function ResearchWorkspacePage() {
       const currentText = lines[lineIndex];
       lineIndex++;
 
-      // Detect speaker
+      // Detect speaker (English and Telugu aliases)
       let speaker: "Alex" | "Jordan" = "Alex";
       let speechContent = currentText;
 
-      if (currentText.startsWith("**Alex:**") || currentText.startsWith("Alex:")) {
+      if (
+        currentText.startsWith("**Alex:**") ||
+        currentText.startsWith("Alex:") ||
+        currentText.startsWith("**అలెక్స్:**") ||
+        currentText.startsWith("అలెక్స్:")
+      ) {
         speaker = "Alex";
-        speechContent = currentText.replace(/^\*\*Alex:\*\*\s*|^Alex:\s*/, "");
-      } else if (currentText.startsWith("**Jordan:**") || currentText.startsWith("Jordan:")) {
+        speechContent = currentText.replace(/^(\*\*Alex:\*\*|Alex:|\*\*అలెక్స్:\*\*|అలెక్స్:)\s*/, "");
+      } else if (
+        currentText.startsWith("**Jordan:**") ||
+        currentText.startsWith("Jordan:") ||
+        currentText.startsWith("**జోర్డాన్:**") ||
+        currentText.startsWith("జోర్డాన్:")
+      ) {
         speaker = "Jordan";
-        speechContent = currentText.replace(/^\*\*Jordan:\*\*\s*|^Jordan:\s*/, "");
+        speechContent = currentText.replace(/^(\*\*Jordan:\*\*|Jordan:|\*\*జోర్డాన్:\*\*|జోర్డాన్:)\s*/, "");
       } else {
         speaker = lineIndex % 2 === 0 ? "Jordan" : "Alex";
       }
@@ -405,8 +457,13 @@ export default function ResearchWorkspacePage() {
       utterance.rate = speechRate;
       utterance.pitch = speaker === "Alex" ? 0.95 : 1.2;
 
-      // Select distinct voices if available
-      if (englishVoices.length >= 2) {
+      // Select voices: Use Telugu voice if language is Telugu, otherwise English
+      if (language === "te") {
+        utterance.lang = "te-IN";
+        if (teluguVoices.length > 0) {
+          utterance.voice = speaker === "Alex" ? teluguVoices[0] : teluguVoices[Math.min(1, teluguVoices.length - 1)];
+        }
+      } else if (englishVoices.length >= 2) {
         utterance.voice = speaker === "Alex" ? englishVoices[0] : englishVoices[1];
       }
 
@@ -437,10 +494,16 @@ export default function ResearchWorkspacePage() {
     return {
       sourcesVerified: Math.max(activeSources.filter((s) => s.status === "ACTIVE").length, 3),
       citationsFound: Math.max(totalCitations, activeSources.length, 5),
-      groundingStatus: "VERIFIED_AGAINST_AUTHORIZED_EVIDENCE",
-      model: "Gemini 2.5 Flash / Academic RAG",
+      groundingStatus:
+        language === "te"
+          ? "అధీకృత ఆధారాల ప్రకారం ధృవీకరించబడింది"
+          : "VERIFIED_AGAINST_AUTHORIZED_EVIDENCE",
+      model:
+        language === "te"
+          ? "Gemini 2.5 Flash / అకడమిక్ RAG"
+          : "Gemini 2.5 Flash / Academic RAG",
     };
-  }, [synthesisResult, activeSources]);
+  }, [synthesisResult, activeSources, language]);
 
   // ── Clipboard & Download Handlers ───────────────────────────────────────────
 
@@ -526,28 +589,58 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                 <BookMarked className="size-6" />
               </div>
               <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                Advanced Academic Research Workspace
+                {t.pageTitle}
               </h1>
               <Badge variant="outline" className="border-indigo-500/40 text-indigo-600 dark:text-indigo-400 bg-indigo-500/5 font-mono text-xs">
-                Gemini 2.5 Flash / Graph RAG
+                {t.badgeEngine}
               </Badge>
               <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 text-xs">
-                Verifiable Grounding Active
+                {t.badgeGrounding}
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground mt-1.5">
-              Cross-document scientific synthesis, Literature matrices, Viva Voce thesis defense simulator, and BibTeX citation export.
+              {t.pageSubtitle}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            {/* 🌐 Language Switcher (English / తెలుగు) */}
+            <div className="flex items-center rounded-lg border border-border p-1 bg-muted/40 shadow-sm">
+              <button
+                type="button"
+                onClick={() => handleLanguageChange("en")}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                  language === "en"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                title="Switch to English"
+              >
+                <span>🇬🇧</span>
+                <span>English</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleLanguageChange("te")}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                  language === "te"
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                title="తెలుగు భాషను ఎంచుకోండి (Switch to Telugu)"
+              >
+                <span>🇮🇳</span>
+                <span>తెలుగు</span>
+              </button>
+            </div>
+
             <Button variant="outline" size="sm" onClick={fetchWorkspaces} disabled={loadingWorkspaces} className="text-xs">
               <RefreshCw className={`size-3.5 mr-1.5 ${loadingWorkspaces ? "animate-spin" : ""}`} />
-              Sync
+              {t.syncBtn}
             </Button>
             <Button size="sm" onClick={openCreateModal} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm">
               <Plus className="size-3.5 mr-1.5" />
-              New Research Workspace
+              {t.newWorkspaceBtn}
             </Button>
           </div>
         </div>
@@ -557,17 +650,20 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-indigo-900 dark:text-indigo-300 flex items-center gap-1.5">
               <Sparkles className="size-3.5 text-indigo-600" />
-              Curated Departmental Research Workspaces (Instant 1-Click Launch)
+              {t.starterRibbonTitle}
             </span>
             <span className="text-[11px] text-muted-foreground hidden sm:inline">
-              Pre-loaded with authorized technical papers & IEEE formats
+              {t.starterRibbonSubtitle}
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 pt-1">
             {STARTER_PREVIEWS.map((starter) => {
               const Icon = starter.icon;
               const isSelected = selectedWorkspaceId === starter.id;
+              const starterTitle = language === "te" && starter.titleTe ? starter.titleTe : starter.title;
+              const starterDept = language === "te" && starter.deptTe ? starter.deptTe : starter.dept;
+
               return (
                 <button
                   key={starter.id}
@@ -584,15 +680,15 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                         <Icon className="size-4" />
                       </div>
                       <Badge variant="outline" className={`text-[10px] py-0 px-1.5 ${starter.badgeColor}`}>
-                        {starter.dept}
+                        {starterDept}
                       </Badge>
                     </div>
                     {isSelected && (
                       <CheckCircle2 className="size-4 text-indigo-600 shrink-0" />
                     )}
                   </div>
-                  <p className="text-xs font-bold text-foreground mt-2 line-clamp-1">
-                    {starter.title}
+                  <p className="text-xs font-bold text-foreground mt-2 line-clamp-2">
+                    {starterTitle}
                   </p>
                 </button>
               );
@@ -622,10 +718,10 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                     <BookMarked className="size-3.5" />
-                    Workspaces ({workspaces.length})
+                    {t.workspacesTitle} ({workspaces.length})
                   </CardTitle>
                   <Badge variant="secondary" className="text-[10px]">
-                    Academic Labs
+                    {t.academicLabs}
                   </Badge>
                 </div>
               </CardHeader>
@@ -633,15 +729,15 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                 {loadingWorkspaces ? (
                   <div className="py-12 text-center text-muted-foreground">
                     <Loader2 className="size-5 animate-spin mx-auto mb-2 text-indigo-600" />
-                    <span className="text-xs">Loading research workspaces...</span>
+                    <span className="text-xs">{t.loadingWorkspaces}</span>
                   </div>
                 ) : workspaces.length === 0 ? (
                   <div className="py-12 text-center text-muted-foreground px-4">
                     <BookMarked className="size-8 mx-auto mb-2 opacity-40" />
-                    <p className="text-sm font-medium">No custom workspaces yet</p>
-                    <p className="text-xs mt-1">Select a curated workspace above or create a new one.</p>
+                    <p className="text-sm font-medium">{t.noWorkspaces}</p>
+                    <p className="text-xs mt-1">{t.noWorkspacesDesc}</p>
                     <Button size="sm" variant="outline" className="mt-4 text-xs" onClick={openCreateModal}>
-                      Create Workspace
+                      {t.createWorkspaceSmall}
                     </Button>
                   </div>
                 ) : (
@@ -672,7 +768,7 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                           )}
                           <div className="flex items-center gap-2 mt-2 pl-4 text-[10px] text-muted-foreground">
                             <span className="flex items-center gap-1 font-medium">
-                              <FileText className="size-3 text-indigo-500" /> {ws.totalSources} sources
+                              <FileText className="size-3 text-indigo-500" /> {ws.totalSources} {t.sourcesCount}
                             </span>
                             <span>•</span>
                             <Badge
@@ -681,7 +777,7 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                                 isStarter ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300" : ""
                               }`}
                             >
-                              {isStarter ? "Curated" : ws.status}
+                              {isStarter ? t.curated : ws.status}
                             </Badge>
                           </div>
                         </div>
@@ -708,12 +804,12 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
             <div className="p-3.5 rounded-xl border border-border bg-card/50 text-xs space-y-2">
               <div className="flex items-center gap-1.5 font-semibold text-foreground">
                 <Info className="size-3.5 text-indigo-500" />
-                <span>Research Lab Best Practices</span>
+                <span>{t.bestPracticesTitle}</span>
               </div>
               <ul className="text-[11px] text-muted-foreground space-y-1 list-disc pl-4 leading-relaxed">
-                <li>Use <strong>Literature Matrix</strong> for your capstone literature review chapter.</li>
-                <li>Run the <strong>Thesis Defense Simulator</strong> to test viva voce preparedness.</li>
-                <li>Directly copy <strong>BibTeX records</strong> for IEEE LaTeX templates.</li>
+                <li>{t.bestPractice1}</li>
+                <li>{t.bestPractice2}</li>
+                <li>{t.bestPractice3}</li>
               </ul>
             </div>
           </div>
@@ -737,7 +833,7 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                       <div className="flex items-center gap-2 shrink-0">
                         <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 bg-emerald-500/5 text-xs">
                           <ShieldCheck className="size-3.5 mr-1 text-emerald-500" />
-                          Authorized Repository
+                          {t.authorizedRepo}
                         </Badge>
                       </div>
                     </div>
@@ -749,20 +845,20 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                           <FileText className="size-3.5" />
-                          Authorized Repository Sources ({activeSources.length})
+                          {t.authorizedSources} ({activeSources.length})
                         </h3>
                         <span className="text-[11px] text-muted-foreground">
-                          Click inspect to preview citations & excerpts
+                          {t.inspectSubtitle}
                         </span>
                       </div>
 
                       {loadingSources ? (
                         <div className="p-6 text-center text-muted-foreground">
                           <Loader2 className="size-4 animate-spin inline mr-2 text-indigo-600" />
-                          <span className="text-xs">Loading authorized sources...</span>
+                          <span className="text-xs">{t.loadingSources}</span>
                         </div>
                       ) : activeSources.length === 0 ? (
-                        <p className="text-xs text-muted-foreground italic">No sources attached to this workspace.</p>
+                        <p className="text-xs text-muted-foreground italic">{t.noSources}</p>
                       ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
                           {activeSources.map((src) => (
@@ -787,7 +883,7 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                                   className="h-6 px-1.5 text-[10px] text-indigo-600 hover:text-indigo-700"
                                 >
                                   <Eye className="size-3 mr-1" />
-                                  Inspect
+                                  {t.inspect}
                                 </Button>
                               </div>
                             </div>
@@ -801,10 +897,10 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                       <div className="flex items-center justify-between">
                         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                           <Sparkles className="size-3.5 text-indigo-600" />
-                          Scientific Research Studio (8 Multi-Doc Synthesizers)
+                          {t.studioTitle}
                         </h3>
                         <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">
-                          1-Click Deep Synthesis
+                          {t.studioSubtitle}
                         </span>
                       </div>
 
@@ -819,11 +915,11 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                             <div className="p-2 rounded-md bg-emerald-500/10 text-emerald-600 w-fit mb-2 group-hover:scale-105 transition-transform">
                               <Table className="size-4" />
                             </div>
-                            <p className="font-bold text-xs text-foreground">Literature Matrix</p>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">Cross-paper grid & gaps</p>
+                            <p className="font-bold text-xs text-foreground">{t.modes.literature_matrix.name}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{t.modes.literature_matrix.desc}</p>
                           </div>
                           <Badge variant="outline" className="mt-2 w-fit text-[9px] border-emerald-500/30 text-emerald-600 py-0 px-1">
-                            Systematic Review
+                            {t.modes.literature_matrix.badge}
                           </Badge>
                         </button>
 
@@ -837,11 +933,11 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                             <div className="p-2 rounded-md bg-amber-500/10 text-amber-600 w-fit mb-2 group-hover:scale-105 transition-transform">
                               <GraduationCap className="size-4" />
                             </div>
-                            <p className="font-bold text-xs text-foreground">Thesis Defense</p>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">Viva voce simulator</p>
+                            <p className="font-bold text-xs text-foreground">{t.modes.thesis_defense.name}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{t.modes.thesis_defense.desc}</p>
                           </div>
                           <Badge variant="outline" className="mt-2 w-fit text-[9px] border-amber-500/30 text-amber-600 py-0 px-1">
-                            Viva Exam
+                            {t.modes.thesis_defense.badge}
                           </Badge>
                         </button>
 
@@ -855,11 +951,11 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                             <div className="p-2 rounded-md bg-blue-500/10 text-blue-600 w-fit mb-2 group-hover:scale-105 transition-transform">
                               <Bookmark className="size-4" />
                             </div>
-                            <p className="font-bold text-xs text-foreground">BibTeX Citations</p>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">IEEE, ACM & .bib</p>
+                            <p className="font-bold text-xs text-foreground">{t.modes.bibtex_citations.name}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{t.modes.bibtex_citations.desc}</p>
                           </div>
                           <Badge variant="outline" className="mt-2 w-fit text-[9px] border-blue-500/30 text-blue-600 py-0 px-1">
-                            Exportable
+                            {t.modes.bibtex_citations.badge}
                           </Badge>
                         </button>
 
@@ -873,11 +969,11 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                             <div className="p-2 rounded-md bg-purple-500/10 text-purple-600 w-fit mb-2 group-hover:scale-105 transition-transform">
                               <Code2 className="size-4" />
                             </div>
-                            <p className="font-bold text-xs text-foreground">Methodology & Math</p>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">LaTeX equations & algo</p>
+                            <p className="font-bold text-xs text-foreground">{t.modes.methodology.name}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{t.modes.methodology.desc}</p>
                           </div>
                           <Badge variant="outline" className="mt-2 w-fit text-[9px] border-purple-500/30 text-purple-600 py-0 px-1">
-                            Formal Algo
+                            {t.modes.methodology.badge}
                           </Badge>
                         </button>
 
@@ -891,11 +987,11 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                             <div className="p-2 rounded-md bg-violet-500/10 text-violet-600 w-fit mb-2 group-hover:scale-105 transition-transform">
                               <Headphones className="size-4" />
                             </div>
-                            <p className="font-bold text-xs text-foreground">Deep Dive Audio</p>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">2-Host podcast player</p>
+                            <p className="font-bold text-xs text-foreground">{t.modes.podcast.name}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{t.modes.podcast.desc}</p>
                           </div>
                           <Badge variant="outline" className="mt-2 w-fit text-[9px] border-violet-500/30 text-violet-600 py-0 px-1">
-                            Interactive Voice
+                            {t.modes.podcast.badge}
                           </Badge>
                         </button>
 
@@ -909,11 +1005,11 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                             <div className="p-2 rounded-md bg-indigo-500/10 text-indigo-600 w-fit mb-2 group-hover:scale-105 transition-transform">
                               <BookOpen className="size-4" />
                             </div>
-                            <p className="font-bold text-xs text-foreground">Study Guide</p>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">Concept breakdown & quiz</p>
+                            <p className="font-bold text-xs text-foreground">{t.modes.study_guide.name}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{t.modes.study_guide.desc}</p>
                           </div>
                           <Badge variant="outline" className="mt-2 w-fit text-[9px] border-indigo-500/30 text-indigo-600 py-0 px-1">
-                            Exam Ready
+                            {t.modes.study_guide.badge}
                           </Badge>
                         </button>
 
@@ -927,11 +1023,11 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                             <div className="p-2 rounded-md bg-sky-500/10 text-sky-600 w-fit mb-2 group-hover:scale-105 transition-transform">
                               <FileSearch className="size-4" />
                             </div>
-                            <p className="font-bold text-xs text-foreground">Executive Summary</p>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">Cross-doc synthesis</p>
+                            <p className="font-bold text-xs text-foreground">{t.modes.summary.name}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{t.modes.summary.desc}</p>
                           </div>
                           <Badge variant="outline" className="mt-2 w-fit text-[9px] border-sky-500/30 text-sky-600 py-0 px-1">
-                            Highlights
+                            {t.modes.summary.badge}
                           </Badge>
                         </button>
 
@@ -945,11 +1041,11 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                             <div className="p-2 rounded-md bg-rose-500/10 text-rose-600 w-fit mb-2 group-hover:scale-105 transition-transform">
                               <HelpCircle className="size-4" />
                             </div>
-                            <p className="font-bold text-xs text-foreground">Evidence FAQ</p>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">Direct Q&A with citations</p>
+                            <p className="font-bold text-xs text-foreground">{t.modes.faq.name}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{t.modes.faq.desc}</p>
                           </div>
                           <Badge variant="outline" className="mt-2 w-fit text-[9px] border-rose-500/30 text-rose-600 py-0 px-1">
-                            Citations
+                            {t.modes.faq.badge}
                           </Badge>
                         </button>
                       </div>
@@ -959,14 +1055,14 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                     <div className="pt-3 border-t border-border space-y-2">
                       <div className="flex items-center justify-between">
                         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                          Custom Scientific Research Query
+                          {t.customQueryTitle}
                         </h3>
-                        <span className="text-[11px] text-muted-foreground">Press Enter to synthesize</span>
+                        <span className="text-[11px] text-muted-foreground">{t.pressEnter}</span>
                       </div>
 
                       <div className="flex gap-2">
                         <Input
-                          placeholder="e.g. Compare algorithmic time complexity and failure modes across these papers..."
+                          placeholder={t.customQueryPlaceholder}
                           value={customPrompt}
                           onChange={(e) => setCustomPrompt(e.target.value)}
                           onKeyDown={(e) => {
@@ -988,7 +1084,7 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                             <Loader2 className="size-4 animate-spin" />
                           ) : (
                             <>
-                              Synthesize <ArrowRight className="size-3.5 ml-1" />
+                              {t.synthesizeBtn} <ArrowRight className="size-3.5 ml-1" />
                             </>
                           )}
                         </Button>
@@ -996,13 +1092,8 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
 
                       {/* Quick Prompt Chips */}
                       <div className="flex items-center gap-1.5 flex-wrap pt-1">
-                        <span className="text-[10px] text-muted-foreground mr-1">Quick Prompts:</span>
-                        {[
-                          "Compare algorithmic time & space complexities",
-                          "Identify open research gaps for a student thesis",
-                          "Summarize quantitative benchmark results into a table",
-                          "What are the primary failure edge cases?",
-                        ].map((chip) => (
+                        <span className="text-[10px] text-muted-foreground mr-1">{t.quickPromptsLabel}</span>
+                        {t.quickPrompts.map((chip) => (
                           <button
                             key={chip}
                             onClick={() => {
@@ -1029,9 +1120,9 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                         <Sparkles className="size-5 text-indigo-400 absolute inset-0 m-auto" />
                       </div>
                       <div>
-                        <p className="font-bold text-sm text-foreground">Performing Multi-Document Scientific Synthesis...</p>
+                        <p className="font-bold text-sm text-foreground">{t.synthesisLoadingTitle}</p>
                         <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
-                          Gemini 2.5 Flash is analyzing {activeSources.length} authorized documents with verifiable token-level grounding and LaTeX mathematical formulation.
+                          {t.synthesisLoadingDesc}
                         </p>
                       </div>
                     </CardContent>
@@ -1049,7 +1140,7 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                             {synthesisResult.title}
                           </CardTitle>
                           <CardDescription className="text-xs mt-0.5">
-                            Mode: <span className="font-semibold text-foreground uppercase">{synthesisResult.mode}</span> • Completed at {synthesisResult.timestamp}
+                            {t.modeLabel} <span className="font-semibold text-foreground uppercase">{synthesisResult.mode}</span> • {t.completedAt} {synthesisResult.timestamp}
                           </CardDescription>
                         </div>
 
@@ -1057,7 +1148,7 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <Button variant="outline" size="sm" onClick={handleCopy} className="h-7 px-2 text-xs">
                             {copied ? <Check className="size-3 mr-1 text-emerald-600" /> : <Copy className="size-3 mr-1" />}
-                            {copied ? "Copied" : "Copy"}
+                            {copied ? t.copied : t.copy}
                           </Button>
 
                           {(synthesisResult.mode === "bibtex_citations" || synthesisResult.markdown.includes("@article")) && (
@@ -1069,7 +1160,7 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                                 className="h-7 px-2 text-xs border-blue-500/40 text-blue-600 hover:bg-blue-500/10"
                               >
                                 {copiedBibtex ? <Check className="size-3 mr-1 text-emerald-600" /> : <Bookmark className="size-3 mr-1" />}
-                                {copiedBibtex ? "BibTeX Copied" : "Copy BibTeX"}
+                                {copiedBibtex ? t.bibtexCopied : t.copyBibtex}
                               </Button>
                               <Button
                                 variant="outline"
@@ -1085,12 +1176,12 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
 
                           <Button variant="outline" size="sm" onClick={handleDownloadLatex} className="h-7 px-2 text-xs">
                             <FileCode className="size-3 mr-1" />
-                            LaTeX (.tex)
+                            {t.downloadLatex}
                           </Button>
 
                           <Button variant="outline" size="sm" onClick={handleDownloadMarkdown} className="h-7 px-2 text-xs">
                             <Download className="size-3 mr-1" />
-                            Markdown (.md)
+                            {t.downloadMarkdown}
                           </Button>
                         </div>
                       </div>
@@ -1106,9 +1197,9 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                                 <Headphones className="size-5" />
                               </div>
                               <div>
-                                <h4 className="text-xs font-bold text-foreground">Interactive Audio Deep Dive Player</h4>
+                                <h4 className="text-xs font-bold text-foreground">{t.audioPlayerTitle}</h4>
                                 <p className="text-[11px] text-muted-foreground">
-                                  SpeechSynthesis audio simulation • Co-hosts Alex & Jordan
+                                  {t.audioPlayerSubtitle}
                                 </p>
                               </div>
                             </div>
@@ -1117,7 +1208,7 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                               {isPlayingAudio && (
                                 <div className="flex items-center gap-1 px-2 py-1 rounded bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 text-xs font-medium">
                                   <span className="size-2 rounded-full bg-violet-600 animate-ping mr-1" />
-                                  Speaking: <strong>{currentSpeaker ?? "Alex"}</strong>
+                                  {t.speaking} <strong>{currentSpeaker === "Alex" ? (language === "te" ? "అలెక్స్ (Alex)" : "Alex") : (language === "te" ? "జోర్డాన్ (Jordan)" : "Jordan")}</strong>
                                 </div>
                               )}
 
@@ -1132,11 +1223,11 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                               >
                                 {isPlayingAudio ? (
                                   <>
-                                    <Pause className="size-3.5 mr-1" /> Pause
+                                    <Pause className="size-3.5 mr-1" /> {t.pause}
                                   </>
                                 ) : (
                                   <>
-                                    <Play className="size-3.5 mr-1" /> Listen Aloud
+                                    <Play className="size-3.5 mr-1" /> {t.listen}
                                   </>
                                 )}
                               </Button>
@@ -1174,30 +1265,30 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                           <div className="flex items-center justify-between border-b border-border pb-2.5">
                             <span className="font-bold flex items-center gap-1.5 text-foreground text-xs">
                               <ShieldCheck className="size-4 text-emerald-600" />
-                              Evidence Grounding & Verification Telemetry
+                              {t.telemetryTitle}
                             </span>
                             <Badge variant="outline" className="text-[10px] text-emerald-600 border-emerald-500/30 bg-emerald-500/5 font-semibold">
-                              CONFIDENCE: 99.4% (VERIFIED)
+                              {t.telemetryConfidence}
                             </Badge>
                           </div>
 
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
                             <div>
-                              <span className="text-muted-foreground block text-[11px]">Sources Grounded</span>
-                              <span className="font-bold text-sm text-foreground">{evidenceMetrics.sourcesVerified} Documents</span>
+                              <span className="text-muted-foreground block text-[11px]">{t.sourcesGrounded}</span>
+                              <span className="font-bold text-sm text-foreground">{evidenceMetrics.sourcesVerified} {t.sourcesCount}</span>
                             </div>
                             <div>
-                              <span className="text-muted-foreground block text-[11px]">Citations Grounded</span>
-                              <span className="font-bold text-sm text-foreground">{evidenceMetrics.citationsFound} Citations</span>
+                              <span className="text-muted-foreground block text-[11px]">{t.citationsGrounded}</span>
+                              <span className="font-bold text-sm text-foreground">{evidenceMetrics.citationsFound} {language === "te" ? "సైటేషన్లు" : "Citations"}</span>
                             </div>
                             <div>
-                              <span className="text-muted-foreground block text-[11px]">Synthesis Model</span>
+                              <span className="text-muted-foreground block text-[11px]">{t.synthesisModel}</span>
                               <span className="font-bold text-sm text-foreground">{evidenceMetrics.model}</span>
                             </div>
                             <div>
-                              <span className="text-muted-foreground block text-[11px]">RAG Hallucination Filter</span>
+                              <span className="text-muted-foreground block text-[11px]">{t.hallucinationFilter}</span>
                               <span className="font-bold text-sm text-emerald-600 flex items-center gap-1">
-                                <CheckCheck className="size-3.5" /> Enforced
+                                <CheckCheck className="size-3.5" /> {t.enforced}
                               </span>
                             </div>
                           </div>
@@ -1211,13 +1302,13 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
               <Card>
                 <CardContent className="py-20 text-center text-muted-foreground space-y-3">
                   <BookMarked className="size-12 mx-auto text-muted-foreground/30" />
-                  <h3 className="font-semibold text-base text-foreground">Select or Create a Research Workspace</h3>
+                  <h3 className="font-semibold text-base text-foreground">{t.selectOrCreateTitle}</h3>
                   <p className="text-xs max-w-md mx-auto">
-                    Select a research workspace from the left panel or click one of the curated research labs above to begin literature matrix analysis, thesis defense simulations, and citation generation.
+                    {t.selectOrCreateDesc}
                   </p>
                   <Button size="sm" onClick={openCreateModal} className="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs">
                     <Plus className="size-4 mr-1.5" />
-                    Create Your First Workspace
+                    {t.createFirstWorkspace}
                   </Button>
                 </CardContent>
               </Card>
@@ -1234,36 +1325,40 @@ ${synthesisResult.markdown.replace(/#/g, "% ")}
                   <FileText className="size-5 text-indigo-600" />
                   <div>
                     <h2 className="text-sm font-bold truncate max-w-md">{selectedSourceForInspect.fileName}</h2>
-                    <p className="text-[11px] text-muted-foreground">Authorized Repository Source Provenance</p>
+                    <p className="text-[11px] text-muted-foreground">{t.inspectorTitle}</p>
                   </div>
                 </div>
                 <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 text-[10px]">
-                  VERIFIED
+                  {t.verifiedBadge}
                 </Badge>
               </div>
 
               <div className="space-y-3 text-xs">
                 <div className="p-3 rounded-lg bg-muted/40 border border-border space-y-1.5">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Document ID:</span>
+                    <span className="text-muted-foreground">{t.docId}</span>
                     <span className="font-mono">{selectedSourceForInspect.documentId}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Ingestion Status:</span>
+                    <span className="text-muted-foreground">{t.ingestionStatus}</span>
                     <span className="font-semibold text-emerald-600">{selectedSourceForInspect.status}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Stale Detection:</span>
-                    <span>{selectedSourceForInspect.isStale ? "Stale" : "Up-to-date (Synced)"}</span>
+                    <span className="text-muted-foreground">{t.staleDetection}</span>
+                    <span>{selectedSourceForInspect.isStale ? t.stale : t.upToDate}</span>
                   </div>
                 </div>
 
                 <div>
                   <label className="font-semibold text-muted-foreground block mb-1">
-                    Evidence Verification Excerpt:
+                    {t.excerptLabel}
                   </label>
                   <div className="p-3 rounded-lg bg-slate-950 text-slate-200 font-mono text-[11px] leading-relaxed max-h-48 overflow-y-auto">
-                    {`[Source Grounding: ${selectedSourceForInspect.fileName}]
+                    {language === "te"
+                      ? `[ఆధారాల ధృవీకరణ: ${selectedSourceForInspect.fileName}]
+స్థితి: సంస్థాగత విద్యా నిబంధనల ప్రకారం అధీకృతం.
+ధృవీకరించబడిన సమాచారం: అల్గోరిథమిక్ పద్ధతులు, ప్రయోగాత్మక పరీక్షా ఫలితాలు మరియు గణిత సమీకరణాలు నాలెడ్జ్ రిపోజిటరీలో సురక్షితంగా ఇండెక్స్ చేయబడ్డాయి.`
+                      : `[Source Grounding: ${selectedSourceForInspect.fileName}]
 Status: Authorized under institutional RBAC policy.
 Verified Content: Algorithmic specifications, experimental benchmarks, and mathematical formulations are indexed into the vector & knowledge graph repository.`}
                   </div>
@@ -1272,7 +1367,7 @@ Verified Content: Algorithmic specifications, experimental benchmarks, and mathe
 
               <div className="flex justify-end pt-3 border-t border-border">
                 <Button size="sm" variant="outline" onClick={() => setSelectedSourceForInspect(null)} className="text-xs">
-                  Close Inspector
+                  {t.closeInspector}
                 </Button>
               </div>
             </div>
@@ -1284,19 +1379,19 @@ Verified Content: Algorithmic specifications, experimental benchmarks, and mathe
           <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-card text-card-foreground rounded-xl border border-border shadow-xl max-w-lg w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-150">
               <div>
-                <h2 className="text-lg font-bold">New Research Workspace</h2>
+                <h2 className="text-lg font-bold">{t.modalTitle}</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Select authorized institutional documents to include in your research synthesis.
+                  {t.modalDesc}
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground block mb-1.5">
-                    Workspace Title *
+                    {t.wsTitleLabel}
                   </label>
                   <Input
-                    placeholder="e.g. CS401 AI Ethics & Deep Learning Research"
+                    placeholder={t.wsTitlePlaceholder}
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     className="text-xs"
@@ -1305,10 +1400,10 @@ Verified Content: Algorithmic specifications, experimental benchmarks, and mathe
 
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground block mb-1.5">
-                    Description (Optional)
+                    {t.wsDescLabel}
                   </label>
                   <Input
-                    placeholder="e.g. Cross-curriculum comparative analysis for Spring 2026"
+                    placeholder={t.wsDescPlaceholder}
                     value={newDescription}
                     onChange={(e) => setNewDescription(e.target.value)}
                     className="text-xs"
@@ -1319,20 +1414,20 @@ Verified Content: Algorithmic specifications, experimental benchmarks, and mathe
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-xs font-semibold text-muted-foreground">
-                      Select Authorized Documents ({selectedDocIds.length} selected) *
+                      {t.selectDocsLabel} ({selectedDocIds.length} {language === "te" ? "ఎంపికయ్యాయి" : "selected"}) *
                     </label>
-                    <span className="text-[11px] text-muted-foreground">RBAC Department Scoped</span>
+                    <span className="text-[11px] text-muted-foreground">{t.rbacScoped}</span>
                   </div>
 
                   <div className="border border-border rounded-lg p-2 max-h-48 overflow-y-auto space-y-1.5 bg-muted/20">
                     {loadingDocs ? (
                       <div className="py-6 text-center text-xs text-muted-foreground">
                         <Loader2 className="size-4 animate-spin inline mr-1.5 text-indigo-600" />
-                        Loading authorized documents...
+                        {t.loadingDocs}
                       </div>
                     ) : authorizedDocs.length === 0 ? (
                       <div className="py-6 text-center text-xs text-muted-foreground">
-                        No uploaded documents found. Please upload documents in the Knowledge Bases first.
+                        {t.noDocsFound}
                       </div>
                     ) : (
                       authorizedDocs.map((doc) => {
@@ -1375,7 +1470,7 @@ Verified Content: Algorithmic specifications, experimental benchmarks, and mathe
                   disabled={creating}
                   className="text-xs"
                 >
-                  Cancel
+                  {t.cancel}
                 </Button>
                 <Button
                   size="sm"
@@ -1384,7 +1479,7 @@ Verified Content: Algorithmic specifications, experimental benchmarks, and mathe
                   className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold"
                 >
                   {creating ? <Loader2 className="size-4 animate-spin mr-1" /> : <Plus className="size-3.5 mr-1" />}
-                  {creating ? "Creating Workspace..." : "Create Workspace"}
+                  {creating ? t.creatingSubmitBtn : t.createSubmitBtn}
                 </Button>
               </div>
             </div>

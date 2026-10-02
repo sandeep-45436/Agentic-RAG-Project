@@ -14,6 +14,7 @@ import {
   Zap,
   GraduationCap,
   ArrowRight,
+  Briefcase,
   Layers,
   CheckCircle2,
   Download,
@@ -261,12 +262,11 @@ export default function HomePage() {
     <AnimatedBackground>
       <div className="min-h-screen  text-slate-100 font-sans selection:bg-indigo-500/30 selection:text-indigo-200 relative overflow-x-hidden">
       {/* ─────────────────────────────────────────────────────────────────── */}
-      {/* BACKGROUND COSMIC AURORA & GLOWING LIGHTS                           */}
+      {/* BACKGROUND AMBIENT GRADIENTS (Clean, calm, professional)            */}
       {/* ─────────────────────────────────────────────────────────────────── */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1400px] h-[650px] bg-gradient-to-tr from-indigo-600/20 via-cyan-500/15 to-purple-600/20 blur-[150px] pointer-events-none -z-10 rounded-full animate-glow-pulse" />
-      <div className="absolute top-[30%] right-[-10%] w-[750px] h-[750px] bg-emerald-500/10 blur-[170px] pointer-events-none -z-10 rounded-full animate-float-delayed" />
-      <div className="absolute top-[60%] left-[-10%] w-[750px] h-[750px] bg-indigo-600/12 blur-[180px] pointer-events-none -z-10 rounded-full animate-float" />
-      <div className="absolute bottom-0 right-1/4 w-[650px] h-[650px] bg-cyan-500/10 blur-[160px] pointer-events-none -z-10 rounded-full" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[500px] bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-blue-500/10 blur-[130px] pointer-events-none -z-10 rounded-full" />
+      <div className="absolute top-[35%] right-[-5%] w-[600px] h-[600px] bg-indigo-500/5 blur-[150px] pointer-events-none -z-10 rounded-full" />
+      <div className="absolute top-[65%] left-[-5%] w-[600px] h-[600px] bg-purple-500/5 blur-[150px] pointer-events-none -z-10 rounded-full" />
 
       {/* Cyber Grid Pattern Overlay */}
       <div
@@ -330,18 +330,10 @@ export default function HomePage() {
           <div className="flex items-center gap-2 shrink-0">
             {/* Wide Screen Subsystem Quick Jumps */}
             <Link
-              href="/principal"
-              className="hidden 2xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/50 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800 shadow-xs transition-all"
+              href="/placement"
+              className="hidden 2xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-50 hover:bg-cyan-100 dark:bg-cyan-950/40 dark:hover:bg-cyan-900/50 text-cyan-900 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-800 shadow-xs transition-all"
             >
-              <Landmark className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
-              <span>Principal</span>
-            </Link>
-
-            <Link
-              href="/skills"
-              className="hidden 2xl:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/50 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 shadow-xs transition-all"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
+              <Briefcase className="w-3.5 h-3.5 text-cyan-700 dark:text-cyan-400" />
               <span>Placement</span>
             </Link>
 
@@ -425,20 +417,20 @@ export default function HomePage() {
                 </Link>
 
                 <Link
-                  href="/skills"
+                  href="/placement"
                   onClick={() => setMobileNavOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 hover:bg-cyan-100 dark:hover:bg-cyan-900/50 transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
-                    <div className="p-1.5 bg-emerald-600 text-white rounded-lg">
-                      <Sparkles className="w-4 h-4" />
+                    <div className="p-1.5 bg-cyan-600 text-white rounded-lg">
+                      <Briefcase className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900 dark:text-white">Placement Center</p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Skills Radar & Tests</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white">Placement Portal</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">Campus Drives, ATS & Mock Viva</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-emerald-400" />
+                  <ChevronRight className="w-4 h-4 text-cyan-400" />
                 </Link>
 
                 <Link
@@ -473,23 +465,6 @@ export default function HomePage() {
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-blue-400" />
-                </Link>
-
-                <Link
-                  href="/principal"
-                  onClick={() => setMobileNavOpen(false)}
-                  className="sm:col-span-2 flex items-center justify-between p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className="p-1.5 bg-amber-600 text-white rounded-lg">
-                      <Landmark className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-slate-900 dark:text-white">Principal Portal</p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">All Depts, NAAC & Grants</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-amber-400" />
                 </Link>
               </div>
             </div>
@@ -569,39 +544,46 @@ export default function HomePage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-16 flex flex-col items-center">
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* 2. HERO SECTION WITH ANIMATED FLOATING CHIPS & GLOW                 */}
+        {/* 2. HERO SECTION (User-Friendly, Clean & Welcoming)                */}
         {/* ─────────────────────────────────────────────────────────────────── */}
-        <section className="w-full text-center flex flex-col items-center space-y-8 max-w-5xl pt-4 pb-14 relative">
-          {/* Floating Capability Badge Left */}
-          <div className="hidden lg:flex items-center gap-2 absolute top-12 left-0 p-3 rounded-2xl  border border-cyan-500/40 backdrop-blur-xl shadow-2xl animate-float text-xs text-cyan-300 font-mono">
-            <Zap className="w-4 h-4 text-cyan-400" />
-            <span>⚡ Sub-35ms Hybrid Vector Search</span>
-          </div>
-
-          {/* Floating Capability Badge Right */}
-          <div className="hidden lg:flex items-center gap-2 absolute top-12 right-0 p-3 rounded-2xl  border border-emerald-500/40 backdrop-blur-xl shadow-2xl animate-float-delayed text-xs text-emerald-300 font-mono">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>🛡️ 100% Policy Grounded (Zero Hallucination)</span>
-          </div>
-
+        <section className="w-full text-center flex flex-col items-center space-y-6 max-w-4xl pt-4 pb-10 relative">
+          
           {/* Top Status Pill */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-500/15 via-purple-500/15 to-cyan-500/15 border border-indigo-500/30 text-xs font-semibold text-indigo-300 backdrop-blur-md shadow-inner">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-            <span>Next-Gen Smart University Multi-Agent Cognitive Platform</span>
-            <ArrowRight className="w-3.5 h-3.5 text-indigo-400" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-xs font-bold text-indigo-700 dark:text-indigo-300 shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>ALITS Official Student Academic Portal</span>
           </div>
 
-          {/* Hero Main Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 leading-[1.12]">
-            Autonomous Campus Intelligence. <br />
-            <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradientShift">
-              Zero Hallucinations. Instant Decisions.
+          {/* User-Friendly Hero Main Headline */}
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.15]">
+            Welcome to ALITS <br />
+            <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Smart Student Portal
             </span>
           </h1>
 
-          <p className="text-slate-700 text-base sm:text-xl max-w-3xl leading-relaxed font-normal">
-            Ground-truth academic intelligence for university students, faculty, and department heads. Retrieve syllabi, slice PDF slides on demand, balance faculty workloads, and govern academic policies with verifiable provenance.
+          <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed font-medium">
+            Your centralized academic workspace. Easily browse and search faculty-uploaded course notes, download official syllabi, access lab manuals, and study with verified learning materials.
           </p>
+
+          {/* Direct User-Friendly CTAs */}
+          <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md transition-colors"
+            >
+              <Users className="w-4 h-4" />
+              <span>Enter Student Dashboard</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/documents"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-sm border border-slate-200 dark:border-slate-700 shadow-xs transition-colors"
+            >
+              <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <span>Browse Notes & Search</span>
+            </Link>
+          </div>
 
           {/* ── OFFICIAL ALITS CAMPUS SHOWCASE BANNER ────────────────────── */}
           <div className="w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200/90 shadow-2xl relative group my-3 bg-white/90 backdrop-blur-xl">
@@ -661,58 +643,8 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {/* 1. Principal Portal */}
-              <div className="p-6 rounded-2xl bg-white border border-amber-200 shadow-md hover:shadow-xl hover:border-amber-400 transition-all flex flex-col justify-between text-left group">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="w-11 h-11 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
-                      <Landmark className="w-6 h-6 text-amber-700" />
-                    </div>
-                    <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-                      Institutional Executive
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-black text-slate-900 group-hover:text-amber-700 transition-colors">
-                      Principal Portal
-                    </h3>
-                    <p className="text-xs font-medium text-amber-800">Executive Operations Cockpit</p>
-                  </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Plenary executive oversight and strategic AI intelligence across the university ecosystem.
-                  </p>
-                  <ul className="space-y-1.5 pt-2 border-t border-slate-100 text-xs text-slate-700">
-                    <li className="flex items-start gap-1.5">
-                      <span className="text-amber-600 font-bold">✓</span>
-                      <span>Macro Cockpit across 9 academic departments</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <span className="text-amber-600 font-bold">✓</span>
-                      <span>NAAC Grade A++ & NIRF rank telemetry</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <span className="text-amber-600 font-bold">✓</span>
-                      <span>Multi-crore Research grants & Budget oversight</span>
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <span className="text-amber-600 font-bold">✓</span>
-                      <span>Strategic AI Institutional Reasoning Engine</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="pt-5 mt-4 border-t border-slate-100">
-                  <Link
-                    href="/principal"
-                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition-all"
-                  >
-                    <span>Enter Principal Portal</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* 2. Placement Center */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+              {/* 1. Placement Center */}
               <div className="p-6 rounded-2xl bg-white border border-emerald-200 shadow-md hover:shadow-xl hover:border-emerald-400 transition-all flex flex-col justify-between text-left group">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -827,23 +759,23 @@ export default function HomePage() {
                     <h3 className="text-lg font-black text-slate-900 group-hover:text-purple-700 transition-colors">
                       Faculty Portal
                     </h3>
-                    <p className="text-xs font-medium text-purple-800">Academic Operations & Timetables</p>
+                    <p className="text-xs font-medium text-purple-800">Academic Operations & Notes Hub</p>
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Teaching schedules, syllabus ingestion, smart exam seating, and faculty records.
+                    Course document uploads, syllabus progress tracking, Bloom examination synthesizer, and student mentorship.
                   </p>
                   <ul className="space-y-1.5 pt-2 border-t border-slate-100 text-xs text-slate-700">
                     <li className="flex items-start gap-1.5">
                       <span className="text-purple-600 font-bold">✓</span>
-                      <span>Dynamic Weekly Teaching Timetables (/faculty/timetables)</span>
+                      <span>Academic Notes & Syllabus Ingestion (/faculty/documents)</span>
                     </li>
                     <li className="flex items-start gap-1.5">
                       <span className="text-purple-600 font-bold">✓</span>
-                      <span>Academic Document Ingestion & Syllabi (/faculty/documents)</span>
+                      <span>R23 Autonomous Syllabus Coverage & Attainment</span>
                     </li>
                     <li className="flex items-start gap-1.5">
                       <span className="text-purple-600 font-bold">✓</span>
-                      <span>AI Exam Hall Seating Grid Planner (/faculty/seating)</span>
+                      <span>AI Bloom Exam Studio & Rubrics Synthesizer</span>
                     </li>
                     <li className="flex items-start gap-1.5">
                       <span className="text-purple-600 font-bold">✓</span>
@@ -868,8 +800,8 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* 5. HOD Portal */}
-              <div className="p-6 rounded-2xl bg-white border border-blue-200 shadow-md hover:shadow-xl hover:border-blue-400 transition-all flex flex-col justify-between text-left group md:col-span-2 lg:col-span-2">
+              {/* 4. HOD Portal */}
+              <div className="p-6 rounded-2xl bg-white border border-blue-200 shadow-md hover:shadow-xl hover:border-blue-400 transition-all flex flex-col justify-between text-left group">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="w-11 h-11 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-bold">
@@ -881,55 +813,43 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-slate-900 group-hover:text-blue-700 transition-colors">
-                      HOD Portal (Head of Department)
+                      HOD Portal (Head of Dept)
                     </h3>
-                    <p className="text-xs font-medium text-blue-800">Department Governance & Health Command Center</p>
+                    <p className="text-xs font-medium text-blue-800">Materials Uploads & Faculty Audit</p>
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Department health indexing, faculty workload rebalancing, student risk radars, and approval dockets.
+                    Upload official college timetables and question banks, and audit every faculty member's performance.
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-xs text-slate-700">
-                    <div className="space-y-1.5">
-                      <div className="flex items-start gap-1.5">
-                        <span className="text-blue-600 font-bold">✓</span>
-                        <span>7-Dimension Department Health Index & Live Pulse</span>
-                      </div>
-                      <div className="flex items-start gap-1.5">
-                        <span className="text-blue-600 font-bold">✓</span>
-                        <span>Faculty Workload Engine & Allocation (/hod/faculty)</span>
-                      </div>
-                      <div className="flex items-start gap-1.5">
-                        <span className="text-blue-600 font-bold">✓</span>
-                        <span>Student At-Risk Radar & Attendance Condonations</span>
-                      </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <div className="flex items-start gap-1.5">
-                        <span className="text-blue-600 font-bold">✓</span>
-                        <span>Master Timetables & Smart Conflict-Free Grids (/hod/timetable)</span>
-                      </div>
-                      <div className="flex items-start gap-1.5">
-                        <span className="text-blue-600 font-bold">✓</span>
-                        <span>Department Curriculum & Syllabi Comparator (/hod/courses)</span>
-                      </div>
-                      <div className="flex items-start gap-1.5">
-                        <span className="text-blue-600 font-bold">✓</span>
-                        <span>Research Grant Proposal Review & Approvals (/hod/approvals)</span>
-                      </div>
-                    </div>
-                  </div>
+                  <ul className="space-y-1.5 pt-2 border-t border-slate-100 text-xs text-slate-700">
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-blue-600 font-bold">✓</span>
+                      <span>Upload Timetables & Question Banks (/hod/documents)</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-blue-600 font-bold">✓</span>
+                      <span>Faculty Performance Audit Engine (/hod/faculty)</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-blue-600 font-bold">✓</span>
+                      <span>Workload Limits & AICTE Statutory Compliance</span>
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <span className="text-blue-600 font-bold">✓</span>
+                      <span>Department Academic Regulations & Circulars</span>
+                    </li>
+                  </ul>
                 </div>
                 <div className="pt-5 mt-4 border-t border-slate-100 flex gap-2">
                   <Link
                     href="/hod/dashboard"
                     className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all"
                   >
-                    <span>Enter HOD Command Center</span>
+                    <span>Enter HOD Portal</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                   <Link
                     href="/hod/login"
-                    className="inline-flex items-center justify-center py-2.5 px-4 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 transition-all"
+                    className="inline-flex items-center justify-center py-2.5 px-3 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 transition-all"
                   >
                     Login
                   </Link>

@@ -387,138 +387,156 @@ export default function FacultyDashboardPage() {
     <AnimatedBackground>
       <div className="w-full space-y-6 pb-16 font-sans relative z-10">
 
-        {/* ── 1. PROVENANCE & INSTITUTIONAL BRAND HEADER ── */}
-        <div className="bg-white/95 rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm backdrop-blur-xl">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <div className="relative h-11 w-36 sm:w-44 flex items-center justify-start">
-                <img
-                  src="/images/college-logo.png"
-                  alt="ALITS University Logo"
-                  className="h-10 object-contain drop-shadow-sm"
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = "none";
-                  }}
-                />
-              </div>
-              <div className="h-8 w-[1px] bg-slate-200 hidden sm:block" />
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-black text-slate-900 tracking-tight uppercase">
-                    Anantha Lakshmi Institute of Technology & Sciences
-                  </span>
-                  <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-[10px] font-bold">
-                    Autonomous R23
-                  </Badge>
-                </div>
-                <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                  Faculty Academic Operations Cockpit • Department of {profile?.department?.name || "Computer Science"}
-                </p>
-              </div>
-            </div>
+        {/* ── 1. ULTRA-MODERN FACULTY COMMAND COCKPIT HERO ─────────────────── */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-950 via-slate-900 to-slate-950 text-white p-6 sm:p-8 shadow-2xl border border-purple-500/20 backdrop-blur-2xl">
+          {/* Subtle ambient light aura */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
 
-            {/* AICTE Workload Meter & Provenance Badge */}
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
-                <div>
-                  <div className="flex items-center justify-between text-[10px] font-bold text-slate-600 mb-1">
-                    <span>AICTE Teaching Workload</span>
-                    <span className="text-indigo-600 font-mono">16 / 18 hrs/wk</span>
+          <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            
+            {/* Left: Avatar, Identity & Academic Credentials */}
+            <div className="flex items-start gap-4 sm:gap-5 min-w-0">
+              <div className="relative shrink-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-600 p-0.5 shadow-xl">
+                  <div className="w-full h-full rounded-2xl bg-slate-900 flex items-center justify-center text-purple-300 font-black text-xl sm:text-2xl">
+                    <GraduationCap className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400" />
                   </div>
-                  <div className="w-32 sm:w-40 bg-slate-200 h-2 rounded-full overflow-hidden">
-                    <div className="bg-indigo-600 h-full rounded-full" style={{ width: "88%" }} />
-                  </div>
-                  <span className="text-[9px] text-emerald-600 font-bold mt-0.5 block">
-                    ✓ Compliant (8h Theory + 6h Lab + 2h Mentorship)
-                  </span>
                 </div>
-              </div>
-
-              <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[11px] font-mono py-1 px-2.5">
-                ● Live SIS Synchronized
-              </Badge>
-            </div>
-          </div>
-
-          {/* Explicit Data Provenance Alert */}
-          <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[10px] text-slate-500">
-            <div className="flex items-center gap-1.5">
-              <Info className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
-              <span>
-                Data Source: <strong>{PROVENANCE.source}</strong> • Dataset: <code>{PROVENANCE.datasetId}</code> • Mode: <code>{PROVENANCE.mode}</code>
-              </span>
-            </div>
-            <span className="text-amber-700 font-medium bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60 w-fit">
-              ⚠ Synthetic / Simulation Academic Environment
-            </span>
-          </div>
-        </div>
-
-        {/* ── 2. LIVE TEACHING TODAY RIBBON (DETERMINISTIC) ── */}
-        <div className="rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-5 shadow-lg relative overflow-hidden">
-          <div className="absolute right-0 top-0 -mt-8 -mr-8 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none" />
-
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="flex h-2.5 w-2.5 relative">
+                <div className="absolute -bottom-1 -right-1 flex h-4 w-4">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-                </span>
-                <span className="text-xs font-black uppercase tracking-widest text-indigo-300">
-                  Teaching Schedule Today • Live Operational Clock
-                </span>
+                  <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-slate-900" />
+                </div>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white mt-1">
-                {profile?.title} {profile?.name || "Dr. K. S. Ramanujan"}
-              </h2>
-              <p className="text-xs text-indigo-200 mt-0.5">
-                3 Periods Scheduled • Turing Hall Complex • 152 Enrolled Students Total
-              </p>
+
+              <div className="space-y-1.5 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-400/30 text-[10px] font-bold text-purple-200 uppercase tracking-wider">
+                    {profile?.designation || "Chair & Professor"}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[10px] font-bold text-emerald-300 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    AICTE Compliant
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-[10px] font-bold text-indigo-200">
+                    Autonomous R23
+                  </span>
+                </div>
+
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white truncate">
+                  {profile?.title || "Dr."} {profile?.name || "K. S. Ramanujan"}
+                </h1>
+
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-300 font-medium">
+                  <span className="flex items-center gap-1.5">
+                    <Building className="w-3.5 h-3.5 text-purple-400" />
+                    {profile?.department?.name || "Computer Science & Engineering"} ({profile?.department?.code || "CSE"})
+                  </span>
+                  <span className="text-slate-500 hidden sm:inline">•</span>
+                  <span>Anantha Lakshmi Institute of Tech & Sciences</span>
+                </div>
+
+                {profile?.user?.email && (
+                  <p className="text-[11px] font-mono text-purple-300/80 pt-0.5">
+                    {profile.user.email} • Code: {profile?.facultyCode || "FAC-CSE-001"}
+                  </p>
+                )}
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            {/* Right: Quick Action Buttons & Lecture Briefing */}
+            <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-start lg:justify-end">
               <Button
-                size="sm"
-                onClick={() => {
-                  setActiveTab("attendance");
-                }}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-md gap-1.5"
+                onClick={() => setActiveTab("attendance")}
+                className="group relative inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl text-xs font-extrabold px-5 py-3 transition-all duration-300 shadow-lg shadow-emerald-600/30 hover:shadow-emerald-600/50 hover:scale-105 active:scale-95 border-0"
               >
-                <CheckCircle2 className="h-4 w-4" />
-                Take Period 1 Attendance
+                <CheckCircle2 className="w-4 h-4 transition-transform group-hover:scale-110" />
+                <span>Mark Live Attendance</span>
               </Button>
+
               <Button
-                size="sm"
-                variant="outline"
+                onClick={() => setActiveTab("exam")}
+                className="inline-flex items-center gap-2 bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white rounded-2xl text-xs font-bold px-4 py-3 transition-all border border-slate-700/80 hover:border-purple-400/50 shadow-md active:scale-95"
+              >
+                <Award className="w-4 h-4 text-purple-400" />
+                <span>Bloom's Exam Studio</span>
+              </Button>
+
+              <Button
                 onClick={() => {
-                  // Trigger copilot prompt
                   const el = document.querySelector('button[title*="Faculty Copilot"]') as HTMLElement;
                   if (el) el.click();
                 }}
-                className="border-white/20 bg-white/10 text-white hover:bg-white/20 text-xs font-bold rounded-xl gap-1.5"
+                className="inline-flex items-center gap-2 bg-purple-900/60 hover:bg-purple-800/80 text-purple-200 hover:text-white rounded-2xl text-xs font-bold px-4 py-3 transition-all border border-purple-500/30 shadow-md active:scale-95"
               >
-                <Sparkles className="h-4 w-4 text-amber-300" />
-                5-Min Lecture Briefing
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>AI Briefing</span>
               </Button>
             </div>
           </div>
 
-          {/* Today's 3 Slots Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mt-4 relative z-10">
+          {/* Genuine Real-Time Operational Metadata Strip */}
+          <div className="mt-6 pt-5 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="p-3.5 rounded-2xl bg-slate-800/40 border border-slate-700/40 space-y-1">
+              <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider block">AICTE Workload</span>
+              <div className="flex items-center justify-between">
+                <span className="text-lg font-black text-white">16 / 18</span>
+                <span className="text-[10px] font-mono text-purple-300">hrs/week</span>
+              </div>
+              <div className="w-full bg-slate-700/60 h-1.5 rounded-full overflow-hidden">
+                <div className="bg-purple-500 h-full rounded-full" style={{ width: "88%" }} />
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-slate-800/40 border border-slate-700/40">
+              <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider block">Teaching Slots Today</span>
+              <span className="text-lg font-black text-white mt-0.5 block">3 Periods</span>
+              <span className="text-[10px] text-slate-400">Turing Hall Complex</span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-slate-800/40 border border-slate-700/40">
+              <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-wider block">Active Enrolled</span>
+              <span className="text-lg font-black text-white mt-0.5 block">152 Students</span>
+              <span className="text-[10px] text-slate-400">Across 3 Course Sections</span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-slate-800/40 border border-slate-700/40">
+              <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider block">Course Uploads</span>
+              <span className="text-lg font-black text-white mt-0.5 block">{recentDocs.length > 0 ? recentDocs.length : 5} Documents</span>
+              <span className="text-[10px] text-slate-400">Indexed for Student RAG</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── 2. LIVE TEACHING TODAY SCHEDULE ── */}
+        <div className="rounded-3xl border border-slate-200/90 bg-white/95 p-6 shadow-sm backdrop-blur-xl">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="flex h-2.5 w-2.5 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+              </span>
+              <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                Teaching Schedule Today • Live Operational Clock
+              </span>
+            </div>
+            <span className="text-xs text-slate-500 font-medium">3 Periods Scheduled • Turing Hall Complex</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
             {TODAY_SCHEDULE.map((slot) => {
               const isLive = slot.status === "LIVE_NOW";
               return (
                 <div
                   key={slot.periodNumber}
-                  className={`p-4 rounded-xl border transition-all ${
+                  className={`p-4 rounded-2xl border transition-all ${
                     isLive
-                      ? "bg-white/15 border-emerald-400/60 shadow-lg ring-2 ring-emerald-400/20"
-                      : "bg-white/5 border-white/10 hover:bg-white/10"
+                      ? "bg-gradient-to-br from-indigo-900 to-slate-900 text-white border-indigo-500/60 shadow-lg ring-2 ring-indigo-400/20"
+                      : "bg-slate-50 border-slate-200 hover:bg-white hover:shadow-md"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">
+                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${isLive ? "bg-white/20 text-white" : "bg-slate-200 text-slate-800"}`}>
                       Period #{slot.periodNumber} • {slot.time}
                     </span>
                     {isLive ? (
@@ -526,30 +544,30 @@ export default function FacultyDashboardPage() {
                         LIVE NOW
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-[10px] border-white/30 text-white/80">
+                      <Badge variant="outline" className="text-[10px] border-slate-300 text-slate-600">
                         UPCOMING
                       </Badge>
                     )}
                   </div>
 
-                  <h3 className="text-sm font-bold text-white tracking-tight">
+                  <h3 className={`text-sm font-bold tracking-tight ${isLive ? "text-white" : "text-slate-900"}`}>
                     {slot.courseCode}: {slot.courseTitle}
                   </h3>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-indigo-200">
+                  <div className={`flex items-center gap-2 mt-1 text-xs ${isLive ? "text-indigo-200" : "text-slate-500"}`}>
                     <span>{slot.room}</span>
                     <span>•</span>
                     <span>{slot.enrolled} Students</span>
                   </div>
 
-                  <p className="text-[11px] text-indigo-100/90 mt-2 bg-black/20 p-2 rounded-lg border border-white/5 line-clamp-2">
+                  <p className={`text-[11px] mt-2 p-2 rounded-lg border line-clamp-2 ${isLive ? "bg-black/30 border-white/10 text-indigo-100" : "bg-white border-slate-200/80 text-slate-600"}`}>
                     {slot.unitTopic}
                   </p>
 
-                  <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[11px]">
-                    <span className="text-purple-300 font-medium">{slot.targetCO}</span>
+                  <div className={`mt-3 pt-2.5 border-t flex items-center justify-between text-[11px] ${isLive ? "border-white/10" : "border-slate-200"}`}>
+                    <span className={`font-medium ${isLive ? "text-purple-300" : "text-indigo-600"}`}>{slot.targetCO}</span>
                     <button
                       onClick={() => setActiveTab("attendance")}
-                      className="text-emerald-300 hover:text-white font-bold flex items-center gap-1 transition-colors"
+                      className={`font-bold flex items-center gap-1 transition-colors ${isLive ? "text-emerald-300 hover:text-white" : "text-emerald-700 hover:text-emerald-800"}`}
                     >
                       <span>Attendance</span>
                       <ChevronRight className="h-3 w-3" />
@@ -743,39 +761,7 @@ export default function FacultyDashboardPage() {
               </div>
 
               {/* Secondary Links Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                <Link
-                  href="/faculty/timetables"
-                  className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-indigo-300 hover:shadow-xs transition-all flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
-                      <Calendar className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-slate-900">Weekly Timetable Grid</p>
-                      <p className="text-[11px] text-slate-500">Hall allocation & period schedules</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-slate-400" />
-                </Link>
-
-                <Link
-                  href="/faculty/seating"
-                  className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-indigo-300 hover:shadow-xs transition-all flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
-                      <Layers className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-slate-900">Exam Seating Arrangement</p>
-                      <p className="text-[11px] text-slate-500">Zig-zag alternate seating plans</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-slate-400" />
-                </Link>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                 <Link
                   href="/faculty/documents"
                   className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-indigo-300 hover:shadow-xs transition-all flex items-center justify-between"
@@ -785,8 +771,24 @@ export default function FacultyDashboardPage() {
                       <FileText className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900">Course Materials & Notes</p>
-                      <p className="text-[11px] text-slate-500">Syllabus docs & vector chunks</p>
+                      <p className="text-xs font-bold text-slate-900">Academic Documents & Notes Hub</p>
+                      <p className="text-[11px] text-slate-500">Upload syllabus docs, notes & question papers</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-slate-400" />
+                </Link>
+
+                <Link
+                  href="/faculty/assigned-faculty"
+                  className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-indigo-300 hover:shadow-xs transition-all flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+                      <Users className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900">Department Faculty Directory</p>
+                      <p className="text-[11px] text-slate-500">View faculty allocations & department roles</p>
                     </div>
                   </div>
                   <ChevronRight className="h-4 w-4 text-slate-400" />

@@ -27,6 +27,8 @@ import {
   X,
   PanelLeftClose,
   PanelLeftOpen,
+  Home,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -36,76 +38,22 @@ import { HODContext, HODSessionContextType, useHOD } from "./context";
 
 const navItems = [
   {
-    title: "Command Center",
+    title: "HOD Dashboard",
     href: "/hod/dashboard",
     icon: LayoutDashboard,
-    badge: "Live Pulse",
+    badge: "Control Center",
   },
   {
-    title: "Approval Center",
-    href: "/hod/approvals",
-    icon: ShieldCheck,
-    badge: "Action Queue",
-  },
-  {
-    title: "Faculty & Workload",
-    href: "/hod/faculty",
-    icon: Users,
-    badge: "Workload Engine",
-  },
-  {
-    title: "Student Governance",
-    href: "/hod/students",
-    icon: GraduationCap,
-    badge: "Risk Radar",
-  },
-  {
-    title: "Courses & Curriculum",
-    href: "/hod/courses",
-    icon: BookOpen,
-    badge: null,
-  },
-  {
-    title: "Master Timetable",
-    href: "/hod/timetable",
-    icon: Calendar,
-    badge: "Conflict Free",
-  },
-  {
-    title: "Examinations & Seating",
-    href: "/hod/examinations",
-    icon: Layers,
-    badge: "Invigilation",
-  },
-  {
-    title: "Facilities & Labs",
-    href: "/hod/facilities",
-    icon: Building,
-    badge: null,
-  },
-  {
-    title: "Research & Grants",
-    href: "/hod/research",
-    icon: FlaskConical,
-    badge: "Grants",
-  },
-  {
-    title: "Department Documents",
+    title: "Uploads & College Files",
     href: "/hod/documents",
     icon: FileText,
-    badge: "Syllabus Diff",
+    badge: "Upload Hub",
   },
   {
-    title: "Governance Audit Trail",
-    href: "/hod/audit",
-    icon: Scale,
-    badge: "Audit Log",
-  },
-  {
-    title: "Operations Reports",
-    href: "/hod/reports",
-    icon: FileBarChart,
-    badge: "Executive",
+    title: "Faculty Performance Audit",
+    href: "/hod/faculty",
+    icon: Users,
+    badge: "Audit Engine",
   },
 ];
 
@@ -399,6 +347,18 @@ export default function HODLayout({ children }: { children: React.ReactNode }) {
       {/* Footer Actions */}
       <div className="p-2 border-t border-slate-200/80 space-y-1.5 mt-auto">
         <Link
+          href="/"
+          onClick={() => setMobileOpen(false)}
+          title="Campus Home"
+          className={`flex items-center ${collapsed ? "justify-center p-2" : "justify-between px-3 py-1.5"} text-xs font-semibold text-blue-700 bg-blue-50/70 hover:bg-blue-100/80 rounded-lg transition-colors border border-blue-200/50`}
+        >
+          <div className="flex items-center gap-2">
+            <Home className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+            {!collapsed && <span>Campus Home</span>}
+          </div>
+          {!collapsed && <ChevronRight className="h-3 w-3 text-blue-400" />}
+        </Link>
+        <Link
           href="/faculty/dashboard"
           onClick={() => setMobileOpen(false)}
           title="Switch to Faculty Portal"
@@ -534,6 +494,16 @@ export default function HODLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              {/* Campus Home Button */}
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-200 shadow-xs transition-colors shrink-0"
+                title="Go to Campus Landing Home"
+              >
+                <Home className="h-3.5 w-3.5 text-slate-700" />
+                <span className="hidden sm:inline">Campus Home</span>
+              </Link>
+
               {/* Direct Student Portal Quick Jump from Navbar */}
               <Link
                 href="/dashboard"

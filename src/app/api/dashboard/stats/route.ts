@@ -261,199 +261,15 @@ export async function GET(req: Request) {
 
     const deptCodeKey = (activeDepartment?.code === "CS" ? "CSE" : (activeDepartment?.code || "CSE")).toUpperCase();
 
-    const DEPARTMENT_FACULTY_UPLOADS: Record<string, Array<{
-      id: string;
-      fileName: string;
-      courseCode: string;
-      visibility: string;
-      departmentCode: string;
-      departmentName: string;
-      facultyAuthor: string;
-      facultyTitle: string;
-      fileSizeText: string;
-      processingStatus: string;
-      createdAt: string;
-    }>> = {
-      CSE: [
-        {
-          id: "doc-cse-01",
-          fileName: "CSE401_Advanced_Algorithms_Lecture_Notes_Unit1-4.pdf",
-          courseCode: "CSE401",
-          visibility: "DEPARTMENT",
-          departmentCode: "CSE",
-          departmentName: "Computer Science & Engineering",
-          facultyAuthor: "Prof. John Smith",
-          facultyTitle: "Head of Computer Science & AI",
-          fileSizeText: "4.2 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 2 * 3600 * 1000).toISOString(),
-        },
-        {
-          id: "doc-cse-02",
-          fileName: "CSE501_Deep_Learning_Neural_Architectures_Lab_Manual_2026.pdf",
-          courseCode: "CSE501",
-          visibility: "DEPARTMENT",
-          departmentCode: "CSE",
-          departmentName: "Computer Science & Engineering",
-          facultyAuthor: "Prof. Sarah Jones",
-          facultyTitle: "Associate Professor - AI Systems",
-          fileSizeText: "6.8 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 14 * 3600 * 1000).toISOString(),
-        },
-        {
-          id: "doc-cse-03",
-          fileName: "CSE402_Distributed_Database_Engineering_Midterm_Blueprint.pdf",
-          courseCode: "CSE402",
-          visibility: "DEPARTMENT",
-          departmentCode: "CSE",
-          departmentName: "Computer Science & Engineering",
-          facultyAuthor: "Prof. David Lee",
-          facultyTitle: "Lead Instructor - Distributed Systems",
-          fileSizeText: "2.1 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 28 * 3600 * 1000).toISOString(),
-        },
-        {
-          id: "doc-cse-04",
-          fileName: "CS_Final_Year_Capstone_Project_Evaluation_Guidelines_2026.pdf",
-          courseCode: "CSE499",
-          visibility: "DEPARTMENT",
-          departmentCode: "CSE",
-          departmentName: "Computer Science & Engineering",
-          facultyAuthor: "Dr. K. Srinivas Rao",
-          facultyTitle: "Professor & HOD",
-          fileSizeText: "1.8 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 48 * 3600 * 1000).toISOString(),
-        },
-      ],
-      ECE: [
-        {
-          id: "doc-ece-01",
-          fileName: "ECE301_Digital_Signal_Processing_MATLAB_Lab_Guide.pdf",
-          courseCode: "ECE301",
-          visibility: "DEPARTMENT",
-          departmentCode: "ECE",
-          departmentName: "Electronics & Communication",
-          facultyAuthor: "Prof. S. Ramesh",
-          facultyTitle: "Associate Professor - Signal Processing",
-          fileSizeText: "3.5 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 4 * 3600 * 1000).toISOString(),
-        },
-        {
-          id: "doc-ece-02",
-          fileName: "ECE402_VLSI_Design_CMOS_Circuit_Analysis_Lecture_Notes.pdf",
-          courseCode: "ECE402",
-          visibility: "DEPARTMENT",
-          departmentCode: "ECE",
-          departmentName: "Electronics & Communication",
-          facultyAuthor: "Dr. M. Sunitha",
-          facultyTitle: "Head of Microelectronics",
-          fileSizeText: "5.1 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 18 * 3600 * 1000).toISOString(),
-        },
-        {
-          id: "doc-ece-03",
-          fileName: "ECE305_Wireless_5G_Communications_Syllabus_Blueprint.pdf",
-          courseCode: "ECE305",
-          visibility: "DEPARTMENT",
-          departmentCode: "ECE",
-          departmentName: "Electronics & Communication",
-          facultyAuthor: "Prof. P. Naresh",
-          facultyTitle: "Assistant Professor",
-          fileSizeText: "2.7 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 36 * 3600 * 1000).toISOString(),
-        },
-      ],
-      MECH: [
-        {
-          id: "doc-mech-01",
-          fileName: "MECH301_Thermodynamics_Heat_Mass_Transfer_Lecture_Deck.pdf",
-          courseCode: "MECH301",
-          visibility: "DEPARTMENT",
-          departmentCode: "MECH",
-          departmentName: "Mechanical Engineering",
-          facultyAuthor: "Dr. K. Venkatesh",
-          facultyTitle: "Head of Mechanical Systems",
-          fileSizeText: "8.4 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 6 * 3600 * 1000).toISOString(),
-        },
-        {
-          id: "doc-mech-02",
-          fileName: "MECH402_Finite_Element_Analysis_ANSYS_Lab_Manual.pdf",
-          courseCode: "MECH402",
-          visibility: "DEPARTMENT",
-          departmentCode: "MECH",
-          departmentName: "Mechanical Engineering",
-          facultyAuthor: "Prof. B. Suresh",
-          facultyTitle: "Associate Professor",
-          fileSizeText: "4.9 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 22 * 3600 * 1000).toISOString(),
-        },
-      ],
-      EEE: [
-        {
-          id: "doc-eee-01",
-          fileName: "EEE301_Power_Systems_Transmission_Line_Design_Notes.pdf",
-          courseCode: "EEE301",
-          visibility: "DEPARTMENT",
-          departmentCode: "EEE",
-          departmentName: "Electrical & Electronics",
-          facultyAuthor: "Dr. G. Prasad",
-          facultyTitle: "Professor & Power Grid Specialist",
-          fileSizeText: "3.9 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 8 * 3600 * 1000).toISOString(),
-        },
-        {
-          id: "doc-eee-02",
-          fileName: "EEE402_Control_Systems_State_Space_Simulation_Exercises.pdf",
-          courseCode: "EEE402",
-          visibility: "DEPARTMENT",
-          departmentCode: "EEE",
-          departmentName: "Electrical & Electronics",
-          facultyAuthor: "Prof. N. Lakshmi",
-          facultyTitle: "Associate Professor",
-          fileSizeText: "4.1 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 26 * 3600 * 1000).toISOString(),
-        },
-      ],
-      AIDS: [
-        {
-          id: "doc-aids-01",
-          fileName: "AIDS301_Reinforcement_Learning_Agentic_Systems_Handbook.pdf",
-          courseCode: "AIDS301",
-          visibility: "DEPARTMENT",
-          departmentCode: "AI&DS",
-          departmentName: "Artificial Intelligence & Data Science",
-          facultyAuthor: "Dr. A. Vikram",
-          facultyTitle: "Head of AI & Data Engineering",
-          fileSizeText: "6.2 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 3 * 3600 * 1000).toISOString(),
-        },
-        {
-          id: "doc-aids-02",
-          fileName: "AIDS402_Big_Data_Pipelines_Spark_Hadoop_Cluster_Lab.pdf",
-          courseCode: "AIDS402",
-          visibility: "DEPARTMENT",
-          departmentCode: "AI&DS",
-          departmentName: "Artificial Intelligence & Data Science",
-          facultyAuthor: "Prof. T. Sneha",
-          facultyTitle: "Associate Professor",
-          fileSizeText: "5.4 MB",
-          processingStatus: "COMPLETED",
-          createdAt: new Date(now.getTime() - 20 * 3600 * 1000).toISOString(),
-        },
-      ],
-    };
+    // Resolve all related department IDs (e.g. CS and CSE are mapped together)
+    const relatedDeptIds = allDepts
+      .filter((d) => {
+        if (!activeDepartment) return false;
+        if (d.id === activeDepartment.id) return true;
+        if (["CS", "CSE"].includes(activeDepartment.code) && ["CS", "CSE"].includes(d.code)) return true;
+        return false;
+      })
+      .map((d) => d.id);
 
     // Count authorized documents accessible to this student's scope
     const [authorizedDeptDocs, recentDeptDocs] = await Promise.all([
@@ -463,7 +279,7 @@ export async function GET(req: Request) {
           deletedAt: null,
           OR: [
             { visibility: "UNIVERSITY" },
-            ...(activeDepartment ? [{ departmentId: activeDepartment.id }] : []),
+            ...(relatedDeptIds.length > 0 ? [{ departmentId: { in: relatedDeptIds } }] : []),
           ],
         },
       }),
@@ -473,11 +289,11 @@ export async function GET(req: Request) {
           deletedAt: null,
           OR: [
             { visibility: "UNIVERSITY" },
-            ...(activeDepartment ? [{ departmentId: activeDepartment.id }] : []),
+            ...(relatedDeptIds.length > 0 ? [{ departmentId: { in: relatedDeptIds } }] : []),
           ],
         },
         orderBy: { createdAt: "desc" },
-        take: 5,
+        take: 15,
         include: {
           department: true,
         },
@@ -499,14 +315,8 @@ export async function GET(req: Request) {
       createdAt: d.createdAt.toISOString(),
     }));
 
-    // Fallback/supplemental department uploads
-    const defaultDeptUploads = DEPARTMENT_FACULTY_UPLOADS[deptCodeKey] || DEPARTMENT_FACULTY_UPLOADS["CSE"];
-    const combinedDeptDocs: any[] = [...dbMappedDocs];
-    for (const item of defaultDeptUploads) {
-      if (!combinedDeptDocs.some((d) => d.fileName.toLowerCase() === item.fileName.toLowerCase())) {
-        combinedDeptDocs.push(item);
-      }
-    }
+    // Only use real DB documents — no hardcoded fixtures
+    const combinedDeptDocs = dbMappedDocs;
 
     return NextResponse.json({
       stats: {
@@ -532,8 +342,8 @@ export async function GET(req: Request) {
         departmentId: activeDepartment?.id || null,
         departmentCode: activeDepartment?.code || "CSE",
         departmentName: activeDepartment?.name || "Computer Science & Engineering",
-        authorizedDocsCount: authorizedDeptDocs > 0 ? authorizedDeptDocs : combinedDeptDocs.length,
-        recentDepartmentDocs: combinedDeptDocs,
+        authorizedDocsCount: authorizedDeptDocs > 0 ? authorizedDeptDocs : dbMappedDocs.length,
+        recentDepartmentDocs: dbMappedDocs,
       },
       tokenChart,
       storage: {

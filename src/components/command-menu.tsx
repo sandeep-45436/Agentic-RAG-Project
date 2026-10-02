@@ -65,16 +65,22 @@ export function CommandMenu() {
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />
+        <CommandGroup heading="Student & Career">
+          <CommandItem onSelect={() => runCommand(() => router.push("/placement"))}>
+            <CreditCard className="mr-2 h-4 w-4" />
+            <span>Placement & Career Hub</span>
+          </CommandItem>
+          <CommandItem onSelect={() => runCommand(() => router.push("/student/profile"))}>
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            <span>Student Profile</span>
+          </CommandItem>
+        </CommandGroup>
+        <CommandSeparator />
         <CommandGroup heading="Settings">
           <CommandItem onSelect={() => runCommand(() => router.push("/settings"))}>
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
             <CommandShortcut>⌘S</CommandShortcut>
-          </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => router.push("/pricing"))}>
-            <CreditCard className="mr-2 h-4 w-4" />
-            <span>Billing</span>
-            <CommandShortcut>⌘B</CommandShortcut>
           </CommandItem>
         </CommandGroup>
       </CommandList>

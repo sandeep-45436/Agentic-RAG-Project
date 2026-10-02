@@ -23,49 +23,30 @@ export function AnimatedBackground({
         className
       )}
     >
-      {/* ── 1. COLORFUL ANIMATED AURORA ORBS & GRADIENTS ──────────────────── */}
+      {/* ── 1. CLEAN INSTITUTIONAL CALM BACKGROUND (No revolving or spinning animations) ── */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Orb 1: Vibrant Indigo & Blue (Top Left) */}
+        {/* Soft, gentle static ambient illumination */}
         <div
-          className="absolute -top-[10%] -left-[5%] w-[650px] h-[650px] rounded-full animate-float-orb-1"
+          className="absolute -top-[10%] -left-[5%] w-[600px] h-[600px] rounded-full opacity-60"
           style={{
-            background: "radial-gradient(circle at center, rgba(99, 102, 241, 0.22) 0%, rgba(59, 130, 246, 0.12) 40%, transparent 70%)",
-            filter: "blur(60px)",
+            background: "radial-gradient(circle at center, rgba(99, 102, 241, 0.12) 0%, rgba(59, 130, 246, 0.05) 50%, transparent 70%)",
+            filter: "blur(80px)",
           }}
         />
 
-        {/* Orb 2: Radiant Fuchsia & Violet (Top Right) */}
         <div
-          className="absolute top-[10%] -right-[8%] w-[580px] h-[580px] rounded-full animate-float-orb-2"
+          className="absolute top-[20%] -right-[8%] w-[500px] h-[500px] rounded-full opacity-50"
           style={{
-            background: "radial-gradient(circle at center, rgba(217, 70, 239, 0.18) 0%, rgba(168, 85, 247, 0.10) 45%, transparent 70%)",
-            filter: "blur(65px)",
+            background: "radial-gradient(circle at center, rgba(168, 85, 247, 0.08) 0%, transparent 70%)",
+            filter: "blur(80px)",
           }}
         />
 
-        {/* Orb 3: Sunny Rose & Amber (Bottom Right) */}
+        {/* Clean, subtle micro-dot texture */}
         <div
-          className="absolute -bottom-[12%] right-[10%] w-[620px] h-[620px] rounded-full animate-float-orb-3"
+          className="absolute inset-0 opacity-[0.25]"
           style={{
-            background: "radial-gradient(circle at center, rgba(244, 63, 94, 0.15) 0%, rgba(249, 115, 22, 0.10) 45%, transparent 70%)",
-            filter: "blur(70px)",
-          }}
-        />
-
-        {/* Orb 4: Fresh Emerald & Cyan (Bottom Left) */}
-        <div
-          className="absolute bottom-[5%] -left-[8%] w-[540px] h-[540px] rounded-full animate-float-orb-4"
-          style={{
-            background: "radial-gradient(circle at center, rgba(16, 185, 129, 0.16) 0%, rgba(6, 182, 212, 0.10) 45%, transparent 70%)",
-            filter: "blur(65px)",
-          }}
-        />
-
-        {/* High-tech micro-dot grid pattern for clean professional SaaS polish */}
-        <div
-          className="absolute inset-0 opacity-[0.4]"
-          style={{
-            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.12) 1px, transparent 0)",
+            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.08) 1px, transparent 0)",
             backgroundSize: "28px 28px",
           }}
         />

@@ -1,36 +1,39 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { AnimatedBackground } from "@/components/animated-background";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/insforge/client";
 import {
-  Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import {
-  FileText, MessageSquare, Zap, Users, ArrowUpRight,
-  ArrowDownRight, Loader2, UploadCloud, Bot, Database,
-  BarChart2, ChevronRight, RefreshCw, Sparkles, Building,
-  GraduationCap, ShieldCheck, CheckCircle2, XCircle, BookOpen,
-  Calendar, Layers, ArrowRight, Eye, Download, User, BookMarked,
+  FileText, ChevronRight, ChevronDown, RefreshCw,
+  GraduationCap, BookOpen, Download, Info, CheckCircle2,
+  Sparkles, Clock, Play, Pause, RotateCcw, Bot, Briefcase,
+  LayoutGrid, List, Copy, Check, Eye, ShieldCheck,
+  Calendar, Building2, Flame, ArrowUpRight, Award, Compass
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 // ── Types ────────────────────────────────────────────────────────────────────
+
+interface DocItem {
+  id: string;
+  fileName: string;
+  courseCode?: string;
+  visibility: string;
+  departmentCode: string;
+  departmentName: string;
+  facultyAuthor?: string;
+  facultyTitle?: string;
+  fileSizeText?: string;
+  processingStatus: string;
+  createdAt: string;
+}
 
 interface DashboardData {
   stats: {
     totalDocs: number;
-    docsTrend: number | null;
-    totalConversations: number;
-    conversationsTrend: number | null;
-    totalTokens: number;
-    tokensTrend: number | null;
-    totalMembers: number;
-    membersTrend: number | null;
     authorizedDeptDocs?: number;
+    totalConversations?: number;
   };
   academicContext?: {
     isStudent: boolean;
@@ -38,44 +41,12 @@ interface DashboardData {
     role: string;
     studentNumber: string;
     major: string;
-    gpa: number;
-    academicStatus: string;
-    enrolledCoursesCount: number;
     departmentId: string | null;
     departmentCode: string;
     departmentName: string;
     authorizedDocsCount: number;
-    recentDepartmentDocs: Array<{
-      id: string;
-      fileName: string;
-      courseCode?: string;
-      visibility: string;
-      departmentCode: string;
-      departmentName: string;
-      facultyAuthor?: string;
-      facultyTitle?: string;
-      fileSizeText?: string;
-      processingStatus: string;
-      createdAt: string;
-    }>;
+    recentDepartmentDocs: DocItem[];
   };
-  tokenChart: { date: string; tokens: number }[];
-  storage: {
-    docBytes: number;
-    embeddingBytes: number;
-    kbBytes: number;
-    otherBytes: number;
-    totalBytes: number;
-    limitBytes: number;
-  };
-  activity: {
-    id: string;
-    type: "document" | "chat";
-    label: string;
-    sublabel: string;
-    time: string;
-  }[];
-  topKBs: { id: string; name: string; runs: number }[];
   user: { email: string; name: string };
 }
 
@@ -91,61 +62,11 @@ function timeAgo(iso: string) {
   return `${Math.floor(h / 24)}d ago`;
 }
 
-function fmtNum(n: number) {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + "M";
-  if (n >= 1_000) return (n / 1_000).toFixed(1) + "K";
-  return n.toString();
-}
-
-function greeting() {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 18) return "Good afternoon";
-  return "Good evening";
-}
-
-// ── Stat Card ────────────────────────────────────────────────────────────────
-
-function StatCard({
-  icon: Icon,
-  iconBg,
-  cardBg,
-  borderColor,
-  label,
-  value,
-  subtext,
-  badge,
-  badgeClass,
-}: {
-  icon: React.ElementType;
-  iconBg: string;
-  cardBg?: string;
-  borderColor?: string;
-  label: string;
-  value: string;
-  subtext?: string;
-  badge?: string;
-  badgeClass?: string;
-}) {
-  return (
-    <div className={`rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-lg shadow-sm border ${cardBg || "bg-white/95"} ${borderColor || "border-slate-200/90"} backdrop-blur-xl`}>
-      <div className="flex items-start justify-between gap-3">
-        <div className={`${iconBg} p-3 rounded-2xl shrink-0 shadow-md text-white`}>
-          <Icon className="w-5 h-5" />
-        </div>
-        {badge && (
-          <Badge className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${badgeClass || "bg-emerald-50 text-emerald-700 border-emerald-200"}`}>
-            {badge}
-          </Badge>
-        )}
-      </div>
-      <div className="mt-4">
-        <p className="text-xs text-slate-500 font-semibold tracking-wide uppercase">{label}</p>
-        <p className="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tracking-tight font-mono">{value}</p>
-        {subtext && <p className="text-[11px] text-slate-600 mt-1 font-medium leading-tight">{subtext}</p>}
-      </div>
-    </div>
-  );
+function getGreeting(): { text: string; emoji: string } {
+  const hour = new Date().getHours();
+  if (hour < 12) return { text: "Good Morning", emoji: "☀️" };
+  if (hour < 17) return { text: "Good Afternoon", emoji: "🌤️" };
+  return { text: "Good Evening", emoji: "🌙" };
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
@@ -154,29 +75,55 @@ export default function DashboardPage() {
   const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // Document Viewer Modal State
-  const [viewerDocId, setViewerDocId] = useState<string | null>(null);
-  const [viewerDoc, setViewerDoc] = useState<any | null>(null);
-  const [loadingDoc, setLoadingDoc] = useState(false);
 
-  const openDocViewer = async (id: string) => {
-    setViewerDocId(id);
-    setLoadingDoc(true);
-    try {
-      const res = await fetch(`/api/documents/${id}`);
-      const data = await res.json();
-      if (data.document) {
-        setViewerDoc(data.document);
-      }
-    } catch (err) {
-      console.error("Failed to load document preview:", err);
-    } finally {
-      setLoadingDoc(false);
+  // Interactive UI States
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [docFilter, setDocFilter] = useState<"all" | "notes" | "syllabus" | "lab">("all");
+  const [noticeCategory, setNoticeCategory] = useState<"all" | "academic" | "exams" | "library">("all");
+  const [copied, setCopied] = useState(false);
+  const [previewDoc, setPreviewDoc] = useState<DocItem | null>(null);
+
+  // Interactive Study Focus Timer (Pomodoro Widget)
+  const [timerSeconds, setTimerSeconds] = useState(25 * 60);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [timerMode, setTimerMode] = useState<"pomodoro" | "shortBreak">("pomodoro");
+
+  // Timer Effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (isTimerRunning && timerSeconds > 0) {
+      interval = setInterval(() => {
+        setTimerSeconds((prev) => prev - 1);
+      }, 1000);
+    } else if (timerSeconds === 0) {
+      setIsTimerRunning(false);
     }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isTimerRunning, timerSeconds]);
+
+  const toggleTimer = () => setIsTimerRunning((prev) => !prev);
+  const resetTimer = (mode: "pomodoro" | "shortBreak" = timerMode) => {
+    setIsTimerRunning(false);
+    setTimerMode(mode);
+    setTimerSeconds(mode === "pomodoro" ? 25 * 60 : 5 * 60);
   };
 
+  const timerFormatted = useMemo(() => {
+    const mins = Math.floor(timerSeconds / 60);
+    const secs = timerSeconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  }, [timerSeconds]);
+
+  const timerProgress = useMemo(() => {
+    const total = timerMode === "pomodoro" ? 25 * 60 : 5 * 60;
+    return Math.round(((total - timerSeconds) / total) * 100);
+  }, [timerSeconds, timerMode]);
+
+  // Auth check
   useEffect(() => {
     const insforge = createClient();
     insforge.auth.getCurrentUser().then((res: any) => {
@@ -186,14 +133,13 @@ export default function DashboardPage() {
     });
   }, [router]);
 
-  const [selectedDept, setSelectedDept] = useState<string | null>(null);
-
-  const load = useCallback((deptOverride?: string) => {
-    setLoading(true);
+  // Data loader
+  const load = useCallback((isManualRefresh = false) => {
+    if (isManualRefresh) setRefreshing(true);
+    else setLoading(true);
     setError(null);
-    const targetDept = deptOverride !== undefined ? deptOverride : selectedDept;
-    const url = targetDept ? `/api/dashboard/stats?department=${encodeURIComponent(targetDept)}` : "/api/dashboard/stats";
-    fetch(url)
+
+    fetch("/api/dashboard/stats")
       .then(async (r) => {
         const contentType = r.headers.get("content-type");
         if (contentType && contentType.includes("text/html")) {
@@ -208,25 +154,63 @@ export default function DashboardPage() {
       })
       .then((d) => {
         if (!d) return;
-        if (d.error) {
-          throw new Error(d.error);
-        }
+        if (d.error) throw new Error(d.error);
         setData(d);
         setLoading(false);
+        setRefreshing(false);
       })
       .catch((err) => {
         console.error("Dashboard load failed:", err);
         setError(err.message || "Failed to load dashboard data");
         setLoading(false);
+        setRefreshing(false);
       });
-  }, [selectedDept]);
+  }, []);
 
   useEffect(() => { load(); }, [load]);
 
+  const ac = data?.academicContext;
+  const deptCode = ac?.departmentCode || "CSE";
+  const deptName = ac?.departmentName || "Computer Science & Engineering";
+  const studentName = data?.user?.name || "Student Scholar";
+  const studentEmail = data?.user?.email || "";
+  const recentDocs = ac?.recentDepartmentDocs ?? [];
+  const greeting = getGreeting();
+
+  // Filtered documents
+  const filteredDocs = useMemo(() => {
+    if (docFilter === "all") return recentDocs;
+    if (docFilter === "notes") {
+      return recentDocs.filter((d) => /note|unit|lecture|chapter|module/i.test(d.fileName));
+    }
+    if (docFilter === "syllabus") {
+      return recentDocs.filter((d) => /syllabus|curriculum|scheme|regulation/i.test(d.fileName));
+    }
+    if (docFilter === "lab") {
+      return recentDocs.filter((d) => /lab|manual|practical|experiment/i.test(d.fileName));
+    }
+    return recentDocs;
+  }, [recentDocs, docFilter]);
+
+  const copyEmail = () => {
+    if (!studentEmail) return;
+    navigator.clipboard.writeText(studentEmail);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      <div className="flex flex-col items-center justify-center h-[70vh] gap-3">
+        <div className="relative">
+          <div className="w-12 h-12 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin" />
+          <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-indigo-600">
+            AI
+          </div>
+        </div>
+        <p className="text-xs font-bold text-slate-600 uppercase tracking-widest animate-pulse">
+          Loading Academic Intelligence...
+        </p>
       </div>
     );
   }
@@ -234,671 +218,723 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
-        <div className="bg-white border border-red-200 rounded-3xl p-8 max-w-md text-center shadow-xl">
-          <h2 className="text-lg font-bold text-red-600 mb-2">Connection Issue</h2>
-          <p className="text-sm text-slate-600 mb-6">{error}</p>
+        <div className="bg-white border border-rose-200 rounded-3xl p-8 max-w-md text-center shadow-xl">
+          <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-3">
+            <Info className="w-6 h-6" />
+          </div>
+          <h2 className="text-base font-bold text-rose-900 mb-1">Connection Interrupted</h2>
+          <p className="text-xs text-slate-600 mb-5 leading-relaxed">{error}</p>
           <button
-            onClick={() => load()}
-            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 text-sm font-semibold transition-all shadow-md shadow-indigo-600/25"
+            onClick={() => load(true)}
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 text-xs font-bold transition-all shadow-md shadow-indigo-600/20 active:scale-95"
           >
-            Try Again
+            <RefreshCw className="w-3.5 h-3.5" /> Try Again
           </button>
         </div>
       </div>
     );
   }
 
-  const s = data?.stats;
-  const ac = data?.academicContext;
-  const deptCode = ac?.departmentCode || "CSE";
-  const deptName = ac?.departmentName || "Computer Science & Engineering";
-  const studentName = data?.user?.name || "Student Scholar";
-  const authDocs = ac?.authorizedDocsCount ?? s?.authorizedDeptDocs ?? s?.totalDocs ?? 0;
-
   return (
     <AnimatedBackground>
-    <div className="space-y-6 pb-12 font-sans">
-      {/* ── STUDENT ACADEMIC OPERATIONS SUB-FEATURES HUB ────────────────── */}
-      <div className="bg-white/95 rounded-3xl border border-indigo-100/90 p-5 sm:p-6 shadow-sm shadow-indigo-100/30 backdrop-blur-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 mb-4 border-b border-slate-100 gap-2">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-500/25">
-              <GraduationCap className="h-5 w-5" />
+      <div className="space-y-6 pb-16 font-sans max-w-7xl mx-auto px-2 sm:px-4">
+        
+        {/* ── 1. BREATHTAKING HERO CARD & STUDENT COCKPIT ──────────────────── */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 text-white p-6 sm:p-8 shadow-2xl border border-indigo-500/20 backdrop-blur-2xl">
+          {/* Subtle ambient light aura */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            
+            {/* Left: Avatar, Greeting, Identity & Badges */}
+            <div className="flex items-start gap-4 sm:gap-5 min-w-0">
+              <div className="relative shrink-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 p-0.5 shadow-xl">
+                  <div className="w-full h-full rounded-2xl bg-slate-900 flex items-center justify-center text-indigo-300 font-black text-xl sm:text-2xl">
+                    {studentName.charAt(0).toUpperCase()}
+                  </div>
+                </div>
+                <div className="absolute -bottom-1 -right-1 flex h-4 w-4">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-slate-900" />
+                </div>
+              </div>
+
+              <div className="space-y-1.5 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-semibold text-indigo-300 flex items-center gap-1">
+                    <span>{greeting.emoji}</span> {greeting.text},
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-[10px] font-bold text-indigo-200 uppercase tracking-wider">
+                    {deptCode} Academic Scholar
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[10px] font-bold text-emerald-300 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    Enrolled
+                  </span>
+                </div>
+
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white truncate">
+                  {studentName}
+                </h1>
+
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-300 font-medium">
+                  <span className="flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-indigo-400" />
+                    {deptName}
+                  </span>
+                  <span className="text-slate-500 hidden sm:inline">•</span>
+                  <span>Anantha Lakshmi Institute of Tech & Sciences</span>
+                </div>
+
+                {studentEmail && (
+                  <button
+                    onClick={copyEmail}
+                    className="inline-flex items-center gap-1.5 text-[11px] font-mono text-slate-400 hover:text-slate-200 transition-colors pt-0.5"
+                    title="Click to copy student email"
+                  >
+                    <span>{studentEmail}</span>
+                    {copied ? (
+                      <Check className="w-3 h-3 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3 h-3 text-slate-500 hover:text-slate-300" />
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
-            <div>
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">Student Academic Modules & Resources Hub</h2>
-              <p className="text-xs text-slate-500">Access your department faculty materials, AI study assistant, notes repository, and research tools</p>
+
+            {/* Right: Quick Action Buttons & Refresh */}
+            <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-start lg:justify-end">
+              <Link
+                href="/documents"
+                className="group relative inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-2xl text-xs font-extrabold px-5 py-3 transition-all duration-300 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 hover:scale-105 active:scale-95"
+              >
+                <BookOpen className="w-4 h-4 transition-transform group-hover:rotate-6" />
+                <span>Browse Notes & Search</span>
+                <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+
+              <Link
+                href="/chat"
+                className="inline-flex items-center gap-2 bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white rounded-2xl text-xs font-bold px-4 py-3 transition-all border border-slate-700/80 hover:border-indigo-400/50 shadow-md active:scale-95"
+              >
+                <Bot className="w-4 h-4 text-indigo-400" />
+                <span>AI Copilot</span>
+              </Link>
+
+              <button
+                onClick={() => load(true)}
+                disabled={refreshing}
+                className="p-3 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 rounded-2xl transition-all shadow-md active:scale-90"
+                title="Refresh real-time data"
+              >
+                <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin text-indigo-400" : ""}`} />
+              </button>
             </div>
           </div>
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/80 shadow-xs w-fit">
-            ✨ 5 Student Sub-Features Available
-          </span>
+
+          {/* Genuine Real-Time Department Metadata Strip */}
+          <div className="mt-6 pt-5 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="p-3 rounded-2xl bg-slate-800/40 border border-slate-700/40">
+              <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-wider block">Department Files</span>
+              <span className="text-lg font-black text-white mt-0.5 block">{recentDocs.length} Materials</span>
+              <span className="text-[10px] text-slate-400">Published by {deptCode} faculty</span>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-800/40 border border-slate-700/40">
+              <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider block">Academic Scope</span>
+              <span className="text-lg font-black text-white mt-0.5 block">{deptCode}</span>
+              <span className="text-[10px] text-slate-400">Direct course clearance</span>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-800/40 border border-slate-700/40">
+              <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider block">Autonomous Status</span>
+              <span className="text-lg font-black text-white mt-0.5 block">NAAC 'A'</span>
+              <span className="text-[10px] text-slate-400">JNTUA Affiliated</span>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-800/40 border border-slate-700/40">
+              <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider block">Knowledge Engine</span>
+              <span className="text-lg font-black text-white mt-0.5 block">Verified</span>
+              <span className="text-[10px] text-slate-400">Zero-hallucination RAG</span>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-          <a
-            href="#dept-feed"
-            className="group flex flex-col justify-between p-4 rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50/70 via-white to-blue-50/40 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-100/50 hover:-translate-y-1 transition-all"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-500/20 group-hover:scale-110 transition-transform">
-                <FileText className="h-4 w-4" />
+        {/* ── 2. INTERACTIVE STUDY UTILITIES & ACADEMIC INFORMATION ────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Left 2 Cols: Interactive Notice Board & Guidelines */}
+          <div className="lg:col-span-2 bg-white/95 rounded-3xl p-6 border border-slate-200/90 shadow-sm backdrop-blur-xl space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-2xl bg-indigo-50 text-indigo-600">
+                  <Info className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-extrabold text-slate-900">
+                    Student Notices & Academic Information
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Verified guidelines and circulars for {deptName} scholars.
+                  </p>
+                </div>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Live Feed</span>
+
+              {/* Interactive Category Filter Pills */}
+              <div className="flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl">
+                {(["all", "academic", "exams", "library"] as const).map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setNoticeCategory(cat)}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold capitalize transition-all ${
+                      noticeCategory === cat
+                        ? "bg-white text-indigo-600 shadow-xs"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {/* Interactive Notice Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {(noticeCategory === "all" || noticeCategory === "academic") && (
+                <div className="group p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-indigo-50/20 border border-slate-200 hover:border-indigo-300 transition-all duration-300 hover:shadow-md space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100/70 px-2 py-0.5 rounded-full">
+                      Regulation
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">Policy 2026</span>
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                    75% Mandatory Attendance Rule
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                    Students must maintain a minimum of 75% overall lecture attendance. Medical condonations between 65%-74% require formal verification by the HOD.
+                  </p>
+                </div>
+              )}
+
+              {(noticeCategory === "all" || noticeCategory === "library") && (
+                <div className="group p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-emerald-50/20 border border-slate-200 hover:border-emerald-300 transition-all duration-300 hover:shadow-md space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">
+                      Materials
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">1-Click PDF</span>
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                    Instant Faculty Notes & Syllabi
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                    All official PDFs, question banks, and lecture slides uploaded by professors are accessible below with direct 1-click downloads.
+                  </p>
+                </div>
+              )}
+
+              {(noticeCategory === "all" || noticeCategory === "exams") && (
+                <div className="group p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-purple-50/20 border border-slate-200 hover:border-purple-300 transition-all duration-300 hover:shadow-md space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-100/70 px-2 py-0.5 rounded-full">
+                      Exams
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">Continuous Eval</span>
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
+                    Mid-Term Syllabus Coverage
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                    Internal assessments follow autonomous unit guidelines. Download the syllabus copy from the materials section to review credit weightage.
+                  </p>
+                </div>
+              )}
+
+              {(noticeCategory === "all" || noticeCategory === "academic") && (
+                <div className="group p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-amber-50/20 border border-slate-200 hover:border-amber-300 transition-all duration-300 hover:shadow-md space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-full">
+                      Search Tip
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">Browse Notes</span>
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-amber-800 transition-colors">
+                    Intelligent Document Search
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                    To search across documents by topic or abbreviation (e.g. DBMS, OS, IP), head to <strong>Browse Notes</strong> for real-time concept matching.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Col: Interactive Study Focus Timer (Pomodoro Widget) */}
+          <div className="bg-white/95 rounded-3xl p-6 border border-slate-200/90 shadow-sm backdrop-blur-xl flex flex-col justify-between">
             <div>
-              <p className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Faculty Uploads Feed</p>
-              <p className="text-[11px] text-slate-600 mt-0.5">Syllabi, course handouts & lecture notes</p>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                    Study Focus Timer
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-[10px] font-bold">
+                  <button
+                    onClick={() => resetTimer("pomodoro")}
+                    className={`px-2 py-0.5 rounded-lg transition-all ${
+                      timerMode === "pomodoro" ? "bg-white text-indigo-600 shadow-xs" : "text-slate-500"
+                    }`}
+                  >
+                    25m
+                  </button>
+                  <button
+                    onClick={() => resetTimer("shortBreak")}
+                    className={`px-2 py-0.5 rounded-lg transition-all ${
+                      timerMode === "shortBreak" ? "bg-white text-indigo-600 shadow-xs" : "text-slate-500"
+                    }`}
+                  >
+                    5m
+                  </button>
+                </div>
+              </div>
+
+              {/* Animated Progress Display */}
+              <div className="relative my-6 flex flex-col items-center justify-center">
+                <div className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 font-mono">
+                  {timerFormatted}
+                </div>
+                <p className="text-xs text-slate-500 font-medium mt-1">
+                  {timerMode === "pomodoro" ? "Active Study Interval" : "Short Break Time"}
+                </p>
+
+                {/* Progress bar */}
+                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-4">
+                  <div
+                    className="bg-indigo-600 h-full transition-all duration-1000 rounded-full"
+                    style={{ width: `${timerProgress}%` }}
+                  />
+                </div>
+              </div>
             </div>
-            <div className="mt-3 pt-2 border-t border-indigo-100/80 flex items-center text-[11px] font-bold text-indigo-600">
-              <span>Jump to Feed</span>
-              <ChevronRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+
+            {/* Timer Controls */}
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <button
+                onClick={toggleTimer}
+                className={`flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-2xl text-xs font-bold text-white transition-all shadow-md active:scale-95 ${
+                  isTimerRunning
+                    ? "bg-amber-600 hover:bg-amber-700 shadow-amber-600/20"
+                    : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/20"
+                }`}
+              >
+                {isTimerRunning ? (
+                  <>
+                    <Pause className="w-4 h-4" /> Pause Session
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4" /> Start Focus
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => resetTimer(timerMode)}
+                className="p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
+                title="Reset timer"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
             </div>
-          </a>
+          </div>
+        </div>
+
+        {/* ── 3. WORLD-CLASS FACULTY COURSE MATERIALS GALLERY ──────────────── */}
+        <div className="bg-white/95 rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-sm backdrop-blur-xl space-y-6">
+          
+          {/* Header Row: Title + Filter Pills + View Switcher */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-2xl bg-indigo-50 text-indigo-600">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-black text-slate-900 tracking-tight">
+                    {deptCode} Course Uploads & Academic Materials
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Official syllabus copies, lecture units, and reference notes published by your professors.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Category Filter Pills */}
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl text-xs font-bold">
+                {[
+                  { id: "all", label: `All (${recentDocs.length})` },
+                  { id: "notes", label: "Notes" },
+                  { id: "syllabus", label: "Syllabus" },
+                  { id: "lab", label: "Labs" },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setDocFilter(item.id as any)}
+                    className={`px-3 py-1.5 rounded-xl transition-all ${
+                      docFilter === item.id
+                        ? "bg-white text-indigo-700 shadow-xs"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* View Switcher: Grid vs List */}
+              <div className="hidden sm:flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`p-1.5 rounded-lg transition-all ${
+                    viewMode === "grid" ? "bg-white text-indigo-600 shadow-xs" : "text-slate-500 hover:text-slate-900"
+                  }`}
+                  title="Grid view"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`p-1.5 rounded-lg transition-all ${
+                    viewMode === "list" ? "bg-white text-indigo-600 shadow-xs" : "text-slate-500 hover:text-slate-900"
+                  }`}
+                  title="List view"
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Direct Jump to Browse Notes & Deep Search */}
+              <Link
+                href="/documents"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold border border-indigo-200 transition-all hover:scale-105 active:scale-95"
+              >
+                <span>Deep Search</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Documents Content */}
+          {filteredDocs.length === 0 ? (
+            <div className="py-16 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                <FileText className="w-6 h-6" />
+              </div>
+              <p className="text-sm font-bold text-slate-800">No documents found for this category</p>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                No materials currently match the selected filter. Try selecting "All" or check Browse Notes.
+              </p>
+            </div>
+          ) : viewMode === "grid" ? (
+            /* ── GRID VIEW ─────────────────────────────────────────────── */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredDocs.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="group relative bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:shadow-xl hover:border-indigo-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+                >
+                  <div>
+                    {/* Top Row: File Type + Dept Pill + Time */}
+                    <div className="flex items-center justify-between mb-3.5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                          <FileText className="w-4 h-4" />
+                        </div>
+                        <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
+                          {doc.departmentCode || deptCode}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 font-medium">
+                        {timeAgo(doc.createdAt)}
+                      </span>
+                    </div>
+
+                    {/* Document Title */}
+                    <h3
+                      className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-2 leading-snug"
+                      title={doc.fileName}
+                    >
+                      {doc.fileName}
+                    </h3>
+
+                    {/* Author & Size Metadata */}
+                    <div className="mt-2.5 pt-2.5 border-t border-slate-100 space-y-1 text-xs">
+                      {doc.facultyAuthor && (
+                        <p className="text-slate-600 truncate text-[11px]">
+                          Faculty: <span className="font-semibold text-slate-800">{doc.facultyAuthor}</span>
+                          {doc.facultyTitle ? ` (${doc.facultyTitle})` : ""}
+                        </p>
+                      )}
+                      {doc.fileSizeText && (
+                        <p className="text-slate-500 text-[11px] font-mono">
+                          Size: {doc.fileSizeText}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions Bottom */}
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => setPreviewDoc(doc)}
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 hover:text-indigo-600 transition-colors py-1.5"
+                    >
+                      <Eye className="w-3.5 h-3.5" /> Details
+                    </button>
+
+                    <div className="flex items-center gap-1.5">
+                      <Link
+                        href="/chat"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold transition-all"
+                        title="Discuss in AI Chat"
+                      >
+                        <Bot className="w-3.5 h-3.5 text-indigo-600" /> Ask
+                      </Link>
+
+                      <a
+                        href={`/api/documents/${doc.id}/download`}
+                        download={doc.fileName}
+                        title={`Download ${doc.fileName}`}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-xs transition-all hover:scale-105 active:scale-95"
+                      >
+                        <Download className="w-3.5 h-3.5" /> Download
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            /* ── LIST VIEW ─────────────────────────────────────────────── */
+            <div className="divide-y divide-slate-100 bg-white rounded-2xl border border-slate-200/90 overflow-hidden">
+              {filteredDocs.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/80 transition-colors"
+                >
+                  <div className="flex items-start gap-3.5 min-w-0">
+                    <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl shrink-0 mt-0.5">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-bold text-slate-900 truncate">{doc.fileName}</h3>
+                      <div className="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-slate-600">
+                        {doc.facultyAuthor && (
+                          <span>
+                            By <strong className="text-slate-800">{doc.facultyAuthor}</strong>
+                          </span>
+                        )}
+                        <span className="text-slate-400">•</span>
+                        <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-[10px] text-slate-700">
+                          {doc.departmentCode || deptCode}
+                        </span>
+                        {doc.fileSizeText && (
+                          <>
+                            <span className="text-slate-400">•</span>
+                            <span className="text-slate-500">{doc.fileSizeText}</span>
+                          </>
+                        )}
+                        <span className="text-slate-400">•</span>
+                        <span className="text-slate-500">{timeAgo(doc.createdAt)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                    <button
+                      onClick={() => setPreviewDoc(doc)}
+                      className="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-1"
+                    >
+                      <Eye className="w-3.5 h-3.5" /> Details
+                    </button>
+                    <a
+                      href={`/api/documents/${doc.id}/download`}
+                      download={doc.fileName}
+                      className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Download PDF
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── 4. QUICK ACADEMIC SHORTCUTS ─────────────────────────────────── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link
+            href="/documents"
+            className="group p-5 rounded-3xl bg-white border border-slate-200/90 shadow-xs hover:shadow-xl hover:border-indigo-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+          >
+            <div className="space-y-2">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                Notes & Syllabus Repo
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Full-text search, acronym matching, and subject filtration.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1 text-xs font-bold text-indigo-600">
+              <span>Open Repository</span>
+              <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+            </div>
+          </Link>
 
           <Link
             href="/chat"
-            className="group flex flex-col justify-between p-4 rounded-2xl border border-purple-100 bg-gradient-to-br from-purple-50/70 via-white to-fuchsia-50/40 hover:border-purple-300 hover:shadow-lg hover:shadow-purple-100/50 hover:-translate-y-1 transition-all"
+            className="group p-5 rounded-3xl bg-white border border-slate-200/90 shadow-xs hover:shadow-xl hover:border-purple-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 rounded-xl bg-purple-600 text-white shadow-md shadow-purple-500/20 group-hover:scale-110 transition-transform">
-                <Bot className="h-4 w-4" />
+            <div className="space-y-2">
+              <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
+                <Bot className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">RAG AI</span>
+              <h3 className="text-sm font-bold text-slate-900 group-hover:text-purple-600 transition-colors">
+                AI Academic Copilot
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Instant Q&A grounded directly in university course material.
+              </p>
             </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900 group-hover:text-purple-600 transition-colors">AI Academic Chat</p>
-              <p className="text-[11px] text-slate-600 mt-0.5">Ask questions on textbooks, syllabus & slides</p>
-            </div>
-            <div className="mt-3 pt-2 border-t border-purple-100/80 flex items-center text-[11px] font-bold text-purple-600">
-              <span>Start Chat</span>
-              <ChevronRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+            <div className="mt-4 flex items-center gap-1 text-xs font-bold text-purple-600">
+              <span>Launch Chat</span>
+              <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
             </div>
           </Link>
 
           <Link
-            href="/documents"
-            className="group flex flex-col justify-between p-4 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/70 via-white to-cyan-50/40 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-100/50 hover:-translate-y-1 transition-all"
+            href="/placement"
+            className="group p-5 rounded-3xl bg-white border border-slate-200/90 shadow-xs hover:shadow-xl hover:border-cyan-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20 group-hover:scale-110 transition-transform">
-                <BookOpen className="h-4 w-4" />
+            <div className="space-y-2">
+              <div className="w-10 h-10 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
+                <Briefcase className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Docs</span>
+              <h3 className="text-sm font-bold text-slate-900 group-hover:text-cyan-600 transition-colors">
+                Career & Placement Arena
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Campus recruitment drives, ATS resume matcher & AI viva arena.
+              </p>
             </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Browse Notes & Docs</p>
-              <p className="text-[11px] text-slate-600 mt-0.5">Searchable textbook chunks & question banks</p>
-            </div>
-            <div className="mt-3 pt-2 border-t border-blue-100/80 flex items-center text-[11px] font-bold text-blue-600">
-              <span>Browse Documents</span>
-              <ChevronRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+            <div className="mt-4 flex items-center gap-1 text-xs font-bold text-cyan-600">
+              <span>Explore Drives</span>
+              <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
             </div>
           </Link>
 
-          <Link
-            href="/knowledge-bases"
-            className="group flex flex-col justify-between p-4 rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/40 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-100/50 hover:-translate-y-1 transition-all"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 rounded-xl bg-emerald-600 text-white shadow-md shadow-emerald-500/20 group-hover:scale-110 transition-transform">
-                <Layers className="h-4 w-4" />
-              </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Repositories</span>
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">Knowledge Bases</p>
-              <p className="text-[11px] text-slate-600 mt-0.5">Indexed department collections & curriculum</p>
-            </div>
-            <div className="mt-3 pt-2 border-t border-emerald-100/80 flex items-center text-[11px] font-bold text-emerald-600">
-              <span>View Repositories</span>
-              <ChevronRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-
-          <Link
-            href="/research"
-            className="group flex flex-col justify-between p-4 rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50/70 via-white to-orange-50/40 hover:border-amber-300 hover:shadow-lg hover:shadow-amber-100/50 hover:-translate-y-1 transition-all"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 rounded-xl bg-amber-600 text-white shadow-md shadow-amber-500/20 group-hover:scale-110 transition-transform">
-                <BookMarked className="h-4 w-4" />
-              </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Research</span>
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors">Research Workspace</p>
-              <p className="text-[11px] text-slate-600 mt-0.5">AI literature analysis & project research</p>
-            </div>
-            <div className="mt-3 pt-2 border-t border-amber-100/80 flex items-center text-[11px] font-bold text-amber-600">
-              <span>Open Workspace</span>
-              <ChevronRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* ── ALITS STUDENT INSTITUTIONAL BRAND HEADER ──────────────────────── */}
-      <div className="bg-white/95 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-200/90 backdrop-blur-xl">
-        <div className="flex items-center gap-3.5">
-          <div className="relative h-12 w-36 sm:w-44 flex items-center justify-start">
-            <img
-              src="/images/college-logo.png"
-              alt="ALITS University Logo"
-              className="h-10 object-contain drop-shadow-sm"
-              onError={(e) => {
-                (e.target as HTMLElement).style.display = "none";
-              }}
-            />
-          </div>
-          <div className="h-8 w-[1px] bg-slate-200 hidden sm:block" />
-          <div>
-            <span className="text-xs sm:text-sm font-bold text-slate-900 block tracking-tight">
-              Anantha Lakshmi Institute of Technology & Sciences
-            </span>
-            <span className="text-[11px] sm:text-xs text-indigo-600 font-semibold flex items-center gap-1.5 mt-0.5">
-              <ShieldCheck className="h-4 w-4 text-emerald-600" />
-              Student Academic Intelligence & Learning Portal
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
           <Link
             href="/student/profile"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl shadow-md shadow-indigo-600/25 text-xs font-bold px-4 py-2.5 transition-all hover:scale-105"
+            className="group p-5 rounded-3xl bg-white border border-slate-200/90 shadow-xs hover:shadow-xl hover:border-emerald-300 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
           >
-            <User className="h-4 w-4" />
-            My Student Profile ({ac?.studentNumber || "STU-CSE-001"})
-            <ChevronRight className="h-3.5 w-3.5 opacity-80" />
+            <div className="space-y-2">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold group-hover:scale-110 transition-transform">
+                <GraduationCap className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
+                Student Profile & Records
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Academic department details, student roll and contact records.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1 text-xs font-bold text-emerald-600">
+              <span>View Profile</span>
+              <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+            </div>
           </Link>
         </div>
-      </div>
 
-      {/* ── ACADEMIC HERO BANNER ────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 p-6 sm:p-8 text-white shadow-xl shadow-indigo-500/20">
-        <div className="absolute right-0 top-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-white/20 blur-3xl pointer-events-none" />
-        <div className="absolute left-1/3 bottom-0 -mb-10 h-48 w-48 rounded-full bg-purple-400/20 blur-2xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge className="bg-white/20 hover:bg-white/25 text-white border-white/30 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-md">
-                🎓 Academic Year 2026-2027 • Fall Term
-              </Badge>
-              <Badge className="bg-emerald-400/30 text-white border-emerald-300/40 text-xs font-bold px-2.5 py-0.5 rounded-full backdrop-blur-md">
-                ✓ {ac?.academicStatus || "Good Standing"}
-              </Badge>
-              <span className="text-xs text-white/80 font-mono font-bold bg-white/10 px-2 py-0.5 rounded-md">
-                {ac?.studentNumber || "STU-CS-101"}
-              </span>
-            </div>
-            
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight drop-shadow-sm">
-              {greeting()}, {studentName}
-            </h1>
-            
-            <p className="text-sm text-indigo-50 max-w-xl leading-relaxed font-medium">
-              <span className="font-bold text-white bg-white/15 px-2 py-0.5 rounded-md">{deptName} ({deptCode})</span>
-              {" • "}
-              <span>{ac?.enrolledCoursesCount || 5} Active Enrolled Courses</span>
-              {" • "}
-              <span className="text-emerald-200 font-semibold">Department Retrieval Scope Active</span>
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
-            <Link
-              href="/chat"
-              className="inline-flex items-center justify-center bg-white text-indigo-700 hover:bg-indigo-50 rounded-2xl shadow-lg shadow-black/10 text-xs font-bold px-5 py-3 transition-all gap-2 hover:scale-105"
-            >
-              <Bot className="h-4 w-4 text-indigo-600" />
-              Ask Department AI
-            </Link>
-            <Link
-              href="/documents"
-              className="inline-flex items-center justify-center border border-white/40 bg-white/15 hover:bg-white/25 text-white rounded-2xl text-xs font-bold px-4 py-3 transition-all gap-2 backdrop-blur-md"
-            >
-              <BookOpen className="h-4 w-4" />
-              Browse Notes
-            </Link>
-            <button
-              onClick={() => load()}
-              className="p-3 text-white hover:text-white bg-white/15 hover:bg-white/25 border border-white/30 rounded-2xl transition-all backdrop-blur-md"
-              title="Refresh metrics"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 4 ACADEMIC STAT CARDS ──────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={FileText}
-          iconBg="bg-gradient-to-tr from-indigo-600 to-blue-500"
-          cardBg="bg-gradient-to-br from-indigo-50/60 via-white to-blue-50/40"
-          borderColor="border-indigo-100"
-          label="Authorized Knowledge Base"
-          value={fmtNum(authDocs)}
-          subtext={`Syllabi & Notes in ${deptCode} + University-wide`}
-          badge="Live Synced"
-          badgeClass="bg-emerald-100 text-emerald-800 border-emerald-300"
-        />
-        <StatCard
-          icon={Building}
-          iconBg="bg-gradient-to-tr from-purple-600 to-fuchsia-500"
-          cardBg="bg-gradient-to-br from-purple-50/60 via-white to-fuchsia-50/40"
-          borderColor="border-purple-100"
-          label="Active Knowledge Scope"
-          value={deptCode}
-          subtext={deptName}
-          badge="Scoped"
-          badgeClass="bg-purple-100 text-purple-800 border-purple-300"
-        />
-        <StatCard
-          icon={MessageSquare}
-          iconBg="bg-gradient-to-tr from-blue-600 to-cyan-500"
-          cardBg="bg-gradient-to-br from-blue-50/60 via-white to-cyan-50/40"
-          borderColor="border-blue-100"
-          label="Grounded AI Consultations"
-          value={fmtNum(s?.totalConversations ?? 0)}
-          subtext="Verified Page-Level Citations"
-          badge="Grounded"
-          badgeClass="bg-blue-100 text-blue-800 border-blue-300"
-        />
-        <StatCard
-          icon={Database}
-          iconBg="bg-gradient-to-tr from-emerald-600 to-teal-500"
-          cardBg="bg-gradient-to-br from-emerald-50/60 via-white to-teal-50/40"
-          borderColor="border-emerald-100"
-          label="Cognitive Subsystems"
-          value="Hybrid RAG"
-          subtext="Qdrant + BM25 + Neo4j Graph"
-          badge="Online"
-          badgeClass="bg-emerald-100 text-emerald-800 border-emerald-300"
-        />
-      </div>
-
-      {/* ── TWO-COLUMN DETAILED VIEW ────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        {/* ── Left 2 Cols: Recent Department Materials & Activity ──────── */}
-        <div className="lg:col-span-2 space-y-6">
-          
-          {/* Department Course Materials Feed */}
-          <div id="dept-feed" className="bg-white/95 border border-slate-200/90 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm backdrop-blur-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600">
-                  <BookOpen className="w-5 h-5" />
+        {/* ── 5. INTERACTIVE DOCUMENT PREVIEW DRAWER / MODAL ──────────────── */}
+        {previewDoc && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-5 animate-in zoom-in-95 duration-200">
+              
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 line-clamp-1">{previewDoc.fileName}</h3>
+                    <p className="text-xs text-slate-500">{previewDoc.departmentName || deptName}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-base font-bold text-slate-900 tracking-tight">
-                    {deptCode} Faculty Course Uploads & Syllabi
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Official documents & lecture notes uploaded by {deptName} faculty
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/faculty/documents"
-                  className="text-xs text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-xl font-bold transition-all shadow-xs"
+                <button
+                  onClick={() => setPreviewDoc(null)}
+                  className="p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100 transition-colors"
                 >
-                  + Upload Material
-                </Link>
-                <Link
-                  href="/documents"
-                  className="text-xs text-slate-600 hover:text-slate-900 flex items-center gap-1 font-semibold"
-                >
-                  All Docs <ChevronRight className="w-3.5 h-3.5" />
-                </Link>
+                  ✕
+                </button>
               </div>
-            </div>
 
-            {/* Department Quick Filter Tabs */}
-            <div className="flex flex-wrap items-center gap-1.5 pt-1 pb-2 border-b border-slate-100">
-              <span className="text-[11px] font-bold text-slate-500 mr-1">Switch Dept:</span>
-              {[
-                { code: "CSE", name: "Computer Science" },
-                { code: "ECE", name: "Electronics" },
-                { code: "MECH", name: "Mechanical" },
-                { code: "EEE", name: "Electrical" },
-                { code: "AIDS", label: "AI&DS", name: "AI & Data Sci" },
-              ].map((d) => {
-                const label = (d as any).label || d.code;
-                const isActive = (selectedDept ? selectedDept === d.code : deptCode.toUpperCase() === d.code.toUpperCase());
-                return (
-                  <button
-                    key={d.code}
-                    onClick={() => {
-                      setSelectedDept(d.code);
-                      load(d.code);
-                    }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      isActive
-                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25"
-                        : "bg-slate-100 hover:bg-slate-200 text-slate-700"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="divide-y divide-slate-100">
-              {(!ac?.recentDepartmentDocs || ac.recentDepartmentDocs.length === 0) ? (
-                <div className="py-8 text-center text-xs text-slate-500">
-                  No materials uploaded yet for this department.
+              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 space-y-2 text-xs">
+                <div className="flex justify-between py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500">Department Scope:</span>
+                  <span className="font-bold text-slate-900">{previewDoc.departmentCode || deptCode}</span>
                 </div>
-              ) : (
-                ac.recentDepartmentDocs.map((doc) => (
-                  <div key={doc.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-indigo-50/30 px-3 rounded-2xl transition-colors">
-                    <div className="flex items-start gap-3 min-w-0">
-                      <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl shrink-0 mt-0.5 shadow-xs">
-                        <FileText className="w-4 h-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold text-slate-900 truncate">{doc.fileName}</p>
-                        {doc.facultyAuthor && (
-                          <p className="text-xs text-slate-600 mt-0.5">
-                            Uploaded by <span className="font-semibold text-slate-900">{doc.facultyAuthor}</span>
-                            {doc.facultyTitle ? ` • ${doc.facultyTitle}` : ""}
-                          </p>
-                        )}
-                        <div className="flex flex-wrap items-center gap-2 mt-1.5">
-                          {doc.courseCode && (
-                            <span className="text-[10px] font-bold text-indigo-700 font-mono bg-indigo-100/80 px-2 py-0.5 rounded-md border border-indigo-200">
-                              {doc.courseCode}
-                            </span>
-                          )}
-                          <span className="text-[10px] text-slate-700 font-mono font-medium bg-slate-100 px-2 py-0.5 rounded-md">
-                            {doc.departmentCode}
-                          </span>
-                          {doc.fileSizeText && (
-                            <span className="text-[10px] text-slate-500 font-medium">
-                              {doc.fileSizeText}
-                            </span>
-                          )}
-                          <span className="text-[10px] text-slate-500 font-medium">
-                            {timeAgo(doc.createdAt)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
-                      <button
-                        onClick={() => openDocViewer(doc.id)}
-                        className="text-xs text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 px-3 py-1.5 rounded-xl font-semibold transition-all flex items-center gap-1.5 border border-slate-200 shadow-xs"
-                      >
-                        <Eye className="w-3.5 h-3.5 text-cyan-600" /> View
-                      </button>
-                      <Link
-                        href={`/chat`}
-                        className="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-3.5 py-1.5 rounded-xl font-bold transition-all shadow-sm shadow-indigo-600/20"
-                      >
-                        Ask AI
-                      </Link>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Activity Timeline */}
-          <div className="bg-white/95 border border-slate-200/90 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm backdrop-blur-xl">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-amber-500" />
-              <h3 className="text-base font-bold text-slate-900 tracking-tight">
-                Live Knowledge Platform Activity
-              </h3>
-            </div>
-
-            <div className="space-y-2.5">
-              {(!data?.activity || data.activity.length === 0) ? (
-                <p className="text-xs text-slate-500 py-4 text-center">No recent activity.</p>
-              ) : (
-                data.activity.map((act) => (
-                  <div key={act.id} className="flex items-center justify-between gap-3 py-2.5 border-b border-slate-100 last:border-0">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`p-2 rounded-xl shrink-0 ${act.type === "document" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
-                        {act.type === "document" ? <FileText className="w-4 h-4" /> : <MessageSquare className="w-4 h-4" />}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">{act.label}</p>
-                        <p className="text-xs text-slate-600 truncate">{act.sublabel}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs text-slate-500 font-medium shrink-0">{timeAgo(act.time)}</span>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ── Right Col: Scope Policy Card & Quick Shortcuts ──────────── */}
-        <div className="space-y-6">
-
-          {/* Active Knowledge Scope Card */}
-          <div className="bg-gradient-to-br from-indigo-50/80 via-white to-purple-50/60 border border-indigo-200/90 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-indigo-600" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
-                  Access Authorization Policy
-                </h3>
-              </div>
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            </div>
-
-            <div className="bg-white rounded-2xl p-4 border border-indigo-100 space-y-2.5 shadow-xs">
-              <p className="text-xs text-slate-800 font-bold">Your Scoped Retrieval Boundary:</p>
-              <div className="space-y-2 text-xs">
-                <div className="flex items-center gap-2.5 text-emerald-700 font-semibold">
-                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-                  <span>{deptCode} Department Documents</span>
+                <div className="flex justify-between py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500">Instructor:</span>
+                  <span className="font-bold text-slate-900">{previewDoc.facultyAuthor || "Department Faculty"}</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-emerald-700 font-semibold">
-                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-                  <span>University-Wide Regulations</span>
+                <div className="flex justify-between py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500">File Size:</span>
+                  <span className="font-bold text-slate-900">{previewDoc.fileSizeText || "Standard PDF"}</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-slate-500 font-medium">
-                  <XCircle className="w-4 h-4 shrink-0 text-slate-400" />
-                  <span>Other Academic Departments (Blocked)</span>
+                <div className="flex justify-between py-1 border-b border-slate-200/60">
+                  <span className="text-slate-500">Published:</span>
+                  <span className="font-bold text-slate-900">{timeAgo(previewDoc.createdAt)}</span>
                 </div>
-              </div>
-            </div>
-
-            <Link
-              href="/chat"
-              className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-3 rounded-2xl shadow-md shadow-indigo-600/25 transition-all hover:scale-102"
-            >
-              Open Scoped Chat Portal <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          {/* Quick Academic Shortcuts */}
-          <div className="bg-white/95 border border-slate-200/90 rounded-3xl p-5 sm:p-6 space-y-3.5 shadow-sm backdrop-blur-xl">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              University Subsystems
-            </h3>
-
-            <div className="space-y-2.5">
-              <Link
-                href="/chat"
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50/80 hover:bg-indigo-50/60 border border-slate-200/80 hover:border-indigo-200 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-blue-100 rounded-xl text-blue-700">
-                    <MessageSquare className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Department AI Chat</p>
-                    <p className="text-[11px] text-slate-500">Grounded Q&A with page citations</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-              </Link>
-
-              <Link
-                href="/documents"
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50/80 hover:bg-purple-50/60 border border-slate-200/80 hover:border-purple-200 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-purple-100 rounded-xl text-purple-700">
-                    <FileText className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-purple-600 transition-colors">Academic Repository</p>
-                    <p className="text-[11px] text-slate-500">Course notes & regulations</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 transition-colors" />
-              </Link>
-
-              <Link
-                href="/faculty/timetables"
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50/80 hover:bg-amber-50/60 border border-slate-200/80 hover:border-amber-200 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-amber-100 rounded-xl text-amber-700">
-                    <Calendar className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors">Class & Lab Schedules</p>
-                    <p className="text-[11px] text-slate-500">Weekly timetable matrix</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600 transition-colors" />
-              </Link>
-
-              <Link
-                href="/faculty/login"
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50/80 hover:bg-emerald-50/60 border border-slate-200/80 hover:border-emerald-200 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-emerald-100 rounded-xl text-emerald-700">
-                    <GraduationCap className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">Faculty Portal Gateway</p>
-                    <p className="text-[11px] text-slate-500">Instructor auth & document uploads</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-colors" />
-              </Link>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      {/* Document Viewer Modal */}
-      {viewerDocId && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-overlay-in">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col popup-card-in">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3.5">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="p-2.5 bg-indigo-50 rounded-2xl text-indigo-600 shadow-xs">
-                  <FileText className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-base font-bold text-slate-900 truncate">
-                    {viewerDoc?.fileName || "Loading Document..."}
-                  </h3>
-                  <p className="text-xs text-slate-500 font-medium">
-                    {viewerDoc?.department?.name || deptName} • {viewerDoc?.visibility || "DEPARTMENT"} Scope
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => { setViewerDocId(null); setViewerDoc(null); }}
-                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
-              >
-                <XCircle className="w-5 h-5" />
-              </button>
-            </div>
-
-            {loadingDoc ? (
-              <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-500 text-xs">
-                <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
-                <span>Loading document metadata and extracted chunks...</span>
-              </div>
-            ) : viewerDoc ? (
-              <div className="flex-1 overflow-y-auto space-y-4 text-xs pr-1">
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 font-mono text-[11px]">
-                  <div>
-                    <span className="text-slate-500 block text-[10px] font-sans font-semibold uppercase">Total Size</span>
-                    <span className="font-bold text-slate-900 text-sm">{(viewerDoc.fileSize / 1024).toFixed(1)} KB</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block text-[10px] font-sans font-semibold uppercase">RAG Chunks</span>
-                    <span className="font-bold text-indigo-600 text-sm">{viewerDoc._count?.chunks || viewerDoc.chunks?.length || 0} Chunks</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block text-[10px] font-sans font-semibold uppercase">Status</span>
-                    <span className="font-bold text-emerald-600 text-sm">{viewerDoc.processingStatus}</span>
-                  </div>
-                </div>
-
-                {/* Chunks Preview */}
-                <div className="space-y-2">
-                  <span className="text-xs uppercase font-bold text-slate-700 block">
-                    Extracted Text Chunks ({viewerDoc.chunks?.length || 0} displayed)
+                <div className="flex justify-between py-1">
+                  <span className="text-slate-500">Indexing Status:</span>
+                  <span className="font-bold text-emerald-600 flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Grounded in RAG
                   </span>
-                  <div className="space-y-2.5 max-h-60 overflow-y-auto">
-                    {viewerDoc.chunks && viewerDoc.chunks.length > 0 ? (
-                      viewerDoc.chunks.map((c: any, i: number) => (
-                        <div key={i} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
-                          <span className="text-[10px] font-mono text-indigo-600 block font-bold">
-                            Chunk {c.chunkIndex + 1} {c.pageNumber ? `(Page ${c.pageNumber})` : ""} · {c.tokenCount} Tokens
-                          </span>
-                          <p className="text-xs text-slate-700 leading-relaxed line-clamp-3">
-                            {c.content}
-                          </p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-slate-500 italic py-2">No chunks indexed.</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-3.5 border-t border-slate-100">
-                  <Link
-                    href={`/chat`}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-md shadow-indigo-600/25"
-                  >
-                    <Bot className="w-4 h-4" /> Ask Questions in Chat
-                  </Link>
-
-                  {viewerDoc.signedUrl && (
-                    <a
-                      href={viewerDoc.signedUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold transition-all shadow-xs"
-                    >
-                      <Download className="w-3.5 h-3.5" /> Download Full Document
-                    </a>
-                  )}
                 </div>
               </div>
-            ) : (
-              <p className="text-rose-500 text-center py-6 font-medium">Failed to load document details.</p>
-            )}
+
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/chat"
+                  onClick={() => setPreviewDoc(null)}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold border border-indigo-200 transition-all"
+                >
+                  <Bot className="w-4 h-4" /> Ask in AI Chat
+                </Link>
+                <a
+                  href={`/api/documents/${previewDoc.id}/download`}
+                  download={previewDoc.fileName}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md active:scale-95"
+                >
+                  <Download className="w-4 h-4" /> Download PDF
+                </a>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+
+      </div>
     </AnimatedBackground>
   );
 }

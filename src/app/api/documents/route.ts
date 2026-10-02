@@ -3,6 +3,7 @@ import { createClient } from "@/utils/insforge/server";
 import { db } from "@/server/db/prisma";
 import { syncUserToDatabase } from "@/server/actions/auth";
 import { DocumentAccessPolicy } from "@/server/services/document-access-policy";
+import { getSearchExpansions } from "@/lib/academic-search";
 
 export const dynamic = "force-dynamic";
 
@@ -50,19 +51,51 @@ export async function GET(req: Request) {
 
     const baseWhere = DocumentAccessPolicy.buildPrismaDocumentWhere(accessContext);
 
+    const andClauses: any[] = [];
+
+    // 1. Preserve access policy visibility OR clauses
+    if (baseWhere.OR) {
+      andClauses.push({ OR: baseWhere.OR });
+    }
+
+    // 2. Academic concept expansion: resolve search terms including synonyms, acronyms, typo corrections
+    let matchedConcept: string | null = null;
+    if (search.trim()) {
+      const expansion = getSearchExpansions(search.trim());
+      matchedConcept = expansion.matchedConcept;
+
+      // Match filenames for all expansion terms
+      const filenameClauses = expansion.expansions.map((term) => ({
+        fileName: { contains: term, mode: "insensitive" as const },
+      }));
+
+      // Only search chunks for terms with length >= 4 to avoid short acronym false positives (e.g. 'ai', 'os')
+      const chunkClauses = expansion.expansions
+        .filter((term) => term.length >= 4)
+        .map((term) => ({
+          chunks: {
+            some: {
+              content: { contains: term, mode: "insensitive" as const },
+              deletedAt: null,
+            },
+          },
+        }));
+
+      const searchOrClauses = [...filenameClauses, ...chunkClauses];
+      if (searchOrClauses.length > 0) {
+        andClauses.push({ OR: searchOrClauses });
+      }
+    }
+
     const where: any = {
-      ...baseWhere,
+      organizationId: baseWhere.organizationId,
+      ...(baseWhere.visibility ? { visibility: baseWhere.visibility } : {}),
       ...(status === "DELETED"
         ? { deletedAt: { not: null } }
         : { deletedAt: null }),
+      ...(status && status !== "DELETED" ? { processingStatus: status } : {}),
+      ...(andClauses.length > 0 ? { AND: andClauses } : {}),
     };
-
-    if (status && status !== "DELETED") {
-      where.processingStatus = status;
-    }
-    if (search) {
-      where.fileName = { contains: search, mode: "insensitive" };
-    }
 
     const [docs, count, storage, departments] = await Promise.all([
       db.document.findMany({
@@ -105,10 +138,14 @@ export async function GET(req: Request) {
     ]);
 
     return NextResponse.json({
-      documents: docs,
+      documents: docs.map((d) => ({
+        ...d,
+        downloadUrl: `/api/documents/${d.id}/download`,
+      })),
       pagination: { page, pageSize, total: count, pages: Math.ceil(count / pageSize) },
       totalStorageBytes: storage._sum.fileSize ?? 0,
       departments,
+      matchedConcept,
       scope: {
         departmentId: accessContext.departmentId,
         userRole: accessContext.userRole,

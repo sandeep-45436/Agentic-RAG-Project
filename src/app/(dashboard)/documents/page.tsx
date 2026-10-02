@@ -1,12 +1,13 @@
 "use client";
 
 import { AnimatedBackground } from "@/components/animated-background";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import {
-  Search, Upload, Filter, MoreHorizontal, ChevronLeft, ChevronRight,
-  FileText, Loader2, CheckCircle2, AlertCircle, Clock, Trash2,
-  X, ExternalLink, Eye, Building,
+  Search, ChevronLeft, ChevronRight,
+  FileText, Loader2, CheckCircle2, AlertCircle, Clock,
+  X, ExternalLink, Eye, Download, Sparkles, Upload
 } from "lucide-react";
+import { getSearchExpansions, scoreDocumentMatch } from "@/lib/academic-search";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -53,7 +54,7 @@ function timeAgo(iso: string) {
   return `${Math.floor(h / 24)}d ago`;
 }
 
-function fileIcon(name: string, type: string) {
+function fileIconProps(name: string, type: string) {
   const ext = name.split(".").pop()?.toLowerCase() ?? "";
   if (ext === "pdf" || type.includes("pdf"))
     return { bg: "bg-red-500/15", text: "text-red-400", label: "PDF" };
@@ -76,7 +77,7 @@ const TAB_STATUS: Record<Tab, string | null> = {
   "Processed": "COMPLETED",
   "Processing": "PROCESSING",
   "Failed": "FAILED",
-  "Trash": "DELETED",
+  "Trash": "DELETED"
 };
 
 // ── Status Badge ──────────────────────────────────────────────────────────────
@@ -113,7 +114,7 @@ function StatusBadge({ status }: { status: string }) {
 // ── File Icon ─────────────────────────────────────────────────────────────────
 
 function FileIcon({ name, type }: { name: string; type: string }) {
-  const { bg, text, label } = fileIcon(name, type);
+  const { bg, text, label } = fileIconProps(name, type);
   return (
     <div className={`w-8 h-8 ${bg} rounded-lg flex items-center justify-center shrink-0`}>
       <span className={`text-[10px] font-bold ${text}`}>{label}</span>
@@ -286,12 +287,21 @@ function DetailPanel({ docId, onClose }: { docId: string; onClose: () => void })
           </div>
         )}
 
-        {/* Footer CTA */}
-        {detail?.signedUrl && (
-          <div className="p-4 border-t border-slate-200 bg-slate-50/50">
-            <a href={detail.signedUrl} target="_blank" rel="noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold transition-all shadow-sm active:scale-98">
-              <Eye className="w-4 h-4" /> View Full Document <ExternalLink className="w-3.5 h-3.5" />
+        {/* Footer CTAs — View + Download */}
+        {detail && (
+          <div className="p-4 border-t border-slate-200 bg-slate-50/50 space-y-2">
+            {detail.signedUrl && (
+              <a href={detail.signedUrl} target="_blank" rel="noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold transition-all shadow-sm active:scale-98">
+                <Eye className="w-4 h-4" /> View Full Document <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
+            <a
+              href={`/api/documents/${detail.id}/download`}
+              download={detail.fileName}
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm active:scale-98"
+            >
+              <Download className="w-4 h-4" /> Download PDF
             </a>
           </div>
         )}
@@ -304,67 +314,102 @@ function DetailPanel({ docId, onClose }: { docId: string; onClose: () => void })
 
 export default function DocumentsPage() {
   const [docs, setDocs] = useState<Doc[]>([]);
-  const [departments, setDepartments] = useState<Array<{ id: string; code: string; name: string }>>([]);
-  const [selectedDeptId, setSelectedDeptId] = useState<string>("ALL");
+  const [deptLabel, setDeptLabel] = useState<string>("");
   const [pagination, setPagination] = useState<Pagination>({ page: 1, pageSize: 10, total: 0, pages: 1 });
   const [totalStorage, setTotalStorage] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
   const [tab, setTab] = useState<Tab>("All Documents");
   const [search, setSearch] = useState("");
+  const [lastQueriedSearch, setLastQueriedSearch] = useState("");
+  // matchedConcept returned from the backend expansion engine
+  const [matchedConcept, setMatchedConcept] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [showUpload, setShowUpload] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const searchTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const load = useCallback((p = 1, s = search, t = tab, deptId = selectedDeptId) => {
-    setLoading(true);
+  const load = useCallback((p = 1, s = search, t = tab, isBackground = false) => {
+    if (!isBackground) {
+      if (s.trim()) setIsSearching(true);
+      else setLoading(true);
+    }
     const params = new URLSearchParams({ page: String(p), pageSize: "10" });
     const st = TAB_STATUS[t];
     if (st) params.set("status", st);
-    if (s) params.set("search", s);
-    if (deptId && deptId !== "ALL") params.set("departmentId", deptId);
-    if (deptId === "ALL") params.set("departmentId", "ALL");
+    if (s.trim()) params.set("search", s.trim());
 
     fetch(`/api/documents?${params}`)
       .then((r) => r.json())
       .then((d) => {
         setDocs(d.documents ?? []);
-        if (d.departments && d.departments.length > 0) {
-          setDepartments(d.departments);
-        }
         setPagination(d.pagination ?? { page: 1, pageSize: 10, total: 0, pages: 1 });
         setTotalStorage(d.totalStorageBytes ?? 0);
+        // Store the matched concept label from the backend expansion engine
+        setMatchedConcept(d.matchedConcept ?? null);
+        setLastQueriedSearch(s.trim());
+        // Capture the student's resolved department label for display
+        if (d.scope?.deptName) setDeptLabel(d.scope.deptName);
+        else if (d.departments?.length > 0) setDeptLabel(d.departments[0].name);
         setLoading(false);
+        setIsSearching(false);
       })
-      .catch(() => setLoading(false));
-  }, [search, tab, selectedDeptId]);
+      .catch(() => {
+        setLoading(false);
+        setIsSearching(false);
+      });
+  }, [search, tab]);
 
   // Initial load and tab change
-  useEffect(() => { load(1, search, tab, selectedDeptId); }, [tab, selectedDeptId]);
+  useEffect(() => { load(1, search, tab); }, [tab]);
 
+  // Debounced search — 300ms
   useEffect(() => {
     if (searchTimer.current) clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => load(1, search, tab, selectedDeptId), 400);
+    if (!search.trim()) {
+      setMatchedConcept(null);
+      setLastQueriedSearch("");
+    }
+    searchTimer.current = setTimeout(() => load(1, search, tab), 300);
   }, [search]);
 
-  // Live auto-polling every 5 seconds for instant sync when faculty uploads documents
+  // Live auto-polling every 10 seconds (only when not searching)
   useEffect(() => {
+    if (search.trim()) return;
     const iv = setInterval(() => {
-      load(pagination.page, search, tab, selectedDeptId);
-    }, 5000);
+      load(pagination.page, "", tab, true);
+    }, 10000);
     return () => clearInterval(iv);
-  }, [load, pagination.page, search, tab, selectedDeptId]);
+  }, [load, pagination.page, search, tab]);
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Delete this document? This cannot be undone.")) return;
-    setDeletingId(id);
-    await fetch(`/api/documents/${id}`, { method: "DELETE" });
-    setDocs((prev) => prev.filter((d) => d.id !== id));
-    if (selectedId === id) setSelectedId(null);
-    setDeletingId(null);
-    setMenuOpenId(null);
-  };
+  // ── Client-side instant scoring ────────────────────────────────────────────
+  // Instant real-time filtering while user types and when results arrive
+  const displayedDocs = useMemo(() => {
+    const trimmed = search.trim();
+    if (!trimmed || docs.length === 0) return docs;
+    const exp = getSearchExpansions(trimmed);
+    if (!exp.normalizedQuery) return docs;
+
+    const scored = docs.map((doc) => ({
+      doc,
+      match: scoreDocumentMatch(
+        { fileName: doc.fileName, departmentCode: doc.department?.code ?? undefined },
+        exp
+      )
+    }));
+
+    const matched = scored.filter(({ match }) => match.isMatch);
+
+    // If server has already delivered results for this query and found items (or chunk matches)
+    if (lastQueriedSearch === trimmed) {
+      if (matched.length > 0) {
+        return matched.sort((a, b) => b.match.score - a.match.score).map(({ doc }) => doc);
+      }
+      return docs;
+    }
+
+    // While client is typing (before server query returns), filter to matches only
+    return matched.sort((a, b) => b.match.score - a.match.score).map(({ doc }) => doc);
+  }, [docs, search, lastQueriedSearch]);
+
 
   return (
     <AnimatedBackground>
@@ -380,48 +425,52 @@ export default function DocumentsPage() {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live Synced
                 </span>
               </div>
-              <p className="text-xs text-slate-600 mt-1 font-medium">Explore institutional and departmental course materials. Academic documents uploaded by faculty appear here in real time.</p>
+              <p className="text-xs text-slate-600 mt-1 font-medium">Browse and download course notes, syllabi, and academic materials uploaded by your department faculty.</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 shrink-0">
-              {/* Department Scope Selector */}
-              <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl px-3 py-1.5 shadow-2xs">
-                <Building className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                <span className="text-[11px] text-slate-500 font-bold hidden sm:inline">Scope:</span>
-                <select
-                  value={selectedDeptId}
-                  onChange={(e) => {
-                    setSelectedDeptId(e.target.value);
-                  }}
-                  className="bg-transparent text-xs font-bold text-indigo-700 border-none outline-none focus:ring-0 cursor-pointer pr-1"
-                >
-                  <option value="ALL" className="bg-white text-slate-900 font-semibold">
-                    All Departments & University
-                  </option>
-                  {departments.map((dept) => (
-                    <option key={dept.id} value={dept.id} className="bg-white text-slate-900 font-medium">
-                      {dept.code} - {dept.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* Student dept badge — read-only, scoped automatically */}
+              {deptLabel && (
+                <div className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 rounded-xl px-3 py-1.5 shadow-2xs">
+                  <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wide">Dept</span>
+                  <span className="text-xs font-extrabold text-indigo-800">{deptLabel}</span>
+                </div>
+              )}
 
-              {/* Search */}
-              <div className="relative flex-1 sm:w-48">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search documents..."
-                  className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 font-medium focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-2xs"
-                />
-              </div>
+              {/* Smart Search */}
+              <div className="flex flex-col gap-1 flex-1 sm:w-72">
+                <div className="relative">
+                  {isSearching ? (
+                    <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-indigo-600 animate-spin" />
+                  ) : (
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                  )}
+                  <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search by name, acronym or topic (e.g. DBMS, Computer Networks)…"
+                    className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-8 py-1.5 text-xs text-slate-900 placeholder-slate-400 font-medium focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-2xs"
+                  />
+                  {search && (
+                    <button
+                      onClick={() => { setSearch(""); setMatchedConcept(null); setLastQueriedSearch(""); load(1, "", tab); }}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      aria-label="Clear search"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
 
-              <a
-                href="/faculty/documents"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-xs text-purple-700 font-bold transition-all shadow-2xs shrink-0"
-              >
-                🎓 <span className="hidden xs:inline">Faculty</span> Portal
-              </a>
+                {/* Concept Match Chip */}
+                {matchedConcept && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-lg w-fit">
+                    <Sparkles className="w-3 h-3 text-amber-500 shrink-0" />
+                    <span className="text-[10px] font-bold text-amber-800">
+                      Matched concept: {matchedConcept}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -440,7 +489,7 @@ export default function DocumentsPage() {
 
           {/* ── Table ── */}
           <div className="flex-1 overflow-auto">
-            <table className="w-full min-w-[650px] text-xs">
+            <table className="w-full min-w-[700px] text-xs">
               <thead className="sticky top-0 bg-slate-50/95 border-b border-slate-200 z-10">
                 <tr>
                   <th className="text-left px-6 py-3.5 text-slate-700 font-bold uppercase tracking-wider text-[11px]">Name</th>
@@ -448,34 +497,36 @@ export default function DocumentsPage() {
                   <th className="text-left px-4 py-3.5 text-slate-700 font-bold uppercase tracking-wider text-[11px]">Status</th>
                   <th className="text-left px-4 py-3.5 text-slate-700 font-bold uppercase tracking-wider text-[11px] hidden md:table-cell">Chunks</th>
                   <th className="text-left px-4 py-3.5 text-slate-700 font-bold uppercase tracking-wider text-[11px] hidden md:table-cell">Size</th>
-                  <th className="text-left px-4 py-3.5 text-slate-700 font-bold uppercase tracking-wider text-[11px] hidden lg:table-cell">Uploaded At</th>
-                  <th className="px-4 py-3.5" />
+                  <th className="text-left px-4 py-3.5 text-slate-700 font-bold uppercase tracking-wider text-[11px] hidden lg:table-cell">Uploaded</th>
+                  <th className="text-left px-4 py-3.5 text-slate-700 font-bold uppercase tracking-wider text-[11px]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {loading ? (
+                {loading && docs.length === 0 ? (
                   <tr><td colSpan={7} className="text-center py-16"><Loader2 className="w-5 h-5 animate-spin text-indigo-600 mx-auto" /></td></tr>
-                ) : docs.length === 0 ? (
+                ) : displayedDocs.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="text-center py-16 text-slate-500">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <FileText className="w-9 h-9 text-slate-400 mb-1" />
-                        <p className="font-bold text-slate-900 text-sm">No documents found in selected scope</p>
+                        <p className="font-bold text-slate-900 text-sm">No documents found</p>
                         <p className="text-xs text-slate-500 max-w-sm font-medium">
-                          Select "All Departments & University" or switch to another department to view course materials uploaded by faculty.
+                          {search
+                            ? `No results for "${search}". Try a different term or acronym (e.g. DBMS, Computer Networks, or AI).`
+                            : `No documents have been uploaded for your department yet. Check back when faculty upload new materials.`}
                         </p>
-                        {selectedDeptId !== "ALL" && (
+                        {search && (
                           <button
-                            onClick={() => setSelectedDeptId("ALL")}
+                            onClick={() => { setSearch(""); setMatchedConcept(null); setLastQueriedSearch(""); load(1, "", tab); }}
                             className="mt-2 text-xs font-bold text-indigo-700 hover:text-indigo-800 bg-indigo-50 px-3.5 py-1.5 rounded-xl border border-indigo-200 shadow-2xs transition-all"
                           >
-                            View All Departments
+                            Clear Search
                           </button>
                         )}
                       </div>
                     </td>
                   </tr>
-                ) : docs.map((doc) => (
+                ) : displayedDocs.map((doc) => (
                   <tr
                     key={doc.id}
                     onClick={() => setSelectedId(selectedId === doc.id ? null : doc.id)}
@@ -502,24 +553,30 @@ export default function DocumentsPage() {
                     </td>
                     <td className="px-4 py-3.5 text-slate-600 font-medium hidden md:table-cell">{fmtBytes(doc.fileSize)}</td>
                     <td className="px-4 py-3.5 text-slate-500 font-medium hidden lg:table-cell">{timeAgo(doc.createdAt)}</td>
+
+                    {/* ── Actions column: Download + overflow menu ── */}
                     <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
-                      <div className="relative">
-                        <button onClick={() => setMenuOpenId(menuOpenId === doc.id ? null : doc.id)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
-                          <MoreHorizontal className="w-4 h-4" />
+                      <div className="flex items-center gap-1.5">
+                        {/* View details */}
+                        <button
+                          onClick={() => setSelectedId(selectedId === doc.id ? null : doc.id)}
+                          title="View document details"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 font-bold transition-all text-[11px] shadow-xs"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">View</span>
                         </button>
-                        {menuOpenId === doc.id && (
-                          <div className="absolute right-0 top-8 bg-white border border-slate-200 rounded-xl shadow-xl z-20 w-36 overflow-hidden">
-                            <button onClick={() => { setSelectedId(doc.id); setMenuOpenId(null); }}
-                              className="flex items-center gap-2 w-full px-3 py-2.5 text-xs text-slate-700 font-semibold hover:bg-indigo-50 hover:text-indigo-700 transition-colors">
-                              <Eye className="w-3.5 h-3.5 text-indigo-600" /> View details
-                            </button>
-                            <button onClick={() => handleDelete(doc.id)} disabled={deletingId === doc.id}
-                              className="flex items-center gap-2 w-full px-3 py-2.5 text-xs text-rose-600 font-semibold hover:bg-rose-50 transition-colors">
-                              {deletingId === doc.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />} Delete
-                            </button>
-                          </div>
-                        )}
+                        {/* Download PDF */}
+                        <a
+                          href={`/api/documents/${doc.id}/download`}
+                          download={doc.fileName}
+                          title={`Download ${doc.fileName}`}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold transition-all text-[11px] shadow-xs"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">PDF</span>
+                        </a>
                       </div>
                     </td>
                   </tr>
@@ -564,14 +621,6 @@ export default function DocumentsPage() {
 
         {/* ── Detail Panel ── */}
         {selectedId && <DetailPanel docId={selectedId} onClose={() => setSelectedId(null)} />}
-
-        {/* ── Upload Modal ── */}
-        {showUpload && <UploadModal onClose={() => setShowUpload(false)} onDone={() => load(1)} />}
-
-        {/* Close menus on outside click */}
-        {menuOpenId && (
-          <div className="fixed inset-0 z-10" onClick={() => setMenuOpenId(null)} />
-        )}
       </div>
     </AnimatedBackground>
   );

@@ -98,11 +98,9 @@ const portals: Portal[] = [
     badge: "Faculty Ops",
     badgeColor: "bg-purple-100 text-purple-700 border-purple-200",
     activeColor: "bg-purple-50 border-purple-300 ring-2 ring-purple-200",
-    role: "Timetables, Seating & Syllabi",
+    role: "Syllabi, Course Materials & RAG",
     subFeatures: [
       { title: "Faculty Cockpit", href: "/faculty/dashboard", icon: GraduationCap, description: "Course load, classes & quick actions" },
-      { title: "Class Timetables", href: "/faculty/timetables", icon: Calendar, badge: "Schedule", description: "Weekly teaching schedule & periods" },
-      { title: "Exam Seating", href: "/faculty/seating", icon: Users, badge: "Invigilation", description: "Exam hall allocation & seating plan" },
       { title: "Upload Course Docs", href: "/faculty/documents", icon: FileText, badge: "Uploads", description: "Upload syllabi, notes & question banks" },
       { title: "Department Faculty", href: "/faculty/assigned-faculty", icon: Building2, description: "Department colleagues & subject allocations" },
     ],
@@ -116,32 +114,11 @@ const portals: Portal[] = [
     badge: "Governance",
     badgeColor: "bg-blue-100 text-blue-700 border-blue-200",
     activeColor: "bg-blue-50 border-blue-300 ring-2 ring-blue-200",
-    role: "Health Score, Workload & Risks",
+    role: "File Uploads & Faculty Audit",
     subFeatures: [
-      { title: "Command Center", href: "/hod/dashboard", icon: Scale, description: "Department health score & metrics" },
-      { title: "Approval Docket", href: "/hod/approvals", icon: CheckCircle2, badge: "Approvals", description: "Student leaves, OD & faculty requisitions" },
-      { title: "Faculty Workload", href: "/hod/faculty", icon: Users, description: "Teaching hours & workload distribution" },
-      { title: "Student Risk Radar", href: "/hod/students", icon: ShieldAlert, badge: "Alerts", description: "Attendance shortfall & academic alerts" },
-      { title: "Master Timetable", href: "/hod/timetable", icon: Calendar, description: "Department-wide master class schedule" },
-      { title: "Syllabi & Curriculum", href: "/hod/courses", icon: BookOpen, description: "Department course coverage & syllabus" },
-      { title: "Research & Grants", href: "/hod/research", icon: Award, description: "Patents, publications & funded research" },
-    ],
-  },
-  {
-    id: "principal",
-    name: "Principal Portal",
-    shortName: "Principal Portal",
-    href: "/principal",
-    icon: Landmark,
-    badge: "Executive",
-    badgeColor: "bg-amber-100 text-amber-800 border-amber-200",
-    activeColor: "bg-amber-50 border-amber-300 ring-2 ring-amber-200",
-    role: "All Depts, NAAC & Finance",
-    subFeatures: [
-      { title: "Executive Cockpit", href: "/principal", icon: Landmark, description: "Institution overview & academic KPIs" },
-      { title: "9-Dept Matrix", href: "/principal/departments", icon: Building2, badge: "9 Depts", description: "Comparative department benchmarks" },
-      { title: "Approvals Registry", href: "/principal/approvals", icon: CheckCircle2, description: "Institution-level approvals & escalations" },
-      { title: "Budget & Finance", href: "/principal/finance", icon: DollarSign, badge: "Grants", description: "Departmental budget & research grants" },
+      { title: "HOD Command Center", href: "/hod/dashboard", icon: Scale, description: "Department overview & quick audit metrics" },
+      { title: "Uploads & College Files", href: "/hod/documents", icon: FileText, badge: "Upload Hub", description: "Upload timetables, question banks & college circulars" },
+      { title: "Faculty Performance Audit", href: "/hod/faculty", icon: Users, badge: "Audit Engine", description: "Workload, syllabus coverage & faculty audit" },
     ],
   },
 ];
@@ -185,8 +162,8 @@ export function PortalSwitcher({ className = "" }: { className?: string }) {
         </div>
       </div>
 
-      {/* ── 5 Primary Portals ─────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-2.5 mb-3">
+      {/* ── 4 Primary Portals ─────────────────────────────────────── */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 mb-3">
         {portals.map((p) => {
           const isActive = activePortal.id === p.id;
           const Icon = p.icon;
@@ -195,7 +172,7 @@ export function PortalSwitcher({ className = "" }: { className?: string }) {
             <Link
               key={p.id}
               href={p.href}
-              className={`relative group flex flex-col justify-between p-2.5 sm:p-3 rounded-xl border transition-all duration-200 hover-lift last:col-span-2 sm:last:col-span-1 lg:last:col-span-1 ${
+              className={`relative group flex flex-col justify-between p-2.5 sm:p-3 rounded-xl border transition-all duration-200 hover-lift ${
                 isActive
                   ? p.activeColor + " shadow-md"
                   : "bg-slate-50/80 hover:bg-white border-slate-200 hover:border-indigo-300"

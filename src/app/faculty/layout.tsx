@@ -7,11 +7,9 @@ import {
   GraduationCap,
   LayoutDashboard,
   FileText,
-  Calendar,
   Users,
   LogOut,
   Sparkles,
-  Layers,
   ChevronRight,
   ShieldCheck,
   Building2,
@@ -21,6 +19,7 @@ import {
   X,
   PanelLeftClose,
   PanelLeftOpen,
+  Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -49,18 +48,6 @@ const navItems = [
     href: "/faculty/documents",
     icon: FileText,
     badge: "Upload",
-  },
-  {
-    title: "Timetable Management",
-    href: "/faculty/timetables",
-    icon: Calendar,
-    badge: "Weekly",
-  },
-  {
-    title: "Exam Seating Plans",
-    href: "/faculty/seating",
-    icon: Layers,
-    badge: "Smart Grid",
   },
   {
     title: "Assigned Faculty",
@@ -294,6 +281,18 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
       {/* Footer Actions */}
       <div className="p-2 border-t border-slate-200/80 space-y-1.5 mt-auto">
         <Link
+          href="/"
+          onClick={() => setMobileOpen(false)}
+          title="Campus Home"
+          className={`flex items-center ${collapsed ? "justify-center p-2" : "justify-between px-3 py-2"} text-xs font-semibold text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100/80 rounded-lg transition-colors border border-indigo-200/50`}
+        >
+          <div className="flex items-center gap-2">
+            <Home className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
+            {!collapsed && <span>Campus Home</span>}
+          </div>
+          {!collapsed && <ChevronRight className="h-3 w-3 text-indigo-400" />}
+        </Link>
+        <Link
           href="/dashboard"
           onClick={() => setMobileOpen(false)}
           title="Switch to Student Portal"
@@ -379,6 +378,16 @@ export default function FacultyLayout({ children }: { children: React.ReactNode 
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Campus Home Button */}
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-200 shadow-xs transition-colors shrink-0"
+              title="Go to Campus Landing Home"
+            >
+              <Home className="h-3.5 w-3.5 text-slate-700" />
+              <span className="hidden sm:inline">Campus Home</span>
+            </Link>
+
             {/* Direct Student Portal Quick Jump from Navbar */}
             <Link
               href="/dashboard"

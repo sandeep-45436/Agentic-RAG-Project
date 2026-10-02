@@ -15,7 +15,6 @@ import {
   FlaskConical,
   BookMarked,
   Zap,
-  Landmark,
   Calendar,
   Users,
   FileText,
@@ -26,6 +25,7 @@ import {
   DollarSign,
   Briefcase,
   TrendingUp,
+  Home,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -61,32 +61,30 @@ const navSections: NavSection[] = [
   {
     label: "Student Academic Hub",
     items: [
+      { title: "Campus Home", url: "/", icon: Home },
       { title: "Student Dashboard", url: "/dashboard", icon: LayoutDashboard },
-      { title: "AI Academic Chat", url: "/chat", icon: MessageSquare },
-      { title: "Browse Notes & Docs", url: "/documents", icon: BookOpen },
+      { title: "AI Academic Copilot", url: "/chat", icon: MessageSquare },
+      { title: "Course Notes & Syllabi", url: "/documents", icon: BookOpen },
       { title: "Knowledge Bases", url: "/knowledge-bases", icon: FileText },
-      { title: "Research Workspace", url: "/research", icon: BookMarked },
+      { title: "Student Profile", url: "/student/profile", icon: Users },
     ],
   },
   {
-    label: "Placement Center (Student)",
+    label: "Career & Placement Hub",
     items: [
-      { title: "Placement Hub", url: "/placement", icon: Briefcase, badge: "Live" },
-      { title: "Campus Drives", url: "/placement?tab=drives", icon: Building2, badge: "Apply" },
-      { title: "My Applications", url: "/placement?tab=pipeline", icon: TrendingUp, badge: "Kanban" },
-      { title: "Resume ATS Match", url: "/placement?tab=ats", icon: FileText, badge: "AI" },
-      { title: "Technical Viva Arena", url: "/placement?tab=mock-interview", icon: Award, badge: "Simulate" },
-      { title: "Placement Eligibility", url: "/placement?tab=eligibility", icon: CheckCircle2, badge: "Verified" },
-      { title: "Skills & Radar", url: "/skills", icon: Zap, badge: "Radar" },
-      { title: "Certifications", url: "/skills/certifications", icon: CheckCircle2, badge: "Badges" },
+      { title: "Placement Portal", url: "/placement", icon: Briefcase },
+      { title: "Active Campus Drives", url: "/placement?tab=drives", icon: Building2 },
+      { title: "Resume ATS Match", url: "/placement?tab=ats", icon: FileText },
+      { title: "Technical Mock Viva", url: "/placement?tab=mock-interview", icon: Award },
+      { title: "Skills Radar & Roadmap", url: "/skills", icon: Zap },
     ],
   },
   {
-    label: "Platform Intelligence",
+    label: "System & Administration",
     items: [
-      { title: "Autonomous Agents", url: "/agents", icon: Bot, badge: "AI" },
-      { title: "Analytics & Usage", url: "/analytics", icon: BarChart2 },
-      { title: "RAG Evaluation", url: "/evaluation", icon: FlaskConical },
+      { title: "Operational Analytics", url: "/analytics", icon: BarChart2 },
+      { title: "Autonomous Agents", url: "/agents", icon: Bot },
+      { title: "RAG Quality Evaluation", url: "/evaluation", icon: FlaskConical },
       { title: "Settings", url: "/settings", icon: Settings2 },
     ],
   },

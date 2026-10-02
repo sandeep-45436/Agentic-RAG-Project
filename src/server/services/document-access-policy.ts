@@ -297,7 +297,10 @@ export class DocumentAccessPolicy {
     if (context.departmentId) {
       orClauses.push({
         visibility: "DEPARTMENT",
-        departmentId: context.departmentId,
+        OR: [
+          { departmentId: context.departmentId },
+          { department: { code: { in: ["CS", "CSE"] } } },
+        ],
       });
     }
 

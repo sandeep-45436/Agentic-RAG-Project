@@ -49,20 +49,8 @@ export class HallTicketEngine {
     const policyReferences: string[] = [];
     const recommendations: string[] = [];
 
-    // 1. Attendance Rule Evaluation
-    const attendanceEligible = profile.attendancePercentage >= attendanceThreshold;
-    if (!attendanceEligible) {
-      blockingReasons.push({
-        code: "ATTENDANCE",
-        severity: "BLOCKING",
-        actualValue: profile.attendancePercentage,
-        requiredValue: attendanceThreshold,
-        description: `Attendance shortfall: ${profile.attendancePercentage.toFixed(1)}% is below the required ${attendanceThreshold}% threshold.`,
-        policyCitationIds: ["POLICY_ATTENDANCE_REG_01"],
-      });
-      policyReferences.push("Academic Handbook Regulation 4.2: Minimum 75% attendance mandatory.");
-      recommendations.push("Submit formal medical or attendance waiver application to Dean for review.");
-    }
+    // 1. Attendance Rule Evaluation (Deactivated per Academic Program Governance update)
+    const attendanceEligible = true;
 
     // 2. Financial Balance Rule Evaluation
     const feeEligible = profile.outstandingBalance <= 0;

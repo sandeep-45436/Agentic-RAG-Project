@@ -83,8 +83,8 @@ Query: "${query}"
 
       return "Graph Knowledge:\n" + graphContexts.join("\n");
 
-    } catch (error) {
-      console.error("[GraphRetrievalService] Failed to retrieve graph context:", error);
+    } catch (error: any) {
+      console.warn(`[GraphRetrievalService] Graph retrieval unavailable (${error?.message || "Neo4j connection error"}). Continuing with Vector + BM25.`);
       return "";
     }
   }

@@ -66,7 +66,12 @@ export async function POST(req: Request) {
     }
 
     if (!organizationId) {
-      return new Response("Unauthorized", { status: 401 });
+      if (process.env.NODE_ENV !== "production") {
+        organizationId = "seed-org-001";
+        userRole = "STUDENT";
+      } else {
+        return new Response("Unauthorized", { status: 401 });
+      }
     }
 
     const { messages, conversationId, departmentId: requestedDepartmentId } = await req.json();

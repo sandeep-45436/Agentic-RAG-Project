@@ -3,7 +3,7 @@ import { WorldStateSnapshot } from "./world-state-manager";
 export interface PolicyRule {
   id: string;
   name: string;
-  category: "ATTENDANCE" | "COMMUNICATION" | "RBAC" | "ACADEMIC";
+  category: "PREREQUISITE" | "COMMUNICATION" | "RBAC" | "CREDIT_LOAD" | "ACADEMIC";
   conditionRegex?: string;
   minThreshold?: number;
   maxThreshold?: number;
@@ -22,14 +22,13 @@ export class PolicyEngine {
   private static readonly DEFAULT_POLICIES: PolicyRule[] = [
     {
       id: "POL-001",
-      name: "Minimum Exam Attendance Requirement",
-      category: "ATTENDANCE",
-      minThreshold: 75,
+      name: "Mandatory Course Prerequisite Verification",
+      category: "PREREQUISITE",
       actionOnViolation: "BLOCK",
     },
     {
       id: "POL-002",
-      name: "Bulk Email Administrative Approval",
+      name: "Bulk Communication Administrative Approval",
       category: "COMMUNICATION",
       maxThreshold: 500,
       requiresApproval: true,
@@ -40,6 +39,13 @@ export class PolicyEngine {
       name: "Grade Alteration Permission Check",
       category: "RBAC",
       actionOnViolation: "BLOCK",
+    },
+    {
+      id: "POL-004",
+      name: "Semester Overload Credit Permission",
+      category: "CREDIT_LOAD",
+      maxThreshold: 26,
+      actionOnViolation: "REQUIRE_APPROVAL",
     },
   ];
 
@@ -55,31 +61,40 @@ export class PolicyEngine {
 
     const trimmed = queryText.toLowerCase();
 
-    // Attendance policy rule check
-    if (/\b(hall ticket|exam admit|exam eligibility|attendance|probation)\b/i.test(trimmed)) {
-      const match = trimmed.match(/\b(\d{1,2})%/);
+    // 1. Credit overload policy check (> 26 credits requires Dean approval)
+    if (/\b(credits?|course load|overload)\b/i.test(trimmed)) {
+      const match = trimmed.match(/\b(\d{2})\s*credits?\b/);
       if (match) {
         const val = parseInt(match[1], 10);
-        if (val < 75) {
-          violatedPolicies.push(`POL-001: Minimum Exam Attendance Requirement (75% required, found ${val}%)`);
-          isAllowed = false;
-          recommendedAction = `Attendance (${val}%) is below 75% threshold. Recommend advisor review & academic warning counseling.`;
+        if (val > 26) {
+          violatedPolicies.push(`POL-004: Semester Overload Credit Permission (max 26 credits, requested ${val})`);
+          requiresApproval = true;
+          recommendedAction = `Course registration load of ${val} credits exceeds standard limit (26 credits). Requires Dean of Academic Affairs sign-off.`;
         }
       }
     }
 
-    // Bulk communication policy check
+    // 2. Prerequisite bypass attempt
+    if (/\b(skip|bypass|waive|override)\b.*\b(prerequisite|prereq)\b/i.test(trimmed)) {
+      if (worldState.activeUserContext.userRole !== "ADMIN" && worldState.activeUserContext.userRole !== "FACULTY") {
+        violatedPolicies.push("POL-001: Mandatory Course Prerequisite Verification");
+        isAllowed = false;
+        recommendedAction = "Prerequisite waiver requests must be approved by the Department Academic Committee.";
+      }
+    }
+
+    // 3. Bulk communication policy check
     if (/\b(email|notify|alert)\b/i.test(trimmed) && /\b(all students|mass|every student|[5-9]\d{2}|\d{4,})\b/i.test(trimmed)) {
       violatedPolicies.push("POL-002: Bulk Email Administrative Approval required for batch > 500");
       requiresApproval = true;
       recommendedAction = "Submit bulk dispatch payload for Department Head approval";
     }
 
-    // RBAC policy check
-    if (/\b(change grade|override mark)\b/i.test(trimmed) && worldState.activeUserContext.userRole !== "ADMIN") {
+    // 4. RBAC policy check for grade alterations
+    if (/\b(change grade|override mark|update result)\b/i.test(trimmed) && worldState.activeUserContext.userRole !== "ADMIN") {
       violatedPolicies.push("POL-003: Grade Alteration Permission Check");
       isAllowed = false;
-      recommendedAction = "Restrict grade modifications to authorized Registrar accounts";
+      recommendedAction = "Grade modifications restricted strictly to authorized Registrar/Dean accounts";
     }
 
     return {

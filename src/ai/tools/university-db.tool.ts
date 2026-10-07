@@ -12,9 +12,13 @@ import { HallTicketEngine } from "@/ai/examination/hall-ticket-engine";
 import { ExaminationSchedulingEngine, ScheduleItem } from "@/ai/examination/examination-scheduling-engine";
 import { InvigilationEngine, FacultyCandidate } from "@/ai/examination/invigilation-engine";
 import { FacultyService } from "@/server/services/faculty.service";
+import { AcademicDecisionEngine } from "@/ai/decision/academic-decision-engine";
+import { AcademicPolicyCache } from "@/ai/cag/academic-policy-cache";
 
 export const UniversityDatabaseToolSchema = z.object({
   operation: z.enum([
+    "degree_audit",
+    "prerequisite_check",
     "probation_students",
     "financial_ledger",
     "faculty_workload",
@@ -38,6 +42,7 @@ export const UniversityDatabaseToolSchema = z.object({
   departmentCode: z.string().optional(),
   examinationId: z.string().optional(),
   studentId: z.string().optional(),
+  targetCourseCode: z.string().optional(),
 });
 
 export type UniversityDatabaseToolInput = z.infer<typeof UniversityDatabaseToolSchema>;
@@ -53,6 +58,49 @@ export class UniversityDatabaseTool {
 
     try {
       switch (operation) {
+        case "degree_audit": {
+          if (!studentId) {
+            return {
+              success: false,
+              operation,
+              error: "studentId is required for degree_audit operation",
+            };
+          }
+          const audit = await StudentOperationsService.auditStudentDegree(studentId, organizationId);
+          return {
+            success: true,
+            operation,
+            records: audit ? [audit] : [],
+          };
+        }
+
+        case "prerequisite_check": {
+          const target = validated.targetCourseCode || "CS401";
+          if (!studentId) {
+            return {
+              success: false,
+              operation,
+              error: "studentId is required for prerequisite_check operation",
+            };
+          }
+          const student = await StudentOperationsService.getStudentFullProfile(studentId, organizationId);
+          const completedMap = new Map<string, string>();
+          for (const e of student?.enrolments || []) {
+            const code = e.courseSection?.course?.code;
+            if (code && e.grade) {
+              completedMap.set(code.toUpperCase(), e.grade);
+            }
+          }
+          // Default prerequisites lookup (e.g. for CS401 requires CS201 and CS301)
+          const prereqs = target.toUpperCase() === "CS401" ? ["CS201", "CS301"] : ["CS101"];
+          const result = AcademicDecisionEngine.verifyPrerequisites(studentId, target, prereqs, completedMap);
+          return {
+            success: true,
+            operation,
+            records: [result],
+          };
+        }
+
         case "exam_analytics":
         case "course_difficulty_index": {
           const metrics = await ExaminationAnalyticsRepository.getCourseDifficultyIndex(organizationId);

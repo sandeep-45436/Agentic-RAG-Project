@@ -1,9 +1,10 @@
 export class GoalNormalizer {
   private static readonly RULES: Array<{ pattern: RegExp; canonicalCode: string }> = [
     { pattern: /\b(greeting|hello|hi|hey|good morning|good afternoon)\b/i, canonicalCode: "CONVERSATIONAL_GREETING" },
-    { pattern: /\b(attendance|absent|present|roll call)\b/i, canonicalCode: "GET_STUDENT_ATTENDANCE" },
+    { pattern: /\b(prereq|prerequisite|can i take|eligible to enroll|enroll in)\b/i, canonicalCode: "VALIDATE_COURSE_PREREQUISITES" },
+    { pattern: /\b(degree audit|credits remaining|graduation ready|credits completed|total credits)\b/i, canonicalCode: "AUDIT_DEGREE_CREDITS" },
     { pattern: /\b(probation|at-risk|failing|gpa|academic standing)\b/i, canonicalCode: "GET_STUDENT_RISK_PROBATION" },
-    { pattern: /\b(policy|handbook|grading|syllabus|credit|deadline)\b/i, canonicalCode: "SEARCH_ACADEMIC_POLICY" },
+    { pattern: /\b(policy|handbook|grading|syllabus|credit limit|deadline|circular)\b/i, canonicalCode: "SEARCH_ACADEMIC_POLICY" },
     { pattern: /\b(email|notify|alert|send message|dispatch)\b/i, canonicalCode: "EXECUTE_COMMUNICATION_WORKFLOW" },
     { pattern: /\b(enrollment|register|course count|total students)\b/i, canonicalCode: "GET_ENROLLMENT_STATISTICS" },
   ];

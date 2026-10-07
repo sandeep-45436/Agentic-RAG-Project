@@ -95,7 +95,7 @@ export class IntentClassifier {
 
     const hasWorkflow = /\b(email|alert|notify|send|generate pdf|transcript|export)\b/i.test(text);
     const hasDataQuery = /\b(gpa|probation|tuition|balance|unpaid|faculty|professor|courses|student|roster|at\.risk|eligible|ineligible|backlog|risk|failing)\b/i.test(text);
-    const hasKnowledge = /\b(policy|policies|rules|handbook|syllabus|regulation|regulations|drop date|deadline|credits|rule|requirement|threshold|minimum|criteria|guideline|fee|fees|condonation|procedure|document|pdf|attendance)\b/i.test(text);
+    const hasKnowledge = /\b(policy|policies|rules|handbook|syllabus|regulation|regulations|drop date|deadline|credits|rule|requirement|threshold|minimum|criteria|guideline|fee|fees|prerequisite|curriculum|circular|degree audit|procedure|document|pdf)\b/i.test(text);
 
     if (hasWorkflow && (hasDataQuery || hasKnowledge)) {
       return {

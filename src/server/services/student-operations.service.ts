@@ -1,4 +1,5 @@
 import { db } from "@/server/db/prisma";
+import { AcademicDecisionEngine } from "@/ai/decision/academic-decision-engine";
 
 export class StudentOperationsService {
   public static async getStudentFullProfile(identifier: string, organizationId: string) {
@@ -28,6 +29,15 @@ export class StudentOperationsService {
           scholarshipRecord: true,
           parentInfo: true,
           financialAccounts: true,
+          enrolments: {
+            include: {
+              courseSection: {
+                include: {
+                  course: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -50,6 +60,9 @@ export class StudentOperationsService {
           department: true,
           attendanceRecords: true,
           scholarshipRecord: true,
+          semesterResults: {
+            orderBy: { createdAt: "desc" },
+          },
         },
       });
     } catch (error) {
@@ -59,8 +72,7 @@ export class StudentOperationsService {
   }
 
   /**
-   * Returns all students who are ineligible for exams based on attendance < 75%,
-   * outstanding fees, or suspension status.
+   * Evaluates students with active suspension or financial holds (attendance checks removed).
    */
   public static async getExamIneligibleStudents(organizationId: string) {
     const students = await db.student.findMany({
@@ -68,7 +80,6 @@ export class StudentOperationsService {
       include: {
         user: true,
         department: true,
-        attendanceRecords: true,
         financialAccounts: true,
         semesterResults: { orderBy: { createdAt: "desc" } },
       },
@@ -76,6 +87,34 @@ export class StudentOperationsService {
 
     const { ExamEligibilityEngine } = await import("@/ai/decision/exam-eligibility-engine");
     return ExamEligibilityEngine.getIneligibleStudents(students);
+  }
+
+  /**
+   * Performs a deterministic degree audit for a specific student.
+   */
+  public static async auditStudentDegree(identifier: string, organizationId: string) {
+    const student = await this.getStudentFullProfile(identifier, organizationId);
+    if (!student) return null;
+
+    const enrolments = (student.enrolments || []).map((e: any) => ({
+      courseCode: e.courseSection?.course?.code || "UNKNOWN",
+      credits: e.courseSection?.course?.credits || 3,
+      grade: e.grade,
+      status: e.status,
+      isCore: true,
+    }));
+
+    const latestResult = student.semesterResults?.[0];
+    const cgpa = latestResult?.cgpa || student.gpa || 0.0;
+    const backlogs = latestResult?.backlogsCount || 0;
+
+    return AcademicDecisionEngine.auditDegreeCredits(
+      student.id,
+      student.studentNumber,
+      enrolments,
+      cgpa,
+      backlogs
+    );
   }
 
   /**

@@ -250,6 +250,31 @@ export async function unifiedPlannerNode(
     };
   }
 
+  // 1.5. CAG Zero-Latency Static Policy Resolution (Instant regulatory FAQ answers)
+  if (kernelContext.cagResolution.isResolved && kernelContext.cagResolution.cachedResponse) {
+    const { durationMs } = StageTimer.end(
+      "plannerNode",
+      stageStart,
+      { organizationId, userId, cacheHit: true },
+      false
+    );
+
+    console.log(`[UnifiedPlanner] Resolved query via CAG Layer (0ms): "${rawQuery}"`);
+
+    return {
+      queryAnalysis: {
+        isConversational: true,
+        intentCategory,
+        rewrittenQuery: rawQuery,
+        variants: [],
+        entities: recognizedGoal.entities,
+      },
+      routedPath: "MEMORY",
+      finalPrompt: kernelContext.cagResolution.cachedResponse,
+      timings: { plannerNode: durationMs, analysisNode: durationMs },
+    };
+  }
+
   const normalizedQuery = rawQuery.toLowerCase().replace(/\s+/g, " ").trim();
   let cacheHit = false;
   let plannerFailed = false;

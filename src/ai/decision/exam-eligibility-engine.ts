@@ -1,6 +1,7 @@
 /**
- * Exam Eligibility Engine — deterministic evaluation of exam eligibility.
- * Rules from Policy Engine POL-001: Attendance >= 75% required.
+ * Legacy Exam Eligibility Engine — Refactored to Academic Standing & Registration Status.
+ * Note: Attendance and Hall Tickets are removed from application policy.
+ * For Degree and Course audits, use AcademicDecisionEngine.
  */
 
 export interface ExamEligibilityResult {
@@ -9,7 +10,7 @@ export interface ExamEligibilityResult {
   studentNumber: string;
   isEligible: boolean;
   attendancePercentage: number;
-  requiredPercentage: number; // 75% per POL-001
+  requiredPercentage: number;
   shortfallClasses: number;
   feesClear: boolean;
   blockingReasons: string[];
@@ -17,10 +18,10 @@ export interface ExamEligibilityResult {
 }
 
 export class ExamEligibilityEngine {
-  private static readonly REQUIRED_ATTENDANCE = 75.0;
+  private static readonly REQUIRED_ATTENDANCE = 0.0; // Attendance gate deactivated
 
   /**
-   * Evaluates a single student's exam eligibility based on their full profile.
+   * Evaluates student eligibility based strictly on academic standing and fee clearance.
    */
   static evaluate(studentProfile: any): ExamEligibilityResult {
     const name = studentProfile?.user?.name || studentProfile?.studentNumber || "Student";
@@ -28,47 +29,21 @@ export class ExamEligibilityEngine {
     const blockingReasons: string[] = [];
     const recommendations: string[] = [];
 
-    // 1. Attendance Check
-    const attendanceRecords = studentProfile?.attendanceRecords || [];
-    let lowestPercentage = 100.0;
-    let totalShortfall = 0;
-
-    for (const record of attendanceRecords) {
-      const pct = record.percentage ?? 100.0;
-      if (pct < lowestPercentage) lowestPercentage = pct;
-      if (pct < ExamEligibilityEngine.REQUIRED_ATTENDANCE) {
-        const total = record.totalClasses || 40;
-        const attended = record.attendedClasses || Math.round((pct / 100) * total);
-        const needed = Math.ceil((ExamEligibilityEngine.REQUIRED_ATTENDANCE / 100) * total) - attended;
-        if (needed > totalShortfall) totalShortfall = needed;
-      }
-    }
-
-    if (lowestPercentage < ExamEligibilityEngine.REQUIRED_ATTENDANCE) {
-      blockingReasons.push(
-        `Attendance ${lowestPercentage.toFixed(1)}% is below the required ${ExamEligibilityEngine.REQUIRED_ATTENDANCE}% threshold (POL-001)`
-      );
-      recommendations.push(
-        `Attend ${totalShortfall} additional classes to reach the minimum attendance requirement`
-      );
-      recommendations.push("Apply for attendance condonation if medical/extenuating circumstances apply");
-    }
-
-    // 2. Financial Check
+    // 1. Financial Check
     const financialAccounts = studentProfile?.financialAccounts || [];
     let feesClear = true;
     for (const account of financialAccounts) {
       if (account.status === "Overdue" || (account.balanceOutstanding && account.balanceOutstanding > 0)) {
         feesClear = false;
         blockingReasons.push(
-          `Outstanding fee balance: $${account.balanceOutstanding?.toFixed(2) || "unknown"} (Status: ${account.status})`
+          `Outstanding fee balance: ₹${account.balanceOutstanding?.toFixed(2) || "unknown"} (Status: ${account.status})`
         );
-        recommendations.push("Clear outstanding dues at the finance office before exam registration deadline");
+        recommendations.push("Clear outstanding dues at the finance office");
         break;
       }
     }
 
-    // 3. Academic Status Check
+    // 2. Academic Status Check
     if (studentProfile?.academicStatus === "Suspended") {
       blockingReasons.push("Student is currently under academic/disciplinary suspension");
       recommendations.push("Contact the Dean of Students office for reinstatement procedures");
@@ -77,7 +52,7 @@ export class ExamEligibilityEngine {
     const isEligible = blockingReasons.length === 0;
 
     if (isEligible) {
-      recommendations.push("Student is eligible for exams. No action required.");
+      recommendations.push("Student is in good academic standing. No blocking holds found.");
     }
 
     return {
@@ -85,9 +60,9 @@ export class ExamEligibilityEngine {
       studentName: name,
       studentNumber,
       isEligible,
-      attendancePercentage: lowestPercentage,
-      requiredPercentage: ExamEligibilityEngine.REQUIRED_ATTENDANCE,
-      shortfallClasses: totalShortfall,
+      attendancePercentage: 100.0,
+      requiredPercentage: 0.0,
+      shortfallClasses: 0,
       feesClear,
       blockingReasons,
       recommendations,
@@ -95,7 +70,7 @@ export class ExamEligibilityEngine {
   }
 
   /**
-   * Batch evaluates multiple student profiles for exam eligibility.
+   * Batch evaluates multiple student profiles.
    */
   static evaluateBatch(studentProfiles: any[]): ExamEligibilityResult[] {
     return studentProfiles.map((profile) => ExamEligibilityEngine.evaluate(profile));

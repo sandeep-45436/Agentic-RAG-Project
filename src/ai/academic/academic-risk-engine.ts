@@ -82,27 +82,17 @@ export class AcademicRiskEngine {
     // Analyze Courses
     for (const crs of courses) {
       let atRiskCount = 0;
-      let totalAttSum = 0;
-      let studentAttCount = 0;
-
       for (const s of students) {
-        const att = await dataSource.attendance.getStudentAttendance(s.id, organizationId);
-        if (att) {
-          totalAttSum += att.percentage;
-          studentAttCount++;
-          if (att.percentage < 75.0 || s.gpa < 2.0) {
-            atRiskCount++;
-          }
+        if (s.gpa < 2.0 || s.academicStatus === "PROBATION") {
+          atRiskCount++;
         }
       }
 
-      const avgAtt = studentAttCount > 0 ? Math.round((totalAttSum / studentAttCount) * 10) / 10 : 85.0;
       const historicalFailRate = crs.code === "CSE204" ? 38.0 : crs.code === "CSE101" ? 15.0 : 12.0;
 
-      // Risk score calculation: 40% failure rate + 30% attendance shortfall + 30% at-risk student ratio
+      // Risk score calculation: 60% historical course failure rate + 40% probation student ratio
       const atRiskRatio = students.length > 0 ? atRiskCount / students.length : 0;
-      const attShortfallScore = Math.max(0, 75.0 - avgAtt) * 2;
-      const riskScore = Math.min(100, Math.round(historicalFailRate * 0.4 + attShortfallScore * 0.3 + atRiskRatio * 100 * 0.3));
+      const riskScore = Math.min(100, Math.round(historicalFailRate * 0.6 + atRiskRatio * 100 * 0.4));
 
       let riskCategory: "CRITICAL_RISK" | "HIGH_RISK" | "MODERATE_RISK" | "LOW_RISK" = "LOW_RISK";
       if (riskScore >= 35) riskCategory = "CRITICAL_RISK";
@@ -113,10 +103,10 @@ export class AcademicRiskEngine {
       let recommendedIntervention = "Continue standard curriculum monitoring.";
 
       if (crs.code === "CSE204" || riskCategory === "CRITICAL_RISK") {
-        primaryRiskFactor = `Historical failure rate of ${historicalFailRate}% combined with average course attendance of ${avgAtt}%.`;
+        primaryRiskFactor = `Historical failure rate of ${historicalFailRate}% with ${atRiskCount} students on academic probation.`;
         recommendedIntervention = "Mandatory peer tutoring support, remedial problem-solving sessions, and mid-term academic counseling.";
       } else if (riskCategory === "HIGH_RISK") {
-        primaryRiskFactor = `Attendance shortfall detected across ${atRiskCount} enrolled students.`;
+        primaryRiskFactor = `High concentration of at-risk probation students (${atRiskCount}) enrolled.`;
         recommendedIntervention = "Academic Advisor outreach and continuous assessment weightage review.";
       }
 
@@ -126,7 +116,7 @@ export class AcademicRiskEngine {
         title: crs.title,
         departmentCode: crs.departmentCode || departmentCode,
         enrolledStudents: students.length,
-        avgAttendancePct: avgAtt,
+        avgAttendancePct: 100, // Non-attendance metric
         historicalFailureRatePct: historicalFailRate,
         atRiskStudentCount: atRiskCount,
         riskScore,

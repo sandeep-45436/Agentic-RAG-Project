@@ -376,7 +376,7 @@ export default function DocumentsPage() {
     if (search.trim()) return;
     const iv = setInterval(() => {
       load(pagination.page, "", tab, true);
-    }, 10000);
+    }, 30000);
     return () => clearInterval(iv);
   }, [load, pagination.page, search, tab]);
 

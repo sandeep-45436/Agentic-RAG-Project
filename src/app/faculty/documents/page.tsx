@@ -116,14 +116,14 @@ export default function FacultyDocumentsPage() {
     fetchDocuments();
   }, []);
 
-  // Active polling: auto-refresh every 3s while any document is PROCESSING
+  // Active polling: auto-refresh every 8s while any document is PROCESSING
   useEffect(() => {
     const hasProcessing = documents.some((d) => d.processingStatus === "PROCESSING");
     if (!hasProcessing) return;
 
     const interval = setInterval(() => {
       fetchDocuments(true);
-    }, 3000);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, [documents]);

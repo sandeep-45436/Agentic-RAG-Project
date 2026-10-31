@@ -27,19 +27,10 @@ export async function GET(req: Request) {
 
     let memberships: any[] = [];
     if (user) {
-      try {
-        memberships = await db.membership.findMany({
-          where: { userId: user.id },
-          include: { organization: { include: { _count: { select: { documents: true } } } } },
-        });
-      } catch (connErr) {
-        console.warn("[DashboardStats] Retrying membership lookup after connection retry...", connErr);
-        await new Promise((r) => setTimeout(r, 500));
-        memberships = await db.membership.findMany({
-          where: { userId: user.id },
-          include: { organization: { include: { _count: { select: { documents: true } } } } },
-        });
-      }
+      memberships = await db.membership.findMany({
+        where: { userId: user.id },
+        include: { organization: { include: { _count: { select: { documents: true } } } } },
+      });
 
       if (memberships.length === 0) {
         await syncUserToDatabase();
@@ -347,7 +338,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       stats: {
-        totalDocs,
+        totalDocs: authorizedDeptDocs > 0 ? authorizedDeptDocs : totalDocs,
         docsTrend: pct(totalDocs, totalDocsLastMonth),
         totalConversations,
         conversationsTrend: pct(totalConversations, totalConversationsLastMonth),

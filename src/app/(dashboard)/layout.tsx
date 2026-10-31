@@ -45,11 +45,11 @@ export default function DashboardLayout({
   }, []);
 
   const handleSignOut = async () => {
-    const res = await signOutAction();
-    if (res.success) {
-      router.push("/login");
-      router.refresh();
-    }
+    try {
+      await signOutAction();
+    } catch {}
+    // Hard refresh/redirect to login to clear all in-memory and browser state
+    window.location.href = "/login";
   };
 
   return (

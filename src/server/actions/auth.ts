@@ -209,11 +209,28 @@ export async function verifyEmailAction(formData: { email: string; otp: string }
 
 export async function logoutAction() {
   try {
-    const insforge = await createClient();
-    await insforge.auth.signOut();
+    const cookieStore = await cookies();
+    // Delete all session and role cookies
+    cookieStore.delete("student_department");
+    cookieStore.delete("faculty_session");
+    cookieStore.delete("hod_session");
+    
+    // Clear insforge cookies if any
+    const allCookies = cookieStore.getAll();
+    for (const c of allCookies) {
+      if (c.name.includes("insforge") || c.name.includes("auth") || c.name.includes("token")) {
+        cookieStore.delete(c.name);
+      }
+    }
+
+    try {
+      const insforge = await createClient();
+      await insforge.auth.signOut();
+    } catch {}
+
     return { success: true };
   } catch (err: any) {
-    return { success: false, error: err.message || "Failed to sign out" };
+    return { success: true };
   }
 }
 

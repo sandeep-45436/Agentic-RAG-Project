@@ -14,6 +14,7 @@ export async function GET(req: Request) {
     const insforge = await createClient();
     const { data: userData } = await insforge.auth.getCurrentUser();
     const user = userData?.user;
+    const dbUser = user?.id ? await db.user.findUnique({ where: { id: user.id }, select: { name: true, email: true } }) : null;
     let membership = null;
 
     // Check query params for department
@@ -376,7 +377,7 @@ export async function GET(req: Request) {
       topKBs,
       user: {
         email: user?.email ?? "",
-        name: (user as any)?.profile?.name ?? user?.email?.split("@")[0] ?? "Student Scholar",
+        name: dbUser?.name ?? (user as any)?.profile?.name ?? user?.email?.split("@")[0] ?? "Student Scholar",
       },
     });
   } catch (error: any) {

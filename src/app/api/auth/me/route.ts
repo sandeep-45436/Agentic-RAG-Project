@@ -33,17 +33,21 @@ export async function GET() {
       return NextResponse.json({ user: null }, { status: 200 });
     }
 
-    // Optional student lookup for enriched context
-    let studentName = user.profile?.name || (user as any).name;
-    if (!studentName && user.email) {
-      studentName = user.email.split("@")[0];
-    }
+    // Look up db user or student record for consistent display name
+    const dbUser = await db.user.findUnique({
+      where: { id: user.id },
+      include: {
+        studentRecord: { select: { id: true, studentNumber: true } }
+      }
+    });
+
+    const studentName = dbUser?.name || user.profile?.name || (user as any).name || user.email?.split("@")[0] || "Student Scholar";
 
     return NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
-        name: studentName || "Student Scholar",
+        name: studentName,
       },
     });
   } catch (err: any) {

@@ -85,11 +85,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    const res = await signOutAction();
-    if (res.success) {
-      router.push("/login");
-      router.refresh();
-    }
+    try {
+      await signOutAction();
+    } catch {}
+    window.location.href = "/login";
   };
 
   return (

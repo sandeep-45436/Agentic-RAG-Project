@@ -29,13 +29,20 @@ export class PromptService {
       formattedContext.includes("Element Type: TABLE") ||
       formattedContext.includes("Element Type: CHART") ||
       formattedContext.includes("Element Type: IMAGE") ||
-      formattedContext.includes("Visual Context:");
+      formattedContext.includes("Visual Context:") ||
+      formattedContext.includes("| ---") ||
+      formattedContext.includes("|:---");
 
     const multimodalInstruction = hasMultimodalElements
       ? `\nMULTIMODAL CONTEXT UNDERSTANDING DIRECTIVE:
 - The CONTEXT contains layout-aware multimodal elements including structured Markdown tables, chart/graph summaries with visual context, and OCR text.
 - When answering questions about charts, trends, or graphical data, refer directly to the visual trends, data points, and legends provided in the Visual Context.
-- When answering questions about tabular data, extract and accurately cite exact values, rows, and columns from the Markdown tables.`
+- When answering questions about tabular data, extract and accurately cite exact values, rows, and columns from the Markdown tables.
+- NUMERICAL & RANGE REASONING:
+  * When tables, lists, or schedules specify ranges (e.g., "190140111121 to 190140111142", "100 to 200", "01 - 30"), understand that EVERY number N where Start <= N <= End is included in that row.
+  * Check whether the user's queried number/roll number falls numerically between the start and end of any range (inclusive).
+  * If the number falls within a range (for instance, 190140111122 is between 190140111121 and 190140111142), extract the corresponding details (Room No., Venue, Block, Branch, etc.) from that matching row and provide the answer with the matching range.
+  * Evaluating whether an integer is between the start and end of a stated range is standard mathematical interpretation of tabular data, NOT hallucinating. NEVER say a number is 'not explicitly listed' or 'cannot be found' if it lies within a stated range in the table.`
       : "";
 
     const rule2 = hasDocumentDelivery

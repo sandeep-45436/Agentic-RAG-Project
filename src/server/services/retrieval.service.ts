@@ -143,6 +143,18 @@ export class RetrievalService {
         }
       }
 
+      // Intelligent expansion for roll number / student ID queries looking for seating / room allocations
+      const hasIdPattern = /\b\d{6,14}\b/.test(rewrittenQuery);
+      const hasSeatingIntent = /\b(room|seat|seating|hall|venue|block|exam|examination|allotment)\b/i.test(rewrittenQuery);
+      if (hasIdPattern && hasSeatingIntent) {
+        const seatingExpansion = "exam seating arrangement";
+        const normExpansion = seatingExpansion.toLowerCase();
+        if (!seenTexts.has(normExpansion)) {
+          seenTexts.add(normExpansion);
+          allQueryTexts.push(seatingExpansion);
+        }
+      }
+
       // Resolve pre-retrieval RBAC filters
       let qdrantAccessFilter: any = undefined;
       let authorizedDocIds: string[] | undefined = undefined;

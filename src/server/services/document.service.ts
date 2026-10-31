@@ -190,6 +190,7 @@ export class DocumentService {
 
       // Clean up previous chunks for idempotent re-processing
       await db.chunk.deleteMany({ where: { documentId } });
+      await VectorService.deleteByDocument(documentId, organizationId);
 
       for (let i = 0; i < layoutChunks.length; i += BATCH_SIZE) {
         const batchChunks = layoutChunks.slice(i, i + BATCH_SIZE);
@@ -203,7 +204,7 @@ export class DocumentService {
             c.metadata?.summary
           ) {
             const titlePrefix = c.metadata.title ? `Document element: ${c.metadata.title}. ` : "";
-            return `${titlePrefix}Summary: ${c.metadata.summary}`;
+            return `${titlePrefix}Summary: ${c.metadata.summary}\n\nContent:\n${c.text}`;
           }
           return c.text;
         });
